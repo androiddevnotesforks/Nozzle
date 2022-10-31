@@ -5,18 +5,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
@@ -77,12 +76,10 @@ fun FeedScreen(posts: List<Post>) {
 fun CreatePostButton() {
     FloatingActionButton(
         onClick = { },
-        backgroundColor = Color.LightGray
     ) {
         Icon(
             imageVector = Icons.Rounded.Add,
             contentDescription = "Write a post",
-            tint = Color.Red,
         )
     }
 }
@@ -101,7 +98,7 @@ fun PostCard(post: Post) {
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Icon(
             imageVector = post.profilePic,
-            contentDescription = "Author's user icon",
+            contentDescription = "Author's profile picture",
             tint = Color.Red,
             modifier = Modifier
                 .size(40.dp)
@@ -110,7 +107,7 @@ fun PostCard(post: Post) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
-            Text(text = post.author)
+            Text(text = post.author, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = post.body)
         }
@@ -118,38 +115,54 @@ fun PostCard(post: Post) {
 
 }
 
+sealed class FooterIcons(
+    val label: String,
+    val imageVector: ImageVector,
+    val contentDescription: String
+) {
+    object Profile : FooterIcons(
+        label = "Profile",
+        imageVector = Icons.Rounded.Person,
+        contentDescription = "Navigate to your profile"
+    )
+
+    object Feed : FooterIcons(
+        label = "Feed",
+        imageVector = Icons.Rounded.Home,
+        contentDescription = "Navigate to the global feed"
+    )
+
+    object Search : FooterIcons(
+        label = "Search",
+        imageVector = Icons.Rounded.Search,
+        contentDescription = "Navigate to the search screen"
+    )
+
+    object Messages : FooterIcons(
+        label = "Messages",
+        imageVector = Icons.Rounded.Email,
+        contentDescription = "Navigate to private messages"
+    )
+}
+
 @Composable
 fun Footer() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-            .background(Color.LightGray)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Home,
-                contentDescription = "Navigate to home",
-                tint = Color.Red
-            )
-            Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = "Navigate to search",
-                tint = Color.Red
-            )
-            Icon(
-                imageVector = Icons.Rounded.Notifications,
-                contentDescription = "Navigate to notifications",
-                tint = Color.Red
-            )
-            Icon(
-                imageVector = Icons.Rounded.Email,
-                contentDescription = "Navigate to private messages",
-                tint = Color.Red
+    var selectedIndex by remember { mutableStateOf(0) }
+    val items =
+        listOf(FooterIcons.Profile, FooterIcons.Feed, FooterIcons.Search, FooterIcons.Messages)
+
+    BottomNavigation {
+        items.forEachIndexed { index, item ->
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        imageVector = item.imageVector,
+                        contentDescription = item.contentDescription
+                    )
+                },
+                label = { Text(text = item.label) },
+                selected = selectedIndex == index,
+                onClick = { selectedIndex = index }
             )
         }
     }
