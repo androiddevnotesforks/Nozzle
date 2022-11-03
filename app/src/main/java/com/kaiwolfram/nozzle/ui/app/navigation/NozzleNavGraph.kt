@@ -1,0 +1,47 @@
+package com.kaiwolfram.nozzle.ui.app
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.kaiwolfram.nozzle.ui.app.feed.FeedRoute
+import com.kaiwolfram.nozzle.ui.app.messages.MessagesRoute
+import com.kaiwolfram.nozzle.ui.app.profile.ProfileRoute
+import com.kaiwolfram.nozzle.ui.app.search.SearchRoute
+
+@Composable
+fun NozzleNavGraph(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = NozzleRoutes.FEED,
+    vmContainer: VMContainer,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
+        composable(NozzleRoutes.PROFILE) {
+            ProfileRoute(
+                profileViewModel = vmContainer.profileViewModel,
+            )
+        }
+        composable(NozzleRoutes.FEED) {
+            FeedRoute(
+                feedViewModel = vmContainer.feedViewModel,
+            )
+        }
+        composable(NozzleRoutes.SEARCH) {
+            SearchRoute(
+                searchViewModel = vmContainer.searchViewModel,
+            )
+        }
+        composable(NozzleRoutes.MESSAGES) {
+            MessagesRoute(
+                messagesViewModel = vmContainer.messagesViewModel,
+            )
+        }
+    }
+}
