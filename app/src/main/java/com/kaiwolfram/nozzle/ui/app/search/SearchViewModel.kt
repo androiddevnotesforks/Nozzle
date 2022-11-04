@@ -11,11 +11,10 @@ import kotlinx.coroutines.flow.stateIn
 private const val TAG = "SearchViewModel"
 
 data class SearchViewModelState(
-    val label: String = "Search is coming soon",
+    val label: String = "Search is coming soon!",
 )
 
 class SearchViewModel : ViewModel() {
-
     private val viewModelState = MutableStateFlow(SearchViewModelState())
 
     val uiState = viewModelState

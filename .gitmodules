@@ -1,0 +1,3 @@
+[submodule "NostrPostr"]
+	path = NostrPostr
+	url = https://github.com/kaiwolfram/NostrPostr.git

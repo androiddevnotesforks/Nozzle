@@ -10,6 +10,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/NostrPostr" />
+            <option value="$PROJECT_DIR$/NostrPostr/nostrpostrlib" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

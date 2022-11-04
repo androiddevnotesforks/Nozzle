@@ -20,19 +20,11 @@ import java.time.LocalDateTime
 fun FeedScreen(
     uiState: FeedViewModelState,
 ) {
-    val posts = listOf(postMock, postMock, postMock, postMock)
-    Feed(posts = posts)
+    Feed(posts = uiState.posts)
 }
 
-val postMock = Post(
-    author = "Kai Wolfram",
-    profilePic = Icons.Rounded.Call,
-    published = LocalDateTime.now(),
-    body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit."
-)
-
 @Composable
-fun Feed(modifier: Modifier = Modifier, posts: List<Post>) {
+private fun Feed(modifier: Modifier = Modifier, posts: List<Post>) {
     Column(modifier = modifier) {
         for (post in posts) {
             NoteCard(post = post)
@@ -41,7 +33,7 @@ fun Feed(modifier: Modifier = Modifier, posts: List<Post>) {
 }
 
 @Composable
-fun NoteCard(post: Post) {
+private fun NoteCard(post: Post) {
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Icon(
             imageVector = post.profilePic,

@@ -11,11 +11,10 @@ import kotlinx.coroutines.flow.stateIn
 private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
-    val label: String = "Profile is coming soon",
+    val label: String = "Profile is coming soon!",
 )
 
 class ProfileViewModel : ViewModel() {
-
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
 
     val uiState = viewModelState

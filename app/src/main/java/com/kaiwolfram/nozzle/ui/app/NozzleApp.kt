@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui
+package com.kaiwolfram.nozzle.ui.app
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,9 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.kaiwolfram.nozzle.ui.app.NozzleNavActions
-import com.kaiwolfram.nozzle.ui.app.NozzleScaffold
-import com.kaiwolfram.nozzle.ui.app.VMContainer
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.messages.MessagesViewModel
 import com.kaiwolfram.nozzle.ui.app.profile.ProfileViewModel

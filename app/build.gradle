@@ -71,4 +71,10 @@ dependencies {
 
     // Navigation
     implementation 'androidx.navigation:navigation-compose:2.5.3'
+
+    // NosrPostr submodule
+    implementation project(':NostrPostr:nostrpostrlib')
+
+    // WTF?!
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 }

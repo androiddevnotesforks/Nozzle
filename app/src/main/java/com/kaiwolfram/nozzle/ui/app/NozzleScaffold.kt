@@ -8,9 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 
 @Composable
-internal fun NozzleScaffold(
+fun NozzleScaffold(
     vmContainer: VMContainer,
     navActions: NozzleNavActions,
     navController: NavHostController,

@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app
+package com.kaiwolfram.nozzle.ui.app.navigation
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
