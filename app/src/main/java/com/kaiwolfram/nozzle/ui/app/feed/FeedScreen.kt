@@ -4,17 +4,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Call
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.Post
-import java.time.LocalDateTime
 
 @Composable
 fun FeedScreen(
@@ -37,8 +34,7 @@ private fun NoteCard(post: Post) {
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Icon(
             imageVector = post.profilePic,
-            contentDescription = "Author's profile picture",
-            tint = Color.Red,
+            contentDescription = stringResource(id = R.string.authors_profile_picture),
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)

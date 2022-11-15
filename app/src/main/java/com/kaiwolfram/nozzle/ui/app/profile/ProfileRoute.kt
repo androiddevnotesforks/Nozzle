@@ -12,14 +12,17 @@ fun ProfileRoute(
 
     ProfileRoute(
         uiState = uiState,
+        onChangeProfilePictureUrl = profileViewModel.onChangeProfilePictureUrl
     )
 }
 
 @Composable
 private fun ProfileRoute(
     uiState: ProfileViewModelState,
+    onChangeProfilePictureUrl: (String) -> Unit,
 ) {
     ProfileScreen(
         uiState = uiState,
+        onChangeProfilePictureUrl = onChangeProfilePictureUrl,
     )
 }

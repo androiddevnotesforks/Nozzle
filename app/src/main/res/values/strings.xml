@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Nozzle</string>
+    <string name="authors_profile_picture">Author\'s profile picture</string>
+    <string name="profile_picture">Profile picture</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="set_new_profile_picture_url">Set new profile picture URL</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
 </resources>
