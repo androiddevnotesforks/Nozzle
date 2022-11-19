@@ -18,6 +18,7 @@ data class ProfileViewModelState(
     val profilePicture: ImageVector = Icons.Rounded.Person,
     val profilePictureUrl: String = "https://robohash.org/kai",
     val shortenedPubKey: String = "12345...abcde",
+    val privateKey: String = "12341234123412341234123412341234",
     val name: String = "Kai Wolfram",
     val bio: String = "Hola soy Kai y aqui hay informatciones sobre mi. Bla bla bla",
 )
@@ -36,12 +37,39 @@ class ProfileViewModel : ViewModel() {
         Log.i(TAG, "Initialize ProfileViewModel")
     }
 
-    val onChangeProfilePictureUrl: (String) -> Unit = { url: String ->
-        if (url != uiState.value.profilePictureUrl) {
+    val onChangeProfilePictureUrl: (String) -> Unit = { newUrl: String ->
+        if (newUrl != uiState.value.profilePictureUrl) {
             viewModelState.update {
-                it.copy(profilePictureUrl = url)
+                it.copy(profilePictureUrl = newUrl)
             }
-            Log.i(TAG, "Changed URL to $url")
+            Log.i(TAG, "Changed URL to $newUrl")
+        }
+    }
+
+    val onChangeName: (String) -> Unit = { newName: String ->
+        if (newName != uiState.value.name) {
+            viewModelState.update {
+                it.copy(name = newName)
+            }
+            Log.i(TAG, "Changed name to $newName")
+        }
+    }
+
+    val onChangeBio: (String) -> Unit = { newBio: String ->
+        if (newBio != uiState.value.bio) {
+            viewModelState.update {
+                it.copy(bio = newBio)
+            }
+            Log.i(TAG, "Changed bio to $newBio")
+        }
+    }
+
+    val onChangePrivateKey: (String) -> Unit = { newPrivateKey: String ->
+        if (newPrivateKey != uiState.value.privateKey) {
+            viewModelState.update {
+                it.copy(privateKey = newPrivateKey)
+            }
+            Log.i(TAG, "Changed private key to $newPrivateKey")
         }
     }
 

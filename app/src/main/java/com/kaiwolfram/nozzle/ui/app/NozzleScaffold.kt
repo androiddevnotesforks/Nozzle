@@ -7,7 +7,9 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 
@@ -38,34 +40,15 @@ fun NozzleScaffold(
 }
 
 private sealed class BottomBarField(
-    val label: String,
     val imageVector: ImageVector,
-    val contentDescription: String,
+    var label: String = "",
+    var contentDescription: String = "",
     var navTo: () -> Unit = {},
 ) {
-    object Profile : BottomBarField(
-        label = "Profile",
-        imageVector = Icons.Rounded.Person,
-        contentDescription = "Navigate to your profile",
-    )
-
-    object Feed : BottomBarField(
-        label = "Feed",
-        imageVector = Icons.Rounded.Home,
-        contentDescription = "Navigate to the global feed"
-    )
-
-    object Search : BottomBarField(
-        label = "Search",
-        imageVector = Icons.Rounded.Search,
-        contentDescription = "Navigate to the search screen"
-    )
-
-    object Messages : BottomBarField(
-        label = "Messages",
-        imageVector = Icons.Rounded.Email,
-        contentDescription = "Navigate to private messages"
-    )
+    object Profile : BottomBarField(imageVector = Icons.Rounded.Person)
+    object Feed : BottomBarField(imageVector = Icons.Rounded.Home)
+    object Search : BottomBarField(imageVector = Icons.Rounded.Search)
+    object Messages : BottomBarField(imageVector = Icons.Rounded.Email)
 }
 
 @Composable
@@ -78,10 +61,26 @@ private fun BottomBar(
     var selectedIndex by remember { mutableStateOf(0) }
     val items =
         listOf(
-            BottomBarField.Profile.apply { navTo = onNavToProfile },
-            BottomBarField.Feed.apply { navTo = onNavToFeed },
-            BottomBarField.Search.apply { navTo = onNavToSearch },
-            BottomBarField.Messages.apply { navTo = onNavToMessages })
+            BottomBarField.Profile.apply {
+                navTo = onNavToProfile
+                label = stringResource(id = R.string.profile)
+                contentDescription = stringResource(id = R.string.nav_to_your_profile)
+            },
+            BottomBarField.Feed.apply {
+                navTo = onNavToFeed
+                label = stringResource(id = R.string.feed)
+                contentDescription = stringResource(id = R.string.nav_to_feed)
+            },
+            BottomBarField.Search.apply {
+                navTo = onNavToSearch
+                label = stringResource(id = R.string.search)
+                contentDescription = stringResource(id = R.string.nav_to_search)
+            },
+            BottomBarField.Messages.apply {
+                navTo = onNavToMessages
+                label = stringResource(id = R.string.messages)
+                contentDescription = stringResource(id = R.string.nav_to_messages)
+            })
 
     BottomNavigation {
         items.forEachIndexed { index, item ->

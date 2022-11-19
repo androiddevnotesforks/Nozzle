@@ -12,7 +12,10 @@ fun ProfileRoute(
 
     ProfileRoute(
         uiState = uiState,
-        onChangeProfilePictureUrl = profileViewModel.onChangeProfilePictureUrl
+        onChangeProfilePictureUrl = profileViewModel.onChangeProfilePictureUrl,
+        onChangeName = profileViewModel.onChangeName,
+        onChangeBio = profileViewModel.onChangeBio,
+        onChangePrivateKey = profileViewModel.onChangePrivateKey,
     )
 }
 
@@ -20,9 +23,15 @@ fun ProfileRoute(
 private fun ProfileRoute(
     uiState: ProfileViewModelState,
     onChangeProfilePictureUrl: (String) -> Unit,
+    onChangeName: (String) -> Unit,
+    onChangeBio: (String) -> Unit,
+    onChangePrivateKey: (String) -> Unit,
 ) {
     ProfileScreen(
         uiState = uiState,
         onChangeProfilePictureUrl = onChangeProfilePictureUrl,
+        onChangeName = onChangeName,
+        onChangeBio = onChangeBio,
+        onChangePrivateKey = onChangePrivateKey,
     )
 }
