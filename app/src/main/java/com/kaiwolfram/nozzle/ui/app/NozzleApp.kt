@@ -7,22 +7,27 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
+import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.ui.app.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.messages.MessagesViewModel
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.search.SearchViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 
 @Composable
-fun NozzleApp() {
+fun NozzleApp(appContainer: AppContainer) {
     NozzleTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             val vmContainer = VMContainer(
                 profileViewModel = viewModel(
-                    factory = ProfileViewModel.provideFactory()
+                    factory = ProfileViewModel.provideFactory(
+                        imageLoader = appContainer.imageLoader,
+                        context = LocalContext.current
+                    )
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory()

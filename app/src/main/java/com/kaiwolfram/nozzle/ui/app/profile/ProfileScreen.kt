@@ -1,9 +1,11 @@
 package com.kaiwolfram.nozzle.ui.app.profile
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -11,10 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmapOrNull
 import com.kaiwolfram.nozzle.R
 
 @Composable
@@ -62,13 +67,12 @@ fun ProfileScreen(
         onOpenProfilePicDialog = { openProfilePicDialog = true },
         onOpenNameDialog = { openNameDialog = true },
         onOpenBioDialog = { openBioDialog = true },
-        onOpenKeyDialog = { openKeyDialog = true },
-    )
+    ) { openKeyDialog = true }
 }
 
 @Composable
 private fun ProfileData(
-    profilePicture: ImageVector,
+    profilePicture: Drawable?,
     name: String,
     bio: String,
     shortenedPubKey: String,
@@ -77,12 +81,16 @@ private fun ProfileData(
     onOpenBioDialog: () -> Unit,
     onOpenKeyDialog: () -> Unit,
 ) {
-    Row {
+    Row(modifier = Modifier.padding(2.dp)) {
+        val lol = profilePicture?.toBitmapOrNull()?.asImageBitmap()
+            ?: ImageBitmap.imageResource(id = R.drawable.ic_launcher_foreground)
         Icon(
-            imageVector = profilePicture,
+            bitmap = lol,
             contentDescription = stringResource(id = R.string.profile_picture),
+            tint = Color.Unspecified,
             modifier = Modifier
-                .size(120.dp)
+                .padding(6.dp)
+                .fillMaxWidth(0.25f)
                 .clip(CircleShape)
                 .clickable { onOpenProfilePicDialog() }
 

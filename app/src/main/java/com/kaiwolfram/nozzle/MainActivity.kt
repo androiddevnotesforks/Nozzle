@@ -8,9 +8,9 @@ import com.kaiwolfram.nozzle.ui.app.NozzleApp
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val appContainer = AppContainer(applicationContext)
         setContent {
-            NozzleApp()
+            NozzleApp(appContainer = appContainer)
         }
     }
 }

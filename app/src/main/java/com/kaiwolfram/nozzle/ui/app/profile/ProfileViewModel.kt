@@ -1,29 +1,32 @@
 package com.kaiwolfram.nozzle.ui.app.profile
 
+import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import coil.ImageLoader
+import coil.request.ImageRequest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
-    val profilePicture: ImageVector = Icons.Rounded.Person,
-    val profilePictureUrl: String = "https://robohash.org/kai",
-    val shortenedPubKey: String = "12345...abcde",
+    val profilePicture: Drawable? = null,
+    val profilePictureUrl: String = "https://avatars.githubusercontent.com/u/48265657?v=4",
+    val shortenedPubKey: String = "c1a8cf31...9328574a",
     val privateKey: String = "12341234123412341234123412341234",
     val name: String = "Kai Wolfram",
-    val bio: String = "Hola soy Kai y aqui hay informatciones sobre mi. Bla bla bla",
+    val bio: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.",
 )
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(imageLoader: ImageLoader, context: Context) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
 
     val uiState = viewModelState
@@ -35,6 +38,11 @@ class ProfileViewModel : ViewModel() {
 
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
+        updateProfilePicture(
+            url = viewModelState.value.profilePictureUrl,
+            context = context,
+            imageLoader = imageLoader
+        )
     }
 
     val onChangeProfilePictureUrl: (String) -> Unit = { newUrl: String ->
@@ -43,6 +51,11 @@ class ProfileViewModel : ViewModel() {
                 it.copy(profilePictureUrl = newUrl)
             }
             Log.i(TAG, "Changed URL to $newUrl")
+            updateProfilePicture(
+                url = newUrl,
+                context = context,
+                imageLoader = imageLoader
+            )
         }
     }
 
@@ -73,12 +86,30 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    companion object {
-        fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ProfileViewModel() as T
+    private fun updateProfilePicture(url: String, context: Context, imageLoader: ImageLoader) {
+        viewModelScope.launch(context = Dispatchers.IO) {
+            val request = ImageRequest.Builder(context)
+                .data(url)
+                .build()
+            val drawable = imageLoader.execute(request).drawable
+            val msg = if (drawable == null)
+                "Failed to load profile picture"
+            else
+                "Successfully fetched profile picture"
+            Log.i(TAG, msg)
+            viewModelState.update {
+                it.copy(profilePicture = drawable)
             }
         }
+    }
+
+    companion object {
+        fun provideFactory(imageLoader: ImageLoader, context: Context): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return ProfileViewModel(imageLoader = imageLoader, context = context) as T
+                }
+            }
     }
 }
