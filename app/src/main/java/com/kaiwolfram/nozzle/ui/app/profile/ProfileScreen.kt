@@ -1,11 +1,7 @@
 package com.kaiwolfram.nozzle.ui.app.profile
 
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -13,13 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmapOrNull
 import com.kaiwolfram.nozzle.R
 
 @Composable
@@ -72,7 +65,7 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileData(
-    profilePicture: Drawable?,
+    profilePicture: Painter,
     name: String,
     bio: String,
     shortenedPubKey: String,
@@ -82,15 +75,14 @@ private fun ProfileData(
     onOpenKeyDialog: () -> Unit,
 ) {
     Row(modifier = Modifier.padding(2.dp)) {
-        val lol = profilePicture?.toBitmapOrNull()?.asImageBitmap()
-            ?: ImageBitmap.imageResource(id = R.drawable.ic_launcher_foreground)
         Icon(
-            bitmap = lol,
+            painter = profilePicture,
             contentDescription = stringResource(id = R.string.profile_picture),
             tint = Color.Unspecified,
             modifier = Modifier
                 .padding(6.dp)
                 .fillMaxWidth(0.25f)
+                .aspectRatio(1f)
                 .clip(CircleShape)
                 .clickable { onOpenProfilePicDialog() }
 

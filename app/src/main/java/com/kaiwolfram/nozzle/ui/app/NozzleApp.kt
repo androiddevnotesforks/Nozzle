@@ -8,9 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.messages.MessagesViewModel
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
@@ -25,6 +27,7 @@ fun NozzleApp(appContainer: AppContainer) {
             val vmContainer = VMContainer(
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
+                        defaultProfilePicture = painterResource(R.drawable.ic_default_profile),
                         imageLoader = appContainer.imageLoader,
                         context = LocalContext.current
                     )
