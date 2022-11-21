@@ -66,11 +66,12 @@ class ProfileViewModel(
         )
     }
 
-    val onChangeProfilePictureUrl: (String) -> Unit = { newUrl: String ->
+    val onChangeProfilePictureUrl: (String) -> Unit = {
+        val newUrl = it.trim()
         if (newUrl != uiState.value.profilePictureUrl) {
             Log.i(TAG, "Change URL to $newUrl")
-            viewModelState.update {
-                it.copy(profilePictureUrl = newUrl)
+            viewModelState.update { state ->
+                state.copy(profilePictureUrl = newUrl)
             }
             updateProfilePicture(
                 url = newUrl,
@@ -80,29 +81,32 @@ class ProfileViewModel(
         }
     }
 
-    val onChangeName: (String) -> Unit = { newName: String ->
+    val onChangeName: (String) -> Unit = {
+        val newName = it.trim()
         if (newName != uiState.value.name) {
             Log.i(TAG, "Change name to $newName")
-            viewModelState.update {
-                it.copy(name = newName)
+            viewModelState.update { state ->
+                state.copy(name = newName)
             }
         }
     }
 
-    val onChangeBio: (String) -> Unit = { newBio: String ->
+    val onChangeBio: (String) -> Unit = {
+        val newBio = it.trim()
         if (newBio != uiState.value.bio) {
             Log.i(TAG, "Change bio to $newBio")
-            viewModelState.update {
-                it.copy(bio = newBio)
+            viewModelState.update { state ->
+                state.copy(bio = newBio)
             }
         }
     }
 
-    val onChangePrivateKey: (String) -> Unit = { newPrivateKey: String ->
+    val onChangePrivateKey: (String) -> Unit = {
+        val newPrivateKey = it.trim()
         if (newPrivateKey != uiState.value.privateKey) {
             Log.i(TAG, "Change private key to $newPrivateKey")
-            viewModelState.update {
-                it.copy(privateKey = newPrivateKey)
+            viewModelState.update { state ->
+                state.copy(privateKey = newPrivateKey)
             }
         }
     }
