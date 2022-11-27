@@ -8,15 +8,11 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Surface
 import androidx.compose.material.rememberDrawerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
@@ -24,7 +20,6 @@ import com.kaiwolfram.nozzle.ui.app.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.messages.MessagesViewModel
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
-import com.kaiwolfram.nozzle.ui.app.navigation.NozzleRoute
 import com.kaiwolfram.nozzle.ui.app.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.search.SearchViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
@@ -59,17 +54,15 @@ fun NozzleApp(appContainer: AppContainer) {
             }
 
             val coroutineScope = rememberCoroutineScope()
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute =
-                navBackStackEntry?.destination?.route ?: NozzleRoute.FEED
-
             val drawerState = rememberDrawerState(DrawerValue.Closed)
+            val profileState by vmContainer.profileViewModel.uiState.collectAsState()
 
             ModalDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     NozzleDrawer(
-                        currentRoute = currentRoute,
+                        profilePicture = profileState.profilePicture,
+                        profileName = profileState.name,
                         navigateToProfile = navActions.navigateToProfile,
                         navigateToFeed = navActions.navigateToFeed,
                         navigateToSearch = navActions.navigateToSearch,
