@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.chat
+package com.kaiwolfram.nozzle.ui.app.views.keys
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
-private const val TAG = "ChatViewModel"
+private const val TAG = "KeysViewModel"
 
-data class ChatViewModelState(
-    val label: String = "Chat is coming soon!",
+data class KeysViewModelState(
+    val label: String = "Keys are coming soon!",
 )
 
-class ChatViewModel : ViewModel() {
-    private val viewModelState = MutableStateFlow(ChatViewModelState())
+class KeysViewModel : ViewModel() {
+    private val viewModelState = MutableStateFlow(KeysViewModelState())
 
     val uiState = viewModelState
         .stateIn(
@@ -26,14 +26,14 @@ class ChatViewModel : ViewModel() {
 
 
     init {
-        Log.i(TAG, "Initialize ChatViewModel")
+        Log.i(TAG, "Initialize KeysViewModel")
     }
 
     companion object {
         fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ChatViewModel() as T
+                return KeysViewModel() as T
             }
         }
     }

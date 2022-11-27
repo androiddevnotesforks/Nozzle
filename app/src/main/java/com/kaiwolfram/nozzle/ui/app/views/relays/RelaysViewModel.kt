@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.support
+package com.kaiwolfram.nozzle.ui.app.views.relays
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
-private const val TAG = "SupportViewModel"
+private const val TAG = "RelaysViewModel"
 
-data class SupportViewModelState(
-    val label: String = "Support is coming soon!",
+data class RelaysViewModelState(
+    val label: String = "Relays are coming soon!",
 )
 
-class SupportViewModel : ViewModel() {
-    private val viewModelState = MutableStateFlow(SupportViewModelState())
+class RelaysViewModel : ViewModel() {
+    private val viewModelState = MutableStateFlow(RelaysViewModelState())
 
     val uiState = viewModelState
         .stateIn(
@@ -26,14 +26,14 @@ class SupportViewModel : ViewModel() {
 
 
     init {
-        Log.i(TAG, "Initialize SupportViewModel")
+        Log.i(TAG, "Initialize RelaysViewModel")
     }
 
     companion object {
         fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SupportViewModel() as T
+                return RelaysViewModel() as T
             }
         }
     }

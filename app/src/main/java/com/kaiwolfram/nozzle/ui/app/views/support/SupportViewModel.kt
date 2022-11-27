@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.keys
+package com.kaiwolfram.nozzle.ui.app.views.support
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
-private const val TAG = "KeysViewModel"
+private const val TAG = "SupportViewModel"
 
-data class KeysViewModelState(
-    val label: String = "Keys are coming soon!",
+data class SupportViewModelState(
+    val label: String = "Support is coming soon!",
 )
 
-class KeysViewModel : ViewModel() {
-    private val viewModelState = MutableStateFlow(KeysViewModelState())
+class SupportViewModel : ViewModel() {
+    private val viewModelState = MutableStateFlow(SupportViewModelState())
 
     val uiState = viewModelState
         .stateIn(
@@ -26,14 +26,14 @@ class KeysViewModel : ViewModel() {
 
 
     init {
-        Log.i(TAG, "Initialize KeysViewModel")
+        Log.i(TAG, "Initialize SupportViewModel")
     }
 
     companion object {
         fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return KeysViewModel() as T
+                return SupportViewModel() as T
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.relays
+package com.kaiwolfram.nozzle.ui.app.views.relays
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState

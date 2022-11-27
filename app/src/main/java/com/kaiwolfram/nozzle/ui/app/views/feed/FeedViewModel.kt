@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.feed
+package com.kaiwolfram.nozzle.ui.app.views.feed
 
 import android.util.Log
 import androidx.compose.material.icons.Icons

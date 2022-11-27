@@ -1,11 +1,11 @@
-package com.kaiwolfram.nozzle.ui.app.relays
+package com.kaiwolfram.nozzle.ui.app.views.keys
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun RelaysScreen(
-    uiState: RelaysViewModelState,
+fun KeysScreen(
+    uiState: KeysViewModelState,
 ) {
     Text(text = uiState.label)
 }

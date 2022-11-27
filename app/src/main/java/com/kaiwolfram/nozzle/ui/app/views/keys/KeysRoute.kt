@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.keys
+package com.kaiwolfram.nozzle.ui.app.views.keys
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState

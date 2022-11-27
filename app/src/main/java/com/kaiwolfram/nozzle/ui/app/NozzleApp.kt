@@ -16,14 +16,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.app.chat.ChatViewModel
-import com.kaiwolfram.nozzle.ui.app.feed.FeedViewModel
-import com.kaiwolfram.nozzle.ui.app.keys.KeysViewModel
+import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
+import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
+import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
-import com.kaiwolfram.nozzle.ui.app.profile.ProfileViewModel
-import com.kaiwolfram.nozzle.ui.app.relays.RelaysViewModel
-import com.kaiwolfram.nozzle.ui.app.support.SupportViewModel
+import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
+import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysViewModel
+import com.kaiwolfram.nozzle.ui.app.views.support.SupportViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
 

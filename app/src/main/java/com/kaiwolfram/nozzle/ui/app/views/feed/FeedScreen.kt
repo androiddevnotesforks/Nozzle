@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.feed
+package com.kaiwolfram.nozzle.ui.app.views.feed
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape

@@ -1,11 +1,11 @@
-package com.kaiwolfram.nozzle.ui.app.chat
+package com.kaiwolfram.nozzle.ui.app.views.relays
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun ChatScreen(
-    uiState: ChatViewModelState,
+fun RelaysScreen(
+    uiState: RelaysViewModelState,
 ) {
     Text(text = uiState.label)
 }

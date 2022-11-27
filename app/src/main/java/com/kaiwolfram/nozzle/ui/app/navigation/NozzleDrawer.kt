@@ -63,7 +63,7 @@ private fun ProfileRow(
             navigateToProfile()
             closeDrawer()
         },
-        tint = Color.Unspecified,
+        iconTint = Color.Unspecified,
         iconModifier = Modifier
             .fillMaxWidth(0.20f)
             .aspectRatio(1f)
@@ -142,7 +142,7 @@ private fun DrawerRow(
     action: () -> Unit,
     modifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
-    tint: Color = colors.primary
+    iconTint: Color = colors.primary
 ) {
     Surface(
         modifier = modifier
@@ -164,13 +164,13 @@ private fun DrawerRow(
                     modifier = iconModifier,
                     painter = icon,
                     contentDescription = null,
-                    tint = tint,
+                    tint = iconTint,
                 )
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,
                     style = MaterialTheme.typography.h6,
-                    color = tint
+                    color = colors.onSurface
                 )
             }
         }

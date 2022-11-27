@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.profile
+package com.kaiwolfram.nozzle.ui.app.views.profile
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState

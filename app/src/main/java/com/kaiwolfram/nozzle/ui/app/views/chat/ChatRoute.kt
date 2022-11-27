@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.chat
+package com.kaiwolfram.nozzle.ui.app.views.chat
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
