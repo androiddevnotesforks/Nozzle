@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.search
+package com.kaiwolfram.nozzle.ui.app.chat
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
-private const val TAG = "SearchViewModel"
+private const val TAG = "ChatViewModel"
 
-data class SearchViewModelState(
-    val label: String = "Search is coming soon!",
+data class ChatViewModelState(
+    val label: String = "Chat is coming soon!",
 )
 
-class SearchViewModel : ViewModel() {
-    private val viewModelState = MutableStateFlow(SearchViewModelState())
+class ChatViewModel : ViewModel() {
+    private val viewModelState = MutableStateFlow(ChatViewModelState())
 
     val uiState = viewModelState
         .stateIn(
@@ -24,15 +24,16 @@ class SearchViewModel : ViewModel() {
             viewModelState.value
         )
 
+
     init {
-        Log.i(TAG, "Initialize SearchViewModel")
+        Log.i(TAG, "Initialize ChatViewModel")
     }
 
     companion object {
         fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SearchViewModel() as T
+                return ChatViewModel() as T
             }
         }
     }

@@ -30,18 +30,8 @@ class NozzleNavActions(navController: NavHostController) {
         }
     }
 
-    val navigateToSearch: () -> Unit = {
-        navController.navigate(NozzleRoute.SEARCH) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
-            }
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
-    val navigateToMessages: () -> Unit = {
-        navController.navigate(NozzleRoute.MESSAGES) {
+    val navigateToChat: () -> Unit = {
+        navController.navigate(NozzleRoute.CHAT) {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
             }

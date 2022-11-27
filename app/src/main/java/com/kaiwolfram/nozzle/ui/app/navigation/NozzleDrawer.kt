@@ -5,9 +5,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,55 +23,140 @@ fun NozzleDrawer(
     profileName: String,
     navigateToProfile: () -> Unit,
     navigateToFeed: () -> Unit,
-    navigateToSearch: () -> Unit,
-    navigateToMessages: () -> Unit,
+    navigateToChat: () -> Unit,
     closeDrawer: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        TabRowDefaults.Divider(color = colors.onSurface.copy(alpha = .2f))
-        DrawerButton(
-            icon = profilePicture,
-            label = profileName,
-            action = {
-                navigateToProfile()
-                closeDrawer()
-            },
-            tint = Color.Unspecified,
-            iconModifier = Modifier
-                .fillMaxWidth(0.20f)
-                .aspectRatio(1f)
-                .clip(CircleShape),
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(4.dp)
+    ) {
+        ProfileRow(
+            profilePicture = profilePicture,
+            profileName = profileName,
+            navigateToProfile = navigateToProfile,
+            closeDrawer = closeDrawer
         )
-        DrawerButton(
-            icon = rememberVectorPainter(image = Icons.Filled.Home),
-            label = stringResource(id = R.string.feed),
-            action = {
-                navigateToFeed()
-                closeDrawer()
-            }
+        Spacer(modifier = Modifier.height(4.dp))
+        MainRows(
+            navigateToFeed = navigateToFeed,
+            navigateToChat = navigateToChat,
+            closeDrawer = closeDrawer
         )
-        DrawerButton(
-            icon = rememberVectorPainter(image = Icons.Filled.Search),
-            label = stringResource(id = R.string.search),
-            action = {
-                navigateToSearch()
-                closeDrawer()
-            }
+        RowDivider()
+        OtherRows(
+            navigateToKeys = { /*TODO*/ },
+            navigateToRelays = { /*TODO*/ },
+            navigateToSupport = { /*TODO*/ },
+            closeDrawer = closeDrawer,
         )
-        DrawerButton(
-            icon = rememberVectorPainter(image = Icons.Filled.Email),
-            label = stringResource(id = R.string.messages),
-            action = {
-                navigateToMessages()
-                closeDrawer()
-            }
+        VersionText()
+    }
+}
+
+@Composable
+private fun ProfileRow(
+    profilePicture: Painter,
+    profileName: String,
+    navigateToProfile: () -> Unit,
+    closeDrawer: () -> Unit,
+) {
+    DrawerRow(
+        icon = profilePicture,
+        label = profileName,
+        action = {
+            navigateToProfile()
+            closeDrawer()
+        },
+        tint = Color.Unspecified,
+        iconModifier = Modifier
+            .fillMaxWidth(0.20f)
+            .aspectRatio(1f)
+            .clip(CircleShape),
+    )
+}
+
+@Composable
+private fun MainRows(
+    navigateToFeed: () -> Unit,
+    navigateToChat: () -> Unit,
+    closeDrawer: () -> Unit,
+) {
+    DrawerRow(
+        icon = rememberVectorPainter(image = Icons.Filled.Home),
+        label = stringResource(id = R.string.feed),
+        action = {
+            navigateToFeed()
+            closeDrawer()
+        }
+    )
+    DrawerRow(
+        icon = rememberVectorPainter(image = Icons.Filled.Chat),
+        label = stringResource(id = R.string.chat),
+        action = {
+            navigateToChat()
+            closeDrawer()
+        }
+    )
+}
+
+@Composable
+private fun RowDivider() {
+    TabRowDefaults.Divider(
+        modifier = Modifier.padding(4.dp),
+        color = colors.onSurface.copy(alpha = .2f)
+    )
+}
+
+@Composable
+private fun OtherRows(
+    navigateToKeys: () -> Unit,
+    navigateToRelays: () -> Unit,
+    navigateToSupport: () -> Unit,
+    closeDrawer: () -> Unit,
+) {
+    DrawerRow(
+        icon = rememberVectorPainter(image = Icons.Filled.Key),
+        label = stringResource(id = R.string.keys),
+        action = {
+            navigateToKeys()
+            closeDrawer()
+        }
+    )
+    DrawerRow(
+        icon = rememberVectorPainter(image = Icons.Filled.SatelliteAlt),
+        label = stringResource(id = R.string.relays),
+        action = {
+            navigateToRelays()
+            closeDrawer()
+        }
+    )
+    DrawerRow(
+        icon = rememberVectorPainter(image = Icons.Filled.Support),
+        label = stringResource(id = R.string.support_nozzle),
+        action = {
+            navigateToSupport()
+            closeDrawer()
+        }
+    )
+}
+
+@Composable
+private fun VersionText() {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        Text(
+            text = stringResource(id = R.string.nozzle_version)
         )
     }
 }
 
 @Composable
-private fun DrawerButton(
+private fun DrawerRow(
     icon: Painter,
     label: String,
     action: () -> Unit,
@@ -81,11 +164,8 @@ private fun DrawerButton(
     iconModifier: Modifier = Modifier,
     tint: Color = colors.primary
 ) {
-    val surfaceModifier = modifier
-        .padding(start = 8.dp, top = 8.dp, end = 8.dp)
-        .fillMaxWidth()
     Surface(
-        modifier = surfaceModifier,
+        modifier = modifier.fillMaxWidth().padding(vertical = 1.dp),
         color = colors.surface,
         shape = MaterialTheme.shapes.small
     ) {
@@ -99,15 +179,15 @@ private fun DrawerButton(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
+                    modifier = iconModifier,
                     painter = icon,
                     contentDescription = null,
                     tint = tint,
-                    modifier = iconModifier,
                 )
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.h5,
+                    style = MaterialTheme.typography.h6,
                     color = tint
                 )
             }

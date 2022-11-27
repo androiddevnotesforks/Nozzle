@@ -9,7 +9,6 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 
 @Composable

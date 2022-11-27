@@ -16,12 +16,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.ui.app.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.feed.FeedViewModel
-import com.kaiwolfram.nozzle.ui.app.messages.MessagesViewModel
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.profile.ProfileViewModel
-import com.kaiwolfram.nozzle.ui.app.search.SearchViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
 
@@ -40,11 +39,8 @@ fun NozzleApp(appContainer: AppContainer) {
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory()
                 ),
-                searchViewModel = viewModel(
-                    factory = SearchViewModel.provideFactory()
-                ),
-                messagesViewModel = viewModel(
-                    factory = MessagesViewModel.provideFactory()
+                chatViewModel = viewModel(
+                    factory = ChatViewModel.provideFactory()
                 ),
             )
 
@@ -65,8 +61,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         profileName = profileState.name,
                         navigateToProfile = navActions.navigateToProfile,
                         navigateToFeed = navActions.navigateToFeed,
-                        navigateToSearch = navActions.navigateToSearch,
-                        navigateToMessages = navActions.navigateToMessages,
+                        navigateToChat = navActions.navigateToChat,
                         closeDrawer = { coroutineScope.launch { drawerState.close() } },
                         modifier = Modifier
                             .statusBarsPadding()
