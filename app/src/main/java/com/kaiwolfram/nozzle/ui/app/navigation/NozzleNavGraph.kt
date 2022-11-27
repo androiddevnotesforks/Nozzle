@@ -9,7 +9,10 @@ import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.ui.app.VMContainer
 import com.kaiwolfram.nozzle.ui.app.chat.ChatRoute
 import com.kaiwolfram.nozzle.ui.app.feed.FeedRoute
+import com.kaiwolfram.nozzle.ui.app.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.profile.ProfileRoute
+import com.kaiwolfram.nozzle.ui.app.relays.RelaysRoute
+import com.kaiwolfram.nozzle.ui.app.support.SupportRoute
 
 @Composable
 fun NozzleNavGraph(
@@ -36,6 +39,21 @@ fun NozzleNavGraph(
         composable(NozzleRoute.CHAT) {
             ChatRoute(
                 chatViewModel = vmContainer.chatViewModel,
+            )
+        }
+        composable(NozzleRoute.KEYS) {
+            KeysRoute(
+                keysViewModel = vmContainer.keysViewModel,
+            )
+        }
+        composable(NozzleRoute.RELAYS) {
+            RelaysRoute(
+                relaysViewModel = vmContainer.relaysViewModel,
+            )
+        }
+        composable(NozzleRoute.SUPPORT) {
+            SupportRoute(
+                supportViewModel = vmContainer.supportViewModel,
             )
         }
     }

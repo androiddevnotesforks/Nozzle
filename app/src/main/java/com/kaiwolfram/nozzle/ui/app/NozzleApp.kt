@@ -18,9 +18,12 @@ import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.feed.FeedViewModel
+import com.kaiwolfram.nozzle.ui.app.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.profile.ProfileViewModel
+import com.kaiwolfram.nozzle.ui.app.relays.RelaysViewModel
+import com.kaiwolfram.nozzle.ui.app.support.SupportViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
 
@@ -42,6 +45,15 @@ fun NozzleApp(appContainer: AppContainer) {
                 chatViewModel = viewModel(
                     factory = ChatViewModel.provideFactory()
                 ),
+                keysViewModel = viewModel(
+                    factory = KeysViewModel.provideFactory()
+                ),
+                relaysViewModel = viewModel(
+                    factory = RelaysViewModel.provideFactory()
+                ),
+                supportViewModel = viewModel(
+                    factory = SupportViewModel.provideFactory()
+                ),
             )
 
             val navController = rememberNavController()
@@ -59,9 +71,7 @@ fun NozzleApp(appContainer: AppContainer) {
                     NozzleDrawer(
                         profilePicture = profileState.profilePicture,
                         profileName = profileState.name,
-                        navigateToProfile = navActions.navigateToProfile,
-                        navigateToFeed = navActions.navigateToFeed,
-                        navigateToChat = navActions.navigateToChat,
+                        navActions = navActions,
                         closeDrawer = { coroutineScope.launch { drawerState.close() } },
                         modifier = Modifier
                             .statusBarsPadding()

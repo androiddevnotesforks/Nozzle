@@ -21,9 +21,7 @@ import com.kaiwolfram.nozzle.R
 fun NozzleDrawer(
     profilePicture: Painter,
     profileName: String,
-    navigateToProfile: () -> Unit,
-    navigateToFeed: () -> Unit,
-    navigateToChat: () -> Unit,
+    navActions: NozzleNavActions,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -35,21 +33,17 @@ fun NozzleDrawer(
         ProfileRow(
             profilePicture = profilePicture,
             profileName = profileName,
-            navigateToProfile = navigateToProfile,
+            navigateToProfile = navActions.navigateToProfile,
             closeDrawer = closeDrawer
         )
         Spacer(modifier = Modifier.height(4.dp))
         MainRows(
-            navigateToFeed = navigateToFeed,
-            navigateToChat = navigateToChat,
+            navigateToFeed = navActions.navigateToFeed,
+            navigateToChat = navActions.navigateToChat,
+            navigateToKeys = navActions.navigateToKeys,
+            navigateToRelays = navActions.navigateToRelays,
+            navigateToSupport = navActions.navigateToSupport,
             closeDrawer = closeDrawer
-        )
-        RowDivider()
-        OtherRows(
-            navigateToKeys = { /*TODO*/ },
-            navigateToRelays = { /*TODO*/ },
-            navigateToSupport = { /*TODO*/ },
-            closeDrawer = closeDrawer,
         )
         VersionText()
     }
@@ -81,6 +75,9 @@ private fun ProfileRow(
 private fun MainRows(
     navigateToFeed: () -> Unit,
     navigateToChat: () -> Unit,
+    navigateToKeys: () -> Unit,
+    navigateToRelays: () -> Unit,
+    navigateToSupport: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
     DrawerRow(
@@ -99,23 +96,6 @@ private fun MainRows(
             closeDrawer()
         }
     )
-}
-
-@Composable
-private fun RowDivider() {
-    TabRowDefaults.Divider(
-        modifier = Modifier.padding(4.dp),
-        color = colors.onSurface.copy(alpha = .2f)
-    )
-}
-
-@Composable
-private fun OtherRows(
-    navigateToKeys: () -> Unit,
-    navigateToRelays: () -> Unit,
-    navigateToSupport: () -> Unit,
-    closeDrawer: () -> Unit,
-) {
     DrawerRow(
         icon = rememberVectorPainter(image = Icons.Filled.Key),
         label = stringResource(id = R.string.keys),
@@ -165,7 +145,9 @@ private fun DrawerRow(
     tint: Color = colors.primary
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth().padding(vertical = 1.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 1.dp),
         color = colors.surface,
         shape = MaterialTheme.shapes.small
     ) {
