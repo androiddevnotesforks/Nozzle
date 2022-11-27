@@ -3,16 +3,9 @@ package com.kaiwolfram.nozzle.ui.app.navigation
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
-object NozzleRoutes {
-    const val PROFILE = "profile"
-    const val FEED = "feed"
-    const val SEARCH = "search"
-    const val MESSAGES = "messages"
-}
-
 class NozzleNavActions(navController: NavHostController) {
     val navigateToProfile: () -> Unit = {
-        navController.navigate(NozzleRoutes.PROFILE) {
+        navController.navigate(NozzleRoute.PROFILE) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
             // on the back stack as users select items
@@ -28,7 +21,7 @@ class NozzleNavActions(navController: NavHostController) {
     }
 
     val navigateToFeed: () -> Unit = {
-        navController.navigate(NozzleRoutes.FEED) {
+        navController.navigate(NozzleRoute.FEED) {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
             }
@@ -38,7 +31,7 @@ class NozzleNavActions(navController: NavHostController) {
     }
 
     val navigateToSearch: () -> Unit = {
-        navController.navigate(NozzleRoutes.SEARCH) {
+        navController.navigate(NozzleRoute.SEARCH) {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
             }
@@ -48,7 +41,7 @@ class NozzleNavActions(navController: NavHostController) {
     }
 
     val navigateToMessages: () -> Unit = {
-        navController.navigate(NozzleRoutes.MESSAGES) {
+        navController.navigate(NozzleRoute.MESSAGES) {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
             }

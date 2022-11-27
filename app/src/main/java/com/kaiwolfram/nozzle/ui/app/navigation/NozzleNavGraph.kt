@@ -16,7 +16,7 @@ import com.kaiwolfram.nozzle.ui.app.search.SearchRoute
 fun NozzleNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = NozzleRoutes.FEED,
+    startDestination: String = NozzleRoute.FEED,
     vmContainer: VMContainer,
 ) {
     NavHost(
@@ -24,22 +24,22 @@ fun NozzleNavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable(NozzleRoutes.PROFILE) {
+        composable(NozzleRoute.PROFILE) {
             ProfileRoute(
                 profileViewModel = vmContainer.profileViewModel,
             )
         }
-        composable(NozzleRoutes.FEED) {
+        composable(NozzleRoute.FEED) {
             FeedRoute(
                 feedViewModel = vmContainer.feedViewModel,
             )
         }
-        composable(NozzleRoutes.SEARCH) {
+        composable(NozzleRoute.SEARCH) {
             SearchRoute(
                 searchViewModel = vmContainer.searchViewModel,
             )
         }
-        composable(NozzleRoutes.MESSAGES) {
+        composable(NozzleRoute.MESSAGES) {
             MessagesRoute(
                 messagesViewModel = vmContainer.messagesViewModel,
             )

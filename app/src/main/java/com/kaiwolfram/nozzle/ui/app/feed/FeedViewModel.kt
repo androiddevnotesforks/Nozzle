@@ -40,7 +40,7 @@ class FeedViewModel : ViewModel() {
         )
         viewModelState.update {
             it.copy(
-                posts = listOf(postMock, postMock, postMock, postMock),
+                posts = listOf(postMock, postMock, postMock, postMock, postMock),
             )
         }
     }
