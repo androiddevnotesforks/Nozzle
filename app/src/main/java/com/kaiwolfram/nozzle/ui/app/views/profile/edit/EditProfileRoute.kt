@@ -1,31 +1,27 @@
-package com.kaiwolfram.nozzle.ui.app.views.profile
+package com.kaiwolfram.nozzle.ui.app.views.profile.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
+import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModelState
 
 @Composable
-fun ProfileRoute(
+fun EditProfileRoute(
     profileViewModel: ProfileViewModel,
-    navToEditProfile: () -> Unit,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
-    ProfileRoute(
+    EditProfileRoute(
         uiState = uiState,
-        navToEditProfile = navToEditProfile,
     )
 }
 
 @Composable
-private fun ProfileRoute(
+private fun EditProfileRoute(
     uiState: ProfileViewModelState,
-    navToEditProfile: () -> Unit,
 ) {
-    ProfileScreen(
+    EditProfileScreen(
         uiState = uiState,
-        navToFollowing = { /*TODO*/ },
-        navToFollowers = { /*TODO*/ },
-        navToEditProfile = navToEditProfile,
     )
 }

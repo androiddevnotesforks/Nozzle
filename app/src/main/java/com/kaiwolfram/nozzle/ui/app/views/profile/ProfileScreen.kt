@@ -28,13 +28,15 @@ fun ProfileScreen(
     uiState: ProfileViewModelState,
     navToFollowing: () -> Unit,
     navToFollowers: () -> Unit,
+    navToEditProfile: () -> Unit,
 ) {
     Column {
         ProfileData(
             profilePicture = uiState.profilePicture,
             name = uiState.name,
             shortenedPubKey = uiState.shortenedPubKey,
-            bio = uiState.bio
+            bio = uiState.bio,
+            navToEditProfile = navToEditProfile,
         )
         Spacer(modifier = Modifier.height(4.dp))
         FollowerNumbers(
@@ -88,6 +90,7 @@ private fun ProfileData(
     name: String,
     shortenedPubKey: String,
     bio: String,
+    navToEditProfile: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Spacer(modifier = Modifier.width(6.dp))
@@ -102,7 +105,7 @@ private fun ProfileData(
             NameAndEdit(
                 name = name,
                 shortenedPubKey = shortenedPubKey,
-                navToEditProfile = {  /*TODO*/ }
+                navToEditProfile = navToEditProfile,
             )
             Text(
                 text = bio,

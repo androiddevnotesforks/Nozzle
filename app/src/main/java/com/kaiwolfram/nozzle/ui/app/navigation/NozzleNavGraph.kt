@@ -11,6 +11,7 @@ import com.kaiwolfram.nozzle.ui.app.views.chat.ChatRoute
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
+import com.kaiwolfram.nozzle.ui.app.views.profile.edit.EditProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysRoute
 import com.kaiwolfram.nozzle.ui.app.views.support.SupportRoute
 
@@ -20,6 +21,7 @@ fun NozzleNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = NozzleRoute.FEED,
     vmContainer: VMContainer,
+    navActions: NozzleNavActions,
 ) {
     NavHost(
         navController = navController,
@@ -28,6 +30,12 @@ fun NozzleNavGraph(
     ) {
         composable(NozzleRoute.PROFILE) {
             ProfileRoute(
+                profileViewModel = vmContainer.profileViewModel,
+                navToEditProfile = navActions.navigateToEditProfile,
+            )
+        }
+        composable(NozzleRoute.EDIT_PROFILE) {
+            EditProfileRoute(
                 profileViewModel = vmContainer.profileViewModel,
             )
         }

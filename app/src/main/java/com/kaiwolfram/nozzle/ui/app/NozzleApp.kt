@@ -16,11 +16,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
-import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
-import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.support.SupportViewModel
@@ -31,6 +31,11 @@ import kotlinx.coroutines.launch
 fun NozzleApp(appContainer: AppContainer) {
     NozzleTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
+            val navController = rememberNavController()
+            val navActions = remember(navController) {
+                NozzleNavActions(navController)
+            }
+
             val vmContainer = VMContainer(
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
@@ -55,11 +60,6 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = SupportViewModel.provideFactory()
                 ),
             )
-
-            val navController = rememberNavController()
-            val navActions = remember(navController) {
-                NozzleNavActions(navController)
-            }
 
             val coroutineScope = rememberCoroutineScope()
             val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -86,7 +86,8 @@ fun NozzleApp(appContainer: AppContainer) {
                 ) {
                     NozzleScaffold(
                         vmContainer = vmContainer,
-                        navController = navController
+                        navController = navController,
+                        navActions = navActions,
                     )
                 }
             }

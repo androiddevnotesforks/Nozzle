@@ -9,20 +9,23 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 
 @Composable
 fun NozzleScaffold(
     vmContainer: VMContainer,
     navController: NavHostController,
+    navActions: NozzleNavActions,
 ) {
     Scaffold(
         floatingActionButton = { CreateNoteButton() },
         content = { padding ->
             NozzleNavGraph(
                 modifier = Modifier.padding(padding),
-                navController = navController,
                 vmContainer = vmContainer,
+                navController = navController,
+                navActions = navActions,
             )
         }
     )
