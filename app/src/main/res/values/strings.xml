@@ -24,4 +24,5 @@
     <string name="edit">Edit</string>
     <string name="following">Following</string>
     <string name="followers">Followers</string>
+    <string name="write_a_post">Write a post</string>
 </resources>

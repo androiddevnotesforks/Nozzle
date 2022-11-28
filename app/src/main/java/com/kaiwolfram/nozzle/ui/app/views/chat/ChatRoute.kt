@@ -10,15 +10,6 @@ fun ChatRoute(
 ) {
     val uiState by chatViewModel.uiState.collectAsState()
 
-    ChatRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun ChatRoute(
-    uiState: ChatViewModelState,
-) {
     ChatScreen(
         uiState = uiState,
     )

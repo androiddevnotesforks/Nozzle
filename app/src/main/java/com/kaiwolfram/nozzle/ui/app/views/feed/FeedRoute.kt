@@ -10,15 +10,6 @@ fun FeedRoute(
 ) {
     val uiState by feedViewModel.uiState.collectAsState()
 
-    FeedRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun FeedRoute(
-    uiState: FeedViewModelState,
-) {
     FeedScreen(
         uiState = uiState,
     )

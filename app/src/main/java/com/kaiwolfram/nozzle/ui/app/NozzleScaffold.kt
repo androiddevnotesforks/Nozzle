@@ -8,7 +8,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 
@@ -35,10 +37,11 @@ fun NozzleScaffold(
 private fun CreateNoteButton() {
     FloatingActionButton(
         onClick = { /*TODO*/ },
+
     ) {
         Icon(
             imageVector = Icons.Rounded.Add,
-            contentDescription = "Write a note",
+            contentDescription = stringResource(id = R.string.write_a_post),
         )
     }
 }

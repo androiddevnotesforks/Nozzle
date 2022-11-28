@@ -13,21 +13,6 @@ fun ProfileRoute(
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
-    ProfileRoute(
-        uiState = uiState,
-        navToFollowing = navToFollowing,
-        navToFollowers = navToFollowers,
-        navToEditProfile = navToEditProfile,
-    )
-}
-
-@Composable
-private fun ProfileRoute(
-    uiState: ProfileViewModelState,
-    navToFollowing: () -> Unit,
-    navToFollowers: () -> Unit,
-    navToEditProfile: () -> Unit,
-) {
     ProfileScreen(
         uiState = uiState,
         navToFollowing = navToFollowing,

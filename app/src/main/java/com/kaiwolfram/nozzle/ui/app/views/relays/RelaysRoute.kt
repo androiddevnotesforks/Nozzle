@@ -10,15 +10,6 @@ fun RelaysRoute(
 ) {
     val uiState by relaysViewModel.uiState.collectAsState()
 
-    RelaysRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun RelaysRoute(
-    uiState: RelaysViewModelState,
-) {
     RelaysScreen(
         uiState = uiState,
     )

@@ -12,15 +12,6 @@ fun FollowingRoute(
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
-    FollowingRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun FollowingRoute(
-    uiState: ProfileViewModelState,
-) {
     FollowingScreen(
         uiState = uiState,
     )

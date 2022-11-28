@@ -10,15 +10,6 @@ fun SupportRoute(
 ) {
     val uiState by supportViewModel.uiState.collectAsState()
 
-    SupportRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun SupportRoute(
-    uiState: SupportViewModelState,
-) {
     SupportScreen(
         uiState = uiState,
     )

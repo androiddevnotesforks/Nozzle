@@ -12,15 +12,6 @@ fun FollowersRoute(
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
-    FollowersRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun FollowersRoute(
-    uiState: ProfileViewModelState,
-) {
     FollowersScreen(
         uiState = uiState,
     )

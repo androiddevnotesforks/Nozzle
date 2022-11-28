@@ -12,15 +12,6 @@ fun EditProfileRoute(
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
-    EditProfileRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun EditProfileRoute(
-    uiState: ProfileViewModelState,
-) {
     EditProfileScreen(
         uiState = uiState,
     )

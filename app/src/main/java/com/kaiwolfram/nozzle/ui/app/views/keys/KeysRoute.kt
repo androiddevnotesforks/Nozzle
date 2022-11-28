@@ -10,15 +10,6 @@ fun KeysRoute(
 ) {
     val uiState by keysViewModel.uiState.collectAsState()
 
-    KeysRoute(
-        uiState = uiState,
-    )
-}
-
-@Composable
-private fun KeysRoute(
-    uiState: KeysViewModelState,
-) {
     KeysScreen(
         uiState = uiState,
     )
