@@ -29,6 +29,7 @@ fun ProfileScreen(
     navToFollowing: () -> Unit,
     navToFollowers: () -> Unit,
     navToEditProfile: () -> Unit,
+    onGetPicture: (String) -> Painter,
 ) {
     Column {
         ProfileData(
@@ -47,26 +48,27 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
         Divider()
-        Posts(posts = uiState.posts)
+        Posts(posts = uiState.posts, onGetPicture = onGetPicture)
     }
 }
 
 @Composable
 private fun Posts(
-    posts: List<Post>
+    posts: List<Post>,
+    onGetPicture: (String) -> Painter
 ) {
     LazyColumn {
         items(posts) { post ->
-            PostCard(post = post)
+            PostCard(post = post, onGetPicture = onGetPicture)
         }
     }
 }
 
 @Composable
-private fun PostCard(post: Post) {
+private fun PostCard(post: Post, onGetPicture: (String) -> Painter) {
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Icon(
-            painter = post.profilePic,
+            painter = onGetPicture(post.profilePicUrl),
             contentDescription = null,
             tint = Color.Unspecified,
             modifier = Modifier
@@ -78,7 +80,7 @@ private fun PostCard(post: Post) {
         Column {
             Text(text = post.author, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = post.body)
+            Text(text = post.content)
         }
     }
 

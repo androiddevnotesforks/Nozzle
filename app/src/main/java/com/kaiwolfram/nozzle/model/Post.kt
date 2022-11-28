@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class Post(
     val author: String,
-    var profilePic: Painter,
+    val profilePicUrl: String,
     val published: LocalDateTime,
-    val body: String
+    val content: String
 )

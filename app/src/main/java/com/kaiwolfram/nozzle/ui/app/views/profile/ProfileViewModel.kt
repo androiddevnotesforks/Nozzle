@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.request.ImageRequest
+import com.kaiwolfram.nozzle.data.INostrRepository
 import com.kaiwolfram.nozzle.model.Post
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 private const val TAG = "ProfileViewModel"
 
@@ -37,6 +37,7 @@ data class ProfileViewModelState(
     val profilePicture: Painter = emptyPainter,
     val profilePictureUrl: String = "https://avatars.githubusercontent.com/u/48265657?v=4",
     val shortenedPubKey: String = "c1a8cf31...9328574a",
+    val pubKey: String = "c1a8cf311234qwre9328574a",
     val name: String = "Kai Wolfram",
     val bio: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.",
     val posts: List<Post> = listOf(),
@@ -44,10 +45,12 @@ data class ProfileViewModelState(
 
 class ProfileViewModel(
     private val defaultProfilePicture: Painter,
+    nostrRepository: INostrRepository,
     imageLoader: ImageLoader,
     context: Context
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
+    private val pictures = mutableMapOf<String, Painter>()
 
     val uiState = viewModelState
         .stateIn(
@@ -58,9 +61,24 @@ class ProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
+        val posts = nostrRepository.getPosts(uiState.value.pubKey)
         viewModelState.update {
-            it.copy(profilePicture = defaultProfilePicture)
+            it.copy(
+                profilePicture = defaultProfilePicture,
+                posts = posts
+            )
         }
+        for (post in posts) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                val pic = requestPicture(
+                    url = post.profilePicUrl,
+                    context = context,
+                    imageLoader = imageLoader
+                )
+                pictures[post.profilePicUrl] = pic
+            }
+        }
+
         updateProfilePicture(
             url = viewModelState.value.profilePictureUrl,
             context = context,
@@ -68,76 +86,36 @@ class ProfileViewModel(
         )
     }
 
-    val onChangeProfilePictureUrl: (String) -> Unit = {
-        val newUrl = it.trim()
-        if (newUrl != uiState.value.profilePictureUrl) {
-            Log.i(TAG, "Change URL to $newUrl")
-            viewModelState.update { state ->
-                state.copy(profilePictureUrl = newUrl)
-            }
-            updateProfilePicture(
-                url = newUrl,
-                context = context,
-                imageLoader = imageLoader
-            )
-        }
-    }
-
-    val onChangeName: (String) -> Unit = {
-        val newName = it.trim()
-        if (newName != uiState.value.name) {
-            Log.i(TAG, "Change name to $newName")
-            viewModelState.update { state ->
-                state.copy(name = newName)
-            }
-        }
-    }
-
-    val onChangeBio: (String) -> Unit = {
-        val newBio = it.trim()
-        if (newBio != uiState.value.bio) {
-            Log.i(TAG, "Change bio to $newBio")
-            viewModelState.update { state ->
-                state.copy(bio = newBio)
-            }
-        }
+    val onGetPicture: (url: String) -> Painter = {
+        pictures[it] ?:defaultProfilePicture
     }
 
     private fun updateProfilePicture(url: String, context: Context, imageLoader: ImageLoader) {
         viewModelScope.launch(context = Dispatchers.IO) {
-            val request = ImageRequest.Builder(context)
-                .data(url)
-                .allowConversionToBitmap(true)
-                .build()
-            imageLoader.execute(request).drawable?.let { fetched ->
-                Log.i(TAG, "Successfully fetched image and updated profile picture")
-                viewModelState.update {
-                    it.copy(profilePicture = BitmapPainter(fetched.toBitmap().asImageBitmap()))
-                }
-            } ?: run {
-                Log.i(TAG, "Failed to fetch image. Setting default as profile picture")
-                viewModelState.update {
-                    it.copy(profilePicture = defaultProfilePicture)
-                }
-            }
-            // TODO: This sucks
-            val postMock = Post(
-                author = "Kai Wolfram",
-                profilePic = uiState.value.profilePicture,
-                published = LocalDateTime.now(),
-                body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit."
-            )
+            val result = requestPicture(url = url, context = context, imageLoader = imageLoader)
             viewModelState.update {
-                it.copy(
-                    posts = listOf(postMock, postMock, postMock, postMock, postMock, postMock),
-                )
+                it.copy(profilePicture = result)
             }
         }
+    }
+
+    private suspend fun requestPicture(
+        url: String,
+        context: Context,
+        imageLoader: ImageLoader
+    ): Painter {
+        val request = ImageRequest.Builder(context)
+            .data(url)
+            .allowConversionToBitmap(true)
+            .build()
+        val result = imageLoader.execute(request).drawable?.toBitmap()?.asImageBitmap()
+        return if (result != null) BitmapPainter(result) else defaultProfilePicture
     }
 
     companion object {
         fun provideFactory(
             defaultProfilePicture: Painter,
+            nostrRepository: INostrRepository,
             imageLoader: ImageLoader,
             context: Context,
         ): ViewModelProvider.Factory =
@@ -146,6 +124,7 @@ class ProfileViewModel(
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProfileViewModel(
                         defaultProfilePicture = defaultProfilePicture,
+                        nostrRepository = nostrRepository,
                         imageLoader = imageLoader,
                         context = context
                     ) as T

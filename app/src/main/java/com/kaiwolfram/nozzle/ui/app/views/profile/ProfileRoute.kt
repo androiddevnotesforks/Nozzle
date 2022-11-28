@@ -18,5 +18,6 @@ fun ProfileRoute(
         navToFollowing = navToFollowing,
         navToFollowers = navToFollowers,
         navToEditProfile = navToEditProfile,
+        onGetPicture = profileViewModel.onGetPicture,
     )
 }

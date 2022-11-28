@@ -40,6 +40,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
                         defaultProfilePicture = painterResource(R.drawable.ic_default_profile),
+                        nostrRepository = appContainer.nostrRepository,
                         imageLoader = appContainer.imageLoader,
                         context = LocalContext.current
                     )
