@@ -14,4 +14,5 @@ data class VMContainer(
     val keysViewModel: KeysViewModel,
     val relaysViewModel: RelaysViewModel,
     val supportViewModel: SupportViewModel,
-)
+) {
+}

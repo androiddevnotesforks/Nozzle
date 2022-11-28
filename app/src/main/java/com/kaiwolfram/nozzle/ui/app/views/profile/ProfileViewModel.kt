@@ -131,6 +131,7 @@ class ProfileViewModel(
                     it.copy(profilePicture = defaultProfilePicture)
                 }
             }
+            // TODO: This sucks
             val postMock = Post(
                 author = "Kai Wolfram",
                 profilePic = uiState.value.profilePicture,

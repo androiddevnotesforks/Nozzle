@@ -34,7 +34,7 @@ fun NozzleScaffold(
 @Composable
 private fun CreateNoteButton() {
     FloatingActionButton(
-        onClick = { },
+        onClick = { /*TODO*/ },
     ) {
         Icon(
             imageVector = Icons.Rounded.Add,

@@ -17,6 +17,18 @@ class NozzleNavActions(navController: NavHostController) {
         }
     }
 
+    val navigateToFollowing: () -> Unit = {
+        navController.navigate(NozzleRoute.FOLLOWING) {
+            setSimpleNavOptions(optionsBuilder = this)
+        }
+    }
+
+    val navigateToFollowers: () -> Unit = {
+        navController.navigate(NozzleRoute.FOLLOWERS) {
+            setSimpleNavOptions(optionsBuilder = this)
+        }
+    }
+
     val navigateToFeed: () -> Unit = {
         navController.navigate(NozzleRoute.FEED) {
             setNavOptionsWithPop(navController = navController, optionsBuilder = this)
@@ -47,7 +59,10 @@ class NozzleNavActions(navController: NavHostController) {
         }
     }
 
-    private fun setNavOptionsWithPop(navController: NavHostController, optionsBuilder: NavOptionsBuilder) {
+    private fun setNavOptionsWithPop(
+        navController: NavHostController,
+        optionsBuilder: NavOptionsBuilder
+    ) {
         optionsBuilder.apply {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
