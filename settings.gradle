@@ -14,4 +14,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Nozzle"
 include ':app'
-include 'NostrPostr:nostrpostrlib'

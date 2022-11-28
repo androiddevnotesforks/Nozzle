@@ -75,9 +75,6 @@ dependencies {
     // Image fetcher
     implementation("io.coil-kt:coil:2.2.2")
 
-    // NostrPostr submodule
-    implementation project(':NostrPostr:nostrpostrlib')
-
     // WTF?!
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 }
