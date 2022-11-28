@@ -130,7 +130,8 @@ private fun VersionText() {
         verticalAlignment = Alignment.Bottom,
     ) {
         Text(
-            text = stringResource(id = R.string.nozzle_version)
+            text = stringResource(id = R.string.nozzle_version),
+            style = MaterialTheme.typography.caption,
         )
     }
 }

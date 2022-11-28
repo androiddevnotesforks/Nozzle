@@ -13,12 +13,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.request.ImageRequest
+import com.kaiwolfram.nozzle.model.Post
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 private const val TAG = "ProfileViewModel"
 
@@ -38,6 +40,7 @@ data class ProfileViewModelState(
     val privateKey: String = "12341234123412341234123412341234",
     val name: String = "Kai Wolfram",
     val bio: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.",
+    val posts: List<Post> = listOf(),
 )
 
 class ProfileViewModel(
@@ -127,6 +130,17 @@ class ProfileViewModel(
                 viewModelState.update {
                     it.copy(profilePicture = defaultProfilePicture)
                 }
+            }
+            val postMock = Post(
+                author = "Kai Wolfram",
+                profilePic = uiState.value.profilePicture,
+                published = LocalDateTime.now(),
+                body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit."
+            )
+            viewModelState.update {
+                it.copy(
+                    posts = listOf(postMock, postMock, postMock, postMock, postMock, postMock),
+                )
             }
         }
     }

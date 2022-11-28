@@ -2,106 +2,209 @@ package com.kaiwolfram.nozzle.ui.app.views.profile
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.Post
 
 @Composable
 fun ProfileScreen(
     uiState: ProfileViewModelState,
-    onChangeProfilePictureUrl: (String) -> Unit,
-    onChangeName: (String) -> Unit,
-    onChangeBio: (String) -> Unit,
-    onChangePrivateKey: (String) -> Unit,
+    navToFollowing: () -> Unit,
+    navToFollowers: () -> Unit,
 ) {
-    var openProfilePicDialog by remember { mutableStateOf(false) }
-    var openNameDialog by remember { mutableStateOf(false) }
-    var openBioDialog by remember { mutableStateOf(false) }
-    var openKeyDialog by remember { mutableStateOf(false) }
+    Column {
+        ProfileData(
+            profilePicture = uiState.profilePicture,
+            name = uiState.name,
+            shortenedPubKey = uiState.shortenedPubKey,
+            bio = uiState.bio
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        FollowerNumbers(
+            numOfFollowing = 14u,
+            numOfFollowers = 15u,
+            navToFollowing = navToFollowing,
+            navToFollowers = navToFollowers
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Divider()
+        Posts(posts = uiState.posts)
+    }
+}
 
-    if (openProfilePicDialog) {
-        ChangeProfilePictureDialog(
-            currentUrl = uiState.profilePictureUrl,
-            onChangeUrl = onChangeProfilePictureUrl,
-            onCloseDialog = { openProfilePicDialog = false })
+@Composable
+private fun Posts(
+    posts: List<Post>
+) {
+    LazyColumn {
+        items(posts) { post ->
+            PostCard(post = post)
+        }
     }
-    if (openNameDialog) {
-        ChangeNameDialog(
-            currentName = uiState.name,
-            onChangeName = onChangeName,
-            onCloseDialog = { openNameDialog = false })
+}
+
+@Composable
+private fun PostCard(post: Post) {
+    Row(modifier = Modifier.padding(all = 8.dp)) {
+        Icon(
+            painter = post.profilePic,
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(text = post.author, fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = post.body)
+        }
     }
-    if (openBioDialog) {
-        ChangeBioDialog(
-            currentBio = uiState.bio,
-            onChangeBio = onChangeBio,
-            onCloseDialog = { openBioDialog = false })
-    }
-    if (openKeyDialog) {
-        ChangePrivateKeyDialog(
-            currentPrivateKey = uiState.privateKey,
-            onChangePrivateKey = onChangePrivateKey,
-            onCloseDialog = { openKeyDialog = false })
-    }
-    ProfileData(
-        profilePicture = uiState.profilePicture,
-        name = uiState.name,
-        bio = uiState.bio,
-        shortenedPubKey = uiState.shortenedPubKey,
-        onOpenProfilePicDialog = { openProfilePicDialog = true },
-        onOpenNameDialog = { openNameDialog = true },
-        onOpenBioDialog = { openBioDialog = true },
-    ) { openKeyDialog = true }
+
 }
 
 @Composable
 private fun ProfileData(
     profilePicture: Painter,
     name: String,
-    bio: String,
     shortenedPubKey: String,
-    onOpenProfilePicDialog: () -> Unit,
-    onOpenNameDialog: () -> Unit,
-    onOpenBioDialog: () -> Unit,
-    onOpenKeyDialog: () -> Unit,
+    bio: String,
 ) {
-    Row(modifier = Modifier.padding(2.dp)) {
-        Icon(
-            painter = profilePicture,
-            contentDescription = stringResource(id = R.string.profile_picture),
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .padding(6.dp)
-                .fillMaxWidth(0.25f)
-                .aspectRatio(1f)
-                .clip(CircleShape)
-                .clickable { onOpenProfilePicDialog() }
-
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(modifier = Modifier.width(6.dp))
+        ProfilePicture(
+            modifier = Modifier.padding(6.dp),
+            profilePicture = profilePicture
         )
-        Column {
-            Text(
-                modifier = Modifier.clickable { onOpenNameDialog() },
-                text = name,
-                fontWeight = FontWeight.Bold
+        Spacer(modifier = Modifier.width(6.dp))
+        Column(
+            modifier = Modifier.padding(6.dp)
+        ) {
+            NameAndEdit(
+                name = name,
+                shortenedPubKey = shortenedPubKey,
+                navToEditProfile = {  /*TODO*/ }
             )
             Text(
-                modifier = Modifier.clickable { onOpenKeyDialog() },
-                text = shortenedPubKey,
-                color = Color.Gray.copy(alpha = 0.8f),
-            )
-            Text(
-                modifier = Modifier.clickable { onOpenBioDialog() },
-                text = bio
+                text = bio,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
+}
+
+@Composable
+private fun FollowerNumbers(
+    numOfFollowing: UInt,
+    numOfFollowers: UInt,
+    navToFollowing: () -> Unit,
+    navToFollowers: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 4.dp),
+    ) {
+        Spacer(modifier = Modifier.width(4.dp))
+        Row(modifier = Modifier.clickable { navToFollowing() }) {
+            Text(
+                modifier = Modifier.padding(horizontal = 2.dp),
+                text = numOfFollowing.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                modifier = Modifier.padding(horizontal = 2.dp),
+                text = stringResource(id = R.string.following)
+            )
+
+        }
+        Spacer(modifier = Modifier.width(6.dp))
+        Row(modifier = Modifier.clickable { navToFollowers() }) {
+            Text(
+                modifier = Modifier.padding(horizontal = 2.dp),
+                text = numOfFollowers.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                modifier = Modifier.padding(horizontal = 2.dp),
+                text = stringResource(id = R.string.followers)
+            )
+
+        }
+    }
+}
+
+@Composable
+private fun NameAndEdit(
+    name: String,
+    shortenedPubKey: String,
+    navToEditProfile: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text(
+                text = name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.h6,
+            )
+            Text(
+                text = shortenedPubKey,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Gray.copy(alpha = 0.8f),
+                style = MaterialTheme.typography.body2,
+            )
+        }
+        OutlinedButton(
+            onClick = navToEditProfile,
+            shape = RoundedCornerShape(100),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.onSurface)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = stringResource(id = R.string.nav_to_edit_profile)
+            )
+            Text(text = stringResource(id = R.string.edit))
+        }
+    }
+}
+
+@Composable
+private fun ProfilePicture(
+    profilePicture: Painter,
+    modifier: Modifier = Modifier,
+) {
+    Icon(
+        painter = profilePicture,
+        contentDescription = stringResource(id = R.string.profile_picture),
+        tint = Color.Unspecified,
+        modifier = modifier
+            .fillMaxWidth(0.20f)
+            .aspectRatio(1f)
+            .clip(CircleShape)
+    )
 }
