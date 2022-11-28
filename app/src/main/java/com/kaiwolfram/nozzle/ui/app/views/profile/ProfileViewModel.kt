@@ -37,7 +37,6 @@ data class ProfileViewModelState(
     val profilePicture: Painter = emptyPainter,
     val profilePictureUrl: String = "https://avatars.githubusercontent.com/u/48265657?v=4",
     val shortenedPubKey: String = "c1a8cf31...9328574a",
-    val privateKey: String = "12341234123412341234123412341234",
     val name: String = "Kai Wolfram",
     val bio: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.",
     val posts: List<Post> = listOf(),
@@ -100,16 +99,6 @@ class ProfileViewModel(
             Log.i(TAG, "Change bio to $newBio")
             viewModelState.update { state ->
                 state.copy(bio = newBio)
-            }
-        }
-    }
-
-    val onChangePrivateKey: (String) -> Unit = {
-        val newPrivateKey = it.trim()
-        if (newPrivateKey != uiState.value.privateKey) {
-            Log.i(TAG, "Change private key to $newPrivateKey")
-            viewModelState.update { state ->
-                state.copy(privateKey = newPrivateKey)
             }
         }
     }

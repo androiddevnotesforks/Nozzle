@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
 
@@ -170,6 +171,8 @@ private fun DrawerRow(
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.h6,
                     color = colors.onSurface
                 )

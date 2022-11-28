@@ -165,12 +165,12 @@ private fun NameAndEdit(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {
             Text(
                 text = name,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.h6,
             )
@@ -191,7 +191,11 @@ private fun NameAndEdit(
                 imageVector = Icons.Filled.Edit,
                 contentDescription = stringResource(id = R.string.nav_to_edit_profile)
             )
-            Text(text = stringResource(id = R.string.edit))
+            Text(
+                text = stringResource(id = R.string.edit),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
