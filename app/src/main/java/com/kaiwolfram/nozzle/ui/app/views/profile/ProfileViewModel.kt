@@ -44,17 +44,19 @@ data class ProfileViewModelState(
     val posts: List<Post> = listOf(),
     val numOfFollowers: UInt = 0u,
     val numOfFollowing: UInt = 0u,
-) {
-}
+    val isRefreshing: Boolean = false,
+    val isSyncing: Boolean = false,
+)
 
 class ProfileViewModel(
     private val defaultProfilePicture: Painter,
-    nostrRepository: INostrRepository,
-    imageLoader: ImageLoader,
+    private val nostrRepository: INostrRepository,
+    private val imageLoader: ImageLoader,
     context: Context
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
     private val pictures = mutableMapOf<String, Painter>()
+    private val imageRequestBuilder = ImageRequest.Builder(context)
 
     val uiState = viewModelState
         .stateIn(
@@ -65,11 +67,41 @@ class ProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
+        viewModelState.update {
+            it.copy(
+                profilePicture = defaultProfilePicture
+            )
+        }
+        refreshProfileView()
+    }
+
+    val onRefreshProfileView: () -> Unit = {
+        execWhenSyncingNotBlocked {
+            Log.i(TAG, "Refresh profile view")
+            viewModelState.update {
+                it.copy(isRefreshing = true, isSyncing = true)
+            }
+            refreshProfileView()
+        }
+    }
+
+    val onGetPicture: (url: String) -> Painter = {
+        pictures[it] ?:defaultProfilePicture
+    }
+
+    private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
+        if (uiState.value.isSyncing) {
+            Log.i(TAG, "Blocked sync attempt")
+        } else {
+            exec()
+        }
+    }
+
+    private fun refreshProfileView() {
         val posts = nostrRepository.getPosts(uiState.value.pubKey)
         val profile = nostrRepository.getProfile(UUID.randomUUID().toString())
         viewModelState.update {
             it.copy(
-                profilePicture = defaultProfilePicture,
                 posts = posts,
                 numOfFollowers = nostrRepository.getFollowerCount(),
                 numOfFollowing = nostrRepository.getFollowingCount(),
@@ -77,46 +109,31 @@ class ProfileViewModel(
                 bio = profile.bio,
                 profilePictureUrl = profile.picture,
                 shortenedPubKey = "${profile.pubKey.substring(0, 15)}...",
-                pubKey = profile.pubKey
+                pubKey = profile.pubKey,
+                isRefreshing = false,
+                isSyncing = false
             )
         }
+        updateProfilePicture(url = viewModelState.value.profilePictureUrl)
         for (post in posts) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                val pic = requestPicture(
-                    url = post.profilePicUrl,
-                    context = context,
-                    imageLoader = imageLoader
-                )
+                val pic = requestPicture(url = post.profilePicUrl)
                 pictures[post.profilePicUrl] = pic
             }
         }
-
-        updateProfilePicture(
-            url = viewModelState.value.profilePictureUrl,
-            context = context,
-            imageLoader = imageLoader
-        )
     }
 
-    val onGetPicture: (url: String) -> Painter = {
-        pictures[it] ?:defaultProfilePicture
-    }
-
-    private fun updateProfilePicture(url: String, context: Context, imageLoader: ImageLoader) {
+    private fun updateProfilePicture(url: String) {
         viewModelScope.launch(context = Dispatchers.IO) {
-            val result = requestPicture(url = url, context = context, imageLoader = imageLoader)
+            val result = requestPicture(url = url)
             viewModelState.update {
                 it.copy(profilePicture = result)
             }
         }
     }
 
-    private suspend fun requestPicture(
-        url: String,
-        context: Context,
-        imageLoader: ImageLoader
-    ): Painter {
-        val request = ImageRequest.Builder(context)
+    private suspend fun requestPicture(url: String): Painter {
+        val request = imageRequestBuilder
             .data(url)
             .allowConversionToBitmap(true)
             .build()

@@ -20,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.Post
 
@@ -30,6 +32,7 @@ fun ProfileScreen(
     navToFollowers: () -> Unit,
     navToEditProfile: () -> Unit,
     onGetPicture: (String) -> Painter,
+    onRefreshProfileView: () -> Unit,
 ) {
     Column {
         ProfileData(
@@ -48,24 +51,42 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
         Divider()
-        Posts(posts = uiState.posts, onGetPicture = onGetPicture)
+        Posts(
+            posts = uiState.posts,
+            isRefreshing = uiState.isRefreshing,
+            onGetPicture = onGetPicture,
+            onRefreshProfileView = onRefreshProfileView,
+        )
     }
 }
 
 @Composable
 private fun Posts(
     posts: List<Post>,
-    onGetPicture: (String) -> Painter
+    isRefreshing: Boolean,
+    onGetPicture: (String) -> Painter,
+    onRefreshProfileView: () -> Unit,
 ) {
-    LazyColumn {
-        items(posts) { post ->
-            PostCard(post = post, onGetPicture = onGetPicture)
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = onRefreshProfileView,
+    ) {
+        LazyColumn {
+            items(posts) { post ->
+                PostCard(
+                    post = post,
+                    onGetPicture = onGetPicture
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun PostCard(post: Post, onGetPicture: (String) -> Painter) {
+private fun PostCard(
+    post: Post,
+    onGetPicture: (String) -> Painter
+) {
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
