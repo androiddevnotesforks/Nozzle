@@ -26,6 +26,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.Post
+import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 
 @Composable
 fun ProfileScreen(
@@ -97,16 +98,13 @@ private fun PostCard(
             .padding(all = 8.dp)
             .fillMaxWidth()
     ) {
-        Icon(
+        ProfilePicture(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
                 .clickable { /*TODO: Open profile*/ },
-            painter = onGetPicture(post.profilePicUrl),
-            contentDescription = null,
-            tint = Color.Unspecified,
-
-            )
+            profilePicture = onGetPicture(post.profilePicUrl)
+        )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
             Text(
@@ -139,7 +137,11 @@ private fun ProfileData(
     Row(verticalAlignment = Alignment.CenterVertically) {
         Spacer(modifier = Modifier.width(6.dp))
         ProfilePicture(
-            modifier = Modifier.padding(6.dp),
+            modifier = Modifier
+                .padding(6.dp)
+                .fillMaxWidth(0.20f)
+                .aspectRatio(1f)
+                .clip(CircleShape),
             profilePicture = profilePicture
         )
         Spacer(modifier = Modifier.width(6.dp))
@@ -243,22 +245,6 @@ private fun NameAndEdit(
             )
         }
     }
-}
-
-@Composable
-private fun ProfilePicture(
-    profilePicture: Painter,
-    modifier: Modifier = Modifier,
-) {
-    Icon(
-        painter = profilePicture,
-        contentDescription = stringResource(id = R.string.profile_picture),
-        tint = Color.Unspecified,
-        modifier = modifier
-            .fillMaxWidth(0.20f)
-            .aspectRatio(1f)
-            .clip(CircleShape)
-    )
 }
 
 @Composable

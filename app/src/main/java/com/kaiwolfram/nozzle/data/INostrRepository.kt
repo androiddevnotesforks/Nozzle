@@ -7,5 +7,6 @@ interface INostrRepository {
     fun getFollowerCount(): UInt
     fun getFollowingCount(): UInt
     fun getProfile(pubKey: String): Profile
-    fun getPosts(pubKey: String): List<Post>
+    fun listPosts(pubKey: String): List<Post>
+    fun listFollowedProfiles(pubKey: String): List<Profile>
 }

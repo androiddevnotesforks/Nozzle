@@ -15,6 +15,7 @@ import coil.ImageLoader
 import coil.request.ImageRequest
 import com.kaiwolfram.nozzle.data.INostrRepository
 import com.kaiwolfram.nozzle.model.Post
+import com.kaiwolfram.nozzle.model.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,6 +47,7 @@ data class ProfileViewModelState(
     val numOfFollowing: UInt = 0u,
     val isRefreshing: Boolean = false,
     val isSyncing: Boolean = false,
+    val followingList: List<Profile> = listOf(),
 )
 
 class ProfileViewModel(
@@ -78,15 +80,36 @@ class ProfileViewModel(
     val onRefreshProfileView: () -> Unit = {
         execWhenSyncingNotBlocked {
             Log.i(TAG, "Refresh profile view")
-            viewModelState.update {
-                it.copy(isRefreshing = true, isSyncing = true)
-            }
+            setRefreshAndSync(true)
             refreshProfileView()
         }
     }
 
+    val onRefreshFollowingList: () -> Unit = {
+        execWhenSyncingNotBlocked {
+            Log.i(TAG, "Refresh following list")
+            setRefreshAndSync(true)
+            viewModelScope.launch(context = Dispatchers.IO) {
+                val following = nostrRepository.listFollowedProfiles(uiState.value.pubKey)
+                viewModelState.update {
+                    it.copy(
+                        isRefreshing = false,
+                        isSyncing = false,
+                        followingList = following,
+                    )
+                }
+                for (profile in following) {
+                    viewModelScope.launch(context = Dispatchers.IO) {
+                        val pic = requestPicture(url = profile.picture)
+                        pictures[profile.picture] = pic
+                    }
+                }
+            }
+        }
+    }
+
     val onGetPicture: (url: String) -> Painter = {
-        pictures[it] ?:defaultProfilePicture
+        pictures[it] ?: defaultProfilePicture
     }
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
@@ -97,9 +120,16 @@ class ProfileViewModel(
         }
     }
 
+    private fun setRefreshAndSync(value: Boolean) {
+        viewModelState.update {
+            it.copy(isRefreshing = value, isSyncing = value)
+        }
+    }
+
     private fun refreshProfileView() {
-        val posts = nostrRepository.getPosts(uiState.value.pubKey)
+        val posts = nostrRepository.listPosts(uiState.value.pubKey)
         val profile = nostrRepository.getProfile(UUID.randomUUID().toString())
+        val following = nostrRepository.listFollowedProfiles(profile.pubKey)
         viewModelState.update {
             it.copy(
                 posts = posts,
@@ -111,7 +141,8 @@ class ProfileViewModel(
                 shortenedPubKey = "${profile.pubKey.substring(0, 15)}...",
                 pubKey = profile.pubKey,
                 isRefreshing = false,
-                isSyncing = false
+                isSyncing = false,
+                followingList = following,
             )
         }
         updateProfilePicture(url = viewModelState.value.profilePictureUrl)
@@ -119,6 +150,12 @@ class ProfileViewModel(
             viewModelScope.launch(context = Dispatchers.IO) {
                 val pic = requestPicture(url = post.profilePicUrl)
                 pictures[post.profilePicUrl] = pic
+            }
+        }
+        for (followed in following) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                val pic = requestPicture(url = followed.picture)
+                pictures[followed.picture] = pic
             }
         }
     }

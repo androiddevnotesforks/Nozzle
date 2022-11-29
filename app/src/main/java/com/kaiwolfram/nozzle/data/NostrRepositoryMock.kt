@@ -18,20 +18,27 @@ class NostrRepositoryMock : INostrRepository {
     }
 
     override fun getProfile(pubKey: String): Profile {
-        return Profile(
-            name = UUID.randomUUID().toString(),
-            pubKey = pubKey,
-            bio = UUID.randomUUID().toString().repeat(Random.nextInt(15)),
-            picture = "$baseUrl${UUID.randomUUID()}"
-        )
+        return createRndProfile()
     }
 
-    override fun getPosts(pubKey: String): List<Post> {
+    override fun listPosts(pubKey: String): List<Post> {
         val result = mutableListOf<Post>()
         val max = Random.nextInt(15)
         if (max != 0) {
             for (i in 0..max) {
                 result.add(createRndPost())
+            }
+        }
+
+        return result
+    }
+
+    override fun listFollowedProfiles(pubKey: String): List<Profile> {
+        val result = mutableListOf<Profile>()
+        val max = Random.nextInt(15)
+        if (max != 0) {
+            for (i in 0..max) {
+                result.add(createRndProfile())
             }
         }
 
@@ -44,6 +51,15 @@ class NostrRepositoryMock : INostrRepository {
             profilePicUrl = "$baseUrl${UUID.randomUUID()}",
             published = LocalDateTime.now(),
             content = UUID.randomUUID().toString().repeat(Random.nextInt(20))
+        )
+    }
+
+    private fun createRndProfile(): Profile {
+        return Profile(
+            name = UUID.randomUUID().toString(),
+            pubKey = UUID.randomUUID().toString(),
+            bio = UUID.randomUUID().toString().repeat(Random.nextInt(15)),
+            picture = "$baseUrl${UUID.randomUUID()}"
         )
     }
 }

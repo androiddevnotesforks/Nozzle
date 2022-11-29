@@ -26,4 +26,5 @@
     <string name="followers">Followers</string>
     <string name="write_a_post">Write a post</string>
     <string name="no_posts_found">No posts found</string>
+    <string name="follow_or_unfollow">Follow or unfollow</string>
 </resources>

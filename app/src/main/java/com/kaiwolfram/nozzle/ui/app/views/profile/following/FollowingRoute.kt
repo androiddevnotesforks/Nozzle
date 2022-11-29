@@ -14,5 +14,7 @@ fun FollowingRoute(
 
     FollowingScreen(
         uiState = uiState,
+        onGetPicture = profileViewModel.onGetPicture,
+        onRefreshFollowingList = profileViewModel.onRefreshFollowingList,
     )
 }
