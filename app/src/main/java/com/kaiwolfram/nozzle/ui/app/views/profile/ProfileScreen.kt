@@ -41,8 +41,8 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(4.dp))
         FollowerNumbers(
-            numOfFollowing = 14u,
-            numOfFollowers = 15u,
+            numOfFollowing = uiState.numOfFollowing,
+            numOfFollowers = uiState.numOfFollowers,
             navToFollowing = navToFollowing,
             navToFollowers = navToFollowers
         )

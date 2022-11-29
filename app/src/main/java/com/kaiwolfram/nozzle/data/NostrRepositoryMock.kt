@@ -30,7 +30,8 @@ class NostrRepositoryMock : INostrRepository {
     override fun getProfile(pubKey: String): Profile {
         return Profile(
             name = names.shuffled()[0],
-            bio = UUID.randomUUID().toString(),
+            pubKey = UUID.randomUUID().toString(),
+            bio = UUID.randomUUID().toString().repeat(Random.nextInt(15)),
             picture = "$baseUrl${UUID.randomUUID()}"
         )
     }

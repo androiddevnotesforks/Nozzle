@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "ProfileViewModel"
 
@@ -35,13 +36,16 @@ private val emptyPainter = object : Painter() {
 
 data class ProfileViewModelState(
     val profilePicture: Painter = emptyPainter,
-    val profilePictureUrl: String = "https://avatars.githubusercontent.com/u/48265657?v=4",
-    val shortenedPubKey: String = "c1a8cf31...9328574a",
-    val pubKey: String = "c1a8cf311234qwre9328574a",
-    val name: String = "Kai Wolfram",
-    val bio: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.",
+    val profilePictureUrl: String = "",
+    val shortenedPubKey: String = "",
+    val pubKey: String = "",
+    val name: String = "",
+    val bio: String = "",
     val posts: List<Post> = listOf(),
-)
+    val numOfFollowers: UInt = 0u,
+    val numOfFollowing: UInt = 0u,
+) {
+}
 
 class ProfileViewModel(
     private val defaultProfilePicture: Painter,
@@ -62,10 +66,18 @@ class ProfileViewModel(
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
         val posts = nostrRepository.getPosts(uiState.value.pubKey)
+        val profile = nostrRepository.getProfile(UUID.randomUUID().toString())
         viewModelState.update {
             it.copy(
                 profilePicture = defaultProfilePicture,
-                posts = posts
+                posts = posts,
+                numOfFollowers = nostrRepository.getFollowerCount(),
+                numOfFollowing = nostrRepository.getFollowingCount(),
+                name = profile.name,
+                bio = profile.bio,
+                profilePictureUrl = profile.picture,
+                shortenedPubKey = "${profile.pubKey.substring(0, 15)}...",
+                pubKey = profile.pubKey
             )
         }
         for (post in posts) {
