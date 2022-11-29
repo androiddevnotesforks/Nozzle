@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,7 +40,7 @@ fun ProfileScreen(
         ProfileData(
             profilePicture = uiState.profilePicture,
             name = uiState.name,
-            shortenedPubKey = uiState.shortenedPubKey,
+            pubKey = uiState.pubKey,
             bio = uiState.bio,
             navToEditProfile = navToEditProfile,
         )
@@ -130,34 +129,35 @@ private fun PostCard(
 private fun ProfileData(
     profilePicture: Painter,
     name: String,
-    shortenedPubKey: String,
+    pubKey: String,
     bio: String,
     navToEditProfile: () -> Unit,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Spacer(modifier = Modifier.width(6.dp))
+    Row(
+        modifier = Modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         ProfilePicture(
             modifier = Modifier
-                .padding(6.dp)
-                .fillMaxWidth(0.20f)
+                .size(60.dp)
                 .aspectRatio(1f)
                 .clip(CircleShape),
             profilePicture = profilePicture
         )
-        Spacer(modifier = Modifier.width(6.dp))
-        Column(
-            modifier = Modifier.padding(6.dp)
-        ) {
+        Spacer(modifier = Modifier.width(4.dp))
+        Column(verticalArrangement = Arrangement.Center) {
             NameAndEdit(
                 name = name,
-                shortenedPubKey = shortenedPubKey,
+                pubKey = pubKey,
                 navToEditProfile = navToEditProfile,
             )
-            Text(
-                text = bio,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (bio.isNotBlank()) {
+                Text(
+                    text = bio,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -172,30 +172,27 @@ private fun FollowerNumbers(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 4.dp),
+            .padding(horizontal = 12.dp),
     ) {
-        Spacer(modifier = Modifier.width(4.dp))
         Row(modifier = Modifier.clickable { navToFollowing() }) {
             Text(
-                modifier = Modifier.padding(horizontal = 2.dp),
                 text = numOfFollowing.toString(),
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
-                modifier = Modifier.padding(horizontal = 2.dp),
                 text = stringResource(id = R.string.following)
             )
 
         }
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Row(modifier = Modifier.clickable { navToFollowers() }) {
             Text(
-                modifier = Modifier.padding(horizontal = 2.dp),
                 text = numOfFollowers.toString(),
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
-                modifier = Modifier.padding(horizontal = 2.dp),
                 text = stringResource(id = R.string.followers)
             )
 
@@ -206,22 +203,24 @@ private fun FollowerNumbers(
 @Composable
 private fun NameAndEdit(
     name: String,
-    shortenedPubKey: String,
+    pubKey: String,
     navToEditProfile: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Column(modifier = Modifier.weight(2f)) {
+        Column(
+            modifier = Modifier.padding(end = 4.dp).weight(weight = 3.3f)
+        ) {
             Text(
                 text = name,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.h6,
             )
             Text(
-                text = shortenedPubKey,
+                text = "${pubKey.substring(0, 15)}...",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = Color.LightGray,
@@ -234,10 +233,6 @@ private fun NameAndEdit(
             shape = RoundedCornerShape(100),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.onSurface)
         ) {
-            Icon(
-                imageVector = Icons.Filled.Edit,
-                contentDescription = stringResource(id = R.string.nav_to_edit_profile)
-            )
             Text(
                 text = stringResource(id = R.string.edit),
                 maxLines = 1,

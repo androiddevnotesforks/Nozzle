@@ -38,7 +38,6 @@ private val emptyPainter = object : Painter() {
 data class ProfileViewModelState(
     val profilePicture: Painter = emptyPainter,
     val profilePictureUrl: String = "",
-    val shortenedPubKey: String = "",
     val pubKey: String = "",
     val name: String = "",
     val bio: String = "",
@@ -138,7 +137,6 @@ class ProfileViewModel(
                 name = profile.name,
                 bio = profile.bio,
                 profilePictureUrl = profile.picture,
-                shortenedPubKey = "${profile.pubKey.substring(0, 15)}...",
                 pubKey = profile.pubKey,
                 isRefreshing = false,
                 isSyncing = false,
