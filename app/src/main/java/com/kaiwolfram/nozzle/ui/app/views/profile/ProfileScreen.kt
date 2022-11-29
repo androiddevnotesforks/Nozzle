@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -58,6 +60,9 @@ fun ProfileScreen(
             onRefreshProfileView = onRefreshProfileView,
         )
     }
+    if (uiState.posts.isEmpty()) {
+        NoPostsHint()
+    }
 }
 
 @Composable
@@ -71,7 +76,7 @@ private fun Posts(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefreshProfileView,
     ) {
-        LazyColumn {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(posts) { post ->
                 PostCard(
                     post = post,
@@ -217,7 +222,7 @@ private fun NameAndEdit(
                 text = shortenedPubKey,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.Gray.copy(alpha = 0.8f),
+                color = Color.LightGray,
                 style = MaterialTheme.typography.body2,
             )
         }
@@ -254,4 +259,25 @@ private fun ProfilePicture(
             .aspectRatio(1f)
             .clip(CircleShape)
     )
+}
+
+@Composable
+private fun NoPostsHint() {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Icon(
+            modifier = Modifier.fillMaxSize(0.1f),
+            contentDescription = null,
+            imageVector = Icons.Rounded.Search,
+            tint = Color.LightGray
+        )
+        Text(
+            text = stringResource(id = R.string.no_posts_found),
+            textAlign = TextAlign.Center,
+            color = Color.LightGray
+        )
+    }
 }

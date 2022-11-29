@@ -28,7 +28,7 @@ class NostrRepositoryMock : INostrRepository {
 
     override fun getPosts(pubKey: String): List<Post> {
         val result = mutableListOf<Post>()
-        val max = Random.nextInt(20)
+        val max = Random.nextInt(15)
         if (max != 0) {
             for (i in 0..max) {
                 result.add(createRndPost())
