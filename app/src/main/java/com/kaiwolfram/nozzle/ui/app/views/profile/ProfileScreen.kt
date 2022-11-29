@@ -66,21 +66,37 @@ private fun Posts(
 
 @Composable
 private fun PostCard(post: Post, onGetPicture: (String) -> Painter) {
-    Row(modifier = Modifier.padding(all = 8.dp)) {
+    Row(
+        modifier = Modifier
+            .padding(all = 8.dp)
+            .fillMaxWidth()
+    ) {
         Icon(
-            painter = onGetPicture(post.profilePicUrl),
-            contentDescription = null,
-            tint = Color.Unspecified,
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
+                .clickable { /*TODO: Open profile*/ },
+            painter = onGetPicture(post.profilePicUrl),
+            contentDescription = null,
+            tint = Color.Unspecified,
 
-        )
+            )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
-            Text(text = post.author, fontWeight = FontWeight.SemiBold)
+            Text(
+                modifier = Modifier.clickable { /*TODO: Open profile*/ },
+                text = post.author,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = post.content)
+            Text(
+                modifier = Modifier.clickable { /*TODO: Open thread*/ },
+                text = post.content,
+                maxLines = 12,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 
@@ -169,7 +185,7 @@ private fun NameAndEdit(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Column {
+        Column(modifier = Modifier.weight(2f)) {
             Text(
                 text = name,
                 maxLines = 2,
@@ -185,6 +201,7 @@ private fun NameAndEdit(
             )
         }
         OutlinedButton(
+            modifier = Modifier.weight(weight = 1f, fill = false),
             onClick = navToEditProfile,
             shape = RoundedCornerShape(100),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.onSurface)

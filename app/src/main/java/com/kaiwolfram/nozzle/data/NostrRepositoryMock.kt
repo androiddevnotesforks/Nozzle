@@ -7,16 +7,6 @@ import java.util.*
 import kotlin.random.Random
 
 class NostrRepositoryMock : INostrRepository {
-    private val names = listOf(
-        "kaiwolfram",
-        "wolframkai",
-        "kai",
-        "wolfram",
-        "satoshi",
-        "nakamoto",
-        "satoshinakamoto",
-        "nakamotosatoshi"
-    )
     private val baseUrl = "https://robohash.org/"
 
     override fun getFollowerCount(): UInt {
@@ -29,8 +19,8 @@ class NostrRepositoryMock : INostrRepository {
 
     override fun getProfile(pubKey: String): Profile {
         return Profile(
-            name = names.shuffled()[0],
-            pubKey = UUID.randomUUID().toString(),
+            name = UUID.randomUUID().toString(),
+            pubKey = pubKey,
             bio = UUID.randomUUID().toString().repeat(Random.nextInt(15)),
             picture = "$baseUrl${UUID.randomUUID()}"
         )
@@ -50,10 +40,10 @@ class NostrRepositoryMock : INostrRepository {
 
     private fun createRndPost(): Post {
         return Post(
-            author = names.shuffled()[0],
+            author = UUID.randomUUID().toString(),
             profilePicUrl = "$baseUrl${UUID.randomUUID()}",
             published = LocalDateTime.now(),
-            content = UUID.randomUUID().toString().repeat(Random.nextInt(15))
+            content = UUID.randomUUID().toString().repeat(Random.nextInt(20))
         )
     }
 }
