@@ -20,6 +20,8 @@ import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
+import com.kaiwolfram.nozzle.ui.app.views.followers.FollowersViewModel
+import com.kaiwolfram.nozzle.ui.app.views.following.FollowingViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysViewModel
@@ -43,6 +45,12 @@ fun NozzleApp(appContainer: AppContainer) {
                         imageLoader = appContainer.imageLoader,
                         context = LocalContext.current
                     )
+                ),
+                followersViewModel = viewModel(
+                    factory = FollowersViewModel.provideFactory()
+                ),
+                followingViewModel = viewModel(
+                    factory = FollowingViewModel.provideFactory()
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory()

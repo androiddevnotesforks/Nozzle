@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.views.profile.following
+package com.kaiwolfram.nozzle.ui.app.views.following
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,20 +26,15 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.Profile
-import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModelState
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 
 @Composable
 fun FollowingScreen(
-    uiState: ProfileViewModelState,
-    onGetPicture: (String) -> Painter,
-    onRefreshFollowingList: () -> Unit,
+    uiState: FollowingViewModelState,
 ) {
     FollowingList(
-        profiles = uiState.followingList,
-        isRefreshing = uiState.isRefreshing,
-        onGetPicture = onGetPicture,
-        onRefreshFollowingList = onRefreshFollowingList,
+        profiles = listOf(),
+        isRefreshing = false,
     )
 }
 
@@ -47,18 +42,16 @@ fun FollowingScreen(
 fun FollowingList(
     profiles: List<Profile>,
     isRefreshing: Boolean,
-    onGetPicture: (String) -> Painter,
-    onRefreshFollowingList: () -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
-        onRefresh = onRefreshFollowingList,
+        onRefresh = { TODO() },
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(profiles) { profile ->
                 FollowingCard(
                     profile = profile,
-                    onGetPicture = onGetPicture
+                    onGetPicture = TODO()
                 )
             }
         }

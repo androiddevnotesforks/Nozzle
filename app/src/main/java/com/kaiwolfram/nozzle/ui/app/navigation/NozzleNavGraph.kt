@@ -9,11 +9,11 @@ import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.ui.app.VMContainer
 import com.kaiwolfram.nozzle.ui.app.views.chat.ChatRoute
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
+import com.kaiwolfram.nozzle.ui.app.views.followers.FollowersRoute
+import com.kaiwolfram.nozzle.ui.app.views.following.FollowingRoute
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.edit.EditProfileRoute
-import com.kaiwolfram.nozzle.ui.app.views.profile.followers.FollowersRoute
-import com.kaiwolfram.nozzle.ui.app.views.profile.following.FollowingRoute
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysRoute
 
 @Composable
@@ -44,12 +44,12 @@ fun NozzleNavGraph(
         }
         composable(NozzleRoute.FOLLOWING) {
             FollowingRoute(
-                profileViewModel = vmContainer.profileViewModel,
+                followingViewModel = vmContainer.followingViewModel,
             )
         }
         composable(NozzleRoute.FOLLOWERS) {
             FollowersRoute(
-                profileViewModel = vmContainer.profileViewModel,
+                followersViewModel = vmContainer.followersViewModel,
             )
         }
         composable(NozzleRoute.FEED) {

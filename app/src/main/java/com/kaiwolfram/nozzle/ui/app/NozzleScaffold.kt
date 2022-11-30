@@ -38,7 +38,7 @@ private fun CreateNoteButton() {
     FloatingActionButton(
         onClick = { /*TODO*/ },
 
-    ) {
+        ) {
         Icon(
             imageVector = Icons.Rounded.Add,
             contentDescription = stringResource(id = R.string.write_a_post),

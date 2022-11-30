@@ -211,7 +211,9 @@ private fun NameAndEdit(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(
-            modifier = Modifier.padding(end = 4.dp).weight(weight = 3.3f)
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .weight(weight = 3.3f)
         ) {
             Text(
                 text = name,
