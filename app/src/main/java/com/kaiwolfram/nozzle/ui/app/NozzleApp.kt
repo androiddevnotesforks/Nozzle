@@ -78,7 +78,10 @@ fun NozzleApp(appContainer: AppContainer) {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val drawerViewModel: NozzleDrawerViewModel = viewModel(
                 factory = NozzleDrawerViewModel.provideFactory(
-                    defaultProfilePicture = defaultProfilePicture
+                    defaultProfilePicture = defaultProfilePicture,
+                    nostrRepository = appContainer.nostrRepository,
+                    pictureRequester = appContainer.pictureRequester,
+                    profilePreferences = appContainer.profilePreferences,
                 )
             )
 

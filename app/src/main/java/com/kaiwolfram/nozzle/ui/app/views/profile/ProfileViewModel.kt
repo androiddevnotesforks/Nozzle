@@ -2,9 +2,7 @@ package com.kaiwolfram.nozzle.ui.app.views.profile
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.core.graphics.drawable.toBitmap
@@ -120,16 +118,16 @@ class ProfileViewModel(
     private fun refreshProfileView() {
         val posts = nostrRepository.listPosts(uiState.value.pubKey)
         val profile = nostrRepository.getProfile(UUID.randomUUID().toString())
-        val following = nostrRepository.listFollowedProfiles(profile.pubKey)
+        val following = nostrRepository.listFollowedProfiles(profile?.pubKey ?: "")
         viewModelState.update {
             it.copy(
                 posts = posts,
                 numOfFollowers = nostrRepository.getFollowerCount(),
                 numOfFollowing = nostrRepository.getFollowingCount(),
-                name = profile.name,
-                bio = profile.bio,
-                profilePictureUrl = profile.picture,
-                pubKey = profile.pubKey,
+                name = profile?.name ?: "",
+                bio = profile?.bio ?: "",
+                profilePictureUrl = profile?.picture ?: "",
+                pubKey = profile?.pubKey ?: "",
                 isRefreshing = false,
                 isSyncing = false,
                 followingList = following,
