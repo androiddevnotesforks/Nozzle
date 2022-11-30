@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.request.ImageRequest
 import com.kaiwolfram.nozzle.data.INostrRepository
+import com.kaiwolfram.nozzle.data.utils.createEmptyPainter
 import com.kaiwolfram.nozzle.model.Post
 import com.kaiwolfram.nozzle.model.Profile
 import kotlinx.coroutines.Dispatchers
@@ -26,17 +27,8 @@ import java.util.*
 
 private const val TAG = "ProfileViewModel"
 
-private val emptyPainter = object : Painter() {
-    override val intrinsicSize: Size
-        get() = Size.Zero
-
-    override fun DrawScope.onDraw() {
-        throw IllegalStateException("empty painter should be overwritten")
-    }
-}
-
 data class ProfileViewModelState(
-    val profilePicture: Painter = emptyPainter,
+    val profilePicture: Painter = createEmptyPainter(),
     val profilePictureUrl: String = "",
     val pubKey: String = "",
     val name: String = "",

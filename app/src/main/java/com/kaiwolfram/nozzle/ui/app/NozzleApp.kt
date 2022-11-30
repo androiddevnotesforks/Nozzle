@@ -8,7 +8,9 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Surface
 import androidx.compose.material.rememberDrawerState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -16,14 +18,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.app.navigation.NozzleDrawer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
+import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
+import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.followers.FollowersViewModel
 import com.kaiwolfram.nozzle.ui.app.views.following.FollowingViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
+import com.kaiwolfram.nozzle.ui.app.views.profile.edit.EditProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
@@ -36,15 +40,19 @@ fun NozzleApp(appContainer: AppContainer) {
             val navActions = remember(navController) {
                 NozzleNavActions(navController)
             }
+            val defaultProfilePicture = painterResource(R.drawable.ic_default_profile)
 
             val vmContainer = VMContainer(
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
-                        defaultProfilePicture = painterResource(R.drawable.ic_default_profile),
+                        defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
                         imageLoader = appContainer.imageLoader,
                         context = LocalContext.current
                     )
+                ),
+                editProfileViewModel = viewModel(
+                    factory = EditProfileViewModel.provideFactory()
                 ),
                 followersViewModel = viewModel(
                     factory = FollowersViewModel.provideFactory()
@@ -68,14 +76,17 @@ fun NozzleApp(appContainer: AppContainer) {
 
             val coroutineScope = rememberCoroutineScope()
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-            val profileState by vmContainer.profileViewModel.uiState.collectAsState()
+            val drawerViewModel: NozzleDrawerViewModel = viewModel(
+                factory = NozzleDrawerViewModel.provideFactory(
+                    defaultProfilePicture = defaultProfilePicture
+                )
+            )
 
             ModalDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    NozzleDrawer(
-                        profilePicture = profileState.profilePicture,
-                        profileName = profileState.name,
+                    NozzleDrawerRoute(
+                        nozzleDrawerViewModel = drawerViewModel,
                         navActions = navActions,
                         closeDrawer = { coroutineScope.launch { drawerState.close() } },
                         modifier = Modifier

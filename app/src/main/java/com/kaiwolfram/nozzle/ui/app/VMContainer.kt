@@ -6,10 +6,12 @@ import com.kaiwolfram.nozzle.ui.app.views.followers.FollowersViewModel
 import com.kaiwolfram.nozzle.ui.app.views.following.FollowingViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
+import com.kaiwolfram.nozzle.ui.app.views.profile.edit.EditProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysViewModel
 
 data class VMContainer(
     val profileViewModel: ProfileViewModel,
+    val editProfileViewModel: EditProfileViewModel,
     val followingViewModel: FollowingViewModel,
     val followersViewModel: FollowersViewModel,
     val feedViewModel: FeedViewModel,

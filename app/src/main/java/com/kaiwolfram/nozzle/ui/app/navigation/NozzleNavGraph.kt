@@ -39,7 +39,7 @@ fun NozzleNavGraph(
         }
         composable(NozzleRoute.EDIT_PROFILE) {
             EditProfileRoute(
-                profileViewModel = vmContainer.profileViewModel,
+                editProfileViewModel = vmContainer.editProfileViewModel,
             )
         }
         composable(NozzleRoute.FOLLOWING) {

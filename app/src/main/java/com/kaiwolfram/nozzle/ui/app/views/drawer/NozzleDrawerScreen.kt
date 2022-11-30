@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.navigation
+package com.kaiwolfram.nozzle.ui.app.views.drawer
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -20,11 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 
 @Composable
-fun NozzleDrawer(
-    profilePicture: Painter,
-    profileName: String,
+fun NozzleDrawerScreen(
+    uiState: NozzleDrawerViewModelState,
     navActions: NozzleNavActions,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier,
@@ -35,8 +35,8 @@ fun NozzleDrawer(
             .padding(4.dp)
     ) {
         ProfileRow(
-            profilePicture = profilePicture,
-            profileName = profileName,
+            profilePicture = uiState.profilePicture,
+            profileName = uiState.profileName,
             navigateToProfile = navActions.navigateToProfile,
             closeDrawer = closeDrawer
         )
