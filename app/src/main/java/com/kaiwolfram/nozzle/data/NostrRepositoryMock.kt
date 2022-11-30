@@ -9,19 +9,19 @@ import kotlin.random.Random
 class NostrRepositoryMock : INostrRepository {
     private val baseUrl = "https://robohash.org/"
 
-    override fun getFollowerCount(): UInt {
+    override fun getFollowerCount(publicKey: String): UInt {
         return Random.nextInt(2000).toUInt()
     }
 
-    override fun getFollowingCount(): UInt {
+    override fun getFollowingCount(publicKey: String): UInt {
         return Random.nextInt(2000).toUInt()
     }
 
-    override fun getProfile(pubKey: String): Profile {
-        return createRndProfile()
+    override fun getProfile(publicKey: String): Profile {
+        return createRndProfile(publicKey)
     }
 
-    override fun listPosts(pubKey: String): List<Post> {
+    override fun listPosts(publicKey: String): List<Post> {
         val result = mutableListOf<Post>()
         val max = Random.nextInt(15)
         if (max != 0) {
@@ -54,12 +54,16 @@ class NostrRepositoryMock : INostrRepository {
         )
     }
 
-    private fun createRndProfile(): Profile {
+    private fun createRndProfile(publicKey: String): Profile {
         return Profile(
             name = UUID.randomUUID().toString(),
-            pubKey = UUID.randomUUID().toString(),
+            publicKey = publicKey,
             bio = UUID.randomUUID().toString().repeat(Random.nextInt(15)),
-            picture = "$baseUrl${UUID.randomUUID()}"
+            pictureUrl = "$baseUrl${UUID.randomUUID()}"
         )
+    }
+
+    private fun createRndProfile(): Profile {
+        return createRndProfile(UUID.randomUUID().toString())
     }
 }

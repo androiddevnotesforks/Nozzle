@@ -1,8 +1,8 @@
 package com.kaiwolfram.nozzle.model
 
 data class Profile(
+    val publicKey: String,
     val name: String,
-    val pubKey: String,
     val bio: String,
-    val picture: String
+    val pictureUrl: String
 )

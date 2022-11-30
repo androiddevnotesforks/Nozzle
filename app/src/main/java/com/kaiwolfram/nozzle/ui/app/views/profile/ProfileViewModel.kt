@@ -1,53 +1,46 @@
 package com.kaiwolfram.nozzle.ui.app.views.profile
 
-import android.content.Context
 import android.util.Log
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import coil.ImageLoader
-import coil.request.ImageRequest
 import com.kaiwolfram.nozzle.data.INostrRepository
+import com.kaiwolfram.nozzle.data.PictureRequester
 import com.kaiwolfram.nozzle.data.utils.createEmptyPainter
+import com.kaiwolfram.nozzle.model.NozzleProfile
 import com.kaiwolfram.nozzle.model.Post
-import com.kaiwolfram.nozzle.model.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
 
 private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
-    val profilePicture: Painter = createEmptyPainter(),
-    val profilePictureUrl: String = "",
-    val pubKey: String = "",
+    val publicKey: String = "",
     val name: String = "",
     val bio: String = "",
-    val posts: List<Post> = listOf(),
-    val numOfFollowers: UInt = 0u,
+    val pictureUrl: String = "",
+    val picture: Painter = createEmptyPainter(),
     val numOfFollowing: UInt = 0u,
+    val numOfFollowers: UInt = 0u,
+    val posts: List<Post> = listOf(),
     val isRefreshing: Boolean = false,
     val isSyncing: Boolean = false,
-    val followingList: List<Profile> = listOf(),
 )
 
 class ProfileViewModel(
     private val defaultProfilePicture: Painter,
     private val nostrRepository: INostrRepository,
-    private val imageLoader: ImageLoader,
-    context: Context
+    private val pictureRequester: PictureRequester,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
+
+    private val profiles = mutableMapOf<String, NozzleProfile>()
     private val pictures = mutableMapOf<String, Painter>()
-    private val imageRequestBuilder = ImageRequest.Builder(context)
 
     val uiState = viewModelState
         .stateIn(
@@ -60,118 +53,144 @@ class ProfileViewModel(
         Log.i(TAG, "Initialize ProfileViewModel")
         viewModelState.update {
             it.copy(
-                profilePicture = defaultProfilePicture
+                picture = defaultProfilePicture
             )
         }
-        refreshProfileView()
+    }
+
+    val onSetPublicKey: (String) -> Unit = { publicKey ->
+        Log.i(TAG, "Setting ui data for $publicKey")
+        useCachedValues(publicKey)
+        fetchAndUseNostrData(publicKey)
+    }
+
+    val onGetPicture: (String) -> Painter = { pictureUrl ->
+        val picture = pictures[pictureUrl]
+        if (picture == null) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                requestAndCachePicture(pictureUrl)
+            }
+        }
+        picture ?: defaultProfilePicture
     }
 
     val onRefreshProfileView: () -> Unit = {
         execWhenSyncingNotBlocked {
             Log.i(TAG, "Refresh profile view")
-            setRefreshAndSync(true)
-            refreshProfileView()
+            setRefresh(true)
+            fetchAndUseNostrData(uiState.value.publicKey)
         }
     }
 
-    val onRefreshFollowingList: () -> Unit = {
-        execWhenSyncingNotBlocked {
-            Log.i(TAG, "Refresh following list")
-            setRefreshAndSync(true)
-            viewModelScope.launch(context = Dispatchers.IO) {
-                val following = nostrRepository.listFollowedProfiles(uiState.value.pubKey)
-                viewModelState.update {
-                    it.copy(
-                        isRefreshing = false,
-                        isSyncing = false,
-                        followingList = following,
-                    )
-                }
-                for (profile in following) {
-                    viewModelScope.launch(context = Dispatchers.IO) {
-                        val pic = requestPicture(url = profile.picture)
-                        pictures[profile.picture] = pic
-                    }
-                }
+    private suspend fun requestAndCachePicture(pictureUrl: String): Painter? {
+        val picture = pictureRequester.request(pictureUrl)
+        if (picture != null) {
+            pictures[pictureUrl] = picture
+        }
+        return picture
+    }
+
+    private fun fetchAndUseNostrData(publicKey: String) {
+        Log.i(TAG, "Fetching nostr data for $publicKey")
+        setSync(true)
+        viewModelScope.launch(context = Dispatchers.IO) {
+            val profile = nostrRepository.getProfile(publicKey)
+            if (profile != null) {
+                val picture = pictures[publicKey]
+                    ?: pictureRequester.request(profile.pictureUrl)
+                    ?: defaultProfilePicture
+                val numOfFollowing = nostrRepository.getFollowingCount(publicKey)
+                val numOfFollowers = nostrRepository.getFollowerCount(publicKey)
+                val posts = nostrRepository.listPosts(publicKey)
+                val nozzleProfile =
+                    NozzleProfile(profile, picture, numOfFollowing, numOfFollowers, posts)
+                useAndCacheProfile(nozzleProfile)
             }
+            setSync(false)
+            setRefresh(false)
         }
     }
 
-    val onGetPicture: (url: String) -> Painter = {
-        pictures[it] ?: defaultProfilePicture
+    private fun useAndCacheProfile(profile: NozzleProfile) {
+        Log.i(TAG, "Caching fetched profile of ${profile.profile.publicKey}")
+        profiles[profile.profile.publicKey] = profile
+        pictures[profile.profile.pictureUrl] = profile.picture
+        viewModelState.update {
+            it.copy(
+                publicKey = profile.profile.publicKey,
+                name = profile.profile.name,
+                bio = profile.profile.bio,
+                pictureUrl = profile.profile.pictureUrl,
+                picture = profile.picture,
+                numOfFollowing = profile.numOfFollowing,
+                numOfFollowers = profile.numOfFollowers,
+                posts = profile.posts,
+            )
+        }
+    }
+
+    private fun useCachedValues(publicKey: String) {
+        val profile = profiles[publicKey]
+        if (profile != null) {
+            Log.i(TAG, "Using cached values")
+            viewModelState.update {
+                it.copy(
+                    publicKey = publicKey,
+                    name = profile.profile.name,
+                    bio = profile.profile.bio,
+                    pictureUrl = profile.profile.pictureUrl,
+                    picture = profile.picture,
+                    numOfFollowing = profile.numOfFollowing,
+                    numOfFollowers = profile.numOfFollowers,
+                    posts = profile.posts,
+                )
+            }
+        } else {
+            Log.i(TAG, "Resetting ui state because cache is empty")
+            resetValues(publicKey)
+        }
+    }
+
+    private fun resetValues(publicKey: String) {
+        viewModelState.update {
+            it.copy(
+                publicKey = publicKey,
+                name = "",
+                bio = "",
+                pictureUrl = "",
+                picture = defaultProfilePicture,
+                numOfFollowing = 0u,
+                numOfFollowers = 0u,
+                posts = listOf(),
+            )
+        }
     }
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
         if (uiState.value.isSyncing) {
-            Log.i(TAG, "Blocked sync attempt")
+            Log.i(TAG, "Blocked by active sync process")
         } else {
             exec()
         }
     }
 
-    private fun setRefreshAndSync(value: Boolean) {
+    private fun setRefresh(value: Boolean) {
         viewModelState.update {
-            it.copy(isRefreshing = value, isSyncing = value)
+            it.copy(isRefreshing = value)
         }
     }
 
-    private fun refreshProfileView() {
-        val posts = nostrRepository.listPosts(uiState.value.pubKey)
-        val profile = nostrRepository.getProfile(UUID.randomUUID().toString())
-        val following = nostrRepository.listFollowedProfiles(profile?.pubKey ?: "")
+    private fun setSync(value: Boolean) {
         viewModelState.update {
-            it.copy(
-                posts = posts,
-                numOfFollowers = nostrRepository.getFollowerCount(),
-                numOfFollowing = nostrRepository.getFollowingCount(),
-                name = profile?.name ?: "",
-                bio = profile?.bio ?: "",
-                profilePictureUrl = profile?.picture ?: "",
-                pubKey = profile?.pubKey ?: "",
-                isRefreshing = false,
-                isSyncing = false,
-                followingList = following,
-            )
+            it.copy(isSyncing = value)
         }
-        updateProfilePicture(url = viewModelState.value.profilePictureUrl)
-        for (post in posts) {
-            viewModelScope.launch(context = Dispatchers.IO) {
-                val pic = requestPicture(url = post.profilePicUrl)
-                pictures[post.profilePicUrl] = pic
-            }
-        }
-        for (followed in following) {
-            viewModelScope.launch(context = Dispatchers.IO) {
-                val pic = requestPicture(url = followed.picture)
-                pictures[followed.picture] = pic
-            }
-        }
-    }
-
-    private fun updateProfilePicture(url: String) {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            val result = requestPicture(url = url)
-            viewModelState.update {
-                it.copy(profilePicture = result)
-            }
-        }
-    }
-
-    private suspend fun requestPicture(url: String): Painter {
-        val request = imageRequestBuilder
-            .data(url)
-            .allowConversionToBitmap(true)
-            .build()
-        val result = imageLoader.execute(request).drawable?.toBitmap()?.asImageBitmap()
-        return if (result != null) BitmapPainter(result) else defaultProfilePicture
     }
 
     companion object {
         fun provideFactory(
             defaultProfilePicture: Painter,
             nostrRepository: INostrRepository,
-            imageLoader: ImageLoader,
-            context: Context,
+            pictureRequester: PictureRequester,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -179,8 +198,7 @@ class ProfileViewModel(
                     return ProfileViewModel(
                         defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = nostrRepository,
-                        imageLoader = imageLoader,
-                        context = context
+                        pictureRequester = pictureRequester,
                     ) as T
                 }
             }

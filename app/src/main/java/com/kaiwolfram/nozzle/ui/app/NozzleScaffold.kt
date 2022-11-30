@@ -36,7 +36,7 @@ fun NozzleScaffold(
 @Composable
 private fun CreateNoteButton() {
     FloatingActionButton(
-        onClick = { /*TODO*/ },
+        onClick = { },
 
         ) {
         Icon(

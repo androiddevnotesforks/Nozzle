@@ -7,16 +7,23 @@ import androidx.compose.runtime.getValue
 @Composable
 fun ProfileRoute(
     profileViewModel: ProfileViewModel,
-    navToFollowing: () -> Unit,
-    navToFollowers: () -> Unit,
-    navToEditProfile: () -> Unit,
+) {
+    ProfileRoute(
+        profileViewModel = profileViewModel,
+        navToEditProfile = null
+    )
+}
+
+
+@Composable
+fun ProfileRoute(
+    profileViewModel: ProfileViewModel,
+    navToEditProfile: (() -> Unit)?,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
     ProfileScreen(
         uiState = uiState,
-        navToFollowing = navToFollowing,
-        navToFollowers = navToFollowers,
         navToEditProfile = navToEditProfile,
         onGetPicture = profileViewModel.onGetPicture,
         onRefreshProfileView = profileViewModel.onRefreshProfileView,

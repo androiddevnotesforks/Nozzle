@@ -30,26 +30,22 @@ import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 @Composable
 fun ProfileScreen(
     uiState: ProfileViewModelState,
-    navToFollowing: () -> Unit,
-    navToFollowers: () -> Unit,
-    navToEditProfile: () -> Unit,
+    navToEditProfile: (() -> Unit)?,
     onGetPicture: (String) -> Painter,
     onRefreshProfileView: () -> Unit,
 ) {
     Column {
         ProfileData(
-            profilePicture = uiState.profilePicture,
+            publicKey = uiState.publicKey,
             name = uiState.name,
-            pubKey = uiState.pubKey,
             bio = uiState.bio,
+            picture = uiState.picture,
             navToEditProfile = navToEditProfile,
         )
         Spacer(modifier = Modifier.height(4.dp))
         FollowerNumbers(
             numOfFollowing = uiState.numOfFollowing,
             numOfFollowers = uiState.numOfFollowers,
-            navToFollowing = navToFollowing,
-            navToFollowers = navToFollowers
         )
         Spacer(modifier = Modifier.height(12.dp))
         Divider()
@@ -100,14 +96,12 @@ private fun PostCard(
         ProfilePicture(
             modifier = Modifier
                 .size(40.dp)
-                .clip(CircleShape)
-                .clickable { /*TODO: Open profile*/ },
+                .clip(CircleShape),
             profilePicture = onGetPicture(post.profilePicUrl)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
             Text(
-                modifier = Modifier.clickable { /*TODO: Open profile*/ },
                 text = post.author,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
@@ -115,7 +109,6 @@ private fun PostCard(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                modifier = Modifier.clickable { /*TODO: Open thread*/ },
                 text = post.content,
                 maxLines = 12,
                 overflow = TextOverflow.Ellipsis
@@ -127,11 +120,11 @@ private fun PostCard(
 
 @Composable
 private fun ProfileData(
-    profilePicture: Painter,
+    publicKey: String,
     name: String,
-    pubKey: String,
     bio: String,
-    navToEditProfile: () -> Unit,
+    picture: Painter,
+    navToEditProfile: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.padding(8.dp),
@@ -142,13 +135,13 @@ private fun ProfileData(
                 .size(60.dp)
                 .aspectRatio(1f)
                 .clip(CircleShape),
-            profilePicture = profilePicture
+            profilePicture = picture
         )
         Spacer(modifier = Modifier.width(4.dp))
         Column(verticalArrangement = Arrangement.Center) {
             NameAndEdit(
                 name = name,
-                pubKey = pubKey,
+                pubKey = publicKey,
                 navToEditProfile = navToEditProfile,
             )
             if (bio.isNotBlank()) {
@@ -166,15 +159,13 @@ private fun ProfileData(
 private fun FollowerNumbers(
     numOfFollowing: UInt,
     numOfFollowers: UInt,
-    navToFollowing: () -> Unit,
-    navToFollowers: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp),
     ) {
-        Row(modifier = Modifier.clickable { navToFollowing() }) {
+        Row {
             Text(
                 text = numOfFollowing.toString(),
                 fontWeight = FontWeight.Bold
@@ -186,7 +177,7 @@ private fun FollowerNumbers(
 
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Row(modifier = Modifier.clickable { navToFollowers() }) {
+        Row {
             Text(
                 text = numOfFollowers.toString(),
                 fontWeight = FontWeight.Bold
@@ -204,7 +195,7 @@ private fun FollowerNumbers(
 private fun NameAndEdit(
     name: String,
     pubKey: String,
-    navToEditProfile: () -> Unit,
+    navToEditProfile: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -229,17 +220,19 @@ private fun NameAndEdit(
                 style = MaterialTheme.typography.body2,
             )
         }
-        OutlinedButton(
-            modifier = Modifier.weight(weight = 1f, fill = false),
-            onClick = navToEditProfile,
-            shape = RoundedCornerShape(100),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.onSurface)
-        ) {
-            Text(
-                text = stringResource(id = R.string.edit),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+        if (navToEditProfile != null) {
+            OutlinedButton(
+                modifier = Modifier.weight(weight = 1f, fill = false),
+                onClick = navToEditProfile,
+                shape = RoundedCornerShape(100),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.onSurface)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.edit),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

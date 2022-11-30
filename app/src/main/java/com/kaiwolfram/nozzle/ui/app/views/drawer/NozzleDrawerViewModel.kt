@@ -10,6 +10,7 @@ import com.kaiwolfram.nozzle.data.INostrRepository
 import com.kaiwolfram.nozzle.data.PictureRequester
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import com.kaiwolfram.nozzle.data.utils.createEmptyPainter
+import com.kaiwolfram.nozzle.model.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,8 +21,10 @@ import kotlinx.coroutines.launch
 private const val TAG = "NozzleDrawerViewModel"
 
 data class NozzleDrawerViewModelState(
-    val profilePicture: Painter = createEmptyPainter(),
-    val profileName: String = "",
+    val publicKey: String = "",
+    val name: String = "",
+    val pictureUrl: String = "",
+    val picture: Painter = createEmptyPainter(),
 )
 
 class NozzleDrawerViewModel(
@@ -45,28 +48,37 @@ class NozzleDrawerViewModel(
     }
 
     private fun setCachedValues() {
-        // TODO: Cache Profile picture and set it here
         viewModelState.update {
             it.copy(
-                profilePicture = defaultProfilePicture,
-                profileName = profilePreferences.getName(),
+                publicKey = profilePreferences.getPublicKey(),
+                name = profilePreferences.getName(),
+                pictureUrl = profilePreferences.getPictureUrl(),
+                picture = defaultProfilePicture,
             )
         }
     }
 
     private fun updateValuesFromNostrMetaData() {
         viewModelScope.launch(context = Dispatchers.IO) {
-            val publicKey = profilePreferences.getPublicKey()
-            nostrRepository.getProfile(publicKey)?.let { profile ->
-                profilePreferences.setProfileValues(profile)
-                viewModelState.update {
-                    it.copy(
-                        profileName = profile.name,
-                        profilePicture = pictureRequester.request(profile.picture)
-                            ?: defaultProfilePicture,
-                    )
-                }
+            val profile = nostrRepository.getProfile(profilePreferences.getPublicKey())
+            if (profile != null) {
+                cacheProfile(profile)
+                fetchPictureAndUpdateUiState(profile)
             }
+        }
+    }
+
+    private fun cacheProfile(profile: Profile) {
+        profilePreferences.setProfileValues(profile)
+    }
+
+    private suspend fun fetchPictureAndUpdateUiState(profile: Profile) {
+        viewModelState.update {
+            it.copy(
+                name = profile.name,
+                pictureUrl = profile.pictureUrl,
+                picture = pictureRequester.request(profile.pictureUrl) ?: defaultProfilePicture
+            )
         }
     }
 

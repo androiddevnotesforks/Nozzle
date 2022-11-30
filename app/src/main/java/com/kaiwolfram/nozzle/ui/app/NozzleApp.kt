@@ -12,19 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
+import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
-import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
-import com.kaiwolfram.nozzle.ui.app.views.followers.FollowersViewModel
-import com.kaiwolfram.nozzle.ui.app.views.following.FollowingViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.edit.EditProfileViewModel
@@ -47,18 +44,11 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = ProfileViewModel.provideFactory(
                         defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
-                        imageLoader = appContainer.imageLoader,
-                        context = LocalContext.current
+                        pictureRequester = appContainer.pictureRequester,
                     )
                 ),
                 editProfileViewModel = viewModel(
                     factory = EditProfileViewModel.provideFactory()
-                ),
-                followersViewModel = viewModel(
-                    factory = FollowersViewModel.provideFactory()
-                ),
-                followingViewModel = viewModel(
-                    factory = FollowingViewModel.provideFactory()
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory()
@@ -76,7 +66,7 @@ fun NozzleApp(appContainer: AppContainer) {
 
             val coroutineScope = rememberCoroutineScope()
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-            val drawerViewModel: NozzleDrawerViewModel = viewModel(
+            val nozzleDrawerViewModel: NozzleDrawerViewModel = viewModel(
                 factory = NozzleDrawerViewModel.provideFactory(
                     defaultProfilePicture = defaultProfilePicture,
                     nostrRepository = appContainer.nostrRepository,
@@ -89,8 +79,9 @@ fun NozzleApp(appContainer: AppContainer) {
                 drawerState = drawerState,
                 drawerContent = {
                     NozzleDrawerRoute(
-                        nozzleDrawerViewModel = drawerViewModel,
+                        nozzleDrawerViewModel = nozzleDrawerViewModel,
                         navActions = navActions,
+                        onSetPublicKey = vmContainer.profileViewModel.onSetPublicKey,
                         closeDrawer = { coroutineScope.launch { drawerState.close() } },
                         modifier = Modifier
                             .statusBarsPadding()

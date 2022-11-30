@@ -9,8 +9,9 @@ import com.kaiwolfram.nozzle.model.Profile
 private const val TAG: String = "ProfilePreferences"
 
 private object Variables {
-    const val NAME: String = "name"
     const val PUBLIC_KEY: String = "public_key"
+    const val NAME: String = "name"
+    const val PICTURE_URL: String = "picture_url"
 }
 
 class ProfilePreferences(context: Context) {
@@ -27,30 +28,31 @@ class ProfilePreferences(context: Context) {
         }
     }
 
-    fun getName(): String {
-        return preferences.getString(Variables.NAME, "") ?: ""
-    }
-
     fun getPublicKey(): String {
         return preferences.getString(Variables.PUBLIC_KEY, "") ?: ""
     }
 
-    private fun setPublicKey(publicKey: String) {
-        if (publicKey.isBlank()) {
-            Log.i(TAG, "Setting an empty public key is not allowed!")
-            return
-        }
-        Log.i(TAG, "Set public key to $publicKey")
-        preferences.edit()
-            .putString(Variables.PUBLIC_KEY, publicKey)
-            .apply()
+    fun getName(): String {
+        return preferences.getString(Variables.NAME, "") ?: ""
+    }
+
+    fun getPictureUrl(): String {
+        return preferences.getString(Variables.PICTURE_URL, "") ?: ""
     }
 
     fun setProfileValues(profile: Profile) {
         Log.i(TAG, "Set profile values $profile")
         preferences.edit()
+            .putString(Variables.PUBLIC_KEY, profile.publicKey)
             .putString(Variables.NAME, profile.name)
-            .putString(Variables.PUBLIC_KEY, profile.pubKey)
+            .putString(Variables.PICTURE_URL, profile.pictureUrl)
+            .apply()
+    }
+
+    private fun setPublicKey(publicKey: String) {
+        Log.i(TAG, "Set public key to $publicKey")
+        preferences.edit()
+            .putString(Variables.PUBLIC_KEY, publicKey)
             .apply()
     }
 }
