@@ -23,7 +23,6 @@ import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysViewModel
-import com.kaiwolfram.nozzle.ui.app.views.support.SupportViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
 
@@ -56,9 +55,6 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 relaysViewModel = viewModel(
                     factory = RelaysViewModel.provideFactory()
-                ),
-                supportViewModel = viewModel(
-                    factory = SupportViewModel.provideFactory()
                 ),
             )
 

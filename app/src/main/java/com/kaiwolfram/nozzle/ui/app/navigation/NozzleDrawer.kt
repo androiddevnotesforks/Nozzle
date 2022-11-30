@@ -43,7 +43,6 @@ fun NozzleDrawer(
             navigateToChat = navActions.navigateToChat,
             navigateToKeys = navActions.navigateToKeys,
             navigateToRelays = navActions.navigateToRelays,
-            navigateToSupport = navActions.navigateToSupport,
             closeDrawer = closeDrawer
         )
         VersionText()
@@ -78,7 +77,6 @@ private fun MainRows(
     navigateToChat: () -> Unit,
     navigateToKeys: () -> Unit,
     navigateToRelays: () -> Unit,
-    navigateToSupport: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
     DrawerRow(
@@ -110,14 +108,6 @@ private fun MainRows(
         label = stringResource(id = R.string.relays),
         action = {
             navigateToRelays()
-            closeDrawer()
-        }
-    )
-    DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Filled.Support),
-        label = stringResource(id = R.string.support_nozzle),
-        action = {
-            navigateToSupport()
             closeDrawer()
         }
     )

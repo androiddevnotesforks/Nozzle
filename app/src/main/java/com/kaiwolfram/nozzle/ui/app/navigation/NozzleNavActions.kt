@@ -53,12 +53,6 @@ class NozzleNavActions(navController: NavHostController) {
         }
     }
 
-    val navigateToSupport: () -> Unit = {
-        navController.navigate(NozzleRoute.SUPPORT) {
-            setNavOptionsWithPop(navController = navController, optionsBuilder = this)
-        }
-    }
-
     private fun setNavOptionsWithPop(
         navController: NavHostController,
         optionsBuilder: NavOptionsBuilder

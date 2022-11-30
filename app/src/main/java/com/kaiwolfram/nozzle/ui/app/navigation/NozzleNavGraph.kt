@@ -15,7 +15,6 @@ import com.kaiwolfram.nozzle.ui.app.views.profile.edit.EditProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.followers.FollowersRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.following.FollowingRoute
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysRoute
-import com.kaiwolfram.nozzle.ui.app.views.support.SupportRoute
 
 @Composable
 fun NozzleNavGraph(
@@ -71,11 +70,6 @@ fun NozzleNavGraph(
         composable(NozzleRoute.RELAYS) {
             RelaysRoute(
                 relaysViewModel = vmContainer.relaysViewModel,
-            )
-        }
-        composable(NozzleRoute.SUPPORT) {
-            SupportRoute(
-                supportViewModel = vmContainer.supportViewModel,
             )
         }
     }
