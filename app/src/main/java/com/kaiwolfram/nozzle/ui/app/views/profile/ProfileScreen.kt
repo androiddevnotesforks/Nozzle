@@ -1,13 +1,13 @@
 package com.kaiwolfram.nozzle.ui.app.views.profile
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
@@ -30,7 +30,6 @@ import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 @Composable
 fun ProfileScreen(
     uiState: ProfileViewModelState,
-    navToEditProfile: (() -> Unit)?,
     onGetPicture: (String) -> Painter,
     onRefreshProfileView: () -> Unit,
 ) {
@@ -40,7 +39,6 @@ fun ProfileScreen(
             name = uiState.name,
             bio = uiState.bio,
             picture = uiState.picture,
-            navToEditProfile = navToEditProfile,
         )
         Spacer(modifier = Modifier.height(4.dp))
         FollowerNumbers(
@@ -124,7 +122,6 @@ private fun ProfileData(
     name: String,
     bio: String,
     picture: Painter,
-    navToEditProfile: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.padding(8.dp),
@@ -139,10 +136,9 @@ private fun ProfileData(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Column(verticalArrangement = Arrangement.Center) {
-            NameAndEdit(
+            NameAndPublicKey(
                 name = name,
-                pubKey = publicKey,
-                navToEditProfile = navToEditProfile,
+                publicKey = publicKey,
             )
             if (bio.isNotBlank()) {
                 Text(
@@ -192,10 +188,9 @@ private fun FollowerNumbers(
 }
 
 @Composable
-private fun NameAndEdit(
+private fun NameAndPublicKey(
     name: String,
-    pubKey: String,
-    navToEditProfile: (() -> Unit)?,
+    publicKey: String,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -213,26 +208,12 @@ private fun NameAndEdit(
                 style = MaterialTheme.typography.h6,
             )
             Text(
-                text = "${pubKey.substring(0, 15)}...",
+                text = "${publicKey.substring(0, 18)}...",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = Color.LightGray,
                 style = MaterialTheme.typography.body2,
             )
-        }
-        if (navToEditProfile != null) {
-            OutlinedButton(
-                modifier = Modifier.weight(weight = 1f, fill = false),
-                onClick = navToEditProfile,
-                shape = RoundedCornerShape(100),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.onSurface)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.edit),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
         }
     }
 }

@@ -18,14 +18,14 @@ import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
-import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
+import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
-import com.kaiwolfram.nozzle.ui.app.views.profile.edit.EditProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysViewModel
+import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
 
@@ -47,9 +47,6 @@ fun NozzleApp(appContainer: AppContainer) {
                         pictureRequester = appContainer.pictureRequester,
                     )
                 ),
-                editProfileViewModel = viewModel(
-                    factory = EditProfileViewModel.provideFactory()
-                ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory()
                 ),
@@ -61,6 +58,9 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 relaysViewModel = viewModel(
                     factory = RelaysViewModel.provideFactory()
+                ),
+                settingsViewModel = viewModel(
+                    factory = SettingsViewModel.provideFactory()
                 ),
             )
 
@@ -97,7 +97,6 @@ fun NozzleApp(appContainer: AppContainer) {
                     NozzleScaffold(
                         vmContainer = vmContainer,
                         navController = navController,
-                        navActions = navActions,
                     )
                 }
             }

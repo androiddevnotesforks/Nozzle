@@ -5,10 +5,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.SatelliteAlt
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +47,7 @@ fun NozzleDrawerScreen(
             navigateToChat = navActions.navigateToChat,
             navigateToKeys = navActions.navigateToKeys,
             navigateToRelays = navActions.navigateToRelays,
+            navigateToSettings = navActions.navigateToSettings,
             closeDrawer = closeDrawer
         )
         VersionText()
@@ -84,6 +82,7 @@ private fun MainRows(
     navigateToChat: () -> Unit,
     navigateToKeys: () -> Unit,
     navigateToRelays: () -> Unit,
+    navigateToSettings: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
     DrawerRow(
@@ -115,6 +114,14 @@ private fun MainRows(
         label = stringResource(id = R.string.relays),
         action = {
             navigateToRelays()
+            closeDrawer()
+        }
+    )
+    DrawerRow(
+        icon = rememberVectorPainter(image = Icons.Filled.Settings),
+        label = stringResource(id = R.string.settings),
+        action = {
+            navigateToSettings()
             closeDrawer()
         }
     )

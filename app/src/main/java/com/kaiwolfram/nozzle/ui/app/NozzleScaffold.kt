@@ -11,14 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 
 @Composable
 fun NozzleScaffold(
     vmContainer: VMContainer,
     navController: NavHostController,
-    navActions: NozzleNavActions,
 ) {
     Scaffold(
         floatingActionButton = { CreateNoteButton() },
@@ -27,7 +25,6 @@ fun NozzleScaffold(
                 modifier = Modifier.padding(padding),
                 vmContainer = vmContainer,
                 navController = navController,
-                navActions = navActions,
             )
         }
     )
