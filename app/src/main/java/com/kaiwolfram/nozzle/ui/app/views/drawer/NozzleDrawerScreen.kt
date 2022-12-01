@@ -172,7 +172,7 @@ private fun DrawerRow(
                     contentDescription = null,
                     tint = iconTint,
                 )
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(8.dp))
                 Text(
                     text = label,
                     maxLines = 3,
