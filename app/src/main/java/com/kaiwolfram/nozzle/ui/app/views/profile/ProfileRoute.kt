@@ -13,5 +13,6 @@ fun ProfileRoute(
     ProfileScreen(
         uiState = uiState,
         onRefreshProfileView = profileViewModel.onRefreshProfileView,
+        onCopyPubkeyAndShowToast = profileViewModel.onCopyPubkeyAndShowToast,
     )
 }

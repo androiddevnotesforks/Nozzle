@@ -1,7 +1,11 @@
 package com.kaiwolfram.nozzle.ui.app.views.profile
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -65,8 +69,15 @@ class ProfileViewModel(
             useCachedValues(pubkey)
             fetchAndUseNostrData(pubkey)
         }
-
     }
+
+    val onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit =
+        { context, clipboardManager, toast ->
+            val pubkey = uiState.value.pubkey
+            Log.i(TAG, "Copy pubkey $pubkey and show toast '$toast'")
+            clipboardManager.setText(AnnotatedString(pubkey))
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        }
 
     val onRefreshProfileView: () -> Unit = {
         execWhenSyncingNotBlocked {
@@ -75,7 +86,6 @@ class ProfileViewModel(
                 setRefresh(true)
                 fetchAndUseNostrData(uiState.value.pubkey)
             }
-
         }
     }
 
@@ -95,8 +105,10 @@ class ProfileViewModel(
                 numOfFollowers = numOfFollowers,
             )
             val posts = nostrRepository.listPosts(pubkey)
-            val picture =
-                pictureRequester.requestOrDefault(profile.pictureUrl, defaultProfilePicture)
+            val picture = pictureRequester.requestOrDefault(
+                profile.pictureUrl,
+                defaultProfilePicture
+            )
             useAndCacheProfile(profile = profile, posts = posts, picture = picture)
         }
         setSync(false)

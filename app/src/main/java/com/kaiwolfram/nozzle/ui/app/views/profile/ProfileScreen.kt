@@ -1,5 +1,7 @@
 package com.kaiwolfram.nozzle.ui.app.views.profile
 
+import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,6 +11,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +38,7 @@ import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 fun ProfileScreen(
     uiState: ProfileViewModelState,
     onRefreshProfileView: () -> Unit,
+    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
 ) {
     Column {
         ProfileData(
@@ -39,13 +46,14 @@ fun ProfileScreen(
             name = uiState.name,
             bio = uiState.bio,
             picture = uiState.picture,
+            onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(Modifier.height(4.dp))
         FollowerNumbers(
             numOfFollowing = uiState.numOfFollowing,
             numOfFollowers = uiState.numOfFollowers,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
         Divider()
         Posts(
             posts = uiState.posts,
@@ -72,7 +80,7 @@ private fun Posts(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefreshProfileView,
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(Modifier.fillMaxSize()) {
             items(posts) { post ->
                 PostCard(post, name, picture)
             }
@@ -87,7 +95,7 @@ private fun PostCard(
     picture: Painter,
 ) {
     Row(
-        modifier = Modifier
+        Modifier
             .padding(all = 8.dp)
             .padding(end = 4.dp)
             .fillMaxWidth()
@@ -98,7 +106,7 @@ private fun PostCard(
                 .clip(CircleShape),
             profilePicture = picture
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(Modifier.width(8.dp))
         Column {
             Text(
                 text = name,
@@ -106,7 +114,7 @@ private fun PostCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = post.content,
                 maxLines = 12,
@@ -123,6 +131,7 @@ private fun ProfileData(
     name: String,
     bio: String,
     picture: Painter,
+    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -137,11 +146,12 @@ private fun ProfileData(
                 .clip(CircleShape),
             profilePicture = picture
         )
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(Modifier.width(4.dp))
         Column(verticalArrangement = Arrangement.Center) {
             NameAndPubkey(
                 name = name,
                 pubkey = pubkey,
+                onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
             )
             if (bio.isNotBlank()) {
                 Text(
@@ -160,7 +170,7 @@ private fun FollowerNumbers(
     numOfFollowers: Int,
 ) {
     Row(
-        modifier = Modifier
+        Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp),
     ) {
@@ -169,23 +179,17 @@ private fun FollowerNumbers(
                 text = numOfFollowing.toString(),
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = stringResource(id = R.string.following)
-            )
-
+            Spacer(Modifier.width(4.dp))
+            Text(text = stringResource(id = R.string.following))
         }
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(Modifier.width(8.dp))
         Row {
             Text(
                 text = numOfFollowers.toString(),
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = stringResource(id = R.string.followers)
-            )
-
+            Text(text = stringResource(id = R.string.followers))
         }
     }
 }
@@ -194,13 +198,14 @@ private fun FollowerNumbers(
 private fun NameAndPubkey(
     name: String,
     pubkey: String,
+    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(
-            modifier = Modifier
+            Modifier
                 .padding(end = 4.dp)
                 .weight(weight = 3.3f)
         ) {
@@ -210,14 +215,42 @@ private fun NameAndPubkey(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.h6,
             )
-            Text(
-                text = pubkey,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = Color.LightGray,
-                style = MaterialTheme.typography.body2,
-            )
+            CopyablePubkey(pubkey = pubkey, onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast)
         }
+    }
+}
+
+@Composable
+private fun CopyablePubkey(
+    pubkey: String,
+    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
+) {
+    val toast = stringResource(id = R.string.copied_pubkey)
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    Row(
+        Modifier.clickable {
+            onCopyPubkeyAndShowToast(
+                context,
+                clipboardManager,
+                toast
+            )
+        },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = pubkey,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = Color.LightGray,
+            style = MaterialTheme.typography.body2,
+        )
+        Icon(
+            modifier = Modifier.size(16.dp),
+            imageVector = Icons.Rounded.ContentCopy,
+            contentDescription = stringResource(id = R.string.copy_pubkey),
+            tint = Color.LightGray
+        )
     }
 }
 

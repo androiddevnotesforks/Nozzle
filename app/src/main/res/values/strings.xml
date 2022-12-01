@@ -28,4 +28,6 @@
     <string name="no_posts_found">No posts found</string>
     <string name="follow_or_unfollow">Follow or unfollow</string>
     <string name="settings">Settings</string>
+    <string name="copy_pubkey">Copy public key</string>
+    <string name="copied_pubkey">Copied public key</string>
 </resources>
