@@ -6,11 +6,11 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.INostrRepository
 import com.kaiwolfram.nozzle.data.PictureRequester
+import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.nostr.NostrProfile
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import com.kaiwolfram.nozzle.data.utils.createEmptyPainter
-import com.kaiwolfram.nozzle.model.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 private const val TAG = "NozzleDrawerViewModel"
 
 data class NozzleDrawerViewModelState(
-    val publicKey: String = "",
+    val pubkey: String = "",
     val name: String = "",
     val pictureUrl: String = "",
     val picture: Painter = createEmptyPainter(),
@@ -50,7 +50,7 @@ class NozzleDrawerViewModel(
     private fun setCachedValues() {
         viewModelState.update {
             it.copy(
-                publicKey = profilePreferences.getPublicKey(),
+                pubkey = profilePreferences.getPubkey(),
                 name = profilePreferences.getName(),
                 pictureUrl = profilePreferences.getPictureUrl(),
                 picture = defaultProfilePicture,
@@ -60,7 +60,7 @@ class NozzleDrawerViewModel(
 
     private fun updateValuesFromNostrMetaData() {
         viewModelScope.launch(context = Dispatchers.IO) {
-            val profile = nostrRepository.getProfile(profilePreferences.getPublicKey())
+            val profile = nostrRepository.getProfile(profilePreferences.getPubkey())
             if (profile != null) {
                 cacheProfile(profile)
                 fetchPictureAndUpdateUiState(profile)
@@ -68,16 +68,16 @@ class NozzleDrawerViewModel(
         }
     }
 
-    private fun cacheProfile(profile: Profile) {
+    private fun cacheProfile(profile: NostrProfile) {
         profilePreferences.setProfileValues(profile)
     }
 
-    private suspend fun fetchPictureAndUpdateUiState(profile: Profile) {
+    private suspend fun fetchPictureAndUpdateUiState(profile: NostrProfile) {
         viewModelState.update {
             it.copy(
                 name = profile.name,
-                pictureUrl = profile.pictureUrl,
-                picture = pictureRequester.request(profile.pictureUrl) ?: defaultProfilePicture
+                pictureUrl = profile.picture,
+                picture = pictureRequester.request(profile.picture) ?: defaultProfilePicture
             )
         }
     }

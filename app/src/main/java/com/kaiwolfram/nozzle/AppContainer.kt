@@ -1,17 +1,15 @@
 package com.kaiwolfram.nozzle
 
 import android.content.Context
-import coil.ImageLoader
+import androidx.room.Room
 import coil.imageLoader
-import com.kaiwolfram.nozzle.data.INostrRepository
-import com.kaiwolfram.nozzle.data.NostrRepositoryMock
 import com.kaiwolfram.nozzle.data.PictureRequester
+import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.nostr.NostrRepositoryMock
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
+import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
-    val imageLoader: ImageLoader by lazy {
-        context.imageLoader
-    }
     val nostrRepository: INostrRepository by lazy {
         NostrRepositoryMock()
     }
@@ -19,6 +17,13 @@ class AppContainer(context: Context) {
         ProfilePreferences(context = context)
     }
     val pictureRequester: PictureRequester by lazy {
-        PictureRequester(imageLoader = imageLoader, context = context)
+        PictureRequester(imageLoader = context.imageLoader, context = context)
+    }
+    val roomDb: AppDatabase by lazy {
+        Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "nozzle_database"
+        ).build()
     }
 }

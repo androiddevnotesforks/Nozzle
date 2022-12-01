@@ -11,7 +11,7 @@ import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 fun NozzleDrawerRoute(
     nozzleDrawerViewModel: NozzleDrawerViewModel,
     navActions: NozzleNavActions,
-    onSetPublicKey: (String) -> Unit,
+    onSetPubkey: (String) -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -21,7 +21,7 @@ fun NozzleDrawerRoute(
         modifier = modifier,
         uiState = uiState,
         navActions = navActions,
-        onSetPublicKey = onSetPublicKey,
+        onSetPubkey = onSetPubkey,
         closeDrawer = closeDrawer,
     )
 }

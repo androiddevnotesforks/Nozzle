@@ -23,7 +23,7 @@ import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 fun NozzleDrawerScreen(
     uiState: NozzleDrawerViewModelState,
     navActions: NozzleNavActions,
-    onSetPublicKey: (String) -> Unit,
+    onSetPubkey: (String) -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -36,7 +36,7 @@ fun NozzleDrawerScreen(
             profilePicture = uiState.picture,
             profileName = uiState.name,
             navigateToProfile = {
-                onSetPublicKey(uiState.publicKey)
+                onSetPubkey(uiState.pubkey)
                 navActions.navigateToPersonalProfile()
             },
             closeDrawer = closeDrawer

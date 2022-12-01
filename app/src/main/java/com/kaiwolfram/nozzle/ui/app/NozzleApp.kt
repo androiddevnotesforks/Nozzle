@@ -45,6 +45,8 @@ fun NozzleApp(appContainer: AppContainer) {
                         defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
                         pictureRequester = appContainer.pictureRequester,
+                        profileDao = appContainer.roomDb.profileDao(),
+                        eventDao = appContainer.roomDb.eventDao(),
                     )
                 ),
                 feedViewModel = viewModel(
@@ -81,7 +83,7 @@ fun NozzleApp(appContainer: AppContainer) {
                     NozzleDrawerRoute(
                         nozzleDrawerViewModel = nozzleDrawerViewModel,
                         navActions = navActions,
-                        onSetPublicKey = vmContainer.profileViewModel.onSetPublicKey,
+                        onSetPubkey = vmContainer.profileViewModel.onSetPubkey,
                         closeDrawer = { coroutineScope.launch { drawerState.close() } },
                         modifier = Modifier
                             .statusBarsPadding()

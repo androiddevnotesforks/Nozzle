@@ -5,11 +5,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.INostrRepository
 import com.kaiwolfram.nozzle.data.PictureRequester
+import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.room.dao.EventDao
+import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
+import com.kaiwolfram.nozzle.data.room.entity.EventEntity
+import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import com.kaiwolfram.nozzle.data.utils.createEmptyPainter
-import com.kaiwolfram.nozzle.model.NozzleProfile
-import com.kaiwolfram.nozzle.model.Post
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,14 +22,14 @@ import kotlinx.coroutines.launch
 private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
-    val publicKey: String = "",
+    val pubkey: String = "",
     val name: String = "",
     val bio: String = "",
     val pictureUrl: String = "",
     val picture: Painter = createEmptyPainter(),
-    val numOfFollowing: UInt = 0u,
-    val numOfFollowers: UInt = 0u,
-    val posts: List<Post> = listOf(),
+    val numOfFollowing: Int = 0,
+    val numOfFollowers: Int = 0,
+    val posts: List<EventEntity> = listOf(),
     val isRefreshing: Boolean = false,
     val isSyncing: Boolean = false,
 )
@@ -36,11 +38,10 @@ class ProfileViewModel(
     private val defaultProfilePicture: Painter,
     private val nostrRepository: INostrRepository,
     private val pictureRequester: PictureRequester,
+    private val profileDao: ProfileDao,
+    private val eventDao: EventDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
-
-    private val profiles = mutableMapOf<String, NozzleProfile>()
-    private val pictures = mutableMapOf<String, Painter>()
 
     val uiState = viewModelState
         .stateIn(
@@ -58,113 +59,122 @@ class ProfileViewModel(
         }
     }
 
-    val onSetPublicKey: (String) -> Unit = { publicKey ->
-        Log.i(TAG, "Setting ui data for $publicKey")
-        useCachedValues(publicKey)
-        fetchAndUseNostrData(publicKey)
-    }
-
-    val onGetPicture: (String) -> Painter = { pictureUrl ->
-        val picture = pictures[pictureUrl]
-        if (picture == null) {
-            viewModelScope.launch(context = Dispatchers.IO) {
-                requestAndCachePicture(pictureUrl)
-            }
+    val onSetPubkey: (String) -> Unit = { pubkey ->
+        viewModelScope.launch(context = Dispatchers.IO) {
+            Log.i(TAG, "Setting ui data for $pubkey")
+            useCachedValues(pubkey)
+            fetchAndUseNostrData(pubkey)
         }
-        picture ?: defaultProfilePicture
+
     }
 
     val onRefreshProfileView: () -> Unit = {
         execWhenSyncingNotBlocked {
-            Log.i(TAG, "Refresh profile view")
-            setRefresh(true)
-            fetchAndUseNostrData(uiState.value.publicKey)
-        }
-    }
-
-    private suspend fun requestAndCachePicture(pictureUrl: String): Painter? {
-        val picture = pictureRequester.request(pictureUrl)
-        if (picture != null) {
-            pictures[pictureUrl] = picture
-        }
-        return picture
-    }
-
-    private fun fetchAndUseNostrData(publicKey: String) {
-        Log.i(TAG, "Fetching nostr data for $publicKey")
-        setSync(true)
-        viewModelScope.launch(context = Dispatchers.IO) {
-            val profile = nostrRepository.getProfile(publicKey)
-            if (profile != null) {
-                val picture = pictures[publicKey]
-                    ?: pictureRequester.request(profile.pictureUrl)
-                    ?: defaultProfilePicture
-                val numOfFollowing = nostrRepository.getFollowingCount(publicKey)
-                val numOfFollowers = nostrRepository.getFollowerCount(publicKey)
-                val posts = nostrRepository.listPosts(publicKey)
-                val nozzleProfile =
-                    NozzleProfile(profile, picture, numOfFollowing, numOfFollowers, posts)
-                useAndCacheProfile(nozzleProfile)
+            viewModelScope.launch(context = Dispatchers.IO) {
+                Log.i(TAG, "Refresh profile view")
+                setRefresh(true)
+                fetchAndUseNostrData(uiState.value.pubkey)
             }
-            setSync(false)
-            setRefresh(false)
+
         }
     }
 
-    private fun useAndCacheProfile(profile: NozzleProfile) {
-        Log.i(TAG, "Caching fetched profile of ${profile.profile.publicKey}")
-        profiles[profile.profile.publicKey] = profile
-        pictures[profile.profile.pictureUrl] = profile.picture
+    private suspend fun fetchAndUseNostrData(pubkey: String) {
+        Log.i(TAG, "Fetching nostr data for $pubkey")
+        setSync(true)
+        val nostrProfile = nostrRepository.getProfile(pubkey)
+        if (nostrProfile != null) {
+            val numOfFollowing = nostrRepository.getFollowingCount(pubkey)
+            val numOfFollowers = nostrRepository.getFollowerCount(pubkey)
+            val profile = ProfileEntity(
+                pubkey = pubkey,
+                name = nostrProfile.name,
+                bio = nostrProfile.about,
+                pictureUrl = nostrProfile.picture,
+                numOfFollowing = numOfFollowing,
+                numOfFollowers = numOfFollowers,
+            )
+            val posts = nostrRepository.listPosts(pubkey)
+            val picture =
+                pictureRequester.requestOrDefault(profile.pictureUrl, defaultProfilePicture)
+            useAndCacheProfile(profile = profile, posts = posts, picture = picture)
+        }
+        setSync(false)
+        setRefresh(false)
+    }
+
+    private suspend fun useAndCacheProfile(
+        profile: ProfileEntity,
+        posts: List<EventEntity>,
+        picture: Painter
+    ) {
+        Log.i(TAG, "Caching fetched profile of ${profile.pubkey}")
+        profileDao.insert(profile)
+        eventDao.insert(posts)
         viewModelState.update {
             it.copy(
-                publicKey = profile.profile.publicKey,
-                name = profile.profile.name,
-                bio = profile.profile.bio,
-                pictureUrl = profile.profile.pictureUrl,
-                picture = profile.picture,
+                pubkey = profile.pubkey,
+                name = profile.name,
+                bio = profile.bio,
+                pictureUrl = profile.pictureUrl,
+                picture = picture,
                 numOfFollowing = profile.numOfFollowing,
                 numOfFollowers = profile.numOfFollowers,
-                posts = profile.posts,
+                posts = posts,
             )
         }
     }
 
-    private fun useCachedValues(publicKey: String) {
-        val profile = profiles[publicKey]
-        if (profile != null) {
+    private suspend fun useCachedValues(pubkey: String) {
+        val cachedProfile = profileDao.getProfile(pubkey)
+        val cachedPosts = eventDao.listEventsFromPubkey(pubkey)
+        if (cachedProfile != null) {
             Log.i(TAG, "Using cached values")
+            requestAndSetPicture(cachedProfile.pictureUrl)
             viewModelState.update {
                 it.copy(
-                    publicKey = publicKey,
-                    name = profile.profile.name,
-                    bio = profile.profile.bio,
-                    pictureUrl = profile.profile.pictureUrl,
-                    picture = profile.picture,
-                    numOfFollowing = profile.numOfFollowing,
-                    numOfFollowers = profile.numOfFollowers,
-                    posts = profile.posts,
+                    pubkey = pubkey,
+                    name = cachedProfile.name,
+                    bio = cachedProfile.bio,
+                    pictureUrl = cachedProfile.pictureUrl,
+                    numOfFollowing = cachedProfile.numOfFollowing,
+                    numOfFollowers = cachedProfile.numOfFollowers,
+                    posts = cachedPosts,
                 )
             }
         } else {
-            Log.i(TAG, "Resetting ui state because cache is empty")
-            resetValues(publicKey)
+            Log.i(TAG, "Resetting UI state because cache is empty")
+            resetValues(pubkey)
         }
     }
 
-    private fun resetValues(publicKey: String) {
+    private fun resetValues(pubkey: String) {
         viewModelState.update {
             it.copy(
-                publicKey = publicKey,
+                pubkey = pubkey,
                 name = "",
                 bio = "",
                 pictureUrl = "",
                 picture = defaultProfilePicture,
-                numOfFollowing = 0u,
-                numOfFollowers = 0u,
+                numOfFollowing = 0,
+                numOfFollowers = 0,
                 posts = listOf(),
             )
         }
     }
+
+    private fun requestAndSetPicture(pictureUrl: String) {
+        Log.i(TAG, "Fetching picture $pictureUrl")
+        viewModelScope.launch(context = Dispatchers.IO) {
+            val picture = pictureRequester.requestOrDefault(pictureUrl, defaultProfilePicture)
+            viewModelState.update {
+                it.copy(
+                    picture = picture,
+                )
+            }
+        }
+    }
+
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
         if (uiState.value.isSyncing) {
@@ -191,6 +201,8 @@ class ProfileViewModel(
             defaultProfilePicture: Painter,
             nostrRepository: INostrRepository,
             pictureRequester: PictureRequester,
+            profileDao: ProfileDao,
+            eventDao: EventDao,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -199,6 +211,8 @@ class ProfileViewModel(
                         defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = nostrRepository,
                         pictureRequester = pictureRequester,
+                        profileDao = profileDao,
+                        eventDao = eventDao,
                     ) as T
                 }
             }

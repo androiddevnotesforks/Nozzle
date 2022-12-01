@@ -24,18 +24,18 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.model.Post
+import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+
 
 @Composable
 fun ProfileScreen(
     uiState: ProfileViewModelState,
-    onGetPicture: (String) -> Painter,
     onRefreshProfileView: () -> Unit,
 ) {
     Column {
         ProfileData(
-            publicKey = uiState.publicKey,
+            pubkey = uiState.pubkey,
             name = uiState.name,
             bio = uiState.bio,
             picture = uiState.picture,
@@ -49,8 +49,9 @@ fun ProfileScreen(
         Divider()
         Posts(
             posts = uiState.posts,
+            name = uiState.name,
+            picture = uiState.picture,
             isRefreshing = uiState.isRefreshing,
-            onGetPicture = onGetPicture,
             onRefreshProfileView = onRefreshProfileView,
         )
     }
@@ -61,9 +62,10 @@ fun ProfileScreen(
 
 @Composable
 private fun Posts(
-    posts: List<Post>,
+    posts: List<EventEntity>,
+    name: String,
+    picture: Painter,
     isRefreshing: Boolean,
-    onGetPicture: (String) -> Painter,
     onRefreshProfileView: () -> Unit,
 ) {
     SwipeRefresh(
@@ -72,10 +74,7 @@ private fun Posts(
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(posts) { post ->
-                PostCard(
-                    post = post,
-                    onGetPicture = onGetPicture
-                )
+                PostCard(post, name, picture)
             }
         }
     }
@@ -83,8 +82,9 @@ private fun Posts(
 
 @Composable
 private fun PostCard(
-    post: Post,
-    onGetPicture: (String) -> Painter
+    post: EventEntity,
+    name: String,
+    picture: Painter,
 ) {
     Row(
         modifier = Modifier
@@ -95,12 +95,12 @@ private fun PostCard(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape),
-            profilePicture = onGetPicture(post.profilePicUrl)
+            profilePicture = picture
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
             Text(
-                text = post.author,
+                text = name,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -118,7 +118,7 @@ private fun PostCard(
 
 @Composable
 private fun ProfileData(
-    publicKey: String,
+    pubkey: String,
     name: String,
     bio: String,
     picture: Painter,
@@ -136,9 +136,9 @@ private fun ProfileData(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Column(verticalArrangement = Arrangement.Center) {
-            NameAndPublicKey(
+            NameAndPubkey(
                 name = name,
-                publicKey = publicKey,
+                pubkey = pubkey,
             )
             if (bio.isNotBlank()) {
                 Text(
@@ -153,8 +153,8 @@ private fun ProfileData(
 
 @Composable
 private fun FollowerNumbers(
-    numOfFollowing: UInt,
-    numOfFollowers: UInt,
+    numOfFollowing: Int,
+    numOfFollowers: Int,
 ) {
     Row(
         modifier = Modifier
@@ -188,9 +188,9 @@ private fun FollowerNumbers(
 }
 
 @Composable
-private fun NameAndPublicKey(
+private fun NameAndPubkey(
     name: String,
-    publicKey: String,
+    pubkey: String,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -208,7 +208,7 @@ private fun NameAndPublicKey(
                 style = MaterialTheme.typography.h6,
             )
             Text(
-                text = "${publicKey.substring(0, 18)}...",
+                text = pubkey,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = Color.LightGray,

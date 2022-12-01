@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.data.utils
+package com.kaiwolfram.nozzle.data
 
 import java.util.*
 
@@ -6,6 +6,6 @@ fun generatePrivateKey(): String {
     return UUID.randomUUID().toString()
 }
 
-fun derivePublicKey(privateKey: String): String {
+fun derivePubkey(privateKey: String): String {
     return privateKey.reversed()
 }

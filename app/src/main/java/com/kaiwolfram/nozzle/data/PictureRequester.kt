@@ -24,4 +24,8 @@ class PictureRequester(
         val result = imageLoader.execute(request).drawable?.toBitmap()?.asImageBitmap()
         return if (result != null) BitmapPainter(result) else null
     }
+
+    suspend fun requestOrDefault(url: String, default: Painter): Painter {
+        return request(url) ?: default
+    }
 }

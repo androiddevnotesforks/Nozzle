@@ -12,7 +12,6 @@ fun ProfileRoute(
 
     ProfileScreen(
         uiState = uiState,
-        onGetPicture = profileViewModel.onGetPicture,
         onRefreshProfileView = profileViewModel.onRefreshProfileView,
     )
 }
