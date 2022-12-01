@@ -9,8 +9,6 @@ fun createEmptyPainter(): Painter {
         override val intrinsicSize: Size
             get() = Size.Zero
 
-        override fun DrawScope.onDraw() {
-            throw IllegalStateException("empty painter should be overwritten")
-        }
+        override fun DrawScope.onDraw() {}
     }
 }

@@ -89,6 +89,7 @@ private fun PostCard(
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
+            .padding(end = 4.dp)
             .fillMaxWidth()
     ) {
         ProfilePicture(
@@ -124,7 +125,9 @@ private fun ProfileData(
     picture: Painter,
 ) {
     Row(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .padding(end = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfilePicture(
