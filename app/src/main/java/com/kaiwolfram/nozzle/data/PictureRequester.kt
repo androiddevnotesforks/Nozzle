@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 
 class PictureRequester(
@@ -15,6 +16,9 @@ class PictureRequester(
     suspend fun request(url: String): Painter? {
         val request = ImageRequest.Builder(context)
             .data(url)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .size(300, 300)
             .allowConversionToBitmap(true)
             .build()
         val result = imageLoader.execute(request).drawable?.toBitmap()?.asImageBitmap()
