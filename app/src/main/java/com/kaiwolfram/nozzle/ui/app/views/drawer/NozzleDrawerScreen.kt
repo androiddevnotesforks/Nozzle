@@ -5,7 +5,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,7 +86,7 @@ private fun MainRows(
     closeDrawer: () -> Unit,
 ) {
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Filled.Home),
+        icon = rememberVectorPainter(image = Icons.Rounded.Newspaper),
         label = stringResource(id = R.string.feed),
         action = {
             navigateToFeed()
@@ -94,7 +94,7 @@ private fun MainRows(
         }
     )
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Filled.Chat),
+        icon = rememberVectorPainter(image = Icons.Rounded.Chat),
         label = stringResource(id = R.string.chat),
         action = {
             navigateToChat()
@@ -102,7 +102,7 @@ private fun MainRows(
         }
     )
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Filled.Key),
+        icon = rememberVectorPainter(image = Icons.Rounded.Key),
         label = stringResource(id = R.string.keys),
         action = {
             navigateToKeys()
@@ -110,7 +110,7 @@ private fun MainRows(
         }
     )
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Filled.SatelliteAlt),
+        icon = rememberVectorPainter(image = Icons.Rounded.SatelliteAlt),
         label = stringResource(id = R.string.relays),
         action = {
             navigateToRelays()
@@ -118,7 +118,7 @@ private fun MainRows(
         }
     )
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Filled.Settings),
+        icon = rememberVectorPainter(image = Icons.Rounded.Settings),
         label = stringResource(id = R.string.settings),
         action = {
             navigateToSettings()
