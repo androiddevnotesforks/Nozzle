@@ -1,11 +1,26 @@
 package com.kaiwolfram.nozzle.data
 
-import java.util.*
+import fr.acinq.secp256k1.Secp256k1
+import java.security.SecureRandom
 
-fun generatePrivateKey(): String {
-    return UUID.randomUUID().toString()
+private val rnd = SecureRandom()
+private val secp256k1 = Secp256k1.get()
+
+fun generatePrivkey(): String {
+    val bytes = ByteArray(32)
+    rnd.nextBytes(bytes)
+    return bytes.toHex()
 }
 
-fun derivePubkey(privateKey: String): String {
-    return privateKey.reversed()
+fun derivePubkey(privkey: String): String {
+    val bytes = privkey.chunked(2)
+        .map { it.toInt(16).toByte() }
+        .toByteArray()
+    return secp256k1.pubKeyCompress(secp256k1.pubkeyCreate(bytes))
+        .copyOfRange(1, 33)
+        .toHex()
+}
+
+private fun ByteArray.toHex(): String {
+    return this.joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 }
