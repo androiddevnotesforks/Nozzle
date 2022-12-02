@@ -4,18 +4,22 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 private const val TAG = "KeysViewModel"
 
 data class KeysViewModelState(
-    val pubkey: String = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    val privkey: String = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+    val pubkey: String = "",
+    val privkey: String = "",
 )
 
-class KeysViewModel : ViewModel() {
+class KeysViewModel(
+    profilePreferences: ProfilePreferences,
+) : ViewModel() {
     private val viewModelState = MutableStateFlow(KeysViewModelState())
 
     val uiState = viewModelState
@@ -28,14 +32,21 @@ class KeysViewModel : ViewModel() {
 
     init {
         Log.i(TAG, "Initialize KeysViewModel")
+        viewModelState.update {
+            it.copy(
+                privkey = profilePreferences.getPrivkey(),
+                pubkey = profilePreferences.getPubkey(),
+            )
+        }
     }
 
     companion object {
-        fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return KeysViewModel() as T
+        fun provideFactory(profilePreferences: ProfilePreferences): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return KeysViewModel(profilePreferences = profilePreferences) as T
+                }
             }
-        }
     }
 }

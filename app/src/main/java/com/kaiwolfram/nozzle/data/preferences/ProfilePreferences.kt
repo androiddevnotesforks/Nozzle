@@ -32,7 +32,7 @@ class ProfilePreferences(context: Context) {
         return derivePubkey(getPrivkey())
     }
 
-    private fun getPrivkey(): String {
+    fun getPrivkey(): String {
         return preferences.getString(Variables.PRIVKEY, "") ?: ""
     }
 

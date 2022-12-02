@@ -56,7 +56,9 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = ChatViewModel.provideFactory()
                 ),
                 keysViewModel = viewModel(
-                    factory = KeysViewModel.provideFactory()
+                    factory = KeysViewModel.provideFactory(
+                        profilePreferences = appContainer.profilePreferences,
+                    )
                 ),
                 relaysViewModel = viewModel(
                     factory = RelaysViewModel.provideFactory()
