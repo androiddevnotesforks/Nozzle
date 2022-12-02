@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.stateIn
 private const val TAG = "KeysViewModel"
 
 data class KeysViewModelState(
-    val label: String = "Keys are coming soon!",
+    val pubkey: String = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    val privkey: String = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
 )
 
 class KeysViewModel : ViewModel() {
