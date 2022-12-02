@@ -35,7 +35,6 @@ data class ProfileViewModelState(
     val numOfFollowers: Int = 0,
     val posts: List<EventEntity> = listOf(),
     val isRefreshing: Boolean = false,
-    val isSyncing: Boolean = false,
 )
 
 class ProfileViewModel(
@@ -46,6 +45,7 @@ class ProfileViewModel(
     private val eventDao: EventDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
+    private var isSyncing = false
 
     val uiState = viewModelState
         .stateIn(
@@ -91,7 +91,7 @@ class ProfileViewModel(
 
     private suspend fun fetchAndUseNostrData(pubkey: String) {
         Log.i(TAG, "Fetching nostr data for $pubkey")
-        setSync(true)
+        isSyncing = true
         val nostrProfile = nostrRepository.getProfile(pubkey)
         if (nostrProfile != null) {
             val numOfFollowing = nostrRepository.getFollowingCount(pubkey)
@@ -111,7 +111,7 @@ class ProfileViewModel(
             )
             useAndCacheProfile(profile = profile, posts = posts, picture = picture)
         }
-        setSync(false)
+        isSyncing = false
         setRefresh(false)
     }
 
@@ -189,7 +189,7 @@ class ProfileViewModel(
 
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
-        if (uiState.value.isSyncing) {
+        if (isSyncing) {
             Log.i(TAG, "Blocked by active sync process")
         } else {
             exec()
@@ -199,12 +199,6 @@ class ProfileViewModel(
     private fun setRefresh(value: Boolean) {
         viewModelState.update {
             it.copy(isRefreshing = value)
-        }
-    }
-
-    private fun setSync(value: Boolean) {
-        viewModelState.update {
-            it.copy(isSyncing = value)
         }
     }
 
