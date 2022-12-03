@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.stateIn
 private const val TAG = "SettingsViewModel"
 
 data class SettingsViewModelState(
-    val label: String = "Settings are coming soon!",
+    val name: String = "Settings are coming soon!",
+    val bio: String = "Settings are coming soon!",
+    val pictureUrl: String = "Settings are coming soon!",
 )
 
 class SettingsViewModel : ViewModel() {

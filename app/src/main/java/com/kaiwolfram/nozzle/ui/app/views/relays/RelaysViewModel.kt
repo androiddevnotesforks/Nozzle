@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 private const val TAG = "RelaysViewModel"
 
 data class RelaysViewModelState(
-    val label: String = "Relays are coming soon!",
+    val urls: List<String> = listOf("coming", "soon")
 )
 
 class RelaysViewModel : ViewModel() {
