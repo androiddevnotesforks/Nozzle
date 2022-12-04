@@ -31,4 +31,8 @@
     <string name="copy_pubkey">Copy public key</string>
     <string name="copied_pubkey">Copied public key</string>
     <string name="public_key">Public key</string>
+    <string name="return_back">Return back</string>
+    <string name="copy_content">Copy content</string>
+    <string name="toggle_visibility">Toggle visibility</string>
+    <string name="paste_private_key">Paste private key</string>
 </resources>

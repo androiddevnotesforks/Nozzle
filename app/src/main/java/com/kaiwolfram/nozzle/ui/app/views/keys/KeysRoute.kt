@@ -12,5 +12,6 @@ fun KeysRoute(
 
     KeysScreen(
         uiState = uiState,
+        onCopyPubkeyAndShowToast = keysViewModel.onCopyPubkeyAndShowToast,
     )
 }

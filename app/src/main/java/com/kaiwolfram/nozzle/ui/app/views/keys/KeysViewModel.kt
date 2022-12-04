@@ -1,6 +1,10 @@
 package com.kaiwolfram.nozzle.ui.app.views.keys
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -15,7 +19,9 @@ private const val TAG = "KeysViewModel"
 data class KeysViewModelState(
     val pubkey: String = "",
     val privkey: String = "",
-)
+    val hasChanges: Boolean = true,
+) {
+}
 
 class KeysViewModel(
     profilePreferences: ProfilePreferences,
@@ -39,6 +45,14 @@ class KeysViewModel(
             )
         }
     }
+
+    val onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit =
+        { context, clipboardManager, toast ->
+            val pubkey = uiState.value.pubkey
+            Log.i(TAG, "Copy pubkey $pubkey and show toast '$toast'")
+            clipboardManager.setText(AnnotatedString(pubkey))
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        }
 
     companion object {
         fun provideFactory(profilePreferences: ProfilePreferences): ViewModelProvider.Factory =
