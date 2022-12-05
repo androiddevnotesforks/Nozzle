@@ -20,6 +20,7 @@ fun NozzleNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = NozzleRoute.FEED,
     vmContainer: VMContainer,
+    navActions: NozzleNavActions,
 ) {
     NavHost(
         navController = navController,
@@ -44,6 +45,7 @@ fun NozzleNavGraph(
         composable(NozzleRoute.KEYS) {
             KeysRoute(
                 keysViewModel = vmContainer.keysViewModel,
+                onNavigateToFeed = navActions.navigateToFeed
             )
         }
         composable(NozzleRoute.RELAYS) {

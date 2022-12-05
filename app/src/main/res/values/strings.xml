@@ -35,4 +35,11 @@
     <string name="copy_content">Copy content</string>
     <string name="toggle_visibility">Toggle visibility</string>
     <string name="paste_private_key">Paste private key</string>
+    <string name="update_key_pair">Update key pair</string>
+    <string name="public_key_explanation">Your public key identifies your account. You can share it with anyone trying to find you.</string>
+    <string name="private_key_description">Your private key verifies your identity.</string>
+    <string name="private_key_warning">Do not share it with anyone else!</string>
+    <string name="invalid_private_key">Invalid private key</string>
+    <string name="key_pair_updated">Key pair updated</string>
+    <string name="enter_a_private_key">Enter a private key (64 hex characters)</string>
 </resources>

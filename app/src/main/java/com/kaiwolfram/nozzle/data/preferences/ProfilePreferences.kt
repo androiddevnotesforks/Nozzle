@@ -36,7 +36,7 @@ class ProfilePreferences(context: Context) {
         return preferences.getString(Variables.PRIVKEY, "") ?: ""
     }
 
-    private fun setPrivkey(privkey: String) {
+    fun setPrivkey(privkey: String) {
         preferences.edit()
             .putString(Variables.PRIVKEY, privkey)
             .apply()

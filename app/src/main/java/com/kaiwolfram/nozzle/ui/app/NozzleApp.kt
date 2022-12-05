@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -45,6 +47,8 @@ fun NozzleApp(appContainer: AppContainer) {
                         defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
                         pictureRequester = appContainer.pictureRequester,
+                        context = LocalContext.current,
+                        clip = LocalClipboardManager.current,
                         profileDao = appContainer.roomDb.profileDao(),
                         eventDao = appContainer.roomDb.eventDao(),
                     )
@@ -58,6 +62,8 @@ fun NozzleApp(appContainer: AppContainer) {
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
                         profilePreferences = appContainer.profilePreferences,
+                        context = LocalContext.current,
+                        clip = LocalClipboardManager.current,
                     )
                 ),
                 relaysViewModel = viewModel(
@@ -101,6 +107,7 @@ fun NozzleApp(appContainer: AppContainer) {
                     NozzleScaffold(
                         vmContainer = vmContainer,
                         navController = navController,
+                        navActions = navActions,
                     )
                 }
             }

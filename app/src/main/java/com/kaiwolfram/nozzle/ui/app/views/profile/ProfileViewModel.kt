@@ -41,6 +41,8 @@ class ProfileViewModel(
     private val defaultProfilePicture: Painter,
     private val nostrRepository: INostrRepository,
     private val pictureRequester: PictureRequester,
+    context: Context,
+    clip: ClipboardManager,
     private val profileDao: ProfileDao,
     private val eventDao: EventDao,
 ) : ViewModel() {
@@ -71,13 +73,12 @@ class ProfileViewModel(
         }
     }
 
-    val onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit =
-        { context, clipboardManager, toast ->
-            val pubkey = uiState.value.pubkey
-            Log.i(TAG, "Copy pubkey $pubkey and show toast '$toast'")
-            clipboardManager.setText(AnnotatedString(pubkey))
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-        }
+    val onCopyPubkeyAndShowToast: (String) -> Unit = { toast ->
+        val pubkey = uiState.value.pubkey
+        Log.i(TAG, "Copy pubkey $pubkey and show toast '$toast'")
+        clip.setText(AnnotatedString(pubkey))
+        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+    }
 
     val onRefreshProfileView: () -> Unit = {
         execWhenSyncingNotBlocked {
@@ -207,6 +208,8 @@ class ProfileViewModel(
             defaultProfilePicture: Painter,
             nostrRepository: INostrRepository,
             pictureRequester: PictureRequester,
+            context: Context,
+            clip: ClipboardManager,
             profileDao: ProfileDao,
             eventDao: EventDao,
         ): ViewModelProvider.Factory =
@@ -217,6 +220,8 @@ class ProfileViewModel(
                         defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = nostrRepository,
                         pictureRequester = pictureRequester,
+                        context = context,
+                        clip = clip,
                         profileDao = profileDao,
                         eventDao = eventDao,
                     ) as T

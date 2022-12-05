@@ -1,27 +1,19 @@
 package com.kaiwolfram.nozzle.ui.app.views.profile
 
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,14 +23,16 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
+import com.kaiwolfram.nozzle.ui.components.CopyIcon
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.components.SearchIcon
 
 
 @Composable
 fun ProfileScreen(
     uiState: ProfileViewModelState,
     onRefreshProfileView: () -> Unit,
-    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
+    onCopyPubkeyAndShowToast: (String) -> Unit,
 ) {
     Column {
         ProfileData(
@@ -55,7 +49,7 @@ fun ProfileScreen(
         )
         Spacer(Modifier.height(12.dp))
         Divider()
-        Posts(
+        PostsOfProfile(
             posts = uiState.posts,
             name = uiState.name,
             picture = uiState.picture,
@@ -69,7 +63,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun Posts(
+private fun PostsOfProfile(
     posts: List<EventEntity>,
     name: String,
     picture: Painter,
@@ -131,7 +125,7 @@ private fun ProfileData(
     name: String,
     bio: String,
     picture: Painter,
-    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
+    onCopyPubkeyAndShowToast: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -198,7 +192,7 @@ private fun FollowerNumbers(
 private fun NameAndPubkey(
     name: String,
     pubkey: String,
-    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
+    onCopyPubkeyAndShowToast: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -215,7 +209,10 @@ private fun NameAndPubkey(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.h6,
             )
-            CopyablePubkey(pubkey = pubkey, onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast)
+            CopyablePubkey(
+                pubkey = pubkey,
+                onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast
+            )
         }
     }
 }
@@ -223,19 +220,11 @@ private fun NameAndPubkey(
 @Composable
 private fun CopyablePubkey(
     pubkey: String,
-    onCopyPubkeyAndShowToast: (Context, ClipboardManager, String) -> Unit,
+    onCopyPubkeyAndShowToast: (String) -> Unit,
 ) {
     val toast = stringResource(id = R.string.copied_pubkey)
-    val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
     Row(
-        Modifier.clickable {
-            onCopyPubkeyAndShowToast(
-                context,
-                clipboardManager,
-                toast
-            )
-        },
+        Modifier.clickable { onCopyPubkeyAndShowToast(toast) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -245,11 +234,9 @@ private fun CopyablePubkey(
             color = Color.LightGray,
             style = MaterialTheme.typography.body2,
         )
-        Icon(
+        CopyIcon(
             modifier = Modifier.size(16.dp),
-            imageVector = Icons.Rounded.ContentCopy,
-            contentDescription = stringResource(id = R.string.copy_pubkey),
-            tint = Color.LightGray
+            description = stringResource(id = R.string.copy_pubkey),
         )
     }
 }
@@ -261,12 +248,7 @@ private fun NoPostsHint() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Icon(
-            modifier = Modifier.fillMaxSize(0.1f),
-            contentDescription = null,
-            imageVector = Icons.Rounded.Search,
-            tint = Color.LightGray
-        )
+        SearchIcon(modifier = Modifier.fillMaxSize(0.1f), tint = Color.LightGray)
         Text(
             text = stringResource(id = R.string.no_posts_found),
             textAlign = TextAlign.Center,
