@@ -53,18 +53,18 @@ fun NozzleApp(appContainer: AppContainer) {
                         eventDao = appContainer.roomDb.eventDao(),
                     )
                 ),
-                feedViewModel = viewModel(
-                    factory = FeedViewModel.provideFactory()
-                ),
-                chatViewModel = viewModel(
-                    factory = ChatViewModel.provideFactory()
-                ),
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
                         profilePreferences = appContainer.profilePreferences,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
+                ),
+                feedViewModel = viewModel(
+                    factory = FeedViewModel.provideFactory()
+                ),
+                chatViewModel = viewModel(
+                    factory = ChatViewModel.provideFactory()
                 ),
                 relaysViewModel = viewModel(
                     factory = RelaysViewModel.provideFactory()

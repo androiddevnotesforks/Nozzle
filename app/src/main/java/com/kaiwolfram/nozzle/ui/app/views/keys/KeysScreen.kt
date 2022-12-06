@@ -10,12 +10,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ActionButton
 import com.kaiwolfram.nozzle.ui.components.CopyAndToastIcon
 import com.kaiwolfram.nozzle.ui.components.TopBar
 import com.kaiwolfram.nozzle.ui.components.VisibilityIcon
+import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun KeysScreen(
@@ -28,18 +28,18 @@ fun KeysScreen(
 ) {
     Column {
         TopBar(text = stringResource(id = R.string.keys), onGoBack = onNavigateToFeed)
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(spacing.screenEdge)) {
             Pubkey(
                 pubkey = uiState.pubkey,
                 onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(spacing.large))
             Privkey(
                 privkey = uiState.privkey,
                 isInvalid = uiState.isInvalid,
                 onPrivkeyChange = onPrivkeyChange
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(spacing.xxl))
             if (uiState.hasChanges) {
                 val toast = stringResource(id = R.string.key_pair_updated)
                 ActionButton(

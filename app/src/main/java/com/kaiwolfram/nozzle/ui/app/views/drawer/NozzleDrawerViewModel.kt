@@ -43,11 +43,11 @@ class NozzleDrawerViewModel(
 
     init {
         Log.i(TAG, "Initialize NozzleDrawerViewModel")
-        setCachedValues()
+        useCachedValues()
         updateValuesFromNostrMetaData()
     }
 
-    private fun setCachedValues() {
+    private fun useCachedValues() {
         viewModelState.update {
             it.copy(
                 pubkey = profilePreferences.getPubkey(),

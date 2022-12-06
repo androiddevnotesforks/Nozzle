@@ -7,7 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun TopBar(text: String, onGoBack: (() -> Unit)? = null) {
@@ -15,7 +15,7 @@ fun TopBar(text: String, onGoBack: (() -> Unit)? = null) {
         if (onGoBack != null) {
             GoBackButton(onGoBack = onGoBack)
         }
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(spacing.large))
         Text(
             text = text,
             style = MaterialTheme.typography.h6,

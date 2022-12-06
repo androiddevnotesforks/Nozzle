@@ -15,9 +15,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
+import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun NozzleDrawerScreen(
@@ -30,7 +30,7 @@ fun NozzleDrawerScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(4.dp)
+            .padding(spacing.screenEdge)
     ) {
         ProfileRow(
             profilePicture = uiState.picture,
@@ -41,7 +41,7 @@ fun NozzleDrawerScreen(
             },
             closeDrawer = closeDrawer
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(spacing.medium))
         MainRows(
             navigateToFeed = navActions.navigateToFeed,
             navigateToChat = navActions.navigateToChat,
@@ -153,7 +153,7 @@ private fun DrawerRow(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 1.dp),
+            .padding(vertical = spacing.tiny),
         color = colors.surface,
         shape = MaterialTheme.shapes.small
     ) {
@@ -172,7 +172,7 @@ private fun DrawerRow(
                     contentDescription = null,
                     tint = iconTint,
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(spacing.large))
                 Text(
                     text = label,
                     maxLines = 3,

@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
@@ -26,6 +25,8 @@ import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.ui.components.CopyIcon
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.components.SearchIcon
+import com.kaiwolfram.nozzle.ui.theme.sizing
+import com.kaiwolfram.nozzle.ui.theme.spacing
 
 
 @Composable
@@ -42,12 +43,12 @@ fun ProfileScreen(
             picture = uiState.picture,
             onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
         )
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(spacing.medium))
         FollowerNumbers(
             numOfFollowing = uiState.numOfFollowing,
             numOfFollowers = uiState.numOfFollowers,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(spacing.xl))
         Divider()
         PostsOfProfile(
             posts = uiState.posts,
@@ -90,17 +91,17 @@ private fun PostCard(
 ) {
     Row(
         Modifier
-            .padding(all = 8.dp)
-            .padding(end = 4.dp)
+            .padding(all = spacing.large)
+            .padding(end = spacing.medium)
             .fillMaxWidth()
     ) {
         ProfilePicture(
             modifier = Modifier
-                .size(40.dp)
+                .size(sizing.profilePic)
                 .clip(CircleShape),
             profilePicture = picture
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(spacing.large))
         Column {
             Text(
                 text = name,
@@ -108,7 +109,7 @@ private fun PostCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(spacing.medium))
             Text(
                 text = post.content,
                 maxLines = 12,
@@ -129,18 +130,18 @@ private fun ProfileData(
 ) {
     Row(
         modifier = Modifier
-            .padding(8.dp)
-            .padding(end = 4.dp),
+            .padding(spacing.large)
+            .padding(end = spacing.medium),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfilePicture(
             modifier = Modifier
-                .size(60.dp)
+                .size(sizing.largeProfilePic)
                 .aspectRatio(1f)
                 .clip(CircleShape),
             profilePicture = picture
         )
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(spacing.medium))
         Column(verticalArrangement = Arrangement.Center) {
             NameAndPubkey(
                 name = name,
@@ -166,23 +167,23 @@ private fun FollowerNumbers(
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = spacing.xl),
     ) {
         Row {
             Text(
                 text = numOfFollowing.toString(),
                 fontWeight = FontWeight.Bold
             )
-            Spacer(Modifier.width(4.dp))
+            Spacer(Modifier.width(spacing.medium))
             Text(text = stringResource(id = R.string.following))
         }
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(spacing.large))
         Row {
             Text(
                 text = numOfFollowers.toString(),
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(spacing.medium))
             Text(text = stringResource(id = R.string.followers))
         }
     }
@@ -198,11 +199,7 @@ private fun NameAndPubkey(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Column(
-            Modifier
-                .padding(end = 4.dp)
-                .weight(weight = 3.3f)
-        ) {
+        Column(Modifier.padding(end = spacing.medium)) {
             Text(
                 text = name,
                 maxLines = 1,
@@ -235,7 +232,7 @@ private fun CopyablePubkey(
             style = MaterialTheme.typography.body2,
         )
         CopyIcon(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(sizing.smallIcon),
             description = stringResource(id = R.string.copy_pubkey),
         )
     }

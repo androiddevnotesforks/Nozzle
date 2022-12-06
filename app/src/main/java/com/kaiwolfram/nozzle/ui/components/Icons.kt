@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.ui.theme.sizing
 
 @Composable
 fun CopyAndToastIcon(
@@ -23,7 +23,7 @@ fun CopyAndToastIcon(
 ) {
     CopyIcon(
         modifier = Modifier
-            .size(18.dp)
+            .size(sizing.smallIcon)
             .clickable { onCopyAndShowToast(toastText) },
         description = stringResource(id = R.string.copy_content),
     )
@@ -59,7 +59,7 @@ fun SearchIcon(
 fun VisibilityIcon(isVisible: Boolean, onToggle: () -> Unit) {
     Icon(
         modifier = Modifier
-            .size(18.dp)
+            .size(sizing.smallIcon)
             .clickable { onToggle() },
         imageVector = if (isVisible) {
             Icons.Default.VisibilityOff
