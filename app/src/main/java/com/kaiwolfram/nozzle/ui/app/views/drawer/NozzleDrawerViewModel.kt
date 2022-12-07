@@ -47,6 +47,21 @@ class NozzleDrawerViewModel(
         updateValuesFromNostrMetaData()
     }
 
+    val onUpdatePubkey: () -> Unit = {
+        val oldPubkey = uiState.value.pubkey
+        val newPubkey = profilePreferences.getPubkey()
+        if (newPubkey != oldPubkey) {
+            Log.i(TAG, "Update pubkey from $oldPubkey to $newPubkey")
+            viewModelState.update {
+                it.copy(
+                    pubkey = profilePreferences.getPubkey(),
+                )
+            }
+        } else {
+            Log.i(TAG, "Not updating pubkey: Keys are identical")
+        }
+    }
+
     private fun useCachedValues() {
         viewModelState.update {
             it.copy(

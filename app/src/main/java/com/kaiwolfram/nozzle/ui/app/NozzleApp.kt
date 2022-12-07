@@ -42,6 +42,14 @@ fun NozzleApp(appContainer: AppContainer) {
             val defaultProfilePicture = painterResource(R.drawable.ic_default_profile)
 
             val vmContainer = VMContainer(
+                drawerViewModel = viewModel(
+                    factory = NozzleDrawerViewModel.provideFactory(
+                        defaultProfilePicture = defaultProfilePicture,
+                        nostrRepository = appContainer.nostrRepository,
+                        pictureRequester = appContainer.pictureRequester,
+                        profilePreferences = appContainer.profilePreferences,
+                    )
+                ),
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
                         defaultProfilePicture = defaultProfilePicture,
@@ -76,20 +84,12 @@ fun NozzleApp(appContainer: AppContainer) {
 
             val coroutineScope = rememberCoroutineScope()
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-            val nozzleDrawerViewModel: NozzleDrawerViewModel = viewModel(
-                factory = NozzleDrawerViewModel.provideFactory(
-                    defaultProfilePicture = defaultProfilePicture,
-                    nostrRepository = appContainer.nostrRepository,
-                    pictureRequester = appContainer.pictureRequester,
-                    profilePreferences = appContainer.profilePreferences,
-                )
-            )
 
             ModalDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     NozzleDrawerRoute(
-                        nozzleDrawerViewModel = nozzleDrawerViewModel,
+                        nozzleDrawerViewModel = vmContainer.drawerViewModel,
                         navActions = navActions,
                         onSetPubkey = vmContainer.profileViewModel.onSetPubkey,
                         closeDrawer = { coroutineScope.launch { drawerState.close() } },

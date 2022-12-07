@@ -25,6 +25,7 @@ fun KeysScreen(
     onCopyPrivkeyAndShowToast: (String) -> Unit,
     onUpdateKeyPairAndShowToast: (String) -> Unit,
     onPrivkeyChange: (String) -> Unit,
+    onUpdateDrawerPubkey: () -> Unit,
     onResetUiState: () -> Unit,
     onNavigateToFeed: () -> Unit,
 ) {
@@ -48,7 +49,10 @@ fun KeysScreen(
                 ActionButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(id = R.string.update_key_pair),
-                    onAction = { onUpdateKeyPairAndShowToast(toast) }
+                    onAction = {
+                        onUpdateKeyPairAndShowToast(toast)
+                        onUpdateDrawerPubkey()
+                    }
                 )
             }
         }

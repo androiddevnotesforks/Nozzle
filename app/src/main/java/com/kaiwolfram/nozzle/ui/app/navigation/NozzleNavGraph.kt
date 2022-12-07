@@ -45,7 +45,8 @@ fun NozzleNavGraph(
         composable(NozzleRoute.KEYS) {
             KeysRoute(
                 keysViewModel = vmContainer.keysViewModel,
-                onNavigateToFeed = navActions.navigateToFeed
+                onUpdateDrawerPubkey = vmContainer.drawerViewModel.onUpdatePubkey,
+                onNavigateToFeed = navActions.navigateToFeed,
             )
         }
         composable(NozzleRoute.RELAYS) {
