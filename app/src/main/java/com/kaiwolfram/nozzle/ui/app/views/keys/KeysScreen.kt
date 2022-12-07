@@ -1,15 +1,16 @@
 package com.kaiwolfram.nozzle.ui.app.views.keys
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.*
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ActionButton
 import com.kaiwolfram.nozzle.ui.components.CopyAndToastIcon
@@ -74,7 +75,7 @@ private fun Pubkey(
         onValueChange = { /* Always disabled*/ },
         trailingIcon = {
             CopyAndToastIcon(
-                toastText = stringResource(id = R.string.copied_pubkey),
+                toastText = stringResource(id = R.string.pubkey_copied),
                 onCopyAndShowToast = onCopyPubkeyAndShowToast
             )
         }
@@ -96,17 +97,24 @@ private fun Privkey(
     Text(text = stringResource(id = R.string.private_key_warning))
     var isVisible by remember { mutableStateOf(false) }
     var newPrivkey by remember { mutableStateOf(TextFieldValue(privkey)) }
+    val focusManager = LocalFocusManager.current
     TextField(
         modifier = Modifier.fillMaxWidth(),
         value = newPrivkey,
         isError = isInvalid,
         maxLines = 2,
+        placeholder = { Text(text = stringResource(id = R.string.enter_a_private_key)) },
         label = if (isInvalid) {
             { Text(text = stringResource(id = R.string.invalid_private_key)) }
         } else {
             null
         },
-        placeholder = { Text(text = stringResource(id = R.string.enter_a_private_key)) },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done,
+            autoCorrect = false,
+        ),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         visualTransformation = if (!isVisible) {
             PasswordVisualTransformation()
         } else {
@@ -133,7 +141,7 @@ private fun CopyAndVisibilityIcons(
 ) {
     Row {
         CopyAndToastIcon(
-            toastText = stringResource(id = R.string.copied_privkey),
+            toastText = stringResource(id = R.string.privkey_copied),
             onCopyAndShowToast = onCopyPrivkeyAndShowToast
         )
         Spacer(modifier = Modifier.width(spacing.small))

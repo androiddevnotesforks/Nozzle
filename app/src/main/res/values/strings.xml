@@ -29,7 +29,6 @@
     <string name="follow_or_unfollow">Follow or unfollow</string>
     <string name="settings">Settings</string>
     <string name="copy_pubkey">Copy public key</string>
-    <string name="copied_pubkey">Copied public key</string>
     <string name="public_key">Public key</string>
     <string name="return_back">Return back</string>
     <string name="copy_content">Copy content</string>
@@ -42,5 +41,6 @@
     <string name="invalid_private_key">Invalid private key</string>
     <string name="key_pair_updated">Key pair updated</string>
     <string name="enter_a_private_key">Enter a private key (64 hex characters)</string>
-    <string name="copied_privkey">Copied private key</string>
+    <string name="pubkey_copied">Public key copied</string>
+    <string name="privkey_copied">Private key copied</string>
 </resources>

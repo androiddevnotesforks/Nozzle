@@ -219,7 +219,7 @@ private fun CopyablePubkey(
     pubkey: String,
     onCopyPubkeyAndShowToast: (String) -> Unit,
 ) {
-    val toast = stringResource(id = R.string.copied_pubkey)
+    val toast = stringResource(id = R.string.pubkey_copied)
     Row(
         Modifier.clickable { onCopyPubkeyAndShowToast(toast) },
         verticalAlignment = Alignment.CenterVertically
