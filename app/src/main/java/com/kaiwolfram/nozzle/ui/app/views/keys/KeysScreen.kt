@@ -36,7 +36,7 @@ fun KeysScreen(
                 pubkey = uiState.pubkey,
                 onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast
             )
-            Spacer(modifier = Modifier.height(spacing.large))
+            Spacer(modifier = Modifier.height(spacing.xxl))
             Privkey(
                 privkey = uiState.privkey,
                 isInvalid = uiState.isInvalid,
