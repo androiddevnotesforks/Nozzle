@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Nozzle</string>
+    <string name="nozzle_version" translatable="false">Nozzle v0.0.1</string>
     <string name="profile">Profile</string>
     <string name="feed">Feed</string>
     <string name="search">Search</string>
@@ -18,7 +19,6 @@
     <string name="authors_profile_picture">Author\'s profile picture</string>
     <string name="keys">Keys</string>
     <string name="relays">Relays</string>
-    <string name="nozzle_version">Nozzle v0.0.1</string>
     <string name="support_nozzle">Support Nozzle</string>
     <string name="nav_to_edit_profile">Edit your profile</string>
     <string name="edit">Edit</string>
@@ -42,4 +42,5 @@
     <string name="invalid_private_key">Invalid private key</string>
     <string name="key_pair_updated">Key pair updated</string>
     <string name="enter_a_private_key">Enter a private key (64 hex characters)</string>
+    <string name="copied_privkey">Copied private key</string>
 </resources>

@@ -21,6 +21,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 fun KeysScreen(
     uiState: KeysViewModelState,
     onCopyPubkeyAndShowToast: (String) -> Unit,
+    onCopyPrivkeyAndShowToast: (String) -> Unit,
     onUpdateKeyPairAndShowToast: (String) -> Unit,
     onPrivkeyChange: (String) -> Unit,
     onResetUiState: () -> Unit,
@@ -37,7 +38,8 @@ fun KeysScreen(
             Privkey(
                 privkey = uiState.privkey,
                 isInvalid = uiState.isInvalid,
-                onPrivkeyChange = onPrivkeyChange
+                onPrivkeyChange = onPrivkeyChange,
+                onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
             if (uiState.hasChanges) {
@@ -83,7 +85,8 @@ private fun Pubkey(
 private fun Privkey(
     privkey: String,
     isInvalid: Boolean,
-    onPrivkeyChange: (String) -> Unit
+    onPrivkeyChange: (String) -> Unit,
+    onCopyPrivkeyAndShowToast: (String) -> Unit,
 ) {
     Text(
         text = stringResource(id = R.string.private_key),
@@ -114,9 +117,28 @@ private fun Privkey(
             onPrivkeyChange(newValue.text)
         },
         trailingIcon = {
-            VisibilityIcon(
-                isVisible = isVisible,
-                onToggle = { isVisible = !isVisible })
+            CopyAndVisibilityIcons(isVisible = isVisible,
+                onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast,
+                onToggleVisibility = { isVisible = !isVisible }
+            )
         }
     )
+}
+
+@Composable
+private fun CopyAndVisibilityIcons(
+    isVisible: Boolean,
+    onCopyPrivkeyAndShowToast: (String) -> Unit,
+    onToggleVisibility: () -> Unit
+) {
+    Row {
+        CopyAndToastIcon(
+            toastText = stringResource(id = R.string.copied_privkey),
+            onCopyAndShowToast = onCopyPrivkeyAndShowToast
+        )
+        Spacer(modifier = Modifier.width(spacing.small))
+        VisibilityIcon(
+            isVisible = isVisible,
+            onToggle = { onToggleVisibility() })
+    }
 }
