@@ -1,19 +1,25 @@
 package com.kaiwolfram.nozzle.ui.app.views.settings
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.data.utils.isHex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 private const val TAG = "SettingsViewModel"
 
 data class SettingsViewModelState(
-    val name: String = "Settings are coming soon!",
-    val bio: String = "Settings are coming soon!",
-    val pictureUrl: String = "Settings are coming soon!",
+    val username: String = "",
+    val bio: String = "",
+    val pictureUrl: String = "",
+    val usernameIsInvalid: Boolean = true,
+    val pictureUrlIsInvalid: Boolean = true,
+    val hasChanges: Boolean = false,
 )
 
 class SettingsViewModel : ViewModel() {
@@ -26,9 +32,22 @@ class SettingsViewModel : ViewModel() {
             viewModelState.value
         )
 
-
     init {
         Log.i(TAG, "Initialize SettingsViewModel")
+    }
+
+    val onUpdateProfileAndShowToast: (String) -> Unit =
+        { toast ->
+            TODO(toast)
+        }
+
+    val onResetUiState: () -> Unit = {
+        viewModelState.update {
+            it.copy(
+                hasChanges = false,
+                // TODO: other fields
+            )
+        }
     }
 
     companion object {

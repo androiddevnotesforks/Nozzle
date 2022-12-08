@@ -43,7 +43,7 @@ fun KeysScreen(
                 onPrivkeyChange = onPrivkeyChange,
                 onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast
             )
-            Spacer(modifier = Modifier.height(spacing.xxl))
+            Spacer(modifier = Modifier.height(spacing.large))
             if (uiState.hasChanges) {
                 val toast = stringResource(id = R.string.key_pair_updated)
                 ActionButton(
@@ -93,15 +93,15 @@ private fun Privkey(
     onPrivkeyChange: (String) -> Unit,
     onCopyPrivkeyAndShowToast: (String) -> Unit,
 ) {
+    var isVisible by remember { mutableStateOf(false) }
+    var newPrivkey by remember { mutableStateOf(TextFieldValue(privkey)) }
+    val focusManager = LocalFocusManager.current
     Text(
         text = stringResource(id = R.string.private_key),
         fontWeight = FontWeight.Bold
     )
     Text(text = stringResource(id = R.string.private_key_description))
     Text(text = stringResource(id = R.string.private_key_warning))
-    var isVisible by remember { mutableStateOf(false) }
-    var newPrivkey by remember { mutableStateOf(TextFieldValue(privkey)) }
-    val focusManager = LocalFocusManager.current
     TextField(
         modifier = Modifier.fillMaxWidth(),
         value = newPrivkey,

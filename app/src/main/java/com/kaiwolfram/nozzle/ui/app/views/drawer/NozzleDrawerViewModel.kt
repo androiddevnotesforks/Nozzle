@@ -54,11 +54,26 @@ class NozzleDrawerViewModel(
             Log.i(TAG, "Update pubkey from $oldPubkey to $newPubkey")
             viewModelState.update {
                 it.copy(
-                    pubkey = profilePreferences.getPubkey(),
+                    pubkey = newPubkey,
                 )
             }
         } else {
             Log.i(TAG, "Not updating pubkey: Keys are identical")
+        }
+    }
+
+    val onUpdateName: () -> Unit = {
+        val oldName = uiState.value.name
+        val newName = profilePreferences.getName()
+        if (newName != oldName) {
+            Log.i(TAG, "Update name from $oldName to $newName")
+            viewModelState.update {
+                it.copy(
+                    name = newName,
+                )
+            }
+        } else {
+            Log.i(TAG, "Not updating name: Names are identical")
         }
     }
 

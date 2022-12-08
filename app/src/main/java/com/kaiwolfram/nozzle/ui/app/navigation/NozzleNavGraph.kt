@@ -57,6 +57,8 @@ fun NozzleNavGraph(
         composable(NozzleRoute.SETTINGS) {
             SettingsRoute(
                 settingsViewModel = vmContainer.settingsViewModel,
+                onUpdateDrawerName = vmContainer.drawerViewModel.onUpdateName,
+                onNavigateToFeed = navActions.navigateToFeed,
             )
         }
     }
