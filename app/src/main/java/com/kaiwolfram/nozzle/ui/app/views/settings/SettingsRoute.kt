@@ -16,6 +16,9 @@ fun SettingsRoute(
         uiState = uiState,
         onUpdateProfileAndShowToast = settingsViewModel.onUpdateProfileAndShowToast,
         onUpdateDrawerName = onUpdateDrawerName,
+        onChangeName = settingsViewModel.onChangeName,
+        onChangeBio = settingsViewModel.onChangeBio,
+        onChangePictureUrl = settingsViewModel.onChangePictureUrl,
         onResetUiState = settingsViewModel.onResetUiState,
         onNavigateToFeed = onNavigateToFeed,
     )

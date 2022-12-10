@@ -41,6 +41,21 @@ class SettingsViewModel : ViewModel() {
             TODO(toast)
         }
 
+    val onChangeName: (String) -> Unit =
+        { newName ->
+            TODO(newName)
+        }
+
+    val onChangeBio: (String) -> Unit =
+        { newBio ->
+            TODO(newBio)
+        }
+
+    val onChangePictureUrl: (String) -> Unit =
+        { newUrl ->
+            TODO(newUrl)
+        }
+
     val onResetUiState: () -> Unit = {
         viewModelState.update {
             it.copy(

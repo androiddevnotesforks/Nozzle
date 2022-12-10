@@ -89,7 +89,7 @@ class KeysViewModel(
             }
         }
 
-    val onPrivkeyChange: (String) -> Unit = { newValue ->
+    val onChangePrivkey: (String) -> Unit = { newValue ->
         if (uiState.value.privkey == newValue) {
             viewModelState.update {
                 it.copy(

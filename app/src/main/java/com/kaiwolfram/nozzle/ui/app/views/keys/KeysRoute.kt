@@ -17,7 +17,7 @@ fun KeysRoute(
         onCopyPubkeyAndShowToast = keysViewModel.onCopyPubkeyAndShowToast,
         onCopyPrivkeyAndShowToast = keysViewModel.onCopyPrivkeyAndShowToast,
         onUpdateKeyPairAndShowToast = keysViewModel.onUpdateKeyPairAndShowToast,
-        onPrivkeyChange = keysViewModel.onPrivkeyChange,
+        onChangePrivkey = keysViewModel.onChangePrivkey,
         onUpdateDrawerPubkey = onUpdateDrawerPubkey,
         onResetUiState = keysViewModel.onResetUiState,
         onNavigateToFeed = onNavigateToFeed,

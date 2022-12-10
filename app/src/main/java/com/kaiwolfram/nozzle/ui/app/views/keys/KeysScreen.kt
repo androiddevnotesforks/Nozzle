@@ -1,21 +1,15 @@
 package com.kaiwolfram.nozzle.ui.app.views.keys
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.TextFieldValue
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.components.ActionButton
-import com.kaiwolfram.nozzle.ui.components.CopyAndToastIcon
-import com.kaiwolfram.nozzle.ui.components.TopBar
-import com.kaiwolfram.nozzle.ui.components.VisibilityIcon
+import com.kaiwolfram.nozzle.ui.components.*
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
@@ -24,7 +18,7 @@ fun KeysScreen(
     onCopyPubkeyAndShowToast: (String) -> Unit,
     onCopyPrivkeyAndShowToast: (String) -> Unit,
     onUpdateKeyPairAndShowToast: (String) -> Unit,
-    onPrivkeyChange: (String) -> Unit,
+    onChangePrivkey: (String) -> Unit,
     onUpdateDrawerPubkey: () -> Unit,
     onResetUiState: () -> Unit,
     onNavigateToFeed: () -> Unit,
@@ -40,7 +34,7 @@ fun KeysScreen(
             Privkey(
                 privkey = uiState.privkey,
                 isInvalid = uiState.isInvalid,
-                onPrivkeyChange = onPrivkeyChange,
+                onChangePrivkey = onChangePrivkey,
                 onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast
             )
             Spacer(modifier = Modifier.height(spacing.large))
@@ -90,50 +84,31 @@ private fun Pubkey(
 private fun Privkey(
     privkey: String,
     isInvalid: Boolean,
-    onPrivkeyChange: (String) -> Unit,
+    onChangePrivkey: (String) -> Unit,
     onCopyPrivkeyAndShowToast: (String) -> Unit,
 ) {
     var isVisible by remember { mutableStateOf(false) }
-    var newPrivkey by remember { mutableStateOf(TextFieldValue(privkey)) }
-    val focusManager = LocalFocusManager.current
     Text(
         text = stringResource(id = R.string.private_key),
         fontWeight = FontWeight.Bold
     )
     Text(text = stringResource(id = R.string.private_key_description))
     Text(text = stringResource(id = R.string.private_key_warning))
-    TextField(
+    ChangeableTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = newPrivkey,
+        value = privkey,
         isError = isInvalid,
         maxLines = 2,
-        placeholder = { Text(text = stringResource(id = R.string.enter_a_private_key)) },
-        label = if (isInvalid) {
-            { Text(text = stringResource(id = R.string.invalid_private_key)) }
-        } else {
-            null
-        },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Done,
-            autoCorrect = false,
-        ),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        visualTransformation = if (!isVisible) {
-            PasswordVisualTransformation()
-        } else {
-            VisualTransformation.None
-        },
-        onValueChange = { newValue ->
-            newPrivkey = newValue
-            onPrivkeyChange(newValue.text)
-        },
+        placeholder = stringResource(id = R.string.enter_a_private_key),
+        errorLabel = stringResource(id = R.string.invalid_private_key),
+        isPassword = !isVisible,
+        onChangeValue = onChangePrivkey,
         trailingIcon = {
             CopyAndVisibilityIcons(isVisible = isVisible,
                 onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast,
                 onToggleVisibility = { isVisible = !isVisible }
             )
-        }
+        },
     )
 }
 
