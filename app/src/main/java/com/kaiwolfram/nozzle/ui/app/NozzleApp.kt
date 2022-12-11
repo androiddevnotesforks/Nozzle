@@ -78,7 +78,10 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = RelaysViewModel.provideFactory()
                 ),
                 settingsViewModel = viewModel(
-                    factory = SettingsViewModel.provideFactory()
+                    factory = SettingsViewModel.provideFactory(
+                        profilePreferences = appContainer.profilePreferences,
+                        context = LocalContext.current,
+                    )
                 ),
             )
 

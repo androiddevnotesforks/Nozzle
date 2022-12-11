@@ -29,18 +29,18 @@ fun SettingsScreen(
         TopBar(text = stringResource(id = R.string.settings), onGoBack = onNavigateToFeed)
         Column(modifier = Modifier.padding(spacing.screenEdge)) {
             Username(
-                username = uiState.username,
-                isInvalid = uiState.usernameIsInvalid,
+                username = uiState.usernameInput,
+                isInvalid = uiState.isInvalidUsername,
                 onChangeName = onChangeName
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
 
-            Bio(bio = uiState.bio, onChangeBio = onChangeBio)
+            Bio(bio = uiState.bioInput, onChangeBio = onChangeBio)
             Spacer(modifier = Modifier.height(spacing.xxl))
 
             ProfilePictureUrl(
-                pictureUrl = uiState.pictureUrl,
-                isInvalid = uiState.pictureUrlIsInvalid,
+                pictureUrl = uiState.pictureUrlInput,
+                isInvalid = uiState.isInvalidPictureUrl,
                 onChangePictureUrl = onChangePictureUrl
             )
             Spacer(modifier = Modifier.height(spacing.large))
@@ -107,6 +107,7 @@ private fun ProfilePictureUrl(
         modifier = Modifier.fillMaxWidth(),
         value = pictureUrl,
         isError = isInvalid,
+        maxLines = 3,
         placeholder = stringResource(id = R.string.enter_a_picture_url),
         errorLabel = stringResource(id = R.string.invalid_url),
         keyboardType = KeyboardType.Uri,

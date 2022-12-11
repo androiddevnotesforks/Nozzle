@@ -48,7 +48,7 @@
     <string name="username">Username</string>
     <string name="about_you">About you</string>
     <string name="describe_yourself">Describe yourself</string>
-    <string name="enter_a_picture_url">Enter a picture URL</string>
+    <string name="enter_a_picture_url">Enter a picture URL (https://…)</string>
     <string name="profile_updated">Profile updated</string>
     <string name="update_profile">Update profile</string>
     <string name="invalid_url">Invalid URL</string>

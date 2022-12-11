@@ -32,7 +32,7 @@ fun KeysScreen(
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
             Privkey(
-                privkey = uiState.privkey,
+                privkey = uiState.privkeyInput,
                 isInvalid = uiState.isInvalid,
                 onChangePrivkey = onChangePrivkey,
                 onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast

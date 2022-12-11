@@ -19,8 +19,7 @@ private const val TAG = "KeysViewModel"
 
 data class KeysViewModelState(
     val pubkey: String = "",
-    val privkey: String = "",
-    val newPrivkey: String = "",
+    val privkeyInput: String = "",
     val hasChanges: Boolean = false,
     val isInvalid: Boolean = false,
 )
@@ -31,6 +30,7 @@ class KeysViewModel(
     clip: ClipboardManager,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(KeysViewModelState())
+    private var privkey: String = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -42,20 +42,7 @@ class KeysViewModel(
 
     init {
         Log.i(TAG, "Initialize KeysViewModel")
-        setFromPreferences()
-    }
-
-    private fun setFromPreferences() {
-        viewModelState.update {
-            val privKey = profilePreferences.getPrivkey()
-            it.copy(
-                privkey = privKey,
-                newPrivkey = privKey,
-                pubkey = profilePreferences.getPubkey(),
-                hasChanges = false,
-                isInvalid = false,
-            )
-        }
+        useCachedValues()
     }
 
     val onCopyPubkeyAndShowToast: (String) -> Unit = { toast ->
@@ -66,23 +53,23 @@ class KeysViewModel(
     }
 
     val onCopyPrivkeyAndShowToast: (String) -> Unit = { toast ->
-        val privkey = uiState.value.newPrivkey
-        Log.i(TAG, "Copy privkey $privkey and show toast '$toast'")
-        clip.setText(AnnotatedString(privkey))
+        val privkeyInput = uiState.value.privkeyInput
+        Log.i(TAG, "Copy privkey $privkeyInput and show toast '$toast'")
+        clip.setText(AnnotatedString(privkeyInput))
         Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
     }
 
     val onUpdateKeyPairAndShowToast: (String) -> Unit =
         { toast ->
-            val newPrivkey = uiState.value.newPrivkey
-            val isValid = newPrivkey.length == 64 && newPrivkey.isHex()
+            val privkeyInput = uiState.value.privkeyInput
+            val isValid = privkeyInput.length == 64 && privkeyInput.isHex()
             if (isValid) {
-                Log.i(TAG, "Saving new privkey $newPrivkey")
-                profilePreferences.setPrivkey(newPrivkey)
-                setFromPreferences()
+                Log.i(TAG, "Saving new privkey $privkeyInput")
+                profilePreferences.setPrivkey(privkeyInput)
+                useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {
-                Log.i(TAG, "New privkey $newPrivkey is invalid")
+                Log.i(TAG, "New privkey $privkeyInput is invalid")
                 viewModelState.update {
                     it.copy(isInvalid = true)
                 }
@@ -90,18 +77,18 @@ class KeysViewModel(
         }
 
     val onChangePrivkey: (String) -> Unit = { newValue ->
-        if (uiState.value.privkey == newValue) {
+        if (privkey == newValue) {
             viewModelState.update {
                 it.copy(
-                    newPrivkey = newValue,
+                    privkeyInput = newValue,
                     isInvalid = false,
                     hasChanges = false,
                 )
             }
-        } else if (uiState.value.newPrivkey != newValue) {
+        } else if (uiState.value.privkeyInput != newValue) {
             viewModelState.update {
                 it.copy(
-                    newPrivkey = newValue,
+                    privkeyInput = newValue,
                     isInvalid = false,
                     hasChanges = true,
                 )
@@ -110,9 +97,15 @@ class KeysViewModel(
     }
 
     val onResetUiState: () -> Unit = {
+        useCachedValues()
+    }
+
+    private fun useCachedValues() {
         viewModelState.update {
+            privkey = profilePreferences.getPrivkey()
             it.copy(
-                newPrivkey = uiState.value.privkey,
+                privkeyInput = privkey,
+                pubkey = profilePreferences.getPubkey(),
                 hasChanges = false,
                 isInvalid = false,
             )

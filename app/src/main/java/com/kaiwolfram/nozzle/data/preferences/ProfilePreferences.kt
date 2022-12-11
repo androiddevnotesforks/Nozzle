@@ -11,6 +11,7 @@ private const val TAG: String = "ProfilePreferences"
 private object Variables {
     const val PRIVKEY: String = "privkey"
     const val NAME: String = "name"
+    const val BIO: String = "bio"
     const val PICTURE_URL: String = "picture_url"
 }
 
@@ -42,12 +43,34 @@ class ProfilePreferences(context: Context) {
             .apply()
     }
 
+    fun getBio(): String {
+        return preferences.getString(Variables.BIO, "") ?: ""
+    }
+
+    fun setBio(bio: String) {
+        preferences.edit()
+            .putString(Variables.BIO, bio)
+            .apply()
+    }
+
     fun getName(): String {
         return preferences.getString(Variables.NAME, "") ?: ""
     }
 
+    fun setName(name: String) {
+        preferences.edit()
+            .putString(Variables.NAME, name)
+            .apply()
+    }
+
     fun getPictureUrl(): String {
         return preferences.getString(Variables.PICTURE_URL, "") ?: ""
+    }
+
+    fun setPictureUrl(pictureUrl: String) {
+        preferences.edit()
+            .putString(Variables.PICTURE_URL, pictureUrl)
+            .apply()
     }
 
     fun setProfileValues(profile: NostrProfile) {

@@ -1,11 +1,14 @@
 package com.kaiwolfram.nozzle.ui.app.views.settings
 
+import android.content.Context
 import android.util.Log
+import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.utils.isHex
+import com.kaiwolfram.nozzle.data.nostr.isValidUsername
+import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -14,16 +17,22 @@ import kotlinx.coroutines.flow.update
 private const val TAG = "SettingsViewModel"
 
 data class SettingsViewModelState(
-    val username: String = "",
-    val bio: String = "",
-    val pictureUrl: String = "",
-    val usernameIsInvalid: Boolean = true,
-    val pictureUrlIsInvalid: Boolean = true,
+    val usernameInput: String = "",
+    val bioInput: String = "",
+    val pictureUrlInput: String = "",
     val hasChanges: Boolean = false,
+    val isInvalidUsername: Boolean = false,
+    val isInvalidPictureUrl: Boolean = false,
 )
 
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel(
+    private val profilePreferences: ProfilePreferences,
+    context: Context,
+) : ViewModel() {
     private val viewModelState = MutableStateFlow(SettingsViewModelState())
+    private var username: String = ""
+    private var bio: String = ""
+    private var pictureUrl: String = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -34,42 +43,95 @@ class SettingsViewModel : ViewModel() {
 
     init {
         Log.i(TAG, "Initialize SettingsViewModel")
+        useCachedValues()
     }
 
     val onUpdateProfileAndShowToast: (String) -> Unit =
         { toast ->
-            TODO(toast)
+            val usernameInput = uiState.value.usernameInput
+            val bioInput = uiState.value.bioInput
+            val urlInput = uiState.value.pictureUrlInput
+
+            val isValidUsername = isValidUsername(usernameInput)
+            val isValidUrl = URLUtil.isHttpsUrl(urlInput)
+            if (isValidUsername && isValidUrl) {
+                Log.i(
+                    TAG,
+                    "Saving username $usernameInput, bio $bioInput and picture URL $urlInput"
+                )
+                profilePreferences.setName(usernameInput)
+                profilePreferences.setBio(bioInput)
+                profilePreferences.setPictureUrl(urlInput)
+                useCachedValues()
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            } else {
+                Log.i(TAG, "New values are invalid")
+                viewModelState.update {
+                    it.copy(isInvalidUsername = !isValidUsername, isInvalidPictureUrl = !isValidUrl)
+                }
+            }
         }
 
-    val onChangeName: (String) -> Unit =
-        { newName ->
-            TODO(newName)
-        }
-
-    val onChangeBio: (String) -> Unit =
-        { newBio ->
-            TODO(newBio)
-        }
-
-    val onChangePictureUrl: (String) -> Unit =
-        { newUrl ->
-            TODO(newUrl)
-        }
-
-    val onResetUiState: () -> Unit = {
+    val onChangeName: (String) -> Unit = { input ->
         viewModelState.update {
             it.copy(
+                usernameInput = input,
+                hasChanges = true
+            )
+        }
+    }
+
+    val onChangeBio: (String) -> Unit = { input ->
+        if (input != uiState.value.bioInput) {
+            viewModelState.update {
+                it.copy(
+                    bioInput = input,
+                    hasChanges = true
+                )
+            }
+        }
+    }
+
+    val onChangePictureUrl: (String) -> Unit = { input ->
+        viewModelState.update {
+            it.copy(
+                pictureUrlInput = input,
+                hasChanges = true
+            )
+        }
+    }
+
+    val onResetUiState: () -> Unit = {
+        useCachedValues()
+    }
+
+    private fun useCachedValues() {
+        username = profilePreferences.getName()
+        bio = profilePreferences.getBio()
+        pictureUrl = profilePreferences.getPictureUrl()
+        viewModelState.update {
+            it.copy(
+                usernameInput = username,
+                bioInput = bio,
+                pictureUrlInput = pictureUrl,
                 hasChanges = false,
-                // TODO: other fields
+                isInvalidUsername = false,
+                isInvalidPictureUrl = false
             )
         }
     }
 
     companion object {
-        fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        fun provideFactory(
+            profilePreferences: ProfilePreferences,
+            context: Context,
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SettingsViewModel() as T
+                return SettingsViewModel(
+                    profilePreferences = profilePreferences,
+                    context = context
+                ) as T
             }
         }
     }
