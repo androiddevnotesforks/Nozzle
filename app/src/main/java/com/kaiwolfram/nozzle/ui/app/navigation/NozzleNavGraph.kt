@@ -52,7 +52,8 @@ fun NozzleNavGraph(
         composable(NozzleRoute.RELAYS) {
             RelaysRoute(
                 relaysViewModel = vmContainer.relaysViewModel,
-            )
+                onNavigateToFeed = navActions.navigateToFeed,
+                )
         }
         composable(NozzleRoute.SETTINGS) {
             SettingsRoute(
