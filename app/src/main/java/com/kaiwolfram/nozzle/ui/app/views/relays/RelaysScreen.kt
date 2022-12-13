@@ -20,15 +20,15 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun RelaysScreen(
     uiState: RelaysViewModelState,
+    onLeaveRelay: (Int) ->Unit,
+    onJoinRelay: (Int) ->Unit,
     onNavigateToFeed: () -> Unit,
 ) {
     Column {
         TopBar(text = stringResource(id = R.string.relays), onGoBack = onNavigateToFeed)
         LazyColumn {
             itemsIndexed(uiState.activeRelays) { index, relay ->
-                ActiveRelay(url = relay,
-                    index = index,
-                    onLeave = { TODO() })
+                ActiveRelay(url = relay, index = index, onLeave = onLeaveRelay)
                 // TODO: Last Item has no Divider
                 Divider(modifier = Modifier.fillMaxWidth())
             }
@@ -41,7 +41,7 @@ fun RelaysScreen(
                 Divider(modifier = Modifier.fillMaxWidth())
             }
             itemsIndexed(uiState.inactiveRelays) { index, relay ->
-                InactiveRelay(index = index, url = relay, onJoin = { TODO() })
+                InactiveRelay(index = index, url = relay, onJoin = onJoinRelay)
                 // TODO: Last Item has no Divider
                 Divider(modifier = Modifier.fillMaxWidth())
             }
