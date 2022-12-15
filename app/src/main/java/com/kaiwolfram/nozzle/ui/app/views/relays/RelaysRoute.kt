@@ -13,8 +13,8 @@ fun RelaysRoute(
 
     RelaysScreen(
         uiState = uiState,
-        onLeaveRelay = relaysViewModel.onLeaveRelay,
-        onJoinRelay = relaysViewModel.onJoinRelay,
+        onRemoveRelay = relaysViewModel.onRemoveRelay,
+        onAddRelay = relaysViewModel.onAddRelay,
         onNavigateToFeed = onNavigateToFeed,
     )
 }

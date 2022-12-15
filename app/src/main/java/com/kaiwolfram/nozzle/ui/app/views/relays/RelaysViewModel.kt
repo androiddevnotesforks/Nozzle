@@ -10,23 +10,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 private const val TAG = "RelaysViewModel"
+private const val MAX_RELAYS = 5
 
 data class RelaysViewModelState(
-    val activeRelays: List<String> = listOf(
-        "coming",
-        "soon",
-        "maybe",
-        "2weeks",
-        "coming",
-        "soon",
-        "maybe",
-        "2weeks",
-        "coming",
-        "soon",
-        "maybe",
-        "2weeks"
-    ),
-    val inactiveRelays: List<String> = listOf("lol", "lmao", "never", "ever")
+    val relays: List<String> = listOf(),
+    val showAddButton: Boolean = true,
+    val relayInput: String = ""
 )
 
 class RelaysViewModel : ViewModel() {
@@ -41,36 +30,41 @@ class RelaysViewModel : ViewModel() {
 
     init {
         Log.i(TAG, "Initialize RelaysViewModel")
+        val showAddButton = uiState.value.relays.size < MAX_RELAYS
+        viewModelState.update {
+            it.copy(
+                relays = listOf("lol", "lmao", "xD"),
+                showAddButton = showAddButton,
+                relayInput = ""
+            )
+        }
+
     }
 
-    val onLeaveRelay: (Int) -> Unit = { index ->
-        Log.i(TAG, "Leave index $index")
-        if (uiState.value.activeRelays.size > index) {
-            val active = uiState.value.activeRelays.toMutableList()
-            val inactive = uiState.value.inactiveRelays.toMutableList()
-            val removed = active.removeAt(index)
-            inactive.add(0, removed)
+    val onRemoveRelay: (Int) -> Unit = { index ->
+        if (index > 0 && uiState.value.relays.size > index) {
+            Log.i(TAG, "Leave index $index")
+            val active = uiState.value.relays.toMutableList()
+            active.removeAt(index)
             viewModelState.update {
                 it.copy(
-                    activeRelays = active,
-                    inactiveRelays = inactive
+                    relays = active,
                 )
             }
         }
     }
 
-    val onJoinRelay: (Int) -> Unit = { index ->
-        Log.i(TAG, "Join index $index")
-        if (uiState.value.inactiveRelays.size > index) {
-            val active = uiState.value.activeRelays.toMutableList()
-            val inactive = uiState.value.inactiveRelays.toMutableList()
-            val removed = inactive.removeAt(index)
-            active.add(removed)
-            viewModelState.update {
-                it.copy(
-                    activeRelays = active,
-                    inactiveRelays = inactive
-                )
+    val onAddRelay: () -> Unit = {
+        uiState.value.run {
+            if(!relays.contains(relayInput)){
+                val newList = relays.toMutableList()
+                newList.add(relayInput)
+                viewModelState.update {
+                    it.copy(
+                        relays = newList,
+                        relayInput = "",
+                    )
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -67,5 +68,17 @@ fun VisibilityIcon(isVisible: Boolean, onToggle: () -> Unit) {
             Icons.Default.Visibility
         },
         contentDescription = stringResource(id = R.string.toggle_visibility),
+    )
+}
+
+@Composable
+fun ClearIcon(
+    modifier: Modifier = Modifier,
+    description: String = stringResource(id = R.string.remove),
+) {
+    Icon(
+        modifier = modifier,
+        imageVector = Icons.Default.Clear,
+        contentDescription = description,
     )
 }
