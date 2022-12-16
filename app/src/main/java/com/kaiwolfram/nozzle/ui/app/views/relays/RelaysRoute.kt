@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 fun RelaysRoute(
     relaysViewModel: RelaysViewModel,
     onNavigateToFeed: () -> Unit,
-    ) {
+) {
     val uiState by relaysViewModel.uiState.collectAsState()
 
     RelaysScreen(

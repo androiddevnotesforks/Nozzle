@@ -10,28 +10,15 @@ import androidx.compose.ui.Modifier
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
-fun TopBar(text: String, onGoBack: (() -> Unit)? = null, onAdd: (() -> Unit)? = null) {
+fun TopBar(text: String, onGoBack: (() -> Unit)? = null) {
     TopAppBar {
-        Left(text = text, onGoBack = onGoBack)
-        Right(onAdd = onAdd)
-    }
-}
-
-@Composable
-private fun Left(text: String, onGoBack: (() -> Unit)? = null){
-    if (onGoBack != null) {
-        GoBackButton(onGoBack = onGoBack)
-    }
-    Spacer(modifier = Modifier.width(spacing.large))
-    Text(
-        text = text,
-        style = MaterialTheme.typography.h6,
-    )
-}
-
-@Composable
-private fun Right(onAdd: (() -> Unit)? = null){
-    if (onAdd != null) {
-        GoBackButton(onGoBack = onAdd)
+        if (onGoBack != null) {
+            GoBackButton(onGoBack = onGoBack)
+        }
+        Spacer(modifier = Modifier.width(spacing.large))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.h6,
+        )
     }
 }

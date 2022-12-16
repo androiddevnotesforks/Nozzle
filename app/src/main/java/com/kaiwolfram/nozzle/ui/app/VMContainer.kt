@@ -1,6 +1,5 @@
 package com.kaiwolfram.nozzle.ui.app
 
-import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
@@ -12,7 +11,6 @@ data class VMContainer(
     val drawerViewModel: NozzleDrawerViewModel,
     val profileViewModel: ProfileViewModel,
     val feedViewModel: FeedViewModel,
-    val chatViewModel: ChatViewModel,
     val keysViewModel: KeysViewModel,
     val relaysViewModel: RelaysViewModel,
     val settingsViewModel: SettingsViewModel,

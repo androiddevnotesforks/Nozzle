@@ -5,7 +5,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.Newspaper
+import androidx.compose.material.icons.rounded.SatelliteAlt
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,14 +40,13 @@ fun NozzleDrawerScreen(
             profileName = uiState.name,
             navigateToProfile = {
                 onSetPubkey(uiState.pubkey)
-                navActions.navigateToPersonalProfile()
+                navActions.navigateToProfile()
             },
             closeDrawer = closeDrawer
         )
         Spacer(modifier = Modifier.height(spacing.medium))
         MainRows(
             navigateToFeed = navActions.navigateToFeed,
-            navigateToChat = navActions.navigateToChat,
             navigateToKeys = navActions.navigateToKeys,
             navigateToRelays = navActions.navigateToRelays,
             navigateToSettings = navActions.navigateToSettings,
@@ -79,7 +81,6 @@ private fun ProfileRow(
 @Composable
 private fun MainRows(
     navigateToFeed: () -> Unit,
-    navigateToChat: () -> Unit,
     navigateToKeys: () -> Unit,
     navigateToRelays: () -> Unit,
     navigateToSettings: () -> Unit,
@@ -90,14 +91,6 @@ private fun MainRows(
         label = stringResource(id = R.string.feed),
         action = {
             navigateToFeed()
-            closeDrawer()
-        }
-    )
-    DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Rounded.Chat),
-        label = stringResource(id = R.string.chat),
-        action = {
-            navigateToChat()
             closeDrawer()
         }
     )

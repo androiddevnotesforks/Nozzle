@@ -20,7 +20,6 @@ import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
-import com.kaiwolfram.nozzle.ui.app.views.chat.ChatViewModel
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
@@ -70,9 +69,6 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory()
-                ),
-                chatViewModel = viewModel(
-                    factory = ChatViewModel.provideFactory()
                 ),
                 relaysViewModel = viewModel(
                     factory = RelaysViewModel.provideFactory()

@@ -5,20 +5,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 
 class NozzleNavActions(navController: NavHostController) {
-    val navigateToPersonalProfile: () -> Unit = {
-        navController.navigate(NozzleRoute.PERSONAL_PROFILE) {
+    val navigateToProfile: () -> Unit = {
+        navController.navigate(NozzleRoute.PROFILE) {
             setNavOptionsWithPop(navController = navController, optionsBuilder = this)
         }
     }
 
     val navigateToFeed: () -> Unit = {
         navController.navigate(NozzleRoute.FEED) {
-            setNavOptionsWithPop(navController = navController, optionsBuilder = this)
-        }
-    }
-
-    val navigateToChat: () -> Unit = {
-        navController.navigate(NozzleRoute.CHAT) {
             setNavOptionsWithPop(navController = navController, optionsBuilder = this)
         }
     }

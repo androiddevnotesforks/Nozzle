@@ -56,7 +56,7 @@ class RelaysViewModel : ViewModel() {
 
     val onAddRelay: () -> Unit = {
         uiState.value.run {
-            if(!relays.contains(relayInput)){
+            if (!relays.contains(relayInput)) {
                 val newList = relays.toMutableList()
                 newList.add(relayInput)
                 viewModelState.update {

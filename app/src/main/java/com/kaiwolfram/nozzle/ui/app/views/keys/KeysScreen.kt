@@ -119,13 +119,13 @@ private fun CopyAndVisibilityIcons(
     onToggleVisibility: () -> Unit
 ) {
     Row {
+        VisibilityIcon(
+            isVisible = isVisible,
+            onToggle = { onToggleVisibility() })
+        Spacer(modifier = Modifier.width(spacing.small))
         CopyAndToastIcon(
             toastText = stringResource(id = R.string.privkey_copied),
             onCopyAndShowToast = onCopyPrivkeyAndShowToast
         )
-        Spacer(modifier = Modifier.width(spacing.small))
-        VisibilityIcon(
-            isVisible = isVisible,
-            onToggle = { onToggleVisibility() })
     }
 }
