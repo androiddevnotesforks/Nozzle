@@ -7,7 +7,6 @@ import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Newspaper
-import androidx.compose.material.icons.rounded.SatelliteAlt
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,7 +47,6 @@ fun NozzleDrawerScreen(
         MainRows(
             navigateToFeed = navActions.navigateToFeed,
             navigateToKeys = navActions.navigateToKeys,
-            navigateToRelays = navActions.navigateToRelays,
             navigateToSettings = navActions.navigateToSettings,
             closeDrawer = closeDrawer
         )
@@ -82,7 +80,6 @@ private fun ProfileRow(
 private fun MainRows(
     navigateToFeed: () -> Unit,
     navigateToKeys: () -> Unit,
-    navigateToRelays: () -> Unit,
     navigateToSettings: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
@@ -99,14 +96,6 @@ private fun MainRows(
         label = stringResource(id = R.string.keys),
         action = {
             navigateToKeys()
-            closeDrawer()
-        }
-    )
-    DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Rounded.SatelliteAlt),
-        label = stringResource(id = R.string.relays),
-        action = {
-            navigateToRelays()
             closeDrawer()
         }
     )

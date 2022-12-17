@@ -10,7 +10,6 @@ import com.kaiwolfram.nozzle.ui.app.VMContainer
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
-import com.kaiwolfram.nozzle.ui.app.views.relays.RelaysRoute
 import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsRoute
 
 @Composable
@@ -40,12 +39,6 @@ fun NozzleNavGraph(
             KeysRoute(
                 keysViewModel = vmContainer.keysViewModel,
                 onUpdateDrawerPubkey = vmContainer.drawerViewModel.onUpdatePubkey,
-                onNavigateToFeed = navActions.navigateToFeed,
-            )
-        }
-        composable(NozzleRoute.RELAYS) {
-            RelaysRoute(
-                relaysViewModel = vmContainer.relaysViewModel,
                 onNavigateToFeed = navActions.navigateToFeed,
             )
         }

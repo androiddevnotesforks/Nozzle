@@ -23,12 +23,6 @@ class NozzleNavActions(navController: NavHostController) {
         }
     }
 
-    val navigateToRelays: () -> Unit = {
-        navController.navigate(NozzleRoute.RELAYS) {
-            setNavOptionsWithPop(navController = navController, optionsBuilder = this)
-        }
-    }
-
     val navigateToSettings: () -> Unit = {
         navController.navigate(NozzleRoute.SETTINGS) {
             setNavOptionsWithPop(navController = navController, optionsBuilder = this)
