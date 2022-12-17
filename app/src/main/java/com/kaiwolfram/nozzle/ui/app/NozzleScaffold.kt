@@ -1,16 +1,10 @@
 package com.kaiwolfram.nozzle.ui.app
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
-import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 
@@ -35,13 +29,13 @@ fun NozzleScaffold(
 
 @Composable
 private fun CreateNoteButton() {
-    FloatingActionButton(
-        onClick = { },
-
-        ) {
-        Icon(
-            imageVector = Icons.Rounded.Add,
-            contentDescription = stringResource(id = R.string.write_a_post),
-        )
-    }
+//    FloatingActionButton(
+//        onClick = { },
+//
+//        ) {
+//        Icon(
+//            imageVector = Icons.Rounded.Add,
+//            contentDescription = stringResource(id = R.string.write_a_post),
+//        )
+//    }
 }

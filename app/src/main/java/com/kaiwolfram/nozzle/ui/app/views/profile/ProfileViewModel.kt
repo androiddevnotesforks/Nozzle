@@ -15,7 +15,8 @@ import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
-import com.kaiwolfram.nozzle.data.utils.createEmptyPainter
+import com.kaiwolfram.nozzle.data.utils.emptyPainter
+import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,10 +31,10 @@ data class ProfileViewModelState(
     val name: String = "",
     val bio: String = "",
     val pictureUrl: String = "",
-    val picture: Painter = createEmptyPainter(),
+    val picture: Painter = emptyPainter,
     val numOfFollowing: Int = 0,
     val numOfFollowers: Int = 0,
-    val posts: List<EventEntity> = listOf(),
+    val posts: List<PostWithMeta> = listOf(),
     val isRefreshing: Boolean = false,
 )
 
@@ -133,7 +134,15 @@ class ProfileViewModel(
                 picture = picture,
                 numOfFollowing = profile.numOfFollowing,
                 numOfFollowers = profile.numOfFollowers,
-                posts = posts,
+                posts = posts.map { post ->
+                    PostWithMeta(
+                        name = profile.name,
+                        picture = picture,
+                        pubkey = profile.pubkey,
+                        createdAt = post.createdAt,
+                        content = post.content
+                    )
+                },
             )
         }
     }
@@ -152,7 +161,15 @@ class ProfileViewModel(
                     pictureUrl = cachedProfile.pictureUrl,
                     numOfFollowing = cachedProfile.numOfFollowing,
                     numOfFollowers = cachedProfile.numOfFollowers,
-                    posts = cachedPosts,
+                    posts = cachedPosts.map { post ->
+                        PostWithMeta(
+                            name = cachedProfile.name,
+                            picture = uiState.value.picture,
+                            pubkey = cachedProfile.pubkey,
+                            createdAt = post.createdAt,
+                            content = post.content
+                        )
+                    }
                 )
             }
         } else {

@@ -2,8 +2,6 @@ package com.kaiwolfram.nozzle.ui.app.views.profile
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -16,15 +14,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.ui.components.CopyIcon
+import com.kaiwolfram.nozzle.ui.components.NoPostsHint
+import com.kaiwolfram.nozzle.ui.components.PostCardList
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
-import com.kaiwolfram.nozzle.ui.components.SearchIcon
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -50,74 +45,15 @@ fun ProfileScreen(
         )
         Spacer(Modifier.height(spacing.xl))
         Divider()
-        PostsOfProfile(
+        PostCardList(
             posts = uiState.posts,
-            name = uiState.name,
-            picture = uiState.picture,
             isRefreshing = uiState.isRefreshing,
-            onRefreshProfileView = onRefreshProfileView,
+            onRefresh = onRefreshProfileView
         )
     }
     if (uiState.posts.isEmpty()) {
         NoPostsHint()
     }
-}
-
-@Composable
-private fun PostsOfProfile(
-    posts: List<EventEntity>,
-    name: String,
-    picture: Painter,
-    isRefreshing: Boolean,
-    onRefreshProfileView: () -> Unit,
-) {
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing),
-        onRefresh = onRefreshProfileView,
-    ) {
-        LazyColumn(Modifier.fillMaxSize()) {
-            items(posts) { post ->
-                PostCard(post, name, picture)
-            }
-        }
-    }
-}
-
-@Composable
-private fun PostCard(
-    post: EventEntity,
-    name: String,
-    picture: Painter,
-) {
-    Row(
-        Modifier
-            .padding(all = spacing.large)
-            .padding(end = spacing.medium)
-            .fillMaxWidth()
-    ) {
-        ProfilePicture(
-            modifier = Modifier
-                .size(sizing.profilePic)
-                .clip(CircleShape),
-            profilePicture = picture
-        )
-        Spacer(Modifier.width(spacing.large))
-        Column {
-            Text(
-                text = name,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.height(spacing.medium))
-            Text(
-                text = post.content,
-                maxLines = 12,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-
 }
 
 @Composable
@@ -234,22 +170,6 @@ private fun CopyablePubkey(
         CopyIcon(
             modifier = Modifier.size(sizing.smallIcon),
             description = stringResource(id = R.string.copy_pubkey),
-        )
-    }
-}
-
-@Composable
-private fun NoPostsHint() {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        SearchIcon(modifier = Modifier.fillMaxSize(0.1f), tint = Color.LightGray)
-        Text(
-            text = stringResource(id = R.string.no_posts_found),
-            textAlign = TextAlign.Center,
-            color = Color.LightGray
         )
     }
 }

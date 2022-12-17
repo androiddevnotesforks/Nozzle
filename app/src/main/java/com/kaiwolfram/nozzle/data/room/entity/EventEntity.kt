@@ -9,5 +9,5 @@ data class EventEntity(
     val pubkey: String,
     val kind: Int,
     val createdAt: Long,
-    val content: String
+    val content: String,
 )

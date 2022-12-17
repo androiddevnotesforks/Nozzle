@@ -12,5 +12,6 @@ fun FeedRoute(
 
     FeedScreen(
         uiState = uiState,
+        onRefreshFeedView = feedViewModel.onRefreshFeedView
     )
 }

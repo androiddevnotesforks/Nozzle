@@ -10,7 +10,7 @@ import com.kaiwolfram.nozzle.data.PictureRequester
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.nostr.NostrProfile
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
-import com.kaiwolfram.nozzle.data.utils.createEmptyPainter
+import com.kaiwolfram.nozzle.data.utils.emptyPainter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,7 +24,7 @@ data class NozzleDrawerViewModelState(
     val pubkey: String = "",
     val name: String = "",
     val pictureUrl: String = "",
-    val picture: Painter = createEmptyPainter(),
+    val picture: Painter = emptyPainter,
 )
 
 class NozzleDrawerViewModel(

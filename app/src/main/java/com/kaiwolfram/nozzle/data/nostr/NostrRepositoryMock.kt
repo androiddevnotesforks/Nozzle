@@ -31,6 +31,10 @@ class NostrRepositoryMock : INostrRepository {
         return result
     }
 
+    override fun listPosts(): List<EventEntity> {
+        return listPosts("lol what")
+    }
+
     override fun listFollowedProfiles(pubKey: String): List<NostrProfile> {
         val result = mutableListOf<NostrProfile>()
         val max = Random.nextInt(15)

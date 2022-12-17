@@ -67,7 +67,10 @@ fun NozzleApp(appContainer: AppContainer) {
                     )
                 ),
                 feedViewModel = viewModel(
-                    factory = FeedViewModel.provideFactory()
+                    factory = FeedViewModel.provideFactory(
+                        defaultProfilePicture = defaultProfilePicture,
+                        nostrRepository = appContainer.nostrRepository,
+                    )
                 ),
                 settingsViewModel = viewModel(
                     factory = SettingsViewModel.provideFactory(
