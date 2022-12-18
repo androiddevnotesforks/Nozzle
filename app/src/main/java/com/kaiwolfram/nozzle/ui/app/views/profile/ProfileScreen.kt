@@ -29,6 +29,7 @@ fun ProfileScreen(
     uiState: ProfileViewModelState,
     onRefreshProfileView: () -> Unit,
     onCopyPubkeyAndShowToast: (String) -> Unit,
+    onNavigateToThread: () -> Unit
 ) {
     Column {
         ProfileData(
@@ -48,7 +49,8 @@ fun ProfileScreen(
         PostCardList(
             posts = uiState.posts,
             isRefreshing = uiState.isRefreshing,
-            onRefresh = onRefreshProfileView
+            onRefresh = onRefreshProfileView,
+            onNavigateToThread = onNavigateToThread
         )
     }
     if (uiState.posts.isEmpty()) {

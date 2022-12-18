@@ -13,6 +13,7 @@ import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsRoute
+import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadRoute
 import kotlinx.coroutines.launch
 
 @Composable
@@ -39,12 +40,14 @@ fun NozzleNavGraph(
                         vmContainer.profileViewModel.onSetPubkey(pubkey)
                         navActions.navigateToProfile()
                     }
-                }
+                },
+                onNavigateToThread = navActions.navigateToThread
             )
         }
         composable(NozzleRoute.PROFILE) {
             ProfileRoute(
                 profileViewModel = vmContainer.profileViewModel,
+                onNavigateToThread = navActions.navigateToThread
             )
         }
         composable(NozzleRoute.KEYS) {
@@ -60,6 +63,9 @@ fun NozzleNavGraph(
                 onUpdateDrawerName = vmContainer.drawerViewModel.onUpdateName,
                 onNavigateToFeed = navActions.navigateToFeed,
             )
+        }
+        composable(NozzleRoute.THREAD) {
+            ThreadRoute(threadViewModel = vmContainer.threadViewModel)
         }
     }
 }

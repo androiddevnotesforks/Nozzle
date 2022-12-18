@@ -4,35 +4,38 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 
-class NozzleNavActions(navController: NavHostController) {
+class NozzleNavActions(private val navController: NavHostController) {
     val navigateToProfile: () -> Unit = {
         navController.navigate(NozzleRoute.PROFILE) {
-            setNavOptionsWithPop(navController = navController, optionsBuilder = this)
+            setNavOptionsWithPop(optionsBuilder = this)
         }
     }
 
     val navigateToFeed: () -> Unit = {
         navController.navigate(NozzleRoute.FEED) {
-            setNavOptionsWithPop(navController = navController, optionsBuilder = this)
+            setNavOptionsWithPop(optionsBuilder = this)
         }
     }
 
     val navigateToKeys: () -> Unit = {
         navController.navigate(NozzleRoute.KEYS) {
-            setNavOptionsWithPop(navController = navController, optionsBuilder = this)
+            setNavOptionsWithPop(optionsBuilder = this)
         }
     }
 
     val navigateToSettings: () -> Unit = {
         navController.navigate(NozzleRoute.SETTINGS) {
-            setNavOptionsWithPop(navController = navController, optionsBuilder = this)
+            setNavOptionsWithPop(optionsBuilder = this)
         }
     }
 
-    private fun setNavOptionsWithPop(
-        navController: NavHostController,
-        optionsBuilder: NavOptionsBuilder
-    ) {
+    val navigateToThread: () -> Unit = {
+        navController.navigate(NozzleRoute.THREAD) {
+            setSimpleNavOptions(optionsBuilder = this)
+        }
+    }
+
+    private fun setNavOptionsWithPop(optionsBuilder: NavOptionsBuilder) {
         optionsBuilder.apply {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations

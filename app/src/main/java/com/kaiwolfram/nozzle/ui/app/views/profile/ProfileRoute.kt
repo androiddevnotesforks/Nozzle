@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 @Composable
 fun ProfileRoute(
     profileViewModel: ProfileViewModel,
+    onNavigateToThread: () -> Unit,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
@@ -14,5 +15,6 @@ fun ProfileRoute(
         uiState = uiState,
         onRefreshProfileView = profileViewModel.onRefreshProfileView,
         onCopyPubkeyAndShowToast = profileViewModel.onCopyPubkeyAndShowToast,
+        onNavigateToThread = onNavigateToThread,
     )
 }

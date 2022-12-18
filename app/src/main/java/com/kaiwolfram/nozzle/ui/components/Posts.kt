@@ -28,6 +28,7 @@ fun PostCardList(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onOpenProfile: ((String) -> Unit)? = null,
+    onNavigateToThread: () -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
@@ -35,16 +36,25 @@ fun PostCardList(
     ) {
         LazyColumn(Modifier.fillMaxSize()) {
             items(posts) { post ->
-                PostCard(post = post, onOpenProfile = onOpenProfile)
+                PostCard(
+                    post = post,
+                    onOpenProfile = onOpenProfile,
+                    onNavigateToThread = onNavigateToThread
+                )
             }
         }
     }
 }
 
 @Composable
-private fun PostCard(post: PostWithMeta, onOpenProfile: ((String) -> Unit)?) {
+private fun PostCard(
+    post: PostWithMeta,
+    onOpenProfile: ((String) -> Unit)?,
+    onNavigateToThread: () -> Unit
+) {
     Row(
         Modifier
+            .clickable { onNavigateToThread() }
             .padding(all = spacing.large)
             .padding(end = spacing.medium)
             .fillMaxWidth()
@@ -63,7 +73,6 @@ private fun PostCard(post: PostWithMeta, onOpenProfile: ((String) -> Unit)?) {
         Spacer(Modifier.width(spacing.large))
         Column {
             Text(
-                // TODO: Why does the linter say it's always false
                 modifier = if (onOpenProfile != null) {
                     Modifier.clickable { onOpenProfile(post.pubkey) }
                 } else {

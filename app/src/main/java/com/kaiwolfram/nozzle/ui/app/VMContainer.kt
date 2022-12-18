@@ -5,6 +5,7 @@ import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsViewModel
+import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadViewModel
 
 data class VMContainer(
     val drawerViewModel: NozzleDrawerViewModel,
@@ -12,4 +13,5 @@ data class VMContainer(
     val feedViewModel: FeedViewModel,
     val keysViewModel: KeysViewModel,
     val settingsViewModel: SettingsViewModel,
+    val threadViewModel: ThreadViewModel,
 )

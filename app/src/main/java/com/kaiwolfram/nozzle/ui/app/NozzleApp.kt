@@ -26,6 +26,7 @@ import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsViewModel
+import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
 
@@ -78,6 +79,9 @@ fun NozzleApp(appContainer: AppContainer) {
                         context = LocalContext.current,
                     )
                 ),
+                threadViewModel = viewModel(
+                    factory = ThreadViewModel.provideFactory()
+                )
             )
 
             val coroutineScope = rememberCoroutineScope()

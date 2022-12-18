@@ -23,7 +23,8 @@ fun FeedScreen(
     uiState: FeedViewModelState,
     onRefreshFeedView: () -> Unit,
     onOpenDrawer: () -> Unit,
-    onOpenProfile: (String) -> Unit
+    onOpenProfile: (String) -> Unit,
+    onNavigateToThread: () -> Unit
 ) {
     Column {
         FeedTopBar(
@@ -35,6 +36,7 @@ fun FeedScreen(
             isRefreshing = uiState.isRefreshing,
             onRefresh = onRefreshFeedView,
             onOpenProfile = onOpenProfile,
+            onNavigateToThread = onNavigateToThread,
         )
     }
     if (uiState.posts.isEmpty()) {
