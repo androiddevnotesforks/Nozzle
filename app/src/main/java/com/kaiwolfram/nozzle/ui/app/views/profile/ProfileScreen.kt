@@ -19,7 +19,7 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.CopyIcon
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.PostCardList
-import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.components.ProfilePictureIcon
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -70,9 +70,9 @@ private fun ProfileData(
             .padding(end = spacing.medium),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ProfilePicture(
+        ProfilePictureIcon(
             modifier = Modifier
-                .size(sizing.largeProfilePic)
+                .size(sizing.largeProfilePicture)
                 .aspectRatio(1f)
                 .clip(CircleShape),
             profilePicture = picture

@@ -1,6 +1,7 @@
 package com.kaiwolfram.nozzle.ui.app
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.DrawerState
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,6 +14,7 @@ fun NozzleScaffold(
     vmContainer: VMContainer,
     navController: NavHostController,
     navActions: NozzleNavActions,
+    drawerState: DrawerState,
 ) {
     Scaffold(
         floatingActionButton = { CreateNoteButton() },
@@ -22,6 +24,7 @@ fun NozzleScaffold(
                 vmContainer = vmContainer,
                 navController = navController,
                 navActions = navActions,
+                drawerState = drawerState,
             )
         }
     )

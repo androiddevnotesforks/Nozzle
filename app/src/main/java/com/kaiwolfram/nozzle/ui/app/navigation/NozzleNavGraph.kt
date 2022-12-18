@@ -1,6 +1,8 @@
 package com.kaiwolfram.nozzle.ui.app.navigation
 
+import androidx.compose.material.DrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,6 +13,7 @@ import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsRoute
+import kotlinx.coroutines.launch
 
 @Composable
 fun NozzleNavGraph(
@@ -19,20 +22,23 @@ fun NozzleNavGraph(
     startDestination: String = NozzleRoute.FEED,
     vmContainer: VMContainer,
     navActions: NozzleNavActions,
+    drawerState: DrawerState,
 ) {
+    val scope = rememberCoroutineScope()
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable(NozzleRoute.PROFILE) {
-            ProfileRoute(
-                profileViewModel = vmContainer.profileViewModel,
-            )
-        }
         composable(NozzleRoute.FEED) {
             FeedRoute(
                 feedViewModel = vmContainer.feedViewModel,
+                onOpenDrawer = { scope.launch { drawerState.open() } }
+            )
+        }
+        composable(NozzleRoute.PROFILE) {
+            ProfileRoute(
+                profileViewModel = vmContainer.profileViewModel,
             )
         }
         composable(NozzleRoute.KEYS) {

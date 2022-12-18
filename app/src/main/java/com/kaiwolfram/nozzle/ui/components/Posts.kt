@@ -43,9 +43,9 @@ private fun PostCard(post: PostWithMeta) {
             .padding(end = spacing.medium)
             .fillMaxWidth()
     ) {
-        ProfilePicture(
+        ProfilePictureIcon(
             modifier = Modifier
-                .size(sizing.profilePic)
+                .size(sizing.profilePicture)
                 .clip(CircleShape),
             profilePicture = post.picture
         )

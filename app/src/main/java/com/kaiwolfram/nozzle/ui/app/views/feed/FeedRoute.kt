@@ -7,11 +7,13 @@ import androidx.compose.runtime.getValue
 @Composable
 fun FeedRoute(
     feedViewModel: FeedViewModel,
+    onOpenDrawer: () -> Unit,
 ) {
     val uiState by feedViewModel.uiState.collectAsState()
 
     FeedScreen(
         uiState = uiState,
-        onRefreshFeedView = feedViewModel.onRefreshFeedView
+        onRefreshFeedView = feedViewModel.onRefreshFeedView,
+        onOpenDrawer = onOpenDrawer,
     )
 }

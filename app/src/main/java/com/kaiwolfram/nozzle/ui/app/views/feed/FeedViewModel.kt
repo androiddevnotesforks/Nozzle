@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.utils.emptyPainter
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,7 @@ private const val TAG = "FeedViewModel"
 data class FeedViewModelState(
     val posts: List<PostWithMeta> = listOf(),
     val isRefreshing: Boolean = false,
+    val profilePicture: Painter = emptyPainter,
 )
 
 class FeedViewModel(
@@ -37,6 +39,11 @@ class FeedViewModel(
 
     init {
         Log.i(TAG, "Initialize FeedViewModel")
+        viewModelState.update {
+            it.copy(
+                profilePicture = defaultProfilePicture
+            )
+        }
     }
 
     val onRefreshFeedView: () -> Unit = {

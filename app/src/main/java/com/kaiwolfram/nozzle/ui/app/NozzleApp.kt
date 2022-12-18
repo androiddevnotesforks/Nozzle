@@ -106,6 +106,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         vmContainer = vmContainer,
                         navController = navController,
                         navActions = navActions,
+                        drawerState = drawerState,
                     )
                 }
             }
