@@ -28,7 +28,7 @@ fun PostCardList(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onOpenProfile: ((String) -> Unit)? = null,
-    onNavigateToThread: () -> Unit,
+    onNavigateToThread: (String) -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
@@ -39,7 +39,7 @@ fun PostCardList(
                 PostCard(
                     post = post,
                     onOpenProfile = onOpenProfile,
-                    onNavigateToThread = onNavigateToThread
+                    onNavigateToThread = onNavigateToThread,
                 )
             }
         }
@@ -47,14 +47,19 @@ fun PostCardList(
 }
 
 @Composable
-private fun PostCard(
+fun PostCard(
     post: PostWithMeta,
-    onOpenProfile: ((String) -> Unit)?,
-    onNavigateToThread: () -> Unit
+    modifier: Modifier = Modifier,
+    onOpenProfile: ((String) -> Unit)? = null,
+    onNavigateToThread: ((String) -> Unit)? = null,
 ) {
     Row(
-        Modifier
-            .clickable { onNavigateToThread() }
+        modifier
+            .clickable(enabled = onNavigateToThread != null) {
+                if (onNavigateToThread != null) {
+                    onNavigateToThread(post.id)
+                }
+            }
             .padding(all = spacing.large)
             .padding(end = spacing.medium)
             .fillMaxWidth()

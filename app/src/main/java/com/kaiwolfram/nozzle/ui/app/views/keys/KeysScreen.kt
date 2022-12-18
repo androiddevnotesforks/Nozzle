@@ -21,10 +21,10 @@ fun KeysScreen(
     onChangePrivkey: (String) -> Unit,
     onUpdateDrawerPubkey: () -> Unit,
     onResetUiState: () -> Unit,
-    onNavigateToFeed: () -> Unit,
+    onGoBack: () -> Unit,
 ) {
     Column {
-        TopBar(text = stringResource(id = R.string.keys), onGoBack = onNavigateToFeed)
+        TopBar(text = stringResource(id = R.string.keys), onGoBack = onGoBack)
         Column(modifier = Modifier.padding(spacing.screenEdge)) {
             Pubkey(
                 pubkey = uiState.pubkey,

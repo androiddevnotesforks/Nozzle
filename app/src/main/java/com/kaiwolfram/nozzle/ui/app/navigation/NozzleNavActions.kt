@@ -35,6 +35,10 @@ class NozzleNavActions(private val navController: NavHostController) {
         }
     }
 
+    val popStack: () -> Unit = {
+        navController.popBackStack()
+    }
+
     private fun setNavOptionsWithPop(optionsBuilder: NavOptionsBuilder) {
         optionsBuilder.apply {
             // Pop up to the start destination of the graph to

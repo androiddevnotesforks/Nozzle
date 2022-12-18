@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 fun KeysRoute(
     keysViewModel: KeysViewModel,
     onUpdateDrawerPubkey: () -> Unit,
-    onNavigateToFeed: () -> Unit,
+    onGoBack: () -> Unit,
 ) {
     val uiState by keysViewModel.uiState.collectAsState()
 
@@ -20,6 +20,6 @@ fun KeysRoute(
         onChangePrivkey = keysViewModel.onChangePrivkey,
         onUpdateDrawerPubkey = onUpdateDrawerPubkey,
         onResetUiState = keysViewModel.onResetUiState,
-        onNavigateToFeed = onNavigateToFeed,
+        onGoBack = onGoBack,
     )
 }

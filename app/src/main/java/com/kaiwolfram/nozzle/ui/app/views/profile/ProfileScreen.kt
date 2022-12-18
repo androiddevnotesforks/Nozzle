@@ -29,7 +29,7 @@ fun ProfileScreen(
     uiState: ProfileViewModelState,
     onRefreshProfileView: () -> Unit,
     onCopyPubkeyAndShowToast: (String) -> Unit,
-    onNavigateToThread: () -> Unit
+    onNavigateToThread: (String) -> Unit
 ) {
     Column {
         ProfileData(

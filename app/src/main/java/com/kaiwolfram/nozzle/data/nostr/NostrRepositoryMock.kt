@@ -47,6 +47,10 @@ class NostrRepositoryMock : INostrRepository {
         return result
     }
 
+    override fun getPost(id: String): EventEntity {
+        return createRndPost()
+    }
+
     private fun createRndPost(): EventEntity {
         return EventEntity(
             id = UUID.randomUUID().toString(),

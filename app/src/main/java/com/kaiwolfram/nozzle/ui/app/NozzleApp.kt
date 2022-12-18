@@ -80,7 +80,10 @@ fun NozzleApp(appContainer: AppContainer) {
                     )
                 ),
                 threadViewModel = viewModel(
-                    factory = ThreadViewModel.provideFactory()
+                    factory = ThreadViewModel.provideFactory(
+                        defaultProfilePicture = defaultProfilePicture,
+                        nostrRepository = appContainer.nostrRepository,
+                    )
                 )
             )
 

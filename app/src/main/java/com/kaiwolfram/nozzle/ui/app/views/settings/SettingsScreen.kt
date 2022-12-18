@@ -23,10 +23,10 @@ fun SettingsScreen(
     onChangePictureUrl: (String) -> Unit,
     onUpdateDrawerName: () -> Unit,
     onResetUiState: () -> Unit,
-    onNavigateToFeed: () -> Unit,
+    onGoBack: () -> Unit,
 ) {
     Column {
-        TopBar(text = stringResource(id = R.string.settings), onGoBack = onNavigateToFeed)
+        TopBar(text = stringResource(id = R.string.settings), onGoBack = onGoBack)
         Column(modifier = Modifier.padding(spacing.screenEdge)) {
             Username(
                 username = uiState.usernameInput,

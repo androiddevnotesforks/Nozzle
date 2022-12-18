@@ -7,10 +7,16 @@ import androidx.compose.runtime.getValue
 @Composable
 fun ThreadRoute(
     threadViewModel: ThreadViewModel,
+    onNavigateToProfile: (String) -> Unit,
+    onGoBack: () -> Unit,
 ) {
     val uiState by threadViewModel.uiState.collectAsState()
 
     ThreadScreen(
         uiState = uiState,
+        onRefreshThreadView = threadViewModel.onRefreshThreadView,
+        onOpenThread = threadViewModel.onOpenThread,
+        onNavigateToProfile = onNavigateToProfile,
+        onGoBack = onGoBack,
     )
 }

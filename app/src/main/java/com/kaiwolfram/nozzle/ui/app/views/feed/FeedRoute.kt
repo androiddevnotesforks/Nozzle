@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 fun FeedRoute(
     feedViewModel: FeedViewModel,
     onOpenDrawer: () -> Unit,
-    onOpenProfile: (String) -> Unit,
-    onNavigateToThread: () -> Unit,
+    onNavigateToProfile: (String) -> Unit,
+    onNavigateToThread: (String) -> Unit,
 ) {
     val uiState by feedViewModel.uiState.collectAsState()
 
@@ -17,7 +17,7 @@ fun FeedRoute(
         uiState = uiState,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onOpenDrawer = onOpenDrawer,
-        onOpenProfile = onOpenProfile,
+        onNavigateToProfile = onNavigateToProfile,
         onNavigateToThread = onNavigateToThread
     )
 }

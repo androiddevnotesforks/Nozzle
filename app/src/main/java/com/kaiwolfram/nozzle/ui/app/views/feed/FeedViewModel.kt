@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
 
@@ -29,7 +30,7 @@ class FeedViewModel(
     private val defaultProfilePicture: Painter,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
-    private var isSyncing = false
+    private var isSyncing = AtomicBoolean(false)
 
     val uiState = viewModelState
         .stateIn(
@@ -59,7 +60,7 @@ class FeedViewModel(
 
     private fun fetchAndUseNostrData() {
         Log.i(TAG, "Fetching nostr data for feed")
-        isSyncing = true
+        isSyncing.set(true)
         val posts = nostrRepository.listPosts()
         viewModelState.update {
             it.copy(
@@ -77,12 +78,12 @@ class FeedViewModel(
                 },
             )
         }
-        isSyncing = false
+        isSyncing.set(false)
         setRefresh(false)
     }
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
-        if (isSyncing) {
+        if (isSyncing.get()) {
             Log.i(TAG, "Blocked by active sync process")
         } else {
             exec()

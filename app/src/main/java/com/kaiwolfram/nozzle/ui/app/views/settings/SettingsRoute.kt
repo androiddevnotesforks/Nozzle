@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 fun SettingsRoute(
     settingsViewModel: SettingsViewModel,
     onUpdateDrawerName: () -> Unit,
-    onNavigateToFeed: () -> Unit,
+    onGoBack: () -> Unit,
 ) {
     val uiState by settingsViewModel.uiState.collectAsState()
 
@@ -20,6 +20,6 @@ fun SettingsRoute(
         onChangeBio = settingsViewModel.onChangeBio,
         onChangePictureUrl = settingsViewModel.onChangePictureUrl,
         onResetUiState = settingsViewModel.onResetUiState,
-        onNavigateToFeed = onNavigateToFeed,
+        onGoBack = onGoBack,
     )
 }

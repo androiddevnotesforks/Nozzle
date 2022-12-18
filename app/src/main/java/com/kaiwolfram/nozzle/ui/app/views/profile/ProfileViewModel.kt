@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "ProfileViewModel"
 
@@ -49,7 +50,7 @@ class ProfileViewModel(
     private val eventDao: EventDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
-    private var isSyncing = false
+    private var isSyncing = AtomicBoolean(false)
 
     val uiState = viewModelState
         .stateIn(
@@ -94,7 +95,7 @@ class ProfileViewModel(
 
     private suspend fun fetchAndUseNostrData(pubkey: String) {
         Log.i(TAG, "Fetching nostr data for $pubkey")
-        isSyncing = true
+        isSyncing.set(true)
         val nostrProfile = nostrRepository.getProfile(pubkey)
         if (nostrProfile != null) {
             val numOfFollowing = nostrRepository.getFollowingCount(pubkey)
@@ -114,7 +115,7 @@ class ProfileViewModel(
             )
             useAndCacheProfile(profile = profile, posts = posts, picture = picture)
         }
-        isSyncing = false
+        isSyncing.set(false)
         setRefresh(false)
     }
 
@@ -214,7 +215,7 @@ class ProfileViewModel(
 
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
-        if (isSyncing) {
+        if (isSyncing.get()) {
             Log.i(TAG, "Blocked by active sync process")
         } else {
             exec()
