@@ -60,7 +60,7 @@ fun PostCard(
                     onNavigateToThread(post.id)
                 }
             }
-            .padding(all = spacing.large)
+            .padding(all = spacing.screenEdge)
             .padding(end = spacing.medium)
             .fillMaxWidth()
     ) {

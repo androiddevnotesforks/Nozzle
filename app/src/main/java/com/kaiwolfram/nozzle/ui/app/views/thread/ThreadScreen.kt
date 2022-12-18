@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.ui.app.views.thread
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,7 +32,7 @@ fun ThreadScreen(
 ) {
     Column {
         TopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
-        Column(modifier = Modifier.padding(spacing.screenEdge)) {
+        Column {
             ThreadedPosts(
                 previous = uiState.previous,
                 current = uiState.current,
@@ -69,15 +70,19 @@ private fun ThreadedPosts(
                 )
             }
             item {
-                PostCard(
-                    modifier = Modifier.border(
-                        width = spacing.tiny,
-                        color = colors.onBackground,
-                        shape = shapes.small
-                    ),
-                    post = current,
-                    onOpenProfile = onNavigateToProfile,
-                )
+                Row(modifier = Modifier.padding(spacing.medium)) {
+                    PostCard(
+                        modifier = Modifier
+                            .border(
+                                width = spacing.tiny,
+                                color = colors.onBackground,
+                                shape = shapes.small
+                            ),
+                        post = current,
+                        onOpenProfile = onNavigateToProfile,
+                    )
+
+                }
             }
             items(replies) { post ->
                 PostCard(
