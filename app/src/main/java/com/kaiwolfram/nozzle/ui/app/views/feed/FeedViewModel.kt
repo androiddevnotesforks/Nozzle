@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "FeedViewModel"
 
@@ -64,9 +65,12 @@ class FeedViewModel(
             it.copy(
                 posts = posts.map { post ->
                     PostWithMeta(
-                        name = "TODO", // TODO
+                        name = UUID.randomUUID().toString(),
+                        id = UUID.randomUUID().toString(),
+                        replyToId = UUID.randomUUID().toString(),
+                        replyToName = "Kai Wolfram",
                         picture = defaultProfilePicture,
-                        pubkey = "TODO", // TODO
+                        pubkey = UUID.randomUUID().toString(),
                         createdAt = post.createdAt,
                         content = post.content
                     )

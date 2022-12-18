@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "ProfileViewModel"
 
@@ -137,6 +138,9 @@ class ProfileViewModel(
                 posts = posts.map { post ->
                     PostWithMeta(
                         name = profile.name,
+                        id = UUID.randomUUID().toString(),
+                        replyToId = UUID.randomUUID().toString(),
+                        replyToName = UUID.randomUUID().toString(),
                         picture = picture,
                         pubkey = profile.pubkey,
                         createdAt = post.createdAt,
@@ -164,6 +168,9 @@ class ProfileViewModel(
                     posts = cachedPosts.map { post ->
                         PostWithMeta(
                             name = cachedProfile.name,
+                            id = UUID.randomUUID().toString(),
+                            replyToId = UUID.randomUUID().toString(),
+                            replyToName = UUID.randomUUID().toString(),
                             picture = uiState.value.picture,
                             pubkey = cachedProfile.pubkey,
                             createdAt = post.createdAt,

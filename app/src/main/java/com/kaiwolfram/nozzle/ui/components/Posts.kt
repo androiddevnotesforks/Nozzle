@@ -57,6 +57,7 @@ private fun PostCard(post: PostWithMeta) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            post.replyToName?.let { ReplyingTo(name = it) }
             Spacer(Modifier.height(spacing.medium))
             Text(
                 text = post.content,
@@ -64,6 +65,23 @@ private fun PostCard(post: PostWithMeta) {
                 overflow = TextOverflow.Ellipsis
             )
         }
+    }
+}
+
+@Composable
+private fun ReplyingTo(name: String) {
+    Row {
+        Text(
+            text = stringResource(id = R.string.replying_to),
+            color = Color.LightGray,
+        )
+        Spacer(modifier = Modifier.width(spacing.medium))
+        Text(
+            text = name,
+            color = Color.Blue,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
