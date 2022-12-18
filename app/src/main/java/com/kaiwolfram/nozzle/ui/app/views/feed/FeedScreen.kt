@@ -2,7 +2,6 @@ package com.kaiwolfram.nozzle.ui.app.views.feed
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
@@ -24,6 +23,7 @@ fun FeedScreen(
     uiState: FeedViewModelState,
     onRefreshFeedView: () -> Unit,
     onOpenDrawer: () -> Unit,
+    onOpenProfile: (String) -> Unit
 ) {
     Column {
         FeedTopBar(
@@ -33,7 +33,8 @@ fun FeedScreen(
         PostCardList(
             posts = uiState.posts,
             isRefreshing = uiState.isRefreshing,
-            onRefresh = onRefreshFeedView
+            onRefresh = onRefreshFeedView,
+            onOpenProfile = onOpenProfile,
         )
     }
     if (uiState.posts.isEmpty()) {
@@ -52,10 +53,10 @@ private fun FeedTopBar(profilePicture: Painter, onPictureClick: () -> Unit) {
             Row {
                 Spacer(modifier = Modifier.width(spacing.large))
                 ProfilePictureIcon(
+                    profilePicture = profilePicture,
                     modifier = Modifier
                         .size(sizing.smallProfilePicture)
                         .clickable { onPictureClick() },
-                    profilePicture = profilePicture
                 )
             }
             Text(

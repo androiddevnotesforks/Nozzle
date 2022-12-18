@@ -75,9 +75,14 @@ fun VisibilityIcon(isVisible: Boolean, onToggle: () -> Unit) {
 fun ProfilePictureIcon(
     profilePicture: Painter,
     modifier: Modifier = Modifier,
+    onOpenProfile: (() -> Unit)? = null,
 ) {
     Icon(
-        modifier = modifier,
+        modifier = if (onOpenProfile != null)
+            modifier.clickable { onOpenProfile() }
+        else {
+            modifier
+        },
         painter = profilePicture,
         contentDescription = stringResource(id = R.string.profile_picture),
         tint = Color.Unspecified,

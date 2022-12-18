@@ -33,7 +33,13 @@ fun NozzleNavGraph(
         composable(NozzleRoute.FEED) {
             FeedRoute(
                 feedViewModel = vmContainer.feedViewModel,
-                onOpenDrawer = { scope.launch { drawerState.open() } }
+                onOpenDrawer = { scope.launch { drawerState.open() } },
+                onOpenProfile = { pubkey ->
+                    run {
+                        vmContainer.profileViewModel.onSetPubkey(pubkey)
+                        navActions.navigateToProfile()
+                    }
+                }
             )
         }
         composable(NozzleRoute.PROFILE) {

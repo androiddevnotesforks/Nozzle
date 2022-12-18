@@ -75,7 +75,7 @@ private fun ProfileData(
                 .size(sizing.largeProfilePicture)
                 .aspectRatio(1f)
                 .clip(CircleShape),
-            profilePicture = picture
+            profilePicture = picture,
         )
         Spacer(Modifier.width(spacing.medium))
         Column(verticalArrangement = Arrangement.Center) {

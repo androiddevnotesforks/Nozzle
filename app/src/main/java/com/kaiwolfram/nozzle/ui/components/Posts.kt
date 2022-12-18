@@ -1,5 +1,6 @@
 package com.kaiwolfram.nozzle.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,21 +23,26 @@ import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
-fun PostCardList(posts: List<PostWithMeta>, isRefreshing: Boolean, onRefresh: () -> Unit) {
+fun PostCardList(
+    posts: List<PostWithMeta>,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    onOpenProfile: ((String) -> Unit)? = null,
+) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
         LazyColumn(Modifier.fillMaxSize()) {
             items(posts) { post ->
-                PostCard(post)
+                PostCard(post = post, onOpenProfile = onOpenProfile)
             }
         }
     }
 }
 
 @Composable
-private fun PostCard(post: PostWithMeta) {
+private fun PostCard(post: PostWithMeta, onOpenProfile: ((String) -> Unit)?) {
     Row(
         Modifier
             .padding(all = spacing.large)
@@ -47,11 +53,22 @@ private fun PostCard(post: PostWithMeta) {
             modifier = Modifier
                 .size(sizing.profilePicture)
                 .clip(CircleShape),
-            profilePicture = post.picture
+            profilePicture = post.picture,
+            onOpenProfile = if (onOpenProfile != null) {
+                { onOpenProfile(post.pubkey) }
+            } else {
+                null
+            }
         )
         Spacer(Modifier.width(spacing.large))
         Column {
             Text(
+                // TODO: Why does the linter say it's always false
+                modifier = if (onOpenProfile != null) {
+                    Modifier.clickable { onOpenProfile(post.pubkey) }
+                } else {
+                    Modifier
+                },
                 text = post.name,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
@@ -78,7 +95,8 @@ private fun ReplyingTo(name: String) {
         Spacer(modifier = Modifier.width(spacing.medium))
         Text(
             text = name,
-            color = Color.Blue,
+            color = Color.LightGray,
+            fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
