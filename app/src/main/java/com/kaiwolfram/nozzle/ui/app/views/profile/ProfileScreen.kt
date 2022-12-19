@@ -33,7 +33,7 @@ fun ProfileScreen(
 ) {
     Column {
         ProfileData(
-            pubkey = uiState.pubkey,
+            pubkey = uiState.shortenedPubkey,
             name = uiState.name,
             bio = uiState.bio,
             picture = uiState.picture,
@@ -172,6 +172,7 @@ private fun CopyablePubkey(
         CopyIcon(
             modifier = Modifier.size(sizing.smallIcon),
             description = stringResource(id = R.string.copy_pubkey),
+            tint = Color.LightGray
         )
     }
 }

@@ -21,6 +21,8 @@ fun derivePubkey(privkey: String): String {
         .toHex()
 }
 
+fun ellipsatePubkey(pubkey: String): String = "${pubkey.take(32)}..."
+
 private fun ByteArray.toHex(): String {
     return this.joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 }

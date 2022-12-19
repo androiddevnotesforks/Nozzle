@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.PictureRequester
+import com.kaiwolfram.nozzle.data.ellipsatePubkey
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
@@ -29,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
-    val pubkey: String = "",
+    val shortenedPubkey: String = "",
     val name: String = "",
     val bio: String = "",
     val pictureUrl: String = "",
@@ -51,6 +52,7 @@ class ProfileViewModel(
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
     private var isSyncing = AtomicBoolean(false)
+    private var pubkey = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -77,7 +79,6 @@ class ProfileViewModel(
     }
 
     val onCopyPubkeyAndShowToast: (String) -> Unit = { toast ->
-        val pubkey = uiState.value.pubkey
         Log.i(TAG, "Copy pubkey $pubkey and show toast '$toast'")
         clip.setText(AnnotatedString(pubkey))
         Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
@@ -88,7 +89,7 @@ class ProfileViewModel(
             viewModelScope.launch(context = Dispatchers.IO) {
                 Log.i(TAG, "Refresh profile view")
                 setRefresh(true)
-                fetchAndUseNostrData(uiState.value.pubkey)
+                fetchAndUseNostrData(pubkey)
             }
         }
     }
@@ -127,9 +128,10 @@ class ProfileViewModel(
         Log.i(TAG, "Caching fetched profile of ${profile.pubkey}")
         profileDao.insert(profile)
         eventDao.insert(posts)
+        pubkey = profile.pubkey
         viewModelState.update {
             it.copy(
-                pubkey = profile.pubkey,
+                shortenedPubkey = ellipsatePubkey(pubkey),
                 name = profile.name,
                 bio = profile.bio,
                 pictureUrl = profile.pictureUrl,
@@ -158,9 +160,10 @@ class ProfileViewModel(
         if (cachedProfile != null) {
             Log.i(TAG, "Using cached values")
             requestAndSetPicture(cachedProfile.pictureUrl)
+            this@ProfileViewModel.pubkey = pubkey
             viewModelState.update {
                 it.copy(
-                    pubkey = pubkey,
+                    shortenedPubkey = ellipsatePubkey(pubkey),
                     name = cachedProfile.name,
                     bio = cachedProfile.bio,
                     pictureUrl = cachedProfile.pictureUrl,
@@ -187,9 +190,10 @@ class ProfileViewModel(
     }
 
     private fun resetValues(pubkey: String) {
+        this@ProfileViewModel.pubkey = pubkey
         viewModelState.update {
             it.copy(
-                pubkey = pubkey,
+                shortenedPubkey = ellipsatePubkey(pubkey),
                 name = "",
                 bio = "",
                 pictureUrl = "",

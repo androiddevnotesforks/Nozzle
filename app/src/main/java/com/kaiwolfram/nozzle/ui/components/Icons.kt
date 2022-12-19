@@ -3,6 +3,8 @@ package com.kaiwolfram.nozzle.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
@@ -34,11 +36,13 @@ fun CopyAndToastIcon(
 fun CopyIcon(
     modifier: Modifier = Modifier,
     description: String = stringResource(id = R.string.copy_content),
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
 ) {
     Icon(
         modifier = modifier,
         imageVector = Icons.Default.ContentCopy,
         contentDescription = description,
+        tint = tint,
     )
 }
 
