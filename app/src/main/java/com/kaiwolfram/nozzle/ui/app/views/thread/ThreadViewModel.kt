@@ -18,20 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "ThreadViewModel"
 
-private val emptyPost = PostWithMeta(
-    id = "",
-    replyToId = "",
-    replyToName = "",
-    name = "",
-    pictureUrl = "",
-    pubkey = "",
-    createdAt = -1,
-    content = "",
-)
-
 data class ThreadViewModelState(
     val previous: List<PostWithMeta> = listOf(),
-    val current: PostWithMeta = emptyPost,
+    val current: PostWithMeta? = null,
     val replies: List<PostWithMeta> = listOf(),
     val currentThreadPosition: ThreadPosition = ThreadPosition.SINGLE,
     val isRefreshing: Boolean = false,

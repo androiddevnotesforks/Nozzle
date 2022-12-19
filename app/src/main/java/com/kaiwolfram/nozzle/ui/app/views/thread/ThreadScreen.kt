@@ -35,16 +35,18 @@ fun ThreadScreen(
     Column {
         TopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
         Column {
-            ThreadedPosts(
-                previous = uiState.previous,
-                current = uiState.current,
-                replies = uiState.replies,
-                currentThreadPosition = uiState.currentThreadPosition,
-                isRefreshing = uiState.isRefreshing,
-                onRefresh = onRefreshThreadView,
-                onOpenThread = onOpenThread,
-                onNavigateToProfile = onNavigateToProfile,
-            )
+            uiState.current?.let {
+                ThreadedPosts(
+                    previous = uiState.previous,
+                    current = it,
+                    replies = uiState.replies,
+                    currentThreadPosition = uiState.currentThreadPosition,
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = onRefreshThreadView,
+                    onOpenThread = onOpenThread,
+                    onNavigateToProfile = onNavigateToProfile,
+                )
+            }
         }
     }
 }
