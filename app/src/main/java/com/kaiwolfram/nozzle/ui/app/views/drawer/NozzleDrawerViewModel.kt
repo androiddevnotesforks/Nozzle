@@ -41,36 +41,6 @@ class NozzleDrawerViewModel(
         updateValuesFromNostrMetaData()
     }
 
-    val onUpdatePubkey: () -> Unit = {
-        val oldPubkey = uiState.value.pubkey
-        val newPubkey = profilePreferences.getPubkey()
-        if (newPubkey != oldPubkey) {
-            Log.i(TAG, "Update pubkey from $oldPubkey to $newPubkey")
-            viewModelState.update {
-                it.copy(
-                    pubkey = newPubkey,
-                )
-            }
-        } else {
-            Log.i(TAG, "Not updating pubkey: Keys are identical")
-        }
-    }
-
-    val onUpdateName: () -> Unit = {
-        val oldName = uiState.value.name
-        val newName = profilePreferences.getName()
-        if (newName != oldName) {
-            Log.i(TAG, "Update name from $oldName to $newName")
-            viewModelState.update {
-                it.copy(
-                    name = newName,
-                )
-            }
-        } else {
-            Log.i(TAG, "Not updating name: Names are identical")
-        }
-    }
-
     val onResetUiState: () -> Unit = {
         useCachedValues()
     }

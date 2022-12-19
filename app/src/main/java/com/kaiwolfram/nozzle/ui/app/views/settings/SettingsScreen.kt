@@ -21,7 +21,6 @@ fun SettingsScreen(
     onChangeName: (String) -> Unit,
     onChangeBio: (String) -> Unit,
     onChangePictureUrl: (String) -> Unit,
-    onUpdateDrawerName: () -> Unit,
     onResetUiState: () -> Unit,
     onGoBack: () -> Unit,
 ) {
@@ -50,10 +49,7 @@ fun SettingsScreen(
                 ActionButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(id = R.string.update_profile),
-                    onAction = {
-                        onUpdateProfileAndShowToast(toast)
-                        onUpdateDrawerName()
-                    }
+                    onAction = { onUpdateProfileAndShowToast(toast) }
                 )
             }
         }

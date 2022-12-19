@@ -60,6 +60,15 @@ class FeedViewModel(
         }
     }
 
+    val onResetProfileIconUiState: () -> Unit = {
+        viewModelState.update {
+            it.copy(
+                pictureUrl = profilePreferences.getPictureUrl(),
+                pubkey = profilePreferences.getPubkey(),
+            )
+        }
+    }
+
     private fun fetchAndUseNostrData() {
         Log.i(TAG, "Fetching nostr data for feed")
         isSyncing.set(true)

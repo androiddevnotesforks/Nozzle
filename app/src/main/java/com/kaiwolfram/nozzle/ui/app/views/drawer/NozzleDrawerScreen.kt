@@ -92,8 +92,8 @@ private fun ProfileRow(
                 )
                 Spacer(Modifier.width(spacing.large))
                 Text(
-                    text = profileName,
-                    maxLines = 3,
+                    text = profileName.ifEmpty { pubkey },
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.h6,
                     color = colors.onSurface

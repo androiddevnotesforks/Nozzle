@@ -65,16 +65,17 @@ fun NozzleNavGraph(
         composable(NozzleRoute.KEYS) {
             KeysRoute(
                 keysViewModel = vmContainer.keysViewModel,
-                onUpdateDrawerPubkey = vmContainer.drawerViewModel.onUpdatePubkey,
-                onResetSettingsUiState = vmContainer.settingsViewModel.onResetUiState,
                 onResetDrawerUiState = vmContainer.drawerViewModel.onResetUiState,
+                onResetFeedIconUiState = vmContainer.feedViewModel.onResetProfileIconUiState,
+                onResetSettingsUiState = vmContainer.settingsViewModel.onResetUiState,
                 onGoBack = navActions.popStack,
             )
         }
         composable(NozzleRoute.SETTINGS) {
             SettingsRoute(
                 settingsViewModel = vmContainer.settingsViewModel,
-                onUpdateDrawerName = vmContainer.drawerViewModel.onUpdateName,
+                onResetDrawerUiState = vmContainer.drawerViewModel.onResetUiState,
+                onResetFeedIconUiState = vmContainer.feedViewModel.onResetProfileIconUiState,
                 onGoBack = navActions.popStack,
             )
         }

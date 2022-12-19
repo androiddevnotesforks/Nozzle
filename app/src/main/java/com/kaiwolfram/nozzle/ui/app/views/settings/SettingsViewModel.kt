@@ -50,7 +50,8 @@ class SettingsViewModel(
         { toast ->
             uiState.value.let {
                 val isValidUsername = isValidUsername(it.usernameInput)
-                val isValidUrl = URLUtil.isHttpsUrl(it.pictureUrlInput)
+                val isValidUrl = it.pictureUrlInput.isEmpty()
+                        || URLUtil.isValidUrl(it.pictureUrlInput)
                 if (isValidUsername && isValidUrl) {
                     Log.i(TAG, "Updating profile")
                     profilePreferences.setName(it.usernameInput)

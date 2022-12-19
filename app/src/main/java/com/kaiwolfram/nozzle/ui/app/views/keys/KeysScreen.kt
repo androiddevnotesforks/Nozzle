@@ -20,7 +20,6 @@ fun KeysScreen(
     onCopyPrivkeyAndShowToast: (String) -> Unit,
     onUpdateKeyPairAndShowToast: (String) -> Unit,
     onChangePrivkey: (String) -> Unit,
-    onUpdateDrawerPubkey: () -> Unit,
     onResetUiState: () -> Unit,
     onGoBack: () -> Unit,
 ) {
@@ -48,7 +47,6 @@ fun KeysScreen(
                     onAction = {
                         focusManager.clearFocus()
                         onUpdateKeyPairAndShowToast(toast)
-                        onUpdateDrawerPubkey()
                     }
                 )
             }
