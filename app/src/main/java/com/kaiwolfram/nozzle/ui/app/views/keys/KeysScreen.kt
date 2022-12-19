@@ -5,6 +5,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -40,10 +41,12 @@ fun KeysScreen(
             Spacer(modifier = Modifier.height(spacing.large))
             if (uiState.hasChanges) {
                 val toast = stringResource(id = R.string.key_pair_updated)
+                val focusManager = LocalFocusManager.current
                 ActionButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(id = R.string.update_key_pair),
                     onAction = {
+                        focusManager.clearFocus()
                         onUpdateKeyPairAndShowToast(toast)
                         onUpdateDrawerPubkey()
                     }
