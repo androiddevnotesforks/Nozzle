@@ -1,12 +1,11 @@
 package com.kaiwolfram.nozzle.ui.app.views.feed
 
 import android.util.Log
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
-import com.kaiwolfram.nozzle.data.utils.emptyPainter
+import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +21,12 @@ private const val TAG = "FeedViewModel"
 data class FeedViewModelState(
     val posts: List<PostWithMeta> = listOf(),
     val isRefreshing: Boolean = false,
-    val profilePicture: Painter = emptyPainter,
+    val pictureUrl: String = "",
 )
 
 class FeedViewModel(
     private val nostrRepository: INostrRepository,
-    private val defaultProfilePicture: Painter,
+    private val profilePreferences: ProfilePreferences,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -43,9 +42,10 @@ class FeedViewModel(
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelState.update {
             it.copy(
-                profilePicture = defaultProfilePicture
+                pictureUrl = profilePreferences.getPictureUrl()
             )
         }
+
     }
 
     val onRefreshFeedView: () -> Unit = {
@@ -70,8 +70,8 @@ class FeedViewModel(
                         id = UUID.randomUUID().toString(),
                         replyToId = UUID.randomUUID().toString(),
                         replyToName = "Kai Wolfram",
-                        picture = defaultProfilePicture,
                         pubkey = UUID.randomUUID().toString(),
+                        pictureUrl = "https://www.dadant.com/wp-content/uploads/2016/12/honey-production-dadant.jpg",
                         createdAt = post.createdAt,
                         content = post.content
                     )
@@ -99,13 +99,13 @@ class FeedViewModel(
     companion object {
         fun provideFactory(
             nostrRepository: INostrRepository,
-            defaultProfilePicture: Painter,
+            profilePreferences: ProfilePreferences,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return FeedViewModel(
                     nostrRepository = nostrRepository,
-                    defaultProfilePicture = defaultProfilePicture
+                    profilePreferences = profilePreferences
                 ) as T
             }
         }

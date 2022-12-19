@@ -1,12 +1,10 @@
 package com.kaiwolfram.nozzle.ui.app.views.thread
 
 import android.util.Log
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
-import com.kaiwolfram.nozzle.data.utils.emptyPainter
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +23,7 @@ private val emptyPost = PostWithMeta(
     replyToId = "",
     replyToName = "",
     name = "",
-    picture = emptyPainter,
+    pictureUrl = "",
     pubkey = "",
     createdAt = -1,
     content = "",
@@ -41,7 +39,6 @@ data class ThreadViewModelState(
 
 class ThreadViewModel(
     private val nostrRepository: INostrRepository,
-    private val defaultProfilePicture: Painter,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ThreadViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -55,12 +52,6 @@ class ThreadViewModel(
 
     init {
         Log.i(TAG, "Initialize ThreadViewModel")
-        viewModelState.update {
-            val current = uiState.value.current
-            it.copy(
-                current = current.copy(picture = defaultProfilePicture),
-            )
-        }
     }
 
     val onRefreshThreadView: () -> Unit = {
@@ -72,9 +63,9 @@ class ThreadViewModel(
                     PostWithMeta(
                         name = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
+                        pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                         replyToId = UUID.randomUUID().toString(),
                         replyToName = "Kai Wolfram",
-                        picture = defaultProfilePicture,
                         pubkey = UUID.randomUUID().toString(),
                         createdAt = post.createdAt,
                         content = post.content
@@ -84,8 +75,8 @@ class ThreadViewModel(
                     name = UUID.randomUUID().toString(),
                     id = UUID.randomUUID().toString(),
                     replyToId = UUID.randomUUID().toString(),
+                    pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                     replyToName = "Kai Wolfram",
-                    picture = defaultProfilePicture,
                     pubkey = UUID.randomUUID().toString(),
                     createdAt = 66666666,
                     content = "post.content"
@@ -95,8 +86,8 @@ class ThreadViewModel(
                         name = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
                         replyToId = UUID.randomUUID().toString(),
+                        pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                         replyToName = "Kai Wolfram",
-                        picture = defaultProfilePicture,
                         pubkey = UUID.randomUUID().toString(),
                         createdAt = post.createdAt,
                         content = post.content
@@ -124,7 +115,7 @@ class ThreadViewModel(
                     id = UUID.randomUUID().toString(),
                     replyToId = UUID.randomUUID().toString(),
                     replyToName = "Kai Wolfram",
-                    picture = defaultProfilePicture,
+                    pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                     pubkey = UUID.randomUUID().toString(),
                     createdAt = post.createdAt,
                     content = post.content
@@ -135,7 +126,7 @@ class ThreadViewModel(
                 id = UUID.randomUUID().toString(),
                 replyToId = UUID.randomUUID().toString(),
                 replyToName = "Kai Wolfram",
-                picture = defaultProfilePicture,
+                pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                 pubkey = UUID.randomUUID().toString(),
                 createdAt = 66666666,
                 content = UUID.randomUUID().toString(),
@@ -145,8 +136,8 @@ class ThreadViewModel(
                     name = UUID.randomUUID().toString(),
                     id = UUID.randomUUID().toString(),
                     replyToId = UUID.randomUUID().toString(),
+                    pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                     replyToName = "Kai Wolfram",
-                    picture = defaultProfilePicture,
                     pubkey = UUID.randomUUID().toString(),
                     createdAt = post.createdAt,
                     content = post.content
@@ -189,13 +180,11 @@ class ThreadViewModel(
     companion object {
         fun provideFactory(
             nostrRepository: INostrRepository,
-            defaultProfilePicture: Painter,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ThreadViewModel(
                     nostrRepository = nostrRepository,
-                    defaultProfilePicture = defaultProfilePicture
                 ) as T
             }
         }

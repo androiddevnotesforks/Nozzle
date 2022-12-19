@@ -9,12 +9,11 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.PostCardList
-import com.kaiwolfram.nozzle.ui.components.ProfilePictureIcon
+import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -28,7 +27,7 @@ fun FeedScreen(
 ) {
     Column {
         FeedTopBar(
-            profilePicture = uiState.profilePicture,
+            pictureUrl = uiState.pictureUrl,
             onPictureClick = onOpenDrawer,
         )
         PostCardList(
@@ -45,7 +44,7 @@ fun FeedScreen(
 }
 
 @Composable
-private fun FeedTopBar(profilePicture: Painter, onPictureClick: () -> Unit) {
+private fun FeedTopBar(pictureUrl: String, onPictureClick: () -> Unit) {
     TopAppBar {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -54,8 +53,8 @@ private fun FeedTopBar(profilePicture: Painter, onPictureClick: () -> Unit) {
         ) {
             Row {
                 Spacer(modifier = Modifier.width(spacing.large))
-                ProfilePictureIcon(
-                    profilePicture = profilePicture,
+                ProfilePicture(
+                    pictureUrl = pictureUrl,
                     modifier = Modifier
                         .size(sizing.smallProfilePicture)
                         .clickable { onPictureClick() },

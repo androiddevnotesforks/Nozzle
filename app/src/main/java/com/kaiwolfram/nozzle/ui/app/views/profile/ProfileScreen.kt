@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -19,7 +18,7 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.CopyIcon
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.PostCardList
-import com.kaiwolfram.nozzle.ui.components.ProfilePictureIcon
+import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -36,7 +35,7 @@ fun ProfileScreen(
             pubkey = uiState.shortenedPubkey,
             name = uiState.name,
             bio = uiState.bio,
-            picture = uiState.picture,
+            pictureUrl = uiState.pictureUrl,
             onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
         )
         Spacer(Modifier.height(spacing.medium))
@@ -63,7 +62,7 @@ private fun ProfileData(
     pubkey: String,
     name: String,
     bio: String,
-    picture: Painter,
+    pictureUrl: String,
     onCopyPubkeyAndShowToast: (String) -> Unit,
 ) {
     Row(
@@ -72,12 +71,12 @@ private fun ProfileData(
             .padding(end = spacing.medium),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ProfilePictureIcon(
+        ProfilePicture(
             modifier = Modifier
                 .size(sizing.largeProfilePicture)
                 .aspectRatio(1f)
                 .clip(CircleShape),
-            profilePicture = picture,
+            pictureUrl = pictureUrl,
         )
         Spacer(Modifier.width(spacing.medium))
         Column(verticalArrangement = Arrangement.Center) {

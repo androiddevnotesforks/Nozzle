@@ -14,7 +14,6 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.theme.sizing
@@ -72,23 +71,5 @@ fun VisibilityIcon(isVisible: Boolean, onToggle: () -> Unit) {
             Icons.Default.Visibility
         },
         contentDescription = stringResource(id = R.string.toggle_visibility),
-    )
-}
-
-@Composable
-fun ProfilePictureIcon(
-    profilePicture: Painter,
-    modifier: Modifier = Modifier,
-    onOpenProfile: (() -> Unit)? = null,
-) {
-    Icon(
-        modifier = if (onOpenProfile != null)
-            modifier.clickable { onOpenProfile() }
-        else {
-            modifier
-        },
-        painter = profilePicture,
-        contentDescription = stringResource(id = R.string.profile_picture),
-        tint = Color.Unspecified,
     )
 }

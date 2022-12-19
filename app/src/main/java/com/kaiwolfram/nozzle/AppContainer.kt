@@ -2,8 +2,6 @@ package com.kaiwolfram.nozzle
 
 import android.content.Context
 import androidx.room.Room
-import coil.imageLoader
-import com.kaiwolfram.nozzle.data.PictureRequester
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.nostr.NostrRepositoryMock
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
@@ -15,9 +13,6 @@ class AppContainer(context: Context) {
     }
     val profilePreferences: ProfilePreferences by lazy {
         ProfilePreferences(context = context)
-    }
-    val pictureRequester: PictureRequester by lazy {
-        PictureRequester(imageLoader = context.imageLoader, context = context)
     }
     val roomDb: AppDatabase by lazy {
         Room.databaseBuilder(

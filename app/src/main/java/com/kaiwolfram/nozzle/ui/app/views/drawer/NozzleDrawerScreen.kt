@@ -13,12 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
+import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
@@ -35,7 +35,7 @@ fun NozzleDrawerScreen(
             .padding(spacing.screenEdge)
     ) {
         ProfileRow(
-            profilePicture = uiState.picture,
+            pictureUrl = uiState.pictureUrl,
             profileName = uiState.name,
             navigateToProfile = {
                 onSetPubkey(uiState.pubkey)
@@ -56,24 +56,47 @@ fun NozzleDrawerScreen(
 
 @Composable
 private fun ProfileRow(
-    profilePicture: Painter,
+    pictureUrl: String,
     profileName: String,
     navigateToProfile: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
-    DrawerRow(
-        icon = profilePicture,
-        label = profileName,
-        action = {
-            navigateToProfile()
-            closeDrawer()
-        },
-        iconTint = Color.Unspecified,
-        iconModifier = Modifier
-            .fillMaxWidth(0.20f)
-            .aspectRatio(1f)
-            .clip(CircleShape),
-    )
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = spacing.tiny),
+        color = colors.surface,
+        shape = MaterialTheme.shapes.small
+    ) {
+        TextButton(
+            onClick = {
+                navigateToProfile()
+                closeDrawer()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ProfilePicture(
+                    modifier = Modifier
+                        .fillMaxWidth(0.20f)
+                        .aspectRatio(1f)
+                        .clip(CircleShape), pictureUrl = pictureUrl
+                )
+                Spacer(Modifier.width(spacing.large))
+                Text(
+                    text = profileName,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.h6,
+                    color = colors.onSurface
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -84,7 +107,7 @@ private fun MainRows(
     closeDrawer: () -> Unit,
 ) {
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Rounded.Newspaper),
+        imageVector = Icons.Rounded.Newspaper,
         label = stringResource(id = R.string.feed),
         action = {
             navigateToFeed()
@@ -92,7 +115,7 @@ private fun MainRows(
         }
     )
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Rounded.Key),
+        imageVector = Icons.Rounded.Key,
         label = stringResource(id = R.string.keys),
         action = {
             navigateToKeys()
@@ -100,7 +123,7 @@ private fun MainRows(
         }
     )
     DrawerRow(
-        icon = rememberVectorPainter(image = Icons.Rounded.Settings),
+        imageVector = Icons.Rounded.Settings,
         label = stringResource(id = R.string.settings),
         action = {
             navigateToSettings()
@@ -125,7 +148,7 @@ private fun VersionText() {
 
 @Composable
 private fun DrawerRow(
-    icon: Painter,
+    imageVector: ImageVector,
     label: String,
     action: () -> Unit,
     modifier: Modifier = Modifier,
@@ -150,7 +173,7 @@ private fun DrawerRow(
             ) {
                 Icon(
                     modifier = iconModifier,
-                    painter = icon,
+                    imageVector = imageVector,
                     contentDescription = null,
                     tint = iconTint,
                 )

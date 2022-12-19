@@ -114,11 +114,11 @@ fun PostCard(
             .padding(end = spacing.medium)
             .clipToBounds()
     ) {
-        ProfilePictureIcon(
+        ProfilePicture(
             modifier = Modifier
                 .size(sizing.profilePicture)
                 .clip(CircleShape),
-            profilePicture = post.picture,
+            pictureUrl = post.pictureUrl,
             onOpenProfile = if (onOpenProfile != null) {
                 { onOpenProfile(post.pubkey) }
             } else {

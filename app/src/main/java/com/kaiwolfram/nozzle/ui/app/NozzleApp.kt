@@ -14,11 +14,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
-import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
@@ -38,22 +36,17 @@ fun NozzleApp(appContainer: AppContainer) {
             val navActions = remember(navController) {
                 NozzleNavActions(navController)
             }
-            val defaultProfilePicture = painterResource(R.drawable.ic_default_profile)
 
             val vmContainer = VMContainer(
                 drawerViewModel = viewModel(
                     factory = NozzleDrawerViewModel.provideFactory(
-                        defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
-                        pictureRequester = appContainer.pictureRequester,
                         profilePreferences = appContainer.profilePreferences,
                     )
                 ),
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
-                        defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
-                        pictureRequester = appContainer.pictureRequester,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                         profileDao = appContainer.roomDb.profileDao(),
@@ -69,8 +62,8 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory(
-                        defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
+                        profilePreferences = appContainer.profilePreferences,
                     )
                 ),
                 settingsViewModel = viewModel(
@@ -81,7 +74,6 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 threadViewModel = viewModel(
                     factory = ThreadViewModel.provideFactory(
-                        defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = appContainer.nostrRepository,
                     )
                 )

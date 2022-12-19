@@ -3,20 +3,17 @@ package com.kaiwolfram.nozzle.ui.app.views.profile
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.PictureRequester
 import com.kaiwolfram.nozzle.data.ellipsatePubkey
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
-import com.kaiwolfram.nozzle.data.utils.emptyPainter
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +31,6 @@ data class ProfileViewModelState(
     val name: String = "",
     val bio: String = "",
     val pictureUrl: String = "",
-    val picture: Painter = emptyPainter,
     val numOfFollowing: Int = 0,
     val numOfFollowers: Int = 0,
     val posts: List<PostWithMeta> = listOf(),
@@ -42,9 +38,7 @@ data class ProfileViewModelState(
 )
 
 class ProfileViewModel(
-    private val defaultProfilePicture: Painter,
     private val nostrRepository: INostrRepository,
-    private val pictureRequester: PictureRequester,
     context: Context,
     clip: ClipboardManager,
     private val profileDao: ProfileDao,
@@ -63,11 +57,6 @@ class ProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
-        viewModelState.update {
-            it.copy(
-                picture = defaultProfilePicture
-            )
-        }
     }
 
     val onSetPubkey: (String) -> Unit = { pubkey ->
@@ -110,11 +99,7 @@ class ProfileViewModel(
                 numOfFollowers = numOfFollowers,
             )
             val posts = nostrRepository.listPosts(pubkey)
-            val picture = pictureRequester.requestOrDefault(
-                profile.pictureUrl,
-                defaultProfilePicture
-            )
-            useAndCacheProfile(profile = profile, posts = posts, picture = picture)
+            useAndCacheProfile(profile = profile, posts = posts)
         }
         isSyncing.set(false)
         setRefresh(false)
@@ -123,7 +108,6 @@ class ProfileViewModel(
     private suspend fun useAndCacheProfile(
         profile: ProfileEntity,
         posts: List<EventEntity>,
-        picture: Painter
     ) {
         Log.i(TAG, "Caching fetched profile of ${profile.pubkey}")
         profileDao.insert(profile)
@@ -135,7 +119,6 @@ class ProfileViewModel(
                 name = profile.name,
                 bio = profile.bio,
                 pictureUrl = profile.pictureUrl,
-                picture = picture,
                 numOfFollowing = profile.numOfFollowing,
                 numOfFollowers = profile.numOfFollowers,
                 posts = posts.map { post ->
@@ -144,8 +127,8 @@ class ProfileViewModel(
                         id = UUID.randomUUID().toString(),
                         replyToId = UUID.randomUUID().toString(),
                         replyToName = UUID.randomUUID().toString(),
-                        picture = picture,
                         pubkey = profile.pubkey,
+                        pictureUrl = profile.pictureUrl,
                         createdAt = post.createdAt,
                         content = post.content
                     )
@@ -159,7 +142,6 @@ class ProfileViewModel(
         val cachedPosts = eventDao.listEventsFromPubkey(pubkey)
         if (cachedProfile != null) {
             Log.i(TAG, "Using cached values")
-            requestAndSetPicture(cachedProfile.pictureUrl)
             this@ProfileViewModel.pubkey = pubkey
             viewModelState.update {
                 it.copy(
@@ -175,7 +157,7 @@ class ProfileViewModel(
                             id = UUID.randomUUID().toString(),
                             replyToId = UUID.randomUUID().toString(),
                             replyToName = UUID.randomUUID().toString(),
-                            picture = uiState.value.picture,
+                            pictureUrl = "",
                             pubkey = cachedProfile.pubkey,
                             createdAt = post.createdAt,
                             content = post.content
@@ -197,23 +179,10 @@ class ProfileViewModel(
                 name = "",
                 bio = "",
                 pictureUrl = "",
-                picture = defaultProfilePicture,
                 numOfFollowing = 0,
                 numOfFollowers = 0,
                 posts = listOf(),
             )
-        }
-    }
-
-    private fun requestAndSetPicture(pictureUrl: String) {
-        Log.i(TAG, "Fetching picture $pictureUrl")
-        viewModelScope.launch(context = Dispatchers.IO) {
-            val picture = pictureRequester.requestOrDefault(pictureUrl, defaultProfilePicture)
-            viewModelState.update {
-                it.copy(
-                    picture = picture,
-                )
-            }
         }
     }
 
@@ -234,9 +203,7 @@ class ProfileViewModel(
 
     companion object {
         fun provideFactory(
-            defaultProfilePicture: Painter,
             nostrRepository: INostrRepository,
-            pictureRequester: PictureRequester,
             context: Context,
             clip: ClipboardManager,
             profileDao: ProfileDao,
@@ -246,9 +213,7 @@ class ProfileViewModel(
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProfileViewModel(
-                        defaultProfilePicture = defaultProfilePicture,
                         nostrRepository = nostrRepository,
-                        pictureRequester = pictureRequester,
                         context = context,
                         clip = clip,
                         profileDao = profileDao,
