@@ -8,10 +8,25 @@ import androidx.compose.ui.unit.dp
 
 
 data class Sizing(
+    /**
+     * 16 dp
+     */
     val smallIcon: Dp = 16.dp,
+    /**
+     * 24 dp
+     */
     val mediumIcon: Dp = 24.dp,
+    /**
+     * 32 dp
+     */
     val smallProfilePicture: Dp = 32.dp,
+    /**
+     * 40 dp
+     */
     val profilePicture: Dp = 40.dp,
+    /**
+     * 60 dp
+     */
     val largeProfilePicture: Dp = 60.dp,
 )
 

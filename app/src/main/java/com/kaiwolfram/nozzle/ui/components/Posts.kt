@@ -10,7 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -19,6 +23,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -50,9 +55,14 @@ fun PostCardList(
 fun PostCard(
     post: PostWithMeta,
     modifier: Modifier = Modifier,
+    threadPosition: ThreadPosition = ThreadPosition.SINGLE,
     onOpenProfile: ((String) -> Unit)? = null,
     onNavigateToThread: ((String) -> Unit)? = null,
 ) {
+    val x = sizing.profilePicture / 2 + spacing.screenEdge
+    val yTop = spacing.screenEdge
+    val yBottom = sizing.profilePicture + spacing.screenEdge
+    val small = spacing.small
     Row(
         modifier
             .clickable(enabled = onNavigateToThread != null) {
@@ -60,9 +70,49 @@ fun PostCard(
                     onNavigateToThread(post.id)
                 }
             }
+            .fillMaxWidth()
+            .drawBehind {
+                when (threadPosition) {
+                    ThreadPosition.START -> {
+                        drawThread(
+                            scope = this,
+                            x = x.toPx(),
+                            yStart = yBottom.toPx(),
+                            yEnd = size.height,
+                            width = small.toPx()
+                        )
+                    }
+                    ThreadPosition.MIDDLE -> {
+                        drawThread(
+                            scope = this,
+                            x = x.toPx(),
+                            yStart = 0f,
+                            yEnd = yTop.toPx(),
+                            width = small.toPx()
+                        )
+                        drawThread(
+                            scope = this,
+                            x = x.toPx(),
+                            yStart = yBottom.toPx(),
+                            yEnd = size.height,
+                            width = small.toPx()
+                        )
+                    }
+                    ThreadPosition.END -> {
+                        drawThread(
+                            scope = this,
+                            x = x.toPx(),
+                            yStart = 0f,
+                            yEnd = yTop.toPx(),
+                            width = small.toPx()
+                        )
+                    }
+                    ThreadPosition.SINGLE -> {}
+                }
+            }
             .padding(all = spacing.screenEdge)
             .padding(end = spacing.medium)
-            .fillMaxWidth()
+            .clipToBounds()
     ) {
         ProfilePictureIcon(
             modifier = Modifier
@@ -131,4 +181,13 @@ fun NoPostsHint() {
             color = Color.LightGray
         )
     }
+}
+
+private fun drawThread(scope: DrawScope, x: Float, yStart: Float, yEnd: Float, width: Float) {
+    scope.drawLine(
+        color = Color.LightGray,
+        start = Offset(x = x, y = yStart),
+        end = Offset(x = x, y = yEnd),
+        strokeWidth = width
+    )
 }

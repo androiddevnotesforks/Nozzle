@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.utils.emptyPainter
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.ThreadPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,6 +35,7 @@ data class ThreadViewModelState(
     val previous: List<PostWithMeta> = listOf(),
     val current: PostWithMeta = emptyPost,
     val replies: List<PostWithMeta> = listOf(),
+    val currentThreadPosition: ThreadPosition = ThreadPosition.SINGLE,
     val isRefreshing: Boolean = false,
 )
 
@@ -105,6 +107,7 @@ class ThreadViewModel(
                         previous = previous,
                         current = current,
                         replies = replies,
+                        currentThreadPosition = getThreadPosition(previous)
                     )
                 }
                 setRefresh(false)
@@ -155,8 +158,17 @@ class ThreadViewModel(
                     previous = previous,
                     current = current,
                     replies = replies,
+                    currentThreadPosition = getThreadPosition(previous)
                 )
             }
+        }
+    }
+
+    private fun getThreadPosition(previous: List<PostWithMeta>): ThreadPosition {
+        return if (previous.isEmpty())
+            ThreadPosition.SINGLE
+        else {
+            ThreadPosition.END
         }
     }
 
