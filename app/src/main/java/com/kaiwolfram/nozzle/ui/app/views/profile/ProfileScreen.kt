@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -19,6 +18,7 @@ import com.kaiwolfram.nozzle.ui.components.CopyIcon
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.PostCardList
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -165,13 +165,13 @@ private fun CopyablePubkey(
             text = pubkey,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            color = Color.LightGray,
+            color = LightGray21,
             style = MaterialTheme.typography.body2,
         )
         CopyIcon(
             modifier = Modifier.size(sizing.smallIcon),
             description = stringResource(id = R.string.copy_pubkey),
-            tint = Color.LightGray
+            tint = LightGray21
         )
     }
 }

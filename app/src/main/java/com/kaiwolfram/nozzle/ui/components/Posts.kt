@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +23,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
+import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -154,12 +154,12 @@ private fun ReplyingTo(name: String) {
     Row {
         Text(
             text = stringResource(id = R.string.replying_to),
-            color = Color.LightGray,
+            color = LightGray21,
         )
         Spacer(modifier = Modifier.width(spacing.medium))
         Text(
             text = name,
-            color = Color.LightGray,
+            color = LightGray21,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -174,18 +174,18 @@ fun NoPostsHint() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        SearchIcon(modifier = Modifier.fillMaxSize(0.1f), tint = Color.LightGray)
+        SearchIcon(modifier = Modifier.fillMaxSize(0.1f), tint = LightGray21)
         Text(
             text = stringResource(id = R.string.no_posts_found),
             textAlign = TextAlign.Center,
-            color = Color.LightGray
+            color = LightGray21
         )
     }
 }
 
 private fun drawThread(scope: DrawScope, x: Float, yStart: Float, yEnd: Float, width: Float) {
     scope.drawLine(
-        color = Color.LightGray,
+        color = LightGray21,
         start = Offset(x = x, y = yStart),
         end = Offset(x = x, y = yEnd),
         strokeWidth = width

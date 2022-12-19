@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -21,6 +20,7 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.components.PostCard
 import com.kaiwolfram.nozzle.ui.components.TopBar
+import com.kaiwolfram.nozzle.ui.theme.LightYellow
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 
@@ -80,8 +80,7 @@ private fun ThreadedPosts(
             }
             item {
                 PostCard(
-                    modifier = Modifier
-                        .background(color = Color.Yellow.copy(alpha = 0.1f)),
+                    modifier = Modifier.background(color = LightYellow),
                     post = current,
                     onOpenProfile = onNavigateToProfile,
                     threadPosition = currentThreadPosition
