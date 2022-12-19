@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,7 @@ data class FeedViewModelState(
 
 class FeedViewModel(
     private val nostrRepository: INostrRepository,
-    private val profilePreferences: ProfilePreferences,
+    private val profileStorageReader: PersonalProfileStorageReader,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -43,8 +44,8 @@ class FeedViewModel(
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelState.update {
             it.copy(
-                pictureUrl = profilePreferences.getPictureUrl(),
-                pubkey = profilePreferences.getPubkey()
+                pictureUrl = profileStorageReader.getPictureUrl(),
+                pubkey = profileStorageReader.getPubkey()
             )
         }
 
@@ -63,8 +64,8 @@ class FeedViewModel(
     val onResetProfileIconUiState: () -> Unit = {
         viewModelState.update {
             it.copy(
-                pictureUrl = profilePreferences.getPictureUrl(),
-                pubkey = profilePreferences.getPubkey(),
+                pictureUrl = profileStorageReader.getPictureUrl(),
+                pubkey = profileStorageReader.getPubkey(),
             )
         }
     }
@@ -110,13 +111,13 @@ class FeedViewModel(
     companion object {
         fun provideFactory(
             nostrRepository: INostrRepository,
-            profilePreferences: ProfilePreferences,
+            profileStorageReader: PersonalProfileStorageReader,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return FeedViewModel(
                     nostrRepository = nostrRepository,
-                    profilePreferences = profilePreferences
+                    profileStorageReader = profileStorageReader
                 ) as T
             }
         }

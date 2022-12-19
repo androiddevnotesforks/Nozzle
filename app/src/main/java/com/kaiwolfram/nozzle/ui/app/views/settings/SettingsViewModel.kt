@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.isValidUsername
-import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
+import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -26,7 +26,7 @@ data class SettingsViewModelState(
 )
 
 class SettingsViewModel(
-    private val profilePreferences: ProfilePreferences,
+    private val personalProfileStorage: PersonalProfileStorage,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(SettingsViewModelState())
@@ -54,9 +54,9 @@ class SettingsViewModel(
                         || URLUtil.isValidUrl(it.pictureUrlInput)
                 if (isValidUsername && isValidUrl) {
                     Log.i(TAG, "Updating profile")
-                    profilePreferences.setName(it.usernameInput)
-                    profilePreferences.setBio(it.bioInput)
-                    profilePreferences.setPictureUrl(it.pictureUrlInput)
+                    personalProfileStorage.setName(it.usernameInput)
+                    personalProfileStorage.setBio(it.bioInput)
+                    personalProfileStorage.setPictureUrl(it.pictureUrlInput)
                     useCachedValues()
                     Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
                 } else {
@@ -105,9 +105,9 @@ class SettingsViewModel(
     }
 
     private fun useCachedValues() {
-        username = profilePreferences.getName()
-        bio = profilePreferences.getBio()
-        pictureUrl = profilePreferences.getPictureUrl()
+        username = personalProfileStorage.getName()
+        bio = personalProfileStorage.getBio()
+        pictureUrl = personalProfileStorage.getPictureUrl()
         viewModelState.update {
             it.copy(
                 usernameInput = username,
@@ -122,13 +122,13 @@ class SettingsViewModel(
 
     companion object {
         fun provideFactory(
-            profilePreferences: ProfilePreferences,
+            personalProfileStorage: PersonalProfileStorage,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return SettingsViewModel(
-                    profilePreferences = profilePreferences,
+                    personalProfileStorage = personalProfileStorage,
                     context = context
                 ) as T
             }

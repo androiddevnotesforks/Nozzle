@@ -15,7 +15,7 @@ private object Variables {
     const val PICTURE_URL: String = "picture_url"
 }
 
-class ProfilePreferences(context: Context) {
+class ProfilePreferences(context: Context) : PersonalProfileStorage{
     private val preferences = context.getSharedPreferences(
         PreferenceFileNames.PERSONAL_PROFILE,
         Context.MODE_PRIVATE
@@ -29,63 +29,55 @@ class ProfilePreferences(context: Context) {
         }
     }
 
-    fun getPubkey(): String {
+    override fun getPubkey(): String {
         return derivePubkey(getPrivkey())
     }
 
-    fun getPrivkey(): String {
+    override fun getPrivkey(): String {
         return preferences.getString(Variables.PRIVKEY, "") ?: ""
     }
 
-    fun setPrivkey(privkey: String) {
+    override fun setPrivkey(privkey: String) {
         preferences.edit()
             .putString(Variables.PRIVKEY, privkey)
             .apply()
     }
 
-    fun getBio(): String {
+    override fun getBio(): String {
         return preferences.getString(Variables.BIO, "") ?: ""
     }
 
-    fun setBio(bio: String) {
+    override fun setBio(bio: String) {
         preferences.edit()
             .putString(Variables.BIO, bio)
             .apply()
     }
 
-    fun getName(): String {
+    override fun getName(): String {
         return preferences.getString(Variables.NAME, "") ?: ""
     }
 
-    fun setName(name: String) {
+    override fun setName(name: String) {
         preferences.edit()
             .putString(Variables.NAME, name)
             .apply()
     }
 
-    fun getPictureUrl(): String {
+    override fun getPictureUrl(): String {
         return preferences.getString(Variables.PICTURE_URL, "") ?: ""
     }
 
-    fun setPictureUrl(pictureUrl: String) {
+    override fun setPictureUrl(pictureUrl: String) {
         preferences.edit()
             .putString(Variables.PICTURE_URL, pictureUrl)
             .apply()
     }
 
-    fun resetMetaData() {
+    override fun resetMetaData() {
         preferences.edit()
             .putString(Variables.NAME, "")
             .putString(Variables.BIO, "")
             .putString(Variables.PICTURE_URL, "")
-            .apply()
-    }
-
-    fun setProfileValues(profile: NostrProfile) {
-        Log.i(TAG, "Set name and picture URL $profile")
-        preferences.edit()
-            .putString(Variables.NAME, profile.name)
-            .putString(Variables.PICTURE_URL, profile.picture)
             .apply()
     }
 }

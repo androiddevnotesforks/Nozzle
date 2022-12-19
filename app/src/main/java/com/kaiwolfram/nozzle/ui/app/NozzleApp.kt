@@ -40,8 +40,7 @@ fun NozzleApp(appContainer: AppContainer) {
             val vmContainer = VMContainer(
                 drawerViewModel = viewModel(
                     factory = NozzleDrawerViewModel.provideFactory(
-                        nostrRepository = appContainer.nostrRepository,
-                        profilePreferences = appContainer.profilePreferences,
+                        profileStorageReader = appContainer.profilePreferences,
                     )
                 ),
                 profileViewModel = viewModel(
@@ -55,7 +54,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
-                        profilePreferences = appContainer.profilePreferences,
+                        profileStorage = appContainer.profilePreferences,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
@@ -63,12 +62,12 @@ fun NozzleApp(appContainer: AppContainer) {
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory(
                         nostrRepository = appContainer.nostrRepository,
-                        profilePreferences = appContainer.profilePreferences,
+                        profileStorageReader = appContainer.profilePreferences,
                     )
                 ),
                 settingsViewModel = viewModel(
                     factory = SettingsViewModel.provideFactory(
-                        profilePreferences = appContainer.profilePreferences,
+                        personalProfileStorage = appContainer.profilePreferences,
                         context = LocalContext.current,
                     )
                 ),

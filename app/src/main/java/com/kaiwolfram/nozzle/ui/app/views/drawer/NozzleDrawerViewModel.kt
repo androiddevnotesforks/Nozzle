@@ -5,15 +5,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.nostr.INostrRepository
-import com.kaiwolfram.nozzle.data.nostr.NostrProfile
-import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
-import kotlinx.coroutines.Dispatchers
+import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorageReader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 private const val TAG = "NozzleDrawerViewModel"
 
@@ -24,8 +20,7 @@ data class NozzleDrawerViewModelState(
 )
 
 class NozzleDrawerViewModel(
-    private val nostrRepository: INostrRepository,
-    private val profilePreferences: ProfilePreferences,
+    private val profileStorageReader: PersonalProfileStorageReader,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(NozzleDrawerViewModelState())
     val uiState = viewModelState
@@ -38,7 +33,6 @@ class NozzleDrawerViewModel(
     init {
         Log.i(TAG, "Initialize NozzleDrawerViewModel")
         useCachedValues()
-        updateValuesFromNostrMetaData()
     }
 
     val onResetUiState: () -> Unit = {
@@ -48,37 +42,20 @@ class NozzleDrawerViewModel(
     private fun useCachedValues() {
         viewModelState.update {
             it.copy(
-                pubkey = profilePreferences.getPubkey(),
-                name = profilePreferences.getName(),
-                pictureUrl = profilePreferences.getPictureUrl(),
+                pubkey = profileStorageReader.getPubkey(),
+                name = profileStorageReader.getName(),
+                pictureUrl = profileStorageReader.getPictureUrl(),
             )
         }
     }
 
-    private fun updateValuesFromNostrMetaData() {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            val profile = nostrRepository.getProfile(profilePreferences.getPubkey())
-            if (profile != null) {
-                cacheProfile(profile)
-            }
-        }
-    }
-
-    private fun cacheProfile(profile: NostrProfile) {
-        profilePreferences.setProfileValues(profile)
-    }
-
     companion object {
-        fun provideFactory(
-            nostrRepository: INostrRepository,
-            profilePreferences: ProfilePreferences,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(profileStorageReader: PersonalProfileStorageReader): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return NozzleDrawerViewModel(
-                        nostrRepository = nostrRepository,
-                        profilePreferences = profilePreferences,
+                        profileStorageReader = profileStorageReader,
                     ) as T
                 }
             }

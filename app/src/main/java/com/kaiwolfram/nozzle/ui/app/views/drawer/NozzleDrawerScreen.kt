@@ -32,9 +32,10 @@ fun NozzleDrawerScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(spacing.screenEdge)
+            .padding(vertical = spacing.screenEdge)
     ) {
         ProfileRow(
+            modifier = Modifier.padding(horizontal = spacing.medium),
             pictureUrl = uiState.pictureUrl,
             pubkey = uiState.pubkey,
             profileName = uiState.name,
@@ -44,8 +45,13 @@ fun NozzleDrawerScreen(
             },
             closeDrawer = closeDrawer
         )
-        Spacer(modifier = Modifier.height(spacing.medium))
+        Spacer(
+            modifier = Modifier
+                .height(spacing.medium)
+                .padding(horizontal = spacing.screenEdge)
+        )
         MainRows(
+            modifier = Modifier.padding(spacing.screenEdge),
             navigateToFeed = navActions.navigateToFeed,
             navigateToKeys = navActions.navigateToKeys,
             navigateToSettings = navActions.navigateToSettings,
@@ -62,9 +68,10 @@ private fun ProfileRow(
     profileName: String,
     navigateToProfile: () -> Unit,
     closeDrawer: () -> Unit,
+    modifier: Modifier,
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = spacing.tiny),
         color = colors.surface,
@@ -109,31 +116,34 @@ private fun MainRows(
     navigateToKeys: () -> Unit,
     navigateToSettings: () -> Unit,
     closeDrawer: () -> Unit,
+    modifier: Modifier,
 ) {
-    DrawerRow(
-        imageVector = Icons.Rounded.Newspaper,
-        label = stringResource(id = R.string.feed),
-        action = {
-            navigateToFeed()
-            closeDrawer()
-        }
-    )
-    DrawerRow(
-        imageVector = Icons.Rounded.Key,
-        label = stringResource(id = R.string.keys),
-        action = {
-            navigateToKeys()
-            closeDrawer()
-        }
-    )
-    DrawerRow(
-        imageVector = Icons.Rounded.Settings,
-        label = stringResource(id = R.string.settings),
-        action = {
-            navigateToSettings()
-            closeDrawer()
-        }
-    )
+    Column(modifier = modifier) {
+        DrawerRow(
+            imageVector = Icons.Rounded.Newspaper,
+            label = stringResource(id = R.string.feed),
+            action = {
+                navigateToFeed()
+                closeDrawer()
+            }
+        )
+        DrawerRow(
+            imageVector = Icons.Rounded.Key,
+            label = stringResource(id = R.string.keys),
+            action = {
+                navigateToKeys()
+                closeDrawer()
+            }
+        )
+        DrawerRow(
+            imageVector = Icons.Rounded.Settings,
+            label = stringResource(id = R.string.settings),
+            action = {
+                navigateToSettings()
+                closeDrawer()
+            }
+        )
+    }
 }
 
 @Composable

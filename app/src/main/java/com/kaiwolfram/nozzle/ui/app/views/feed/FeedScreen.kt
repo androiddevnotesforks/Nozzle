@@ -9,11 +9,13 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.PostCardList
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.theme.White21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -45,9 +47,11 @@ fun FeedScreen(
 }
 
 @Composable
-private fun FeedTopBar(pictureUrl: String,
-                       pubkey: String,
-                       onPictureClick: () -> Unit) {
+private fun FeedTopBar(
+    pictureUrl: String,
+    pubkey: String,
+    onPictureClick: () -> Unit
+) {
     TopAppBar {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -61,6 +65,7 @@ private fun FeedTopBar(pictureUrl: String,
                     pubkey = pubkey,
                     modifier = Modifier
                         .size(sizing.smallProfilePicture)
+                        .drawBehind { drawCircle(color = White21, radius = size.width / 2) }
                         .clickable { onPictureClick() },
                 )
             }
