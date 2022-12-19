@@ -2,11 +2,14 @@ package com.kaiwolfram.nozzle.ui.app.views.thread
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +21,7 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.components.PostCard
 import com.kaiwolfram.nozzle.ui.components.TopBar
+import com.kaiwolfram.nozzle.ui.theme.spacing
 
 
 @Composable
@@ -75,11 +79,14 @@ private fun ThreadedPosts(
             item {
                 PostCard(
                     modifier = Modifier
-                        .background(color = Color.LightGray.copy(alpha = 0.2f)),
+                        .background(color = Color.Yellow.copy(alpha = 0.1f)),
                     post = current,
                     onOpenProfile = onNavigateToProfile,
                     threadPosition = currentThreadPosition
                 )
+                Divider()
+                Spacer(modifier = Modifier.height(spacing.tiny))
+                Divider()
             }
             items(replies) { post ->
                 PostCard(

@@ -138,7 +138,7 @@ class ThreadViewModel(
                 picture = defaultProfilePicture,
                 pubkey = UUID.randomUUID().toString(),
                 createdAt = 66666666,
-                content = "post.content"
+                content = UUID.randomUUID().toString(),
             )
             val replies = nostrRepository.listPosts().map { post ->
                 PostWithMeta(

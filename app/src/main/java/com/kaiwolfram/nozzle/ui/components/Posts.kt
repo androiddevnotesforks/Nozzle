@@ -142,7 +142,7 @@ fun PostCard(
             Spacer(Modifier.height(spacing.medium))
             Text(
                 text = post.content,
-                maxLines = 12,
+                maxLines = 21,
                 overflow = TextOverflow.Ellipsis
             )
         }
