@@ -22,6 +22,7 @@ data class FeedViewModelState(
     val posts: List<PostWithMeta> = listOf(),
     val isRefreshing: Boolean = false,
     val pictureUrl: String = "",
+    val pubkey: String = "",
 )
 
 class FeedViewModel(
@@ -42,7 +43,8 @@ class FeedViewModel(
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelState.update {
             it.copy(
-                pictureUrl = profilePreferences.getPictureUrl()
+                pictureUrl = profilePreferences.getPictureUrl(),
+                pubkey = profilePreferences.getPubkey()
             )
         }
 

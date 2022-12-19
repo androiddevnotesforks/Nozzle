@@ -28,6 +28,7 @@ private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
     val shortenedPubkey: String = "",
+    val pubkey: String = "",
     val name: String = "",
     val bio: String = "",
     val pictureUrl: String = "",
@@ -46,7 +47,6 @@ class ProfileViewModel(
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
     private var isSyncing = AtomicBoolean(false)
-    private var pubkey = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -68,8 +68,8 @@ class ProfileViewModel(
     }
 
     val onCopyPubkeyAndShowToast: (String) -> Unit = { toast ->
-        Log.i(TAG, "Copy pubkey $pubkey and show toast '$toast'")
-        clip.setText(AnnotatedString(pubkey))
+        Log.i(TAG, "Copy pubkey ${uiState.value.pubkey} and show toast '$toast'")
+        clip.setText(AnnotatedString(uiState.value.pubkey))
         Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
     }
 
@@ -78,7 +78,7 @@ class ProfileViewModel(
             viewModelScope.launch(context = Dispatchers.IO) {
                 Log.i(TAG, "Refresh profile view")
                 setRefresh(true)
-                fetchAndUseNostrData(pubkey)
+                fetchAndUseNostrData(uiState.value.pubkey)
             }
         }
     }
@@ -112,10 +112,10 @@ class ProfileViewModel(
         Log.i(TAG, "Caching fetched profile of ${profile.pubkey}")
         profileDao.insert(profile)
         eventDao.insert(posts)
-        pubkey = profile.pubkey
         viewModelState.update {
             it.copy(
-                shortenedPubkey = ellipsatePubkey(pubkey),
+                shortenedPubkey = ellipsatePubkey(profile.pubkey),
+                pubkey = profile.pubkey,
                 name = profile.name,
                 bio = profile.bio,
                 pictureUrl = profile.pictureUrl,
@@ -142,10 +142,10 @@ class ProfileViewModel(
         val cachedPosts = eventDao.listEventsFromPubkey(pubkey)
         if (cachedProfile != null) {
             Log.i(TAG, "Using cached values")
-            this@ProfileViewModel.pubkey = pubkey
             viewModelState.update {
                 it.copy(
                     shortenedPubkey = ellipsatePubkey(pubkey),
+                    pubkey = pubkey,
                     name = cachedProfile.name,
                     bio = cachedProfile.bio,
                     pictureUrl = cachedProfile.pictureUrl,
@@ -172,10 +172,10 @@ class ProfileViewModel(
     }
 
     private fun resetValues(pubkey: String) {
-        this@ProfileViewModel.pubkey = pubkey
         viewModelState.update {
             it.copy(
                 shortenedPubkey = ellipsatePubkey(pubkey),
+                pubkey = pubkey,
                 name = "",
                 bio = "",
                 pictureUrl = "",

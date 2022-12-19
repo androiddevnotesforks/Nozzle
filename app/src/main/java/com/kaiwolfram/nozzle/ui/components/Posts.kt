@@ -119,6 +119,7 @@ fun PostCard(
                 .size(sizing.profilePicture)
                 .clip(CircleShape),
             pictureUrl = post.pictureUrl,
+            pubkey = post.pubkey,
             onOpenProfile = if (onOpenProfile != null) {
                 { onOpenProfile(post.pubkey) }
             } else {

@@ -28,6 +28,7 @@ fun FeedScreen(
     Column {
         FeedTopBar(
             pictureUrl = uiState.pictureUrl,
+            pubkey = uiState.pubkey,
             onPictureClick = onOpenDrawer,
         )
         PostCardList(
@@ -44,7 +45,9 @@ fun FeedScreen(
 }
 
 @Composable
-private fun FeedTopBar(pictureUrl: String, onPictureClick: () -> Unit) {
+private fun FeedTopBar(pictureUrl: String,
+                       pubkey: String,
+                       onPictureClick: () -> Unit) {
     TopAppBar {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -55,6 +58,7 @@ private fun FeedTopBar(pictureUrl: String, onPictureClick: () -> Unit) {
                 Spacer(modifier = Modifier.width(spacing.large))
                 ProfilePicture(
                     pictureUrl = pictureUrl,
+                    pubkey = pubkey,
                     modifier = Modifier
                         .size(sizing.smallProfilePicture)
                         .clickable { onPictureClick() },

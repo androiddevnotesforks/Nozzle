@@ -36,6 +36,7 @@ fun NozzleDrawerScreen(
     ) {
         ProfileRow(
             pictureUrl = uiState.pictureUrl,
+            pubkey = uiState.pubkey,
             profileName = uiState.name,
             navigateToProfile = {
                 onSetPubkey(uiState.pubkey)
@@ -57,6 +58,7 @@ fun NozzleDrawerScreen(
 @Composable
 private fun ProfileRow(
     pictureUrl: String,
+    pubkey: String,
     profileName: String,
     navigateToProfile: () -> Unit,
     closeDrawer: () -> Unit,
@@ -84,7 +86,9 @@ private fun ProfileRow(
                     modifier = Modifier
                         .fillMaxWidth(0.20f)
                         .aspectRatio(1f)
-                        .clip(CircleShape), pictureUrl = pictureUrl
+                        .clip(CircleShape),
+                    pictureUrl = pictureUrl,
+                    pubkey = pubkey,
                 )
                 Spacer(Modifier.width(spacing.large))
                 Text(

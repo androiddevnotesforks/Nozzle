@@ -32,7 +32,8 @@ fun ProfileScreen(
 ) {
     Column {
         ProfileData(
-            pubkey = uiState.shortenedPubkey,
+            shortenedPubkey = uiState.shortenedPubkey,
+            pubkey = uiState.pubkey,
             name = uiState.name,
             bio = uiState.bio,
             pictureUrl = uiState.pictureUrl,
@@ -59,6 +60,7 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileData(
+    shortenedPubkey: String,
     pubkey: String,
     name: String,
     bio: String,
@@ -77,12 +79,13 @@ private fun ProfileData(
                 .aspectRatio(1f)
                 .clip(CircleShape),
             pictureUrl = pictureUrl,
+            pubkey = pubkey,
         )
         Spacer(Modifier.width(spacing.medium))
         Column(verticalArrangement = Arrangement.Center) {
             NameAndPubkey(
                 name = name,
-                pubkey = pubkey,
+                pubkey = shortenedPubkey,
                 onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
             )
             if (bio.isNotBlank()) {
