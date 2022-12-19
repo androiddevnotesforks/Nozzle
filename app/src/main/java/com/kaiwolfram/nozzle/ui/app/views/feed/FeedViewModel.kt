@@ -9,6 +9,7 @@ import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -106,6 +107,11 @@ class FeedViewModel(
         viewModelState.update {
             it.copy(isRefreshing = value)
         }
+    }
+
+    override fun onCleared() {
+        viewModelScope.cancel()
+        super.onCleared()
     }
 
     companion object {

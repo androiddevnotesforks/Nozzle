@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.isValidUsername
 import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorage
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -118,6 +119,11 @@ class SettingsViewModel(
                 isInvalidPictureUrl = false
             )
         }
+    }
+
+    override fun onCleared() {
+        viewModelScope.cancel()
+        super.onCleared()
     }
 
     companion object {

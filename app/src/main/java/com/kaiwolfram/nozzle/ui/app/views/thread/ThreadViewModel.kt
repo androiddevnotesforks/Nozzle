@@ -8,6 +8,7 @@ import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -164,6 +165,11 @@ class ThreadViewModel(
         } else {
             exec()
         }
+    }
+
+    override fun onCleared() {
+        viewModelScope.cancel()
+        super.onCleared()
     }
 
     companion object {

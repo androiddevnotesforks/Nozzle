@@ -16,6 +16,7 @@ import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -199,6 +200,11 @@ class ProfileViewModel(
         viewModelState.update {
             it.copy(isRefreshing = value)
         }
+    }
+
+    override fun onCleared() {
+        viewModelScope.cancel()
+        super.onCleared()
     }
 
     companion object {

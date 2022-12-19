@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorage
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import com.kaiwolfram.nozzle.data.utils.isHex
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -111,6 +112,11 @@ class KeysViewModel(
                 isInvalid = false,
             )
         }
+    }
+
+    override fun onCleared() {
+        viewModelScope.cancel()
+        super.onCleared()
     }
 
     companion object {
