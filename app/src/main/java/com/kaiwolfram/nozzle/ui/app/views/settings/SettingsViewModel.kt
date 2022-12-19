@@ -48,26 +48,24 @@ class SettingsViewModel(
 
     val onUpdateProfileAndShowToast: (String) -> Unit =
         { toast ->
-            val usernameInput = uiState.value.usernameInput
-            val bioInput = uiState.value.bioInput
-            val urlInput = uiState.value.pictureUrlInput
-
-            val isValidUsername = isValidUsername(usernameInput)
-            val isValidUrl = URLUtil.isHttpsUrl(urlInput)
-            if (isValidUsername && isValidUrl) {
-                Log.i(
-                    TAG,
-                    "Saving username $usernameInput, bio $bioInput and picture URL $urlInput"
-                )
-                profilePreferences.setName(usernameInput)
-                profilePreferences.setBio(bioInput)
-                profilePreferences.setPictureUrl(urlInput)
-                useCachedValues()
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-            } else {
-                Log.i(TAG, "New values are invalid")
-                viewModelState.update {
-                    it.copy(isInvalidUsername = !isValidUsername, isInvalidPictureUrl = !isValidUrl)
+            uiState.value.let {
+                val isValidUsername = isValidUsername(it.usernameInput)
+                val isValidUrl = URLUtil.isHttpsUrl(it.pictureUrlInput)
+                if (isValidUsername && isValidUrl) {
+                    Log.i(TAG, "Updating profile")
+                    profilePreferences.setName(it.usernameInput)
+                    profilePreferences.setBio(it.bioInput)
+                    profilePreferences.setPictureUrl(it.pictureUrlInput)
+                    useCachedValues()
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                } else {
+                    Log.i(TAG, "New values are invalid")
+                    viewModelState.update { state ->
+                        state.copy(
+                            isInvalidUsername = !isValidUsername,
+                            isInvalidPictureUrl = !isValidUrl
+                        )
+                    }
                 }
             }
         }

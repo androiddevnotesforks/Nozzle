@@ -66,6 +66,7 @@ class KeysViewModel(
             if (isValid) {
                 Log.i(TAG, "Saving new privkey $privkeyInput")
                 profilePreferences.setPrivkey(privkeyInput)
+                profilePreferences.resetMetaData()
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {

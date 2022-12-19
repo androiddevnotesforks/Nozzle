@@ -73,6 +73,14 @@ class ProfilePreferences(context: Context) {
             .apply()
     }
 
+    fun resetMetaData() {
+        preferences.edit()
+            .putString(Variables.NAME, "")
+            .putString(Variables.BIO, "")
+            .putString(Variables.PICTURE_URL, "")
+            .apply()
+    }
+
     fun setProfileValues(profile: NostrProfile) {
         Log.i(TAG, "Set name and picture URL $profile")
         preferences.edit()

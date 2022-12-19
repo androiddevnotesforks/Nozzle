@@ -66,6 +66,8 @@ fun NozzleNavGraph(
             KeysRoute(
                 keysViewModel = vmContainer.keysViewModel,
                 onUpdateDrawerPubkey = vmContainer.drawerViewModel.onUpdatePubkey,
+                onResetSettingsUiState = vmContainer.settingsViewModel.onResetUiState,
+                onResetDrawerUiState = vmContainer.drawerViewModel.onResetUiState,
                 onGoBack = navActions.popStack,
             )
         }

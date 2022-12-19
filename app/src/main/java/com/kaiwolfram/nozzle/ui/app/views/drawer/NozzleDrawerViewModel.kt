@@ -71,6 +71,10 @@ class NozzleDrawerViewModel(
         }
     }
 
+    val onResetUiState: () -> Unit = {
+        useCachedValues()
+    }
+
     private fun useCachedValues() {
         viewModelState.update {
             it.copy(
