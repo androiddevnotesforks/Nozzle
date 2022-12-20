@@ -59,9 +59,9 @@ fun SearchIcon(
 }
 
 @Composable
-fun CommentIcon(
+fun ReplyIcon(
     modifier: Modifier = Modifier,
-    description: String? = null,
+    description: String? = stringResource(id = R.string.reply),
     tint: Color = colors.onBackground,
 ) {
     Icon(
@@ -75,7 +75,7 @@ fun CommentIcon(
 @Composable
 fun RepostIcon(
     modifier: Modifier = Modifier,
-    description: String? = null,
+    description: String? = stringResource(id = R.string.repost),
     tint: Color = colors.onBackground,
 ) {
     Icon(
@@ -90,7 +90,7 @@ fun RepostIcon(
 fun LikeIcon(
     modifier: Modifier = Modifier,
     isLiked: Boolean = false,
-    description: String? = null,
+    description: String? = stringResource(id = R.string.like),
     tint: Color = colors.onBackground,
 ) {
     Icon(

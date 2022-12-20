@@ -53,4 +53,7 @@
     <string name="replying_to">Replying to</string>
     <string name="thread">Thread</string>
     <string name="post_not_found">Post not found</string>
+    <string name="reply">Reply</string>
+    <string name="repost">Repost</string>
+    <string name="like">Like</string>
 </resources>

@@ -151,7 +151,7 @@ fun PostCard(
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(spacing.medium))
-            PostCardActions(numOfComments = 0, numOfReposts = 0, numOfLikes = 0)
+            PostCardActions(numOfReplies = 0, numOfReposts = 0, numOfLikes = 0)
         }
     }
 }
@@ -180,7 +180,7 @@ fun PostNotFound() {
 
 @Composable
 private fun PostCardActions(
-    numOfComments: Int,
+    numOfReplies: Int,
     numOfReposts: Int,
     numOfLikes: Int,
 ) {
@@ -189,20 +189,20 @@ private fun PostCardActions(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        CommentAction(numOfComments = numOfComments)
+        ReplyAction(numOfReplies = numOfReplies)
         RepostAction(numOfReposts = numOfReposts)
         LikeAction(numOfLikes = numOfLikes)
     }
 }
 
 @Composable
-private fun CommentAction(
-    numOfComments: Int,
+private fun ReplyAction(
+    numOfReplies: Int,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        CommentIcon(modifier = Modifier.size(sizing.smallIcon))
+        ReplyIcon(modifier = Modifier.size(sizing.smallIcon))
         Spacer(Modifier.width(spacing.medium))
-        Text(text = numOfComments.toString())
+        Text(text = numOfReplies.toString())
     }
 }
 
