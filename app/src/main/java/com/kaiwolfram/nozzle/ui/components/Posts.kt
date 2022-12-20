@@ -1,10 +1,14 @@
 package com.kaiwolfram.nozzle.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme.shapes
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,11 +22,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
+import com.kaiwolfram.nozzle.ui.theme.DarkGray21
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
@@ -147,6 +153,28 @@ fun PostCard(
                 overflow = TextOverflow.Ellipsis
             )
         }
+    }
+}
+
+@Composable
+fun PostNotFound() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacing.screenEdge)
+            .padding(top = spacing.screenEdge)
+            .clip(shapes.medium)
+            .border(width = spacing.tiny, color = DarkGray21, shape = shapes.medium)
+            .background(LightGray21)
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.screenEdge),
+            text = stringResource(id = R.string.post_not_found),
+            textAlign = TextAlign.Center,
+            color = DarkGray21
+        )
     }
 }
 

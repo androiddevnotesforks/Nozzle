@@ -10,3 +10,4 @@ val Teal200 = Color(0xFF03DAC5)
 val LightGray21 = Color.LightGray
 val LightYellow = Color.Yellow.copy(alpha = 0.1f)
 val White21 = Color.White
+val DarkGray21 = Color.DarkGray

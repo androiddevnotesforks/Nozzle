@@ -52,4 +52,5 @@
     <string name="remove">Remove</string>
     <string name="replying_to">Replying to</string>
     <string name="thread">Thread</string>
+    <string name="post_not_found">Post not found</string>
 </resources>

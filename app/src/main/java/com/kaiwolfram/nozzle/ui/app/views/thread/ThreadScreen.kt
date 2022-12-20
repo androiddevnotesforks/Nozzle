@@ -19,6 +19,7 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.components.PostCard
+import com.kaiwolfram.nozzle.ui.components.PostNotFound
 import com.kaiwolfram.nozzle.ui.components.TopBar
 import com.kaiwolfram.nozzle.ui.theme.LightYellow
 import com.kaiwolfram.nozzle.ui.theme.spacing
@@ -69,13 +70,19 @@ private fun ThreadedPosts(
         val listState = LazyListState(firstVisibleItemIndex = previous.size)
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
             itemsIndexed(previous) { index, post ->
+                var threadPosition = ThreadPosition.MIDDLE
+                if (index == 0) {
+                    if (post.replyToId != null) {
+                        PostNotFound()
+                    } else {
+                        threadPosition = ThreadPosition.START
+                    }
+                }
                 PostCard(
                     post = post,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread,
-                    threadPosition = if (index == 0) ThreadPosition.START else {
-                        ThreadPosition.MIDDLE
-                    }
+                    threadPosition = threadPosition
                 )
             }
             item {
