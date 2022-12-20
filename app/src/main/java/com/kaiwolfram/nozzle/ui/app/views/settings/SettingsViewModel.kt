@@ -9,11 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.isValidUsername
 import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorage
+import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 private const val TAG = "SettingsViewModel"
 
@@ -28,6 +31,7 @@ data class SettingsViewModelState(
 
 class SettingsViewModel(
     private val personalProfileStorage: PersonalProfileStorage,
+    private val profileDao: ProfileDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(SettingsViewModelState())
@@ -55,6 +59,14 @@ class SettingsViewModel(
                         || URLUtil.isValidUrl(it.pictureUrlInput)
                 if (isValidUsername && isValidUrl) {
                     Log.i(TAG, "Updating profile")
+                    viewModelScope.launch(context = Dispatchers.IO) {
+                        profileDao.updateMetaData(
+                            pubkey = personalProfileStorage.getPubkey(),
+                            name = it.usernameInput,
+                            bio = it.bioInput,
+                            pictureUrl = it.pictureUrlInput
+                        )
+                    }
                     personalProfileStorage.setName(it.usernameInput)
                     personalProfileStorage.setBio(it.bioInput)
                     personalProfileStorage.setPictureUrl(it.pictureUrlInput)
@@ -140,12 +152,14 @@ class SettingsViewModel(
     companion object {
         fun provideFactory(
             personalProfileStorage: PersonalProfileStorage,
+            profileDao: ProfileDao,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return SettingsViewModel(
                     personalProfileStorage = personalProfileStorage,
+                    profileDao = profileDao,
                     context = context
                 ) as T
             }

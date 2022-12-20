@@ -68,6 +68,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 settingsViewModel = viewModel(
                     factory = SettingsViewModel.provideFactory(
                         personalProfileStorage = appContainer.profilePreferences,
+                        profileDao = appContainer.roomDb.profileDao(),
                         context = LocalContext.current,
                     )
                 ),
