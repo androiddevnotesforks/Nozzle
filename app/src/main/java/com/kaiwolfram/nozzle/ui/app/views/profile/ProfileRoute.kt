@@ -13,6 +13,7 @@ fun ProfileRoute(
 
     ProfileScreen(
         uiState = uiState,
+        onLike = profileViewModel.onLike,
         onRefreshProfileView = profileViewModel.onRefreshProfileView,
         onCopyPubkeyAndShowToast = profileViewModel.onCopyPubkeyAndShowToast,
         onNavigateToThread = onNavigateToThread,

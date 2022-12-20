@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorage
-import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
 import com.kaiwolfram.nozzle.data.utils.isHex
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow

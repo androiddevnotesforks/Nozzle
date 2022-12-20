@@ -26,6 +26,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun ProfileScreen(
     uiState: ProfileViewModelState,
+    onLike: (String) -> Unit,
     onRefreshProfileView: () -> Unit,
     onCopyPubkeyAndShowToast: (String) -> Unit,
     onNavigateToThread: (String) -> Unit
@@ -48,6 +49,7 @@ fun ProfileScreen(
         Divider()
         PostCardList(
             posts = uiState.posts,
+            onLike = onLike,
             isRefreshing = uiState.isRefreshing,
             onRefresh = onRefreshProfileView,
             onNavigateToThread = onNavigateToThread

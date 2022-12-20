@@ -15,6 +15,7 @@ fun ThreadRoute(
     ThreadScreen(
         uiState = uiState,
         onRefreshThreadView = threadViewModel.onRefreshThreadView,
+        onLike = threadViewModel.onLike,
         onOpenThread = threadViewModel.onOpenThread,
         onNavigateToProfile = onNavigateToProfile,
         onGoBack = onGoBack,

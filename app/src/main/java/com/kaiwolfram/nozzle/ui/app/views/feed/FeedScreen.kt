@@ -22,6 +22,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun FeedScreen(
     uiState: FeedViewModelState,
+    onLike: (String) -> Unit,
     onRefreshFeedView: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (String) -> Unit,
@@ -36,6 +37,7 @@ fun FeedScreen(
         PostCardList(
             posts = uiState.posts,
             isRefreshing = uiState.isRefreshing,
+            onLike = onLike,
             onRefresh = onRefreshFeedView,
             onOpenProfile = onNavigateToProfile,
             onNavigateToThread = onNavigateToThread,

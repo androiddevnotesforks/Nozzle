@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.random.Random
 
 private const val TAG = "ThreadViewModel"
 
@@ -58,7 +60,9 @@ class ThreadViewModel(
                         replyToName = "Kai Wolfram",
                         pubkey = UUID.randomUUID().toString(),
                         createdAt = post.createdAt,
-                        content = post.content
+                        content = post.content,
+                        isLikedByMe = Random.nextBoolean(),
+                        numOfLikes = Random.nextInt(2000),
                     )
                 }
                 val current = PostWithMeta(
@@ -69,7 +73,9 @@ class ThreadViewModel(
                     replyToName = "Kai Wolfram",
                     pubkey = UUID.randomUUID().toString(),
                     createdAt = 66666666,
-                    content = "post.content"
+                    content = "post.content",
+                    isLikedByMe = Random.nextBoolean(),
+                    numOfLikes = Random.nextInt(2000),
                 )
                 val replies = nostrRepository.listPosts().map { post ->
                     PostWithMeta(
@@ -80,7 +86,9 @@ class ThreadViewModel(
                         replyToName = "Kai Wolfram",
                         pubkey = UUID.randomUUID().toString(),
                         createdAt = post.createdAt,
-                        content = post.content
+                        content = post.content,
+                        isLikedByMe = Random.nextBoolean(),
+                        numOfLikes = Random.nextInt(2000),
                     )
                 }
                 viewModelState.update {
@@ -108,7 +116,9 @@ class ThreadViewModel(
                     pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                     pubkey = UUID.randomUUID().toString(),
                     createdAt = post.createdAt,
-                    content = post.content
+                    content = post.content,
+                    isLikedByMe = Random.nextBoolean(),
+                    numOfLikes = Random.nextInt(2000),
                 )
             }
             val current = PostWithMeta(
@@ -120,6 +130,8 @@ class ThreadViewModel(
                 pubkey = UUID.randomUUID().toString(),
                 createdAt = 66666666,
                 content = UUID.randomUUID().toString(),
+                isLikedByMe = Random.nextBoolean(),
+                numOfLikes = Random.nextInt(2000),
             )
             val replies = nostrRepository.listPosts().map { post ->
                 PostWithMeta(
@@ -130,7 +142,9 @@ class ThreadViewModel(
                     replyToName = "Kai Wolfram",
                     pubkey = UUID.randomUUID().toString(),
                     createdAt = post.createdAt,
-                    content = post.content
+                    content = post.content,
+                    isLikedByMe = Random.nextBoolean(),
+                    numOfLikes = Random.nextInt(2000),
                 )
             }
             Log.i(TAG, "Previous: ${previous.size}, replies: ${replies.size}")
@@ -141,6 +155,40 @@ class ThreadViewModel(
                     replies = replies,
                     currentThreadPosition = getThreadPosition(previous)
                 )
+            }
+        }
+    }
+
+    val onLike: (String) -> Unit = { id ->
+//        TODO:
+//        viewModelScope.launch(context = Dispatchers.IO) {
+//            // Update db
+//            // Send nostr event
+//        }
+        // TODO: This sucks lol
+        uiState.value.let { state ->
+            if (state.current != null && state.current.id == id) {
+                viewModelState.update {
+                    it.copy(
+                        current = state.current.copy(isLikedByMe = true),
+                    )
+                }
+            } else if (state.previous.any { post -> post.id == id }) {
+                viewModelState.update {
+                    it.copy(
+                        previous = state.previous.map { toMap ->
+                            mapToLikedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
+            } else if (state.replies.any { post -> post.id == id }) {
+                viewModelState.update {
+                    it.copy(
+                        replies = state.replies.map { toMap ->
+                            mapToLikedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
             }
         }
     }

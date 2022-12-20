@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorageReader
-import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
+import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.random.Random
 
 private const val TAG = "FeedViewModel"
 
@@ -71,6 +72,25 @@ class FeedViewModel(
         }
     }
 
+    val onLike: (String) -> Unit = { id ->
+//        TODO:
+//        viewModelScope.launch(context = Dispatchers.IO) {
+//            // Update db
+//            // Send nostr event
+//        }
+        uiState.value.let { state ->
+            if (state.posts.any { post -> post.id == id }) {
+                viewModelState.update {
+                    it.copy(
+                        posts = state.posts.map { toMap ->
+                            mapToLikedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
+            }
+        }
+    }
+
     private fun fetchAndUseNostrData() {
         Log.i(TAG, "Fetching nostr data for feed")
         isSyncing.set(true)
@@ -86,7 +106,9 @@ class FeedViewModel(
                         pubkey = UUID.randomUUID().toString(),
                         pictureUrl = "https://www.dadant.com/wp-content/uploads/2016/12/honey-production-dadant.jpg",
                         createdAt = post.createdAt,
-                        content = post.content
+                        content = post.content,
+                        isLikedByMe = Random.nextBoolean(),
+                        numOfLikes = Random.nextInt(2000),
                     )
                 },
             )

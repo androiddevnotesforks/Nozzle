@@ -28,6 +28,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun ThreadScreen(
     uiState: ThreadViewModelState,
+    onLike: (String) -> Unit,
     onRefreshThreadView: () -> Unit,
     onOpenThread: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
@@ -44,6 +45,7 @@ fun ThreadScreen(
                     currentThreadPosition = uiState.currentThreadPosition,
                     isRefreshing = uiState.isRefreshing,
                     onRefresh = onRefreshThreadView,
+                    onLike = onLike,
                     onOpenThread = onOpenThread,
                     onNavigateToProfile = onNavigateToProfile,
                 )
@@ -60,6 +62,7 @@ private fun ThreadedPosts(
     currentThreadPosition: ThreadPosition,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
+    onLike: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onOpenThread: (String) -> Unit,
 ) {
@@ -80,6 +83,7 @@ private fun ThreadedPosts(
                 }
                 PostCard(
                     post = post,
+                    onLike = onLike,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread,
                     threadPosition = threadPosition
@@ -89,6 +93,7 @@ private fun ThreadedPosts(
                 PostCard(
                     modifier = Modifier.background(color = LightYellow),
                     post = current,
+                    onLike = onLike,
                     onOpenProfile = onNavigateToProfile,
                     threadPosition = currentThreadPosition
                 )
@@ -99,6 +104,7 @@ private fun ThreadedPosts(
             items(replies) { post ->
                 PostCard(
                     post = post,
+                    onLike = onLike,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread
                 )

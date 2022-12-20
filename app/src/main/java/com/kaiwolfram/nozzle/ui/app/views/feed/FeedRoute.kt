@@ -15,6 +15,7 @@ fun FeedRoute(
 
     FeedScreen(
         uiState = uiState,
+        onLike = feedViewModel.onLike,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onOpenDrawer = onOpenDrawer,
         onNavigateToProfile = onNavigateToProfile,

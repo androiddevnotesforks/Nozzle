@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.shapes
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,16 +27,14 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
-import com.kaiwolfram.nozzle.ui.theme.DarkGray21
-import com.kaiwolfram.nozzle.ui.theme.LightGray21
-import com.kaiwolfram.nozzle.ui.theme.sizing
-import com.kaiwolfram.nozzle.ui.theme.spacing
+import com.kaiwolfram.nozzle.ui.theme.*
 
 @Composable
 fun PostCardList(
     posts: List<PostWithMeta>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
+    onLike: (String) -> Unit,
     onOpenProfile: ((String) -> Unit)? = null,
     onNavigateToThread: (String) -> Unit,
 ) {
@@ -47,6 +46,7 @@ fun PostCardList(
             items(posts) { post ->
                 PostCard(
                     post = post,
+                    onLike = onLike,
                     onOpenProfile = onOpenProfile,
                     onNavigateToThread = onNavigateToThread,
                 )
@@ -58,6 +58,7 @@ fun PostCardList(
 @Composable
 fun PostCard(
     post: PostWithMeta,
+    onLike: (String) -> Unit,
     modifier: Modifier = Modifier,
     threadPosition: ThreadPosition = ThreadPosition.SINGLE,
     onOpenProfile: ((String) -> Unit)? = null,
@@ -151,7 +152,14 @@ fun PostCard(
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(spacing.medium))
-            PostCardActions(numOfReplies = 0, numOfReposts = 0, numOfLikes = 0)
+            PostCardActions(
+                // TODO: No 0s
+                numOfReplies = 0,
+                numOfReposts = 0,
+                numOfLikes = post.numOfLikes,
+                isLikedByMe = post.isLikedByMe,
+                onLike = { onLike(post.id) }
+            )
         }
     }
 }
@@ -183,15 +191,17 @@ private fun PostCardActions(
     numOfReplies: Int,
     numOfReposts: Int,
     numOfLikes: Int,
+    isLikedByMe: Boolean,
+    onLike: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(0.8f),
+        modifier = Modifier.fillMaxWidth(0.85f),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         ReplyAction(numOfReplies = numOfReplies)
         RepostAction(numOfReposts = numOfReposts)
-        LikeAction(numOfLikes = numOfLikes)
+        LikeAction(numOfLikes = numOfLikes, isLikedByMe = isLikedByMe, onLike = onLike)
     }
 }
 
@@ -220,9 +230,18 @@ private fun RepostAction(
 @Composable
 private fun LikeAction(
     numOfLikes: Int,
+    isLikedByMe: Boolean,
+    onLike: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        LikeIcon(modifier = Modifier.size(sizing.smallIcon))
+        LikeIcon(
+            modifier = if (isLikedByMe) Modifier.size(sizing.smallIcon)
+            else Modifier
+                .size(sizing.smallIcon)
+                .clickable { onLike() },
+            isLiked = isLikedByMe,
+            tint = if (isLikedByMe) Red21 else colors.onBackground
+        )
         Spacer(Modifier.width(spacing.medium))
         Text(text = numOfLikes.toString())
     }

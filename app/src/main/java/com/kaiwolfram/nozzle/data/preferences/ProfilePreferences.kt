@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import com.kaiwolfram.nozzle.data.derivePubkey
 import com.kaiwolfram.nozzle.data.generatePrivkey
-import com.kaiwolfram.nozzle.data.nostr.NostrProfile
 
 private const val TAG: String = "ProfilePreferences"
 
@@ -15,7 +14,7 @@ private object Variables {
     const val PICTURE_URL: String = "picture_url"
 }
 
-class ProfilePreferences(context: Context) : PersonalProfileStorage{
+class ProfilePreferences(context: Context) : PersonalProfileStorage {
     private val preferences = context.getSharedPreferences(
         PreferenceFileNames.PERSONAL_PROFILE,
         Context.MODE_PRIVATE

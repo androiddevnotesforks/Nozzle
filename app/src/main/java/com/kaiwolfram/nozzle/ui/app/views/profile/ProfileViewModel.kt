@@ -14,6 +14,7 @@ import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
+import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.random.Random
 
 private const val TAG = "ProfileViewModel"
 
@@ -84,6 +86,25 @@ class ProfileViewModel(
         }
     }
 
+    val onLike: (String) -> Unit = { id ->
+//        TODO:
+//        viewModelScope.launch(context = Dispatchers.IO) {
+//            // Update db
+//            // Send nostr event
+//        }
+        uiState.value.let { state ->
+            if (state.posts.any { post -> post.id == id }) {
+                viewModelState.update {
+                    it.copy(
+                        posts = state.posts.map { toMap ->
+                            mapToLikedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
+            }
+        }
+    }
+
     private suspend fun fetchAndUseNostrData(pubkey: String) {
         Log.i(TAG, "Fetching nostr data for $pubkey")
         isSyncing.set(true)
@@ -131,7 +152,9 @@ class ProfileViewModel(
                         pubkey = profile.pubkey,
                         pictureUrl = profile.pictureUrl,
                         createdAt = post.createdAt,
-                        content = post.content
+                        content = post.content,
+                        isLikedByMe = Random.nextBoolean(),
+                        numOfLikes = Random.nextInt(2000),
                     )
                 },
             )
@@ -161,7 +184,9 @@ class ProfileViewModel(
                             pictureUrl = "",
                             pubkey = cachedProfile.pubkey,
                             createdAt = post.createdAt,
-                            content = post.content
+                            content = post.content,
+                            isLikedByMe = Random.nextBoolean(),
+                            numOfLikes = Random.nextInt(2000),
                         )
                     }
                 )
