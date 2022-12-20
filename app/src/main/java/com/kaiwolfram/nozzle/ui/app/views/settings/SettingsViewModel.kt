@@ -73,36 +73,47 @@ class SettingsViewModel(
         }
 
     val onChangeName: (String) -> Unit = { input ->
-        viewModelState.update {
-            it.copy(
-                usernameInput = input,
-                hasChanges = true
-            )
+        if (input != uiState.value.usernameInput) {
+            viewModelState.update {
+                it.copy(usernameInput = input)
+            }
+            setHasChanges()
         }
     }
 
     val onChangeBio: (String) -> Unit = { input ->
         if (input != uiState.value.bioInput) {
             viewModelState.update {
-                it.copy(
-                    bioInput = input,
-                    hasChanges = true
-                )
+                it.copy(bioInput = input)
             }
+            setHasChanges()
         }
     }
 
     val onChangePictureUrl: (String) -> Unit = { input ->
-        viewModelState.update {
-            it.copy(
-                pictureUrlInput = input,
-                hasChanges = true
-            )
+        if (input != uiState.value.pictureUrlInput) {
+            viewModelState.update {
+                it.copy(pictureUrlInput = input)
+            }
+            setHasChanges()
         }
     }
 
     val onResetUiState: () -> Unit = {
         useCachedValues()
+    }
+
+    private fun setHasChanges() {
+        uiState.value.let {
+            val hasChanges = it.usernameInput != username
+                    || it.bioInput != bio
+                    || it.pictureUrlInput != pictureUrl
+            if (hasChanges != it.hasChanges) {
+                viewModelState.update { state ->
+                    state.copy(hasChanges = hasChanges)
+                }
+            }
+        }
     }
 
     private fun useCachedValues() {
