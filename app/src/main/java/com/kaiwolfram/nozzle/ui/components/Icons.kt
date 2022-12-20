@@ -7,10 +7,9 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Chat
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +53,49 @@ fun SearchIcon(
     Icon(
         modifier = modifier,
         imageVector = Icons.Rounded.Search,
+        contentDescription = description,
+        tint = tint
+    )
+}
+
+@Composable
+fun CommentIcon(
+    modifier: Modifier = Modifier,
+    description: String? = null,
+    tint: Color = colors.onBackground,
+) {
+    Icon(
+        modifier = modifier,
+        imageVector = Icons.Outlined.Chat,
+        contentDescription = description,
+        tint = tint
+    )
+}
+
+@Composable
+fun RepostIcon(
+    modifier: Modifier = Modifier,
+    description: String? = null,
+    tint: Color = colors.onBackground,
+) {
+    Icon(
+        modifier = modifier,
+        imageVector = Icons.Default.Repeat,
+        contentDescription = description,
+        tint = tint
+    )
+}
+
+@Composable
+fun LikeIcon(
+    modifier: Modifier = Modifier,
+    isLiked: Boolean = false,
+    description: String? = null,
+    tint: Color = colors.onBackground,
+) {
+    Icon(
+        modifier = modifier,
+        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
         contentDescription = description,
         tint = tint
     )

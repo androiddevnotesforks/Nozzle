@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme.shapes
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
@@ -152,6 +150,8 @@ fun PostCard(
                 maxLines = 21,
                 overflow = TextOverflow.Ellipsis
             )
+            Spacer(Modifier.height(spacing.medium))
+            PostCardActions(numOfComments = 0, numOfReposts = 0, numOfLikes = 0)
         }
     }
 }
@@ -177,6 +177,57 @@ fun PostNotFound() {
         )
     }
 }
+
+@Composable
+private fun PostCardActions(
+    numOfComments: Int,
+    numOfReposts: Int,
+    numOfLikes: Int,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(0.8f),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        CommentAction(numOfComments = numOfComments)
+        RepostAction(numOfReposts = numOfReposts)
+        LikeAction(numOfLikes = numOfLikes)
+    }
+}
+
+@Composable
+private fun CommentAction(
+    numOfComments: Int,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        CommentIcon(modifier = Modifier.size(sizing.smallIcon))
+        Spacer(Modifier.width(spacing.medium))
+        Text(text = numOfComments.toString())
+    }
+}
+
+@Composable
+private fun RepostAction(
+    numOfReposts: Int,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        RepostIcon(modifier = Modifier.size(sizing.smallIcon))
+        Spacer(Modifier.width(spacing.medium))
+        Text(text = numOfReposts.toString())
+    }
+}
+
+@Composable
+private fun LikeAction(
+    numOfLikes: Int,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        LikeIcon(modifier = Modifier.size(sizing.smallIcon))
+        Spacer(Modifier.width(spacing.medium))
+        Text(text = numOfLikes.toString())
+    }
+}
+
 
 @Composable
 private fun ReplyingTo(name: String) {
