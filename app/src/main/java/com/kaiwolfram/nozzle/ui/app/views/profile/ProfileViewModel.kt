@@ -154,7 +154,6 @@ class ProfileViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
-                        numOfLikes = Random.nextInt(2000),
                     )
                 },
             )
@@ -186,7 +185,6 @@ class ProfileViewModel(
                             createdAt = post.createdAt,
                             content = post.content,
                             isLikedByMe = Random.nextBoolean(),
-                            numOfLikes = Random.nextInt(2000),
                         )
                     }
                 )

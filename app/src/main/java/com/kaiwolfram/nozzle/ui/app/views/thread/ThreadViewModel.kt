@@ -62,7 +62,6 @@ class ThreadViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
-                        numOfLikes = Random.nextInt(2000),
                     )
                 }
                 val current = PostWithMeta(
@@ -75,7 +74,6 @@ class ThreadViewModel(
                     createdAt = 66666666,
                     content = "post.content",
                     isLikedByMe = Random.nextBoolean(),
-                    numOfLikes = Random.nextInt(2000),
                 )
                 val replies = nostrRepository.listPosts().map { post ->
                     PostWithMeta(
@@ -88,7 +86,6 @@ class ThreadViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
-                        numOfLikes = Random.nextInt(2000),
                     )
                 }
                 viewModelState.update {
@@ -118,7 +115,6 @@ class ThreadViewModel(
                     createdAt = post.createdAt,
                     content = post.content,
                     isLikedByMe = Random.nextBoolean(),
-                    numOfLikes = Random.nextInt(2000),
                 )
             }
             val current = PostWithMeta(
@@ -131,7 +127,6 @@ class ThreadViewModel(
                 createdAt = 66666666,
                 content = UUID.randomUUID().toString(),
                 isLikedByMe = Random.nextBoolean(),
-                numOfLikes = Random.nextInt(2000),
             )
             val replies = nostrRepository.listPosts().map { post ->
                 PostWithMeta(
@@ -144,7 +139,6 @@ class ThreadViewModel(
                     createdAt = post.createdAt,
                     content = post.content,
                     isLikedByMe = Random.nextBoolean(),
-                    numOfLikes = Random.nextInt(2000),
                 )
             }
             Log.i(TAG, "Previous: ${previous.size}, replies: ${replies.size}")

@@ -108,7 +108,6 @@ class FeedViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
-                        numOfLikes = Random.nextInt(2000),
                     )
                 },
             )
