@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorageReader
+import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +21,7 @@ data class NozzleDrawerViewModelState(
 )
 
 class NozzleDrawerViewModel(
-    private val profileStorageReader: PersonalProfileStorageReader,
+    private val profileStorageReader: IPersonalProfileStorageReader,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(NozzleDrawerViewModelState())
     val uiState = viewModelState
@@ -56,7 +56,7 @@ class NozzleDrawerViewModel(
     }
 
     companion object {
-        fun provideFactory(profileStorageReader: PersonalProfileStorageReader): ViewModelProvider.Factory =
+        fun provideFactory(profileStorageReader: IPersonalProfileStorageReader): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

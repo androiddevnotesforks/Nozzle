@@ -8,7 +8,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorage
+import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorage
 import com.kaiwolfram.nozzle.data.utils.isHex
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ data class KeysViewModelState(
 )
 
 class KeysViewModel(
-    private val profileStorage: PersonalProfileStorage,
+    private val profileStorage: IPersonalProfileStorage,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
@@ -120,7 +120,7 @@ class KeysViewModel(
 
     companion object {
         fun provideFactory(
-            profileStorage: PersonalProfileStorage,
+            profileStorage: IPersonalProfileStorage,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =

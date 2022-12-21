@@ -1,6 +1,6 @@
 package com.kaiwolfram.nozzle.data.preferences
 
-interface PersonalProfileStorageReader {
+interface IPersonalProfileStorageReader {
     fun getPrivkey(): String
     fun getPubkey(): String
     fun getName(): String

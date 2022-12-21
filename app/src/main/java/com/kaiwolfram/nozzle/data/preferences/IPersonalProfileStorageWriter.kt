@@ -1,6 +1,6 @@
 package com.kaiwolfram.nozzle.data.preferences
 
-interface PersonalProfileStorageWriter {
+interface IPersonalProfileStorageWriter {
     fun setPrivkey(privkey: String)
     fun setName(name: String)
     fun setBio(bio: String)

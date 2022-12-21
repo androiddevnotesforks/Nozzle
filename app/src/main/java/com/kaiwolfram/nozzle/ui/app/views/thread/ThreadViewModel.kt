@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
+import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
@@ -31,6 +33,8 @@ data class ThreadViewModelState(
 
 class ThreadViewModel(
     private val nostrRepository: INostrRepository,
+    private val profileStorageReader: IPersonalProfileStorageReader,
+    private val postCardInteractor: IPostCardInteractor,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ThreadViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -154,20 +158,18 @@ class ThreadViewModel(
     }
 
     val onLike: (String) -> Unit = { id ->
-//        TODO:
-//        viewModelScope.launch(context = Dispatchers.IO) {
-//            // Update db
-//            // Send nostr event
-//        }
         // TODO: This sucks lol
+        var needsUpdate = false
         uiState.value.let { state ->
             if (state.current != null && state.current.id == id) {
+                needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         current = state.current.copy(isLikedByMe = true),
                     )
                 }
             } else if (state.previous.any { post -> post.id == id }) {
+                needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         previous = state.previous.map { toMap ->
@@ -176,6 +178,7 @@ class ThreadViewModel(
                     )
                 }
             } else if (state.replies.any { post -> post.id == id }) {
+                needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         replies = state.replies.map { toMap ->
@@ -183,6 +186,11 @@ class ThreadViewModel(
                         },
                     )
                 }
+            }
+        }
+        if (needsUpdate) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                postCardInteractor.like(pubkey = profileStorageReader.getPubkey(), postId = id)
             }
         }
     }
@@ -217,11 +225,15 @@ class ThreadViewModel(
     companion object {
         fun provideFactory(
             nostrRepository: INostrRepository,
+            profileStorageReader: IPersonalProfileStorageReader,
+            postCardInteractor: IPostCardInteractor,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ThreadViewModel(
                     nostrRepository = nostrRepository,
+                    profileStorageReader = profileStorageReader,
+                    postCardInteractor = postCardInteractor,
                 ) as T
             }
         }

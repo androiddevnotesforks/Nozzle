@@ -1,0 +1,3 @@
+package com.kaiwolfram.nozzle.data.preferences
+
+interface IPersonalProfileStorage : IPersonalProfileStorageReader, IPersonalProfileStorageWriter

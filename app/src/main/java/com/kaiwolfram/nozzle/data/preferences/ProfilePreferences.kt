@@ -14,13 +14,14 @@ private object Variables {
     const val PICTURE_URL: String = "picture_url"
 }
 
-class ProfilePreferences(context: Context) : PersonalProfileStorage {
+class ProfilePreferences(context: Context) : IPersonalProfileStorage {
     private val preferences = context.getSharedPreferences(
         PreferenceFileNames.PERSONAL_PROFILE,
         Context.MODE_PRIVATE
     )
 
     init {
+        Log.i(TAG, "Initialize ProfilePreferences")
         if (getPrivkey().isEmpty()) {
             val privkey = generatePrivkey()
             Log.i(TAG, "Setting initial privkey $privkey ")

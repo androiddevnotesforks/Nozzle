@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.isValidUsername
-import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorage
+import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorage
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -30,7 +30,7 @@ data class SettingsViewModelState(
 )
 
 class SettingsViewModel(
-    private val personalProfileStorage: PersonalProfileStorage,
+    private val personalProfileStorage: IPersonalProfileStorage,
     private val profileDao: ProfileDao,
     context: Context,
 ) : ViewModel() {
@@ -151,7 +151,7 @@ class SettingsViewModel(
 
     companion object {
         fun provideFactory(
-            personalProfileStorage: PersonalProfileStorage,
+            personalProfileStorage: IPersonalProfileStorage,
             profileDao: ProfileDao,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {

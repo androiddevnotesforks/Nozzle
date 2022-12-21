@@ -47,8 +47,12 @@ class NostrRepositoryMock : INostrRepository {
         return result
     }
 
-    override fun getPost(id: String): EventEntity {
+    override fun getPost(postId: String): EventEntity {
         return createRndPost()
+    }
+
+    override fun likePost(postId: String) {
+        // No return
     }
 
     private fun createRndPost(): EventEntity {

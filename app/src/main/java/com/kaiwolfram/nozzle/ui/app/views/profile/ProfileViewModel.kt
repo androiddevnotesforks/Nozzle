@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.ellipsatePubkey
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
@@ -43,10 +44,11 @@ data class ProfileViewModelState(
 
 class ProfileViewModel(
     private val nostrRepository: INostrRepository,
-    context: Context,
-    clip: ClipboardManager,
     private val profileDao: ProfileDao,
     private val eventDao: EventDao,
+    private val postCardInteractor: IPostCardInteractor,
+    context: Context,
+    clip: ClipboardManager,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -87,13 +89,11 @@ class ProfileViewModel(
     }
 
     val onLike: (String) -> Unit = { id ->
-//        TODO:
-//        viewModelScope.launch(context = Dispatchers.IO) {
-//            // Update db
-//            // Send nostr event
-//        }
         uiState.value.let { state ->
             if (state.posts.any { post -> post.id == id }) {
+                viewModelScope.launch(context = Dispatchers.IO) {
+                    postCardInteractor.like(pubkey = uiState.value.pubkey, postId = id)
+                }
                 viewModelState.update {
                     it.copy(
                         posts = state.posts.map { toMap ->
@@ -233,20 +233,22 @@ class ProfileViewModel(
     companion object {
         fun provideFactory(
             nostrRepository: INostrRepository,
-            context: Context,
-            clip: ClipboardManager,
+            postCardInteractor: IPostCardInteractor,
             profileDao: ProfileDao,
             eventDao: EventDao,
+            context: Context,
+            clip: ClipboardManager,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProfileViewModel(
                         nostrRepository = nostrRepository,
-                        context = context,
-                        clip = clip,
+                        postCardInteractor = postCardInteractor,
                         profileDao = profileDao,
                         eventDao = eventDao,
+                        context = context,
+                        clip = clip,
                     ) as T
                 }
             }

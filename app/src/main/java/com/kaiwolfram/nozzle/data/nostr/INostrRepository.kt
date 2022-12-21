@@ -9,5 +9,6 @@ interface INostrRepository {
     fun listPosts(pubkey: String): List<EventEntity>
     fun listFollowedProfiles(pubKey: String): List<NostrProfile>
     fun listPosts(): List<EventEntity>
-    fun getPost(id: String): EventEntity
+    fun getPost(postId: String): EventEntity
+    fun likePost(postId: String)
 }

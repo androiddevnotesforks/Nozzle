@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrRepository
-import com.kaiwolfram.nozzle.data.preferences.PersonalProfileStorageReader
+import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
+import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +31,8 @@ data class FeedViewModelState(
 
 class FeedViewModel(
     private val nostrRepository: INostrRepository,
-    private val profileStorageReader: PersonalProfileStorageReader,
+    private val postCardInteractor: IPostCardInteractor,
+    private val profileStorageReader: IPersonalProfileStorageReader,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -73,13 +75,11 @@ class FeedViewModel(
     }
 
     val onLike: (String) -> Unit = { id ->
-//        TODO:
-//        viewModelScope.launch(context = Dispatchers.IO) {
-//            // Update db
-//            // Send nostr event
-//        }
         uiState.value.let { state ->
             if (state.posts.any { post -> post.id == id }) {
+                viewModelScope.launch(context = Dispatchers.IO) {
+                    postCardInteractor.like(pubkey = uiState.value.pubkey, postId = id)
+                }
                 viewModelState.update {
                     it.copy(
                         posts = state.posts.map { toMap ->
@@ -138,13 +138,15 @@ class FeedViewModel(
     companion object {
         fun provideFactory(
             nostrRepository: INostrRepository,
-            profileStorageReader: PersonalProfileStorageReader,
+            postCardInteractor: IPostCardInteractor,
+            profileStorageReader: IPersonalProfileStorageReader,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return FeedViewModel(
                     nostrRepository = nostrRepository,
-                    profileStorageReader = profileStorageReader
+                    postCardInteractor = postCardInteractor,
+                    profileStorageReader = profileStorageReader,
                 ) as T
             }
         }
