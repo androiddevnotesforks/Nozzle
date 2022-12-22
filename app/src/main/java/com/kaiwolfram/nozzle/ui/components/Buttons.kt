@@ -46,7 +46,7 @@ fun FollowButton(
                 backgroundColor = colors.background
             )
         ) {
-            Text(text = "Following")
+            Text(text = stringResource(id = R.string.following))
         }
     } else {
         Button(
@@ -57,7 +57,7 @@ fun FollowButton(
                 backgroundColor = colors.onBackground
             )
         ) {
-            Text(text = "Follow")
+            Text(text = stringResource(id = R.string.follow))
         }
     }
 }
