@@ -6,3 +6,8 @@ fun mapToLikedPost(toMap: PostWithMeta, id: String): PostWithMeta {
     return if (toMap.id == id) toMap.copy(isLikedByMe = true)
     else toMap
 }
+
+fun mapToRepostedPost(toMap: PostWithMeta, id: String): PostWithMeta {
+    return if (toMap.id == id) toMap.copy(isRepostedByMe = true)
+    else toMap
+}

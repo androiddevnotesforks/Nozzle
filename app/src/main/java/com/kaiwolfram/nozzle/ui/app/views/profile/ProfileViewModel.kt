@@ -16,6 +16,7 @@ import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
+import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -105,6 +106,23 @@ class ProfileViewModel(
         }
     }
 
+    val onRepost: (String) -> Unit = { id ->
+        uiState.value.let { state ->
+            if (state.posts.any { post -> post.id == id }) {
+                viewModelScope.launch(context = Dispatchers.IO) {
+                    postCardInteractor.repost(pubkey = uiState.value.pubkey, postId = id)
+                }
+                viewModelState.update {
+                    it.copy(
+                        posts = state.posts.map { toMap ->
+                            mapToRepostedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
+            }
+        }
+    }
+
     private suspend fun fetchAndUseNostrData(pubkey: String) {
         Log.i(TAG, "Fetching nostr data for $pubkey")
         isSyncing.set(true)
@@ -154,6 +172,7 @@ class ProfileViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
+                        isRepostedByMe = Random.nextBoolean(),
                     )
                 },
             )
@@ -185,6 +204,7 @@ class ProfileViewModel(
                             createdAt = post.createdAt,
                             content = post.content,
                             isLikedByMe = Random.nextBoolean(),
+                            isRepostedByMe = Random.nextBoolean(),
                         )
                     }
                 )

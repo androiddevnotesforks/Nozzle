@@ -29,6 +29,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 fun ThreadScreen(
     uiState: ThreadViewModelState,
     onLike: (String) -> Unit,
+    onRepost: (String) -> Unit,
     onRefreshThreadView: () -> Unit,
     onOpenThread: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
@@ -46,6 +47,7 @@ fun ThreadScreen(
                     isRefreshing = uiState.isRefreshing,
                     onRefresh = onRefreshThreadView,
                     onLike = onLike,
+                    onRepost = onRepost,
                     onOpenThread = onOpenThread,
                     onNavigateToProfile = onNavigateToProfile,
                 )
@@ -63,6 +65,7 @@ private fun ThreadedPosts(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onLike: (String) -> Unit,
+    onRepost: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onOpenThread: (String) -> Unit,
 ) {
@@ -70,6 +73,7 @@ private fun ThreadedPosts(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
+        // TODO: Do not reset after swipe refresh, like, or repost
         val listState = LazyListState(firstVisibleItemIndex = previous.size)
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
             itemsIndexed(previous) { index, post ->
@@ -84,6 +88,7 @@ private fun ThreadedPosts(
                 PostCard(
                     post = post,
                     onLike = onLike,
+                    onRepost = onRepost,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread,
                     threadPosition = threadPosition
@@ -94,6 +99,7 @@ private fun ThreadedPosts(
                     modifier = Modifier.background(color = LightYellow),
                     post = current,
                     onLike = onLike,
+                    onRepost = onRepost,
                     onOpenProfile = onNavigateToProfile,
                     threadPosition = currentThreadPosition
                 )
@@ -105,6 +111,7 @@ private fun ThreadedPosts(
                 PostCard(
                     post = post,
                     onLike = onLike,
+                    onRepost = onRepost,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread
                 )

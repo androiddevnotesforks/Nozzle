@@ -18,8 +18,8 @@ import com.kaiwolfram.nozzle.R
 fun GoBackButton(onGoBack: () -> Unit) {
     Icon(
         modifier = Modifier
-            .clickable { onGoBack() }
-            .clip(CircleShape),
+            .clip(CircleShape)
+            .clickable { onGoBack() },
         imageVector = Icons.Default.ArrowBack,
         contentDescription = stringResource(id = R.string.return_back),
     )

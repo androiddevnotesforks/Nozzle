@@ -11,4 +11,5 @@ interface INostrRepository {
     fun listPosts(): List<EventEntity>
     fun getPost(postId: String): EventEntity
     fun likePost(postId: String)
+    fun repost(postId: String)
 }

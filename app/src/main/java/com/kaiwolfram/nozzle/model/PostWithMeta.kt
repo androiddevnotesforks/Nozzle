@@ -10,4 +10,5 @@ data class PostWithMeta(
     val createdAt: Long,
     val content: String,
     val isLikedByMe: Boolean,
+    val isRepostedByMe: Boolean,
 )

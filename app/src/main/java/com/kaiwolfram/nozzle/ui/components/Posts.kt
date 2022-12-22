@@ -36,6 +36,7 @@ fun PostCardList(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onLike: (String) -> Unit,
+    onRepost: (String) -> Unit,
     onOpenProfile: ((String) -> Unit)? = null,
     onNavigateToThread: (String) -> Unit,
 ) {
@@ -48,6 +49,7 @@ fun PostCardList(
                 PostCard(
                     post = post,
                     onLike = onLike,
+                    onRepost = onRepost,
                     onOpenProfile = onOpenProfile,
                     onNavigateToThread = onNavigateToThread,
                 )
@@ -60,6 +62,7 @@ fun PostCardList(
 fun PostCard(
     post: PostWithMeta,
     onLike: (String) -> Unit,
+    onRepost: (String) -> Unit,
     modifier: Modifier = Modifier,
     threadPosition: ThreadPosition = ThreadPosition.SINGLE,
     onOpenProfile: ((String) -> Unit)? = null,
@@ -159,7 +162,9 @@ fun PostCard(
                 numOfReposts = 0,
                 numOfLikes = 0,
                 isLikedByMe = post.isLikedByMe,
-                onLike = { onLike(post.id) }
+                isRepostedByMe = post.isRepostedByMe,
+                onLike = { onLike(post.id) },
+                onRepost = { onRepost(post.id) },
             )
         }
     }
@@ -193,7 +198,9 @@ private fun PostCardActions(
     numOfReposts: Int,
     numOfLikes: Int,
     isLikedByMe: Boolean,
+    isRepostedByMe: Boolean,
     onLike: () -> Unit,
+    onRepost: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(0.85f),
@@ -201,7 +208,11 @@ private fun PostCardActions(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         ReplyAction(numOfReplies = numOfReplies)
-        RepostAction(numOfReposts = numOfReposts)
+        RepostAction(
+            numOfReposts = numOfReposts,
+            isRepostedByMe = isRepostedByMe,
+            onRepost = onRepost
+        )
         LikeAction(numOfLikes = numOfLikes, isLikedByMe = isLikedByMe, onLike = onLike)
     }
 }
@@ -221,9 +232,17 @@ private fun ReplyAction(
 @Composable
 private fun RepostAction(
     numOfReposts: Int,
+    isRepostedByMe: Boolean,
+    onRepost: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        RepostIcon(modifier = Modifier.size(sizing.smallIcon))
+        val modifier = Modifier
+            .size(sizing.smallIcon)
+            .clip(CircleShape)
+        RepostIcon(
+            modifier = if (isRepostedByMe) modifier.clickable { } else modifier.clickable { onRepost() },
+            tint = if (isRepostedByMe) Green21 else colors.onBackground
+        )
         Spacer(Modifier.width(spacing.medium))
         // TODO: Show num
         Text(text = numOfReposts.toString(), color = Color.Transparent)
@@ -237,11 +256,11 @@ private fun LikeAction(
     onLike: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
+        val modifier = Modifier
+            .size(sizing.smallIcon)
+            .clip(CircleShape)
         LikeIcon(
-            modifier = if (isLikedByMe) Modifier.size(sizing.smallIcon)
-            else Modifier
-                .size(sizing.smallIcon)
-                .clickable { onLike() },
+            modifier = if (isLikedByMe) modifier.clickable { } else modifier.clickable { onLike() },
             isLiked = isLikedByMe,
             tint = if (isLikedByMe) Red21 else colors.onBackground
         )

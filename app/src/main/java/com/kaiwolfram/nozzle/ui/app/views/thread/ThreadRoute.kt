@@ -16,6 +16,7 @@ fun ThreadRoute(
         uiState = uiState,
         onRefreshThreadView = threadViewModel.onRefreshThreadView,
         onLike = threadViewModel.onLike,
+        onRepost = threadViewModel.onRepost,
         onOpenThread = threadViewModel.onOpenThread,
         onNavigateToProfile = onNavigateToProfile,
         onGoBack = onGoBack,

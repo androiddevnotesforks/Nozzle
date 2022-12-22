@@ -8,6 +8,7 @@ import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
+import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -91,6 +92,23 @@ class FeedViewModel(
         }
     }
 
+    val onRepost: (String) -> Unit = { id ->
+        uiState.value.let { state ->
+            if (state.posts.any { post -> post.id == id }) {
+                viewModelScope.launch(context = Dispatchers.IO) {
+                    postCardInteractor.repost(pubkey = uiState.value.pubkey, postId = id)
+                }
+                viewModelState.update {
+                    it.copy(
+                        posts = state.posts.map { toMap ->
+                            mapToRepostedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
+            }
+        }
+    }
+
     private fun fetchAndUseNostrData() {
         Log.i(TAG, "Fetching nostr data for feed")
         isSyncing.set(true)
@@ -108,6 +126,7 @@ class FeedViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
+                        isRepostedByMe = Random.nextBoolean(),
                     )
                 },
             )

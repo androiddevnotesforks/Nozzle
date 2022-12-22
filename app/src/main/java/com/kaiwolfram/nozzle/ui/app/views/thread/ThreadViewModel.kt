@@ -8,6 +8,7 @@ import com.kaiwolfram.nozzle.data.nostr.INostrRepository
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
+import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +67,7 @@ class ThreadViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
+                        isRepostedByMe = Random.nextBoolean(),
                     )
                 }
                 val current = PostWithMeta(
@@ -78,6 +80,7 @@ class ThreadViewModel(
                     createdAt = 66666666,
                     content = "post.content",
                     isLikedByMe = Random.nextBoolean(),
+                    isRepostedByMe = Random.nextBoolean(),
                 )
                 val replies = nostrRepository.listPosts().map { post ->
                     PostWithMeta(
@@ -90,6 +93,7 @@ class ThreadViewModel(
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
+                        isRepostedByMe = Random.nextBoolean(),
                     )
                 }
                 viewModelState.update {
@@ -118,6 +122,7 @@ class ThreadViewModel(
                     pubkey = UUID.randomUUID().toString(),
                     createdAt = post.createdAt,
                     content = post.content,
+                    isRepostedByMe = Random.nextBoolean(),
                     isLikedByMe = Random.nextBoolean(),
                 )
             }
@@ -130,6 +135,7 @@ class ThreadViewModel(
                 pubkey = UUID.randomUUID().toString(),
                 createdAt = 66666666,
                 content = UUID.randomUUID().toString(),
+                isRepostedByMe = Random.nextBoolean(),
                 isLikedByMe = Random.nextBoolean(),
             )
             val replies = nostrRepository.listPosts().map { post ->
@@ -143,6 +149,7 @@ class ThreadViewModel(
                     createdAt = post.createdAt,
                     content = post.content,
                     isLikedByMe = Random.nextBoolean(),
+                    isRepostedByMe = Random.nextBoolean(),
                 )
             }
             Log.i(TAG, "Previous: ${previous.size}, replies: ${replies.size}")
@@ -191,6 +198,44 @@ class ThreadViewModel(
         if (needsUpdate) {
             viewModelScope.launch(context = Dispatchers.IO) {
                 postCardInteractor.like(pubkey = profileStorageReader.getPubkey(), postId = id)
+            }
+        }
+    }
+
+    val onRepost: (String) -> Unit = { id ->
+        // TODO: This sucks lol
+        var needsUpdate = false
+        uiState.value.let { state ->
+            if (state.current != null && state.current.id == id) {
+                needsUpdate = true
+                viewModelState.update {
+                    it.copy(
+                        current = state.current.copy(isRepostedByMe = true),
+                    )
+                }
+            } else if (state.previous.any { post -> post.id == id }) {
+                needsUpdate = true
+                viewModelState.update {
+                    it.copy(
+                        previous = state.previous.map { toMap ->
+                            mapToRepostedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
+            } else if (state.replies.any { post -> post.id == id }) {
+                needsUpdate = true
+                viewModelState.update {
+                    it.copy(
+                        replies = state.replies.map { toMap ->
+                            mapToRepostedPost(toMap = toMap, id = id)
+                        },
+                    )
+                }
+            }
+        }
+        if (needsUpdate) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                postCardInteractor.repost(pubkey = profileStorageReader.getPubkey(), postId = id)
             }
         }
     }

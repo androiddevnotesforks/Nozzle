@@ -19,12 +19,16 @@ class AppContainer(context: Context) {
     }
     val roomDb: AppDatabase by lazy {
         Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "nozzle_database"
+            context = context,
+            klass = AppDatabase::class.java,
+            name = "nozzle_database"
         ).build()
     }
     val postCardInteractor: IPostCardInteractor by lazy {
-        PostCardInteractor(nostrRepository = nostrRepository, reactionDao = roomDb.reactionDao())
+        PostCardInteractor(
+            nostrRepository = nostrRepository,
+            reactionDao = roomDb.reactionDao(),
+            repostDao = roomDb.repostDao()
+        )
     }
 }
