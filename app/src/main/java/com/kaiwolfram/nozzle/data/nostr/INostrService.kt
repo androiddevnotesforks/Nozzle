@@ -2,7 +2,7 @@ package com.kaiwolfram.nozzle.data.nostr
 
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 
-interface INostrRepository {
+interface INostrService {
     fun getFollowerCount(pubkey: String): Int
     fun getFollowingCount(pubkey: String): Int
     fun getProfile(pubkey: String): NostrProfile?
@@ -12,4 +12,6 @@ interface INostrRepository {
     fun getPost(postId: String): EventEntity
     fun likePost(postId: String)
     fun repost(postId: String)
+    fun follow(pubkey: String)
+    fun unfollow(pubkey: String)
 }

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
@@ -31,7 +31,7 @@ data class FeedViewModelState(
 )
 
 class FeedViewModel(
-    private val nostrRepository: INostrRepository,
+    private val nostrService: INostrService,
     private val postCardInteractor: IPostCardInteractor,
     private val profileStorageReader: IPersonalProfileStorageReader,
 ) : ViewModel() {
@@ -112,7 +112,7 @@ class FeedViewModel(
     private fun fetchAndUseNostrData() {
         Log.i(TAG, "Fetching nostr data for feed")
         isSyncing.set(true)
-        val posts = nostrRepository.listPosts()
+        val posts = nostrService.listPosts()
         viewModelState.update {
             it.copy(
                 posts = posts.map { post ->
@@ -156,14 +156,14 @@ class FeedViewModel(
 
     companion object {
         fun provideFactory(
-            nostrRepository: INostrRepository,
+            nostrService: INostrService,
             postCardInteractor: IPostCardInteractor,
             profileStorageReader: IPersonalProfileStorageReader,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return FeedViewModel(
-                    nostrRepository = nostrRepository,
+                    nostrService = nostrService,
                     postCardInteractor = postCardInteractor,
                     profileStorageReader = profileStorageReader,
                 ) as T

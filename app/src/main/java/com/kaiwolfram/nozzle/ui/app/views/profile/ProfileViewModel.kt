@@ -8,9 +8,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.ellipsatePubkey
-import com.kaiwolfram.nozzle.data.nostr.INostrRepository
+import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
+import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
+import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
@@ -32,22 +33,24 @@ import kotlin.random.Random
 private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
-    val shortenedPubkey: String = "",
     val pubkey: String = "",
     val name: String = "",
     val bio: String = "",
     val pictureUrl: String = "",
     val numOfFollowing: Int = 0,
     val numOfFollowers: Int = 0,
+    val isFollowed: Boolean = false,
     val posts: List<PostWithMeta> = listOf(),
     val isRefreshing: Boolean = false,
 )
 
 class ProfileViewModel(
-    private val nostrRepository: INostrRepository,
+    private val nostrService: INostrService,
     private val profileDao: ProfileDao,
     private val eventDao: EventDao,
+    private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
+    private val profileStorageReader: IPersonalProfileStorageReader,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
@@ -123,13 +126,41 @@ class ProfileViewModel(
         }
     }
 
+    val onFollow: (String) -> Unit = { pubkeyToFollow ->
+        if (!uiState.value.isFollowed) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                profileFollower.follow(
+                    pubkey = profileStorageReader.getPubkey(),
+                    pubkeyToFollow = pubkeyToFollow
+                )
+            }
+            viewModelState.update {
+                it.copy(isFollowed = true)
+            }
+        }
+    }
+
+    val onUnfollow: (String) -> Unit = { pubkeyToUnfollow ->
+        if (uiState.value.isFollowed) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                profileFollower.unfollow(
+                    pubkey = profileStorageReader.getPubkey(),
+                    pubkeyToUnfollow = pubkeyToUnfollow
+                )
+            }
+            viewModelState.update {
+                it.copy(isFollowed = false)
+            }
+        }
+    }
+
     private suspend fun fetchAndUseNostrData(pubkey: String) {
         Log.i(TAG, "Fetching nostr data for $pubkey")
         isSyncing.set(true)
-        val nostrProfile = nostrRepository.getProfile(pubkey)
+        val nostrProfile = nostrService.getProfile(pubkey)
         if (nostrProfile != null) {
-            val numOfFollowing = nostrRepository.getFollowingCount(pubkey)
-            val numOfFollowers = nostrRepository.getFollowerCount(pubkey)
+            val numOfFollowing = nostrService.getFollowingCount(pubkey)
+            val numOfFollowers = nostrService.getFollowerCount(pubkey)
             val profile = ProfileEntity(
                 pubkey = pubkey,
                 name = nostrProfile.name,
@@ -138,7 +169,7 @@ class ProfileViewModel(
                 numOfFollowing = numOfFollowing,
                 numOfFollowers = numOfFollowers,
             )
-            val posts = nostrRepository.listPosts(pubkey)
+            val posts = nostrService.listPosts(pubkey)
             useAndCacheProfile(profile = profile, posts = posts)
         }
         isSyncing.set(false)
@@ -154,13 +185,13 @@ class ProfileViewModel(
         eventDao.insert(posts)
         viewModelState.update {
             it.copy(
-                shortenedPubkey = ellipsatePubkey(profile.pubkey),
                 pubkey = profile.pubkey,
                 name = profile.name,
                 bio = profile.bio,
                 pictureUrl = profile.pictureUrl,
                 numOfFollowing = profile.numOfFollowing,
                 numOfFollowers = profile.numOfFollowers,
+                isFollowed = Random.nextBoolean(),
                 posts = posts.map { post ->
                     PostWithMeta(
                         name = profile.name,
@@ -186,13 +217,13 @@ class ProfileViewModel(
             Log.i(TAG, "Using cached values")
             viewModelState.update {
                 it.copy(
-                    shortenedPubkey = ellipsatePubkey(pubkey),
                     pubkey = pubkey,
                     name = cachedProfile.name,
                     bio = cachedProfile.bio,
                     pictureUrl = cachedProfile.pictureUrl,
                     numOfFollowing = cachedProfile.numOfFollowing,
                     numOfFollowers = cachedProfile.numOfFollowers,
+                    isFollowed = Random.nextBoolean(),
                     posts = cachedPosts.map { post ->
                         PostWithMeta(
                             name = cachedProfile.name,
@@ -218,11 +249,11 @@ class ProfileViewModel(
     private fun resetValues(pubkey: String) {
         viewModelState.update {
             it.copy(
-                shortenedPubkey = ellipsatePubkey(pubkey),
                 pubkey = pubkey,
                 name = "",
                 bio = "",
                 pictureUrl = "",
+                isFollowed = false,
                 numOfFollowing = 0,
                 numOfFollowers = 0,
                 posts = listOf(),
@@ -252,8 +283,10 @@ class ProfileViewModel(
 
     companion object {
         fun provideFactory(
-            nostrRepository: INostrRepository,
+            nostrService: INostrService,
+            profileFollower: IProfileFollower,
             postCardInteractor: IPostCardInteractor,
+            profileStorageReader: IPersonalProfileStorageReader,
             profileDao: ProfileDao,
             eventDao: EventDao,
             context: Context,
@@ -263,8 +296,10 @@ class ProfileViewModel(
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProfileViewModel(
-                        nostrRepository = nostrRepository,
+                        nostrService = nostrService,
+                        profileFollower = profileFollower,
                         postCardInteractor = postCardInteractor,
+                        profileStorageReader = profileStorageReader,
                         profileDao = profileDao,
                         eventDao = eventDao,
                         context = context,

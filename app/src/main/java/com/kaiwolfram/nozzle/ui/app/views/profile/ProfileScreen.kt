@@ -14,10 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.components.CopyIcon
-import com.kaiwolfram.nozzle.ui.components.NoPostsHint
-import com.kaiwolfram.nozzle.ui.components.PostCardList
-import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.components.*
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
@@ -28,17 +25,21 @@ fun ProfileScreen(
     uiState: ProfileViewModelState,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
+    onFollow: (String) -> Unit,
+    onUnfollow: (String) -> Unit,
     onRefreshProfileView: () -> Unit,
     onCopyPubkeyAndShowToast: (String) -> Unit,
     onNavigateToThread: (String) -> Unit,
 ) {
     Column {
         ProfileData(
-            shortenedPubkey = uiState.shortenedPubkey,
             pubkey = uiState.pubkey,
             name = uiState.name,
             bio = uiState.bio,
             pictureUrl = uiState.pictureUrl,
+            isFollowed = uiState.isFollowed,
+            onFollow = onFollow,
+            onUnfollow = onUnfollow,
             onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
         )
         Spacer(Modifier.height(spacing.medium))
@@ -64,18 +65,56 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileData(
-    shortenedPubkey: String,
     pubkey: String,
     name: String,
     bio: String,
     pictureUrl: String,
+    isFollowed: Boolean,
+    onFollow: (String) -> Unit,
+    onUnfollow: (String) -> Unit,
     onCopyPubkeyAndShowToast: (String) -> Unit,
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = spacing.screenEdge),
+        verticalArrangement = Arrangement.Center
+    ) {
+        ProfilePictureAndActions(
+            pictureUrl = pictureUrl,
+            pubkey = pubkey,
+            isFollowed = isFollowed,
+            onFollow = onFollow,
+            onUnfollow = onUnfollow,
+        )
+        NameAndPubkey(
+            name = name,
+            pubkey = pubkey,
+            onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
+        )
+        Spacer(Modifier.height(spacing.medium))
+        if (bio.isNotBlank()) {
+            Text(
+                text = bio,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfilePictureAndActions(
+    pictureUrl: String,
+    pubkey: String,
+    isFollowed: Boolean,
+    onFollow: (String) -> Unit,
+    onUnfollow: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
-            .padding(spacing.large)
-            .padding(end = spacing.medium),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(spacing.screenEdge)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         ProfilePicture(
             modifier = Modifier
@@ -85,21 +124,12 @@ private fun ProfileData(
             pictureUrl = pictureUrl,
             pubkey = pubkey,
         )
-        Spacer(Modifier.width(spacing.medium))
-        Column(verticalArrangement = Arrangement.Center) {
-            NameAndPubkey(
-                name = name,
-                pubkey = shortenedPubkey,
-                onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
-            )
-            if (bio.isNotBlank()) {
-                Text(
-                    text = bio,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
+        FollowButton(
+            isFollowed = isFollowed,
+            onFollow = { onFollow(pubkey) },
+            onUnfollow = { onUnfollow(pubkey) }
+        )
+
     }
 }
 
@@ -168,17 +198,17 @@ private fun CopyablePubkey(
         Modifier.clickable { onCopyPubkeyAndShowToast(toast) },
         verticalAlignment = Alignment.CenterVertically
     ) {
+        CopyIcon(
+            modifier = Modifier.size(sizing.smallIcon),
+            description = stringResource(id = R.string.copy_pubkey),
+            tint = LightGray21
+        )
         Text(
             text = pubkey,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             color = LightGray21,
             style = MaterialTheme.typography.body2,
-        )
-        CopyIcon(
-            modifier = Modifier.size(sizing.smallIcon),
-            description = stringResource(id = R.string.copy_pubkey),
-            tint = LightGray21
         )
     }
 }

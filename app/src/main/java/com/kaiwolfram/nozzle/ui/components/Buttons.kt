@@ -1,9 +1,13 @@
 package com.kaiwolfram.nozzle.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -12,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
 
 @Composable
@@ -23,6 +28,38 @@ fun GoBackButton(onGoBack: () -> Unit) {
         imageVector = Icons.Default.ArrowBack,
         contentDescription = stringResource(id = R.string.return_back),
     )
+}
+
+@Composable
+fun FollowButton(
+    isFollowed: Boolean,
+    onFollow: () -> Unit,
+    onUnfollow: () -> Unit
+) {
+    if (isFollowed) {
+        Button(
+            onClick = { onUnfollow() },
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, colors.onBackground),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = colors.onBackground,
+                backgroundColor = colors.background
+            )
+        ) {
+            Text(text = "Following")
+        }
+    } else {
+        Button(
+            onClick = { onFollow() },
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = colors.background,
+                backgroundColor = colors.onBackground
+            )
+        ) {
+            Text(text = "Follow")
+        }
+    }
 }
 
 @Composable

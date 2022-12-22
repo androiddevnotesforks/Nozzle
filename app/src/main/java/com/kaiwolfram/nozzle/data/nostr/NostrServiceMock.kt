@@ -4,7 +4,7 @@ import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import java.util.*
 import kotlin.random.Random
 
-class NostrRepositoryMock : INostrRepository {
+class NostrServiceMock : INostrService {
     private val baseUrl = "https://robohash.org/"
 
     override fun getFollowerCount(pubkey: String): Int {
@@ -56,6 +56,14 @@ class NostrRepositoryMock : INostrRepository {
     }
 
     override fun repost(postId: String) {
+        // No return
+    }
+
+    override fun follow(pubkey: String) {
+        // No return
+    }
+
+    override fun unfollow(pubkey: String) {
         // No return
     }
 

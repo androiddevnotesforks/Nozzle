@@ -15,6 +15,8 @@ fun ProfileRoute(
         uiState = uiState,
         onLike = profileViewModel.onLike,
         onRepost = profileViewModel.onRepost,
+        onFollow = profileViewModel.onFollow,
+        onUnfollow = profileViewModel.onUnfollow,
         onRefreshProfileView = profileViewModel.onRefreshProfileView,
         onCopyPubkeyAndShowToast = profileViewModel.onCopyPubkeyAndShowToast,
         onNavigateToThread = onNavigateToThread,

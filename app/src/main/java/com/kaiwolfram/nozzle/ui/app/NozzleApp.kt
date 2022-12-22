@@ -45,8 +45,10 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
-                        nostrRepository = appContainer.nostrRepository,
+                        nostrService = appContainer.nostrService,
                         postCardInteractor = appContainer.postCardInteractor,
+                        profileFollower = appContainer.profileFollower,
+                        profileStorageReader = appContainer.profilePreferences,
                         profileDao = appContainer.roomDb.profileDao(),
                         eventDao = appContainer.roomDb.eventDao(),
                         context = LocalContext.current,
@@ -62,7 +64,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory(
-                        nostrRepository = appContainer.nostrRepository,
+                        nostrService = appContainer.nostrService,
                         postCardInteractor = appContainer.postCardInteractor,
                         profileStorageReader = appContainer.profilePreferences,
                     )
@@ -76,7 +78,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 threadViewModel = viewModel(
                     factory = ThreadViewModel.provideFactory(
-                        nostrRepository = appContainer.nostrRepository,
+                        nostrService = appContainer.nostrService,
                         profileStorageReader = appContainer.profilePreferences,
                         postCardInteractor = appContainer.postCardInteractor,
                     )

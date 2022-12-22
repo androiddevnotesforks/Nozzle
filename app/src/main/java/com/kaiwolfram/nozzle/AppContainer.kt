@@ -2,17 +2,19 @@ package com.kaiwolfram.nozzle
 
 import android.content.Context
 import androidx.room.Room
-import com.kaiwolfram.nozzle.data.nostr.INostrRepository
-import com.kaiwolfram.nozzle.data.nostr.NostrRepositoryMock
+import com.kaiwolfram.nozzle.data.nostr.INostrService
+import com.kaiwolfram.nozzle.data.nostr.NostrServiceMock
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.postCardInteractor.PostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorage
 import com.kaiwolfram.nozzle.data.preferences.ProfilePreferences
+import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
+import com.kaiwolfram.nozzle.data.profileFollower.ProfileFollower
 import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
-    val nostrRepository: INostrRepository by lazy {
-        NostrRepositoryMock()
+    val nostrService: INostrService by lazy {
+        NostrServiceMock()
     }
     val profilePreferences: IPersonalProfileStorage by lazy {
         ProfilePreferences(context = context)
@@ -26,9 +28,15 @@ class AppContainer(context: Context) {
     }
     val postCardInteractor: IPostCardInteractor by lazy {
         PostCardInteractor(
-            nostrRepository = nostrRepository,
+            nostrService = nostrService,
             reactionDao = roomDb.reactionDao(),
             repostDao = roomDb.repostDao()
+        )
+    }
+    val profileFollower: IProfileFollower by lazy {
+        ProfileFollower(
+            nostrService = nostrService,
+            contactDao = roomDb.contactDao(),
         )
     }
 }
