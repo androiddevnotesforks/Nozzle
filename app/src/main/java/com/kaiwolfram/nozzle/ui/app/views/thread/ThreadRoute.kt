@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 fun ThreadRoute(
     threadViewModel: ThreadViewModel,
     onNavigateToProfile: (String) -> Unit,
+    onNavigateToReply: () -> Unit,
     onGoBack: () -> Unit,
 ) {
     val uiState by threadViewModel.uiState.collectAsState()
@@ -19,6 +20,7 @@ fun ThreadRoute(
         onRepost = threadViewModel.onRepost,
         onOpenThread = threadViewModel.onOpenThread,
         onNavigateToProfile = onNavigateToProfile,
+        onNavigateToReply = onNavigateToReply,
         onGoBack = onGoBack,
     )
 }

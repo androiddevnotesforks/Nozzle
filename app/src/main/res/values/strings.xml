@@ -57,4 +57,6 @@
     <string name="repost">Repost</string>
     <string name="like">Like</string>
     <string name="follow">Follow</string>
+    <string name="close">Close</string>
+    <string name="send">Send</string>
 </resources>

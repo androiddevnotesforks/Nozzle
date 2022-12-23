@@ -10,6 +10,7 @@ fun FeedRoute(
     onOpenDrawer: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToThread: (String) -> Unit,
+    onNavigateToReply: () -> Unit,
 ) {
     val uiState by feedViewModel.uiState.collectAsState()
 
@@ -20,6 +21,7 @@ fun FeedRoute(
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onOpenDrawer = onOpenDrawer,
         onNavigateToProfile = onNavigateToProfile,
-        onNavigateToThread = onNavigateToThread
+        onNavigateToThread = onNavigateToThread,
+        onNavigateToReply = onNavigateToReply,
     )
 }

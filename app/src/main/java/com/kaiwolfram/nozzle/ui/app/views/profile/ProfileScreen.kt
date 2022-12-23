@@ -30,6 +30,7 @@ fun ProfileScreen(
     onRefreshProfileView: () -> Unit,
     onCopyPubkeyAndShowToast: (String) -> Unit,
     onNavigateToThread: (String) -> Unit,
+    onNavigateToReply: () -> Unit,
 ) {
     Column {
         ProfileData(
@@ -51,11 +52,12 @@ fun ProfileScreen(
         Divider()
         PostCardList(
             posts = uiState.posts,
-            onLike = onLike,
-            onRepost = onRepost,
             isRefreshing = uiState.isRefreshing,
             onRefresh = onRefreshProfileView,
-            onNavigateToThread = onNavigateToThread
+            onLike = onLike,
+            onRepost = onRepost,
+            onNavigateToThread = onNavigateToThread,
+            onNavigateToReply = onNavigateToReply
         )
     }
     if (uiState.posts.isEmpty()) {

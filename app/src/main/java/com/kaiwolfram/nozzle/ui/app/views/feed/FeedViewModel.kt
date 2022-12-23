@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
+import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta

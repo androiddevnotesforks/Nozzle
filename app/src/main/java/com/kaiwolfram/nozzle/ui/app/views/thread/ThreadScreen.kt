@@ -34,6 +34,7 @@ fun ThreadScreen(
     onOpenThread: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onGoBack: () -> Unit,
+    onNavigateToReply: () -> Unit,
 ) {
     Column {
         TopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
@@ -50,6 +51,7 @@ fun ThreadScreen(
                     onRepost = onRepost,
                     onOpenThread = onOpenThread,
                     onNavigateToProfile = onNavigateToProfile,
+                    onNavigateToReply = onNavigateToReply,
                 )
             }
         }
@@ -68,6 +70,7 @@ private fun ThreadedPosts(
     onRepost: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onOpenThread: (String) -> Unit,
+    onNavigateToReply: () -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
@@ -89,19 +92,21 @@ private fun ThreadedPosts(
                     post = post,
                     onLike = onLike,
                     onRepost = onRepost,
+                    threadPosition = threadPosition,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread,
-                    threadPosition = threadPosition
+                    onNavigateToReply = onNavigateToReply
                 )
             }
             item {
                 PostCard(
-                    modifier = Modifier.background(color = LightYellow),
                     post = current,
                     onLike = onLike,
                     onRepost = onRepost,
+                    modifier = Modifier.background(color = LightYellow),
+                    threadPosition = currentThreadPosition,
                     onOpenProfile = onNavigateToProfile,
-                    threadPosition = currentThreadPosition
+                    onNavigateToReply = onNavigateToReply
                 )
                 Divider()
                 Spacer(modifier = Modifier.height(spacing.tiny))
@@ -113,7 +118,8 @@ private fun ThreadedPosts(
                     onLike = onLike,
                     onRepost = onRepost,
                     onOpenProfile = onNavigateToProfile,
-                    onNavigateToThread = onOpenThread
+                    onNavigateToThread = onOpenThread,
+                    onNavigateToReply = onNavigateToReply
                 )
             }
         }

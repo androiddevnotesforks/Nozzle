@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.ui.app.views.feed
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
@@ -9,6 +10,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
@@ -28,6 +30,7 @@ fun FeedScreen(
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
+    onNavigateToReply: () -> Unit,
 ) {
     Column {
         FeedTopBar(
@@ -43,6 +46,7 @@ fun FeedScreen(
             onRefresh = onRefreshFeedView,
             onOpenProfile = onNavigateToProfile,
             onNavigateToThread = onNavigateToThread,
+            onNavigateToReply = onNavigateToReply,
         )
     }
     if (uiState.posts.isEmpty()) {
@@ -69,6 +73,7 @@ private fun FeedTopBar(
                     pubkey = pubkey,
                     modifier = Modifier
                         .size(sizing.smallProfilePicture)
+                        .clip(CircleShape)
                         .drawBehind { drawCircle(color = White21, radius = size.width / 2) }
                         .clickable { onPictureClick() },
                 )

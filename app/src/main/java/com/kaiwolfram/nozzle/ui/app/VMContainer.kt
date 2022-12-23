@@ -4,6 +4,7 @@ import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
+import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyViewModel
 import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsViewModel
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadViewModel
 
@@ -14,4 +15,5 @@ data class VMContainer(
     val keysViewModel: KeysViewModel,
     val settingsViewModel: SettingsViewModel,
     val threadViewModel: ThreadViewModel,
+    val replyViewModel: ReplyViewModel,
 )

@@ -6,4 +6,5 @@ object NozzleRoute {
     const val KEYS = "keys"
     const val SETTINGS = "settings"
     const val THREAD = "thread"
+    const val REPLY = "reply"
 }

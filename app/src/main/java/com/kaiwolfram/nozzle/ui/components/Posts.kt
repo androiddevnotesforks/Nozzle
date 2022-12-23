@@ -39,6 +39,7 @@ fun PostCardList(
     onRepost: (String) -> Unit,
     onOpenProfile: ((String) -> Unit)? = null,
     onNavigateToThread: (String) -> Unit,
+    onNavigateToReply: () -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
@@ -52,6 +53,7 @@ fun PostCardList(
                     onRepost = onRepost,
                     onOpenProfile = onOpenProfile,
                     onNavigateToThread = onNavigateToThread,
+                    onNavigateToReply = onNavigateToReply,
                 )
             }
         }
@@ -67,6 +69,7 @@ fun PostCard(
     threadPosition: ThreadPosition = ThreadPosition.SINGLE,
     onOpenProfile: ((String) -> Unit)? = null,
     onNavigateToThread: ((String) -> Unit)? = null,
+    onNavigateToReply: () -> Unit,
 ) {
     val x = sizing.profilePicture / 2 + spacing.screenEdge
     val yTop = spacing.screenEdge
@@ -165,6 +168,7 @@ fun PostCard(
                 isRepostedByMe = post.isRepostedByMe,
                 onLike = { onLike(post.id) },
                 onRepost = { onRepost(post.id) },
+                onNavigateToReply = onNavigateToReply,
             )
         }
     }
@@ -201,13 +205,14 @@ private fun PostCardActions(
     isRepostedByMe: Boolean,
     onLike: () -> Unit,
     onRepost: () -> Unit,
+    onNavigateToReply: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(0.85f),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ReplyAction(numOfReplies = numOfReplies)
+        ReplyAction(numOfReplies = numOfReplies, onNavigateToReply = onNavigateToReply)
         RepostAction(
             numOfReposts = numOfReposts,
             isRepostedByMe = isRepostedByMe,
@@ -220,9 +225,14 @@ private fun PostCardActions(
 @Composable
 private fun ReplyAction(
     numOfReplies: Int,
+    onNavigateToReply: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        ReplyIcon(modifier = Modifier.size(sizing.smallIcon))
+        ReplyIcon(
+            modifier = Modifier
+                .size(sizing.smallIcon)
+                .clip(CircleShape)
+                .clickable { onNavigateToReply() })
         Spacer(Modifier.width(spacing.medium))
         // TODO: Show num
         Text(text = numOfReplies.toString(), color = Color.Transparent)

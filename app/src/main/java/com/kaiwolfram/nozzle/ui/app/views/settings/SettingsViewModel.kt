@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.nostr.isValidUsername
+import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel

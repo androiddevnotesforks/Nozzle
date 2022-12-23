@@ -23,6 +23,7 @@ import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
+import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyViewModel
 import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsViewModel
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
@@ -81,6 +82,11 @@ fun NozzleApp(appContainer: AppContainer) {
                         nostrService = appContainer.nostrService,
                         pubkeyProvider = appContainer.profileCache,
                         postCardInteractor = appContainer.postCardInteractor,
+                    )
+                ),
+                replyViewModel = viewModel(
+                    factory = ReplyViewModel.provideFactory(
+                        nostrService = appContainer.nostrService,
                     )
                 )
             )

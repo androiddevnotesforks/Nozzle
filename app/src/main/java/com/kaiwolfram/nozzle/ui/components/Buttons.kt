@@ -11,6 +11,7 @@ import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,31 @@ fun GoBackButton(onGoBack: () -> Unit) {
         imageVector = Icons.Default.ArrowBack,
         contentDescription = stringResource(id = R.string.return_back),
     )
+}
+
+@Composable
+fun CloseButton(onGoBack: () -> Unit) {
+    Icon(
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable { onGoBack() },
+        imageVector = Icons.Default.Close,
+        contentDescription = stringResource(id = R.string.close),
+    )
+}
+
+@Composable
+fun SendButton(enabled: Boolean, onSend: () -> Unit, onGoBack: () -> Unit) {
+    Button(
+        enabled = enabled,
+        shape = RoundedCornerShape(20.dp),
+        onClick = {
+            onSend()
+            onGoBack()
+        },
+    ) {
+        Text(text = stringResource(id = R.string.send))
+    }
 }
 
 @Composable
