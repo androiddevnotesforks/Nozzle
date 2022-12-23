@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyReader
+import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -34,7 +34,7 @@ data class ThreadViewModelState(
 
 class ThreadViewModel(
     private val nostrRepository: INostrService,
-    private val currentPubkeyReader: IPubkeyReader,
+    private val pubkeyProvider: IPubkeyProvider,
     private val postCardInteractor: IPostCardInteractor,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ThreadViewModelState())
@@ -197,7 +197,7 @@ class ThreadViewModel(
         }
         if (needsUpdate) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.like(pubkey = currentPubkeyReader.getPubkey(), postId = id)
+                postCardInteractor.like(pubkey = pubkeyProvider.getPubkey(), postId = id)
             }
         }
     }
@@ -235,7 +235,7 @@ class ThreadViewModel(
         }
         if (needsUpdate) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.repost(pubkey = currentPubkeyReader.getPubkey(), postId = id)
+                postCardInteractor.repost(pubkey = pubkeyProvider.getPubkey(), postId = id)
             }
         }
     }
@@ -270,14 +270,14 @@ class ThreadViewModel(
     companion object {
         fun provideFactory(
             nostrService: INostrService,
-            currentPubkeyReader: IPubkeyReader,
+            pubkeyProvider: IPubkeyProvider,
             postCardInteractor: IPostCardInteractor,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ThreadViewModel(
                     nostrRepository = nostrService,
-                    currentPubkeyReader = currentPubkeyReader,
+                    pubkeyProvider = pubkeyProvider,
                     postCardInteractor = postCardInteractor,
                 ) as T
             }

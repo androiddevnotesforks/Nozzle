@@ -8,8 +8,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileWriter
 import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
+import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.utils.isHex
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +27,7 @@ data class KeysViewModelState(
 )
 
 class KeysViewModel(
-    private val currentProfileCache: IProfileWriter,
+    private val profileCache: IProfileCache,
     private val keyManager: IKeyManager,
     context: Context,
     clip: ClipboardManager,
@@ -68,7 +68,7 @@ class KeysViewModel(
             if (isValid) {
                 Log.i(TAG, "Saving new privkey $privkeyInput")
                 keyManager.setPrivkey(privkeyInput)
-                currentProfileCache.reset()
+                profileCache.reset()
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {
@@ -122,7 +122,7 @@ class KeysViewModel(
 
     companion object {
         fun provideFactory(
-            currentProfileCache: IProfileWriter,
+            profileCache: IProfileCache,
             keyManager: IKeyManager,
             context: Context,
             clip: ClipboardManager,
@@ -131,7 +131,7 @@ class KeysViewModel(
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return KeysViewModel(
-                        currentProfileCache = currentProfileCache,
+                        profileCache = profileCache,
                         keyManager = keyManager,
                         context = context,
                         clip = clip

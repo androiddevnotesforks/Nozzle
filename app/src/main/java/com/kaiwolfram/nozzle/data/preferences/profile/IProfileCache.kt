@@ -1,6 +1,6 @@
-package com.kaiwolfram.nozzle.data.currentProfileCache
+package com.kaiwolfram.nozzle.data.preferences.profile
 
-interface IProfileWriter {
+interface IProfileCache : IProfileProvider {
     fun setName(name: String)
     fun setBio(bio: String)
     fun setPictureUrl(pictureUrl: String)

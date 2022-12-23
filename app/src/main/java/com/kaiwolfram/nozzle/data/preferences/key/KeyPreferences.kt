@@ -25,12 +25,11 @@ class KeyPreferences(context: Context) : IKeyManager {
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
-    private var privkey: String
     private var pubkey: String
 
     init {
         Log.i(TAG, "Initialize KeyPreferences")
-        privkey = getPrivkey()
+        var privkey = getPrivkey()
         if (privkey.isEmpty()) {
             privkey = generatePrivkey()
             Log.i(TAG, "Setting initial privkey $privkey")
@@ -39,10 +38,11 @@ class KeyPreferences(context: Context) : IKeyManager {
         pubkey = derivePubkey(privkey)
     }
 
+    override fun getPubkey() = pubkey
+
     override fun getPrivkey() = preferences.getString(PRIVKEY, "") ?: ""
 
     override fun setPrivkey(privkey: String) {
-        this.privkey = privkey
         pubkey = derivePubkey(privkey)
         Log.i(TAG, "Setting privkey and derived pubkey $pubkey")
         preferences.edit()
@@ -50,5 +50,4 @@ class KeyPreferences(context: Context) : IKeyManager {
             .apply()
     }
 
-    override fun getPubkey() = pubkey
 }

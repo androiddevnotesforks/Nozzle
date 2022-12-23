@@ -2,8 +2,8 @@ package com.kaiwolfram.nozzle
 
 import android.content.Context
 import androidx.room.Room
-import com.kaiwolfram.nozzle.data.currentProfileCache.CurrentProfileCache
-import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileCache
+import com.kaiwolfram.nozzle.data.preferences.profile.ProfileCache
+import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.nostr.NostrServiceMock
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
@@ -21,8 +21,8 @@ class AppContainer(context: Context) {
     val keyPreferences: IKeyManager by lazy {
         KeyPreferences(context = context)
     }
-    val currentProfileCache: IProfileCache by lazy {
-        CurrentProfileCache(currentPubkeyReader = keyPreferences)
+    val profileCache: IProfileCache by lazy {
+        ProfileCache(pubkeyProvider = keyPreferences, context = context)
     }
     val roomDb: AppDatabase by lazy {
         Room.databaseBuilder(

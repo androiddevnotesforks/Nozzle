@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileReader
+import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +21,7 @@ data class NozzleDrawerViewModelState(
 )
 
 class NozzleDrawerViewModel(
-    private val currentProfileCache: IProfileReader,
+    private val profileProvider: IProfileProvider,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(NozzleDrawerViewModelState())
     val uiState = viewModelState
@@ -43,9 +43,9 @@ class NozzleDrawerViewModel(
     private fun useCachedValues() {
         viewModelState.update {
             it.copy(
-                pubkey = currentProfileCache.getPubkey(),
-                name = currentProfileCache.getName(),
-                pictureUrl = currentProfileCache.getPictureUrl(),
+                pubkey = profileProvider.getPubkey(),
+                name = profileProvider.getName(),
+                pictureUrl = profileProvider.getPictureUrl(),
             )
         }
     }
@@ -56,12 +56,12 @@ class NozzleDrawerViewModel(
     }
 
     companion object {
-        fun provideFactory(currentProfileCache: IProfileReader): ViewModelProvider.Factory =
+        fun provideFactory(profileProvider: IProfileProvider): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return NozzleDrawerViewModel(
-                        currentProfileCache = currentProfileCache,
+                        profileProvider = profileProvider,
                     ) as T
                 }
             }

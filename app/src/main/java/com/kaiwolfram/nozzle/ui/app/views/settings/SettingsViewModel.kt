@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileCache
+import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.nostr.isValidUsername
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +30,7 @@ data class SettingsViewModelState(
 )
 
 class SettingsViewModel(
-    private val currentProfileCache: IProfileCache,
+    private val profileCache: IProfileCache,
     private val profileDao: ProfileDao,
     context: Context,
 ) : ViewModel() {
@@ -58,15 +58,15 @@ class SettingsViewModel(
                     Log.i(TAG, "Updating profile")
                     viewModelScope.launch(context = Dispatchers.IO) {
                         profileDao.updateMetaData(
-                            pubkey = currentProfileCache.getPubkey(),
+                            pubkey = profileCache.getPubkey(),
                             name = it.usernameInput,
                             bio = it.bioInput,
                             pictureUrl = it.pictureUrlInput
                         )
                     }
-                    currentProfileCache.setName(it.usernameInput)
-                    currentProfileCache.setBio(it.bioInput)
-                    currentProfileCache.setPictureUrl(it.pictureUrlInput)
+                    profileCache.setName(it.usernameInput)
+                    profileCache.setBio(it.bioInput)
+                    profileCache.setPictureUrl(it.pictureUrlInput)
                     useCachedValues()
                     Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
                 } else {
@@ -114,9 +114,9 @@ class SettingsViewModel(
 
     private fun setHasChanges() {
         uiState.value.let {
-            val hasChanges = it.usernameInput != currentProfileCache.getName()
-                    || it.bioInput != currentProfileCache.getBio()
-                    || it.pictureUrlInput != currentProfileCache.getPictureUrl()
+            val hasChanges = it.usernameInput != profileCache.getName()
+                    || it.bioInput != profileCache.getBio()
+                    || it.pictureUrlInput != profileCache.getPictureUrl()
             if (hasChanges != it.hasChanges) {
                 viewModelState.update { state ->
                     state.copy(hasChanges = hasChanges)
@@ -128,9 +128,9 @@ class SettingsViewModel(
     private fun useCachedValues() {
         viewModelState.update {
             it.copy(
-                usernameInput = currentProfileCache.getName(),
-                bioInput = currentProfileCache.getBio(),
-                pictureUrlInput = currentProfileCache.getPictureUrl(),
+                usernameInput = profileCache.getName(),
+                bioInput = profileCache.getBio(),
+                pictureUrlInput = profileCache.getPictureUrl(),
                 hasChanges = false,
                 isInvalidUsername = false,
                 isInvalidPictureUrl = false
@@ -145,14 +145,14 @@ class SettingsViewModel(
 
     companion object {
         fun provideFactory(
-            currentProfileCache: IProfileCache,
+            profileCache: IProfileCache,
             profileDao: ProfileDao,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return SettingsViewModel(
-                    currentProfileCache = currentProfileCache,
+                    profileCache = profileCache,
                     profileDao = profileDao,
                     context = context
                 ) as T

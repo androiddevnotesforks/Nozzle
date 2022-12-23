@@ -9,7 +9,6 @@ import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Surface
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -18,8 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
-import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileCache
-import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
@@ -33,11 +30,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun NozzleApp(appContainer: AppContainer) {
-    SetProfileCache(
-        pubkey = appContainer.keyPreferences.getPubkey(),
-        profileDao = appContainer.roomDb.profileDao(),
-        profileCache = appContainer.currentProfileCache,
-    )
     NozzleTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             val navController = rememberNavController()
@@ -47,7 +39,7 @@ fun NozzleApp(appContainer: AppContainer) {
             val vmContainer = VMContainer(
                 drawerViewModel = viewModel(
                     factory = NozzleDrawerViewModel.provideFactory(
-                        currentProfileCache = appContainer.currentProfileCache,
+                        profileProvider = appContainer.profileCache,
                     )
                 ),
                 profileViewModel = viewModel(
@@ -55,7 +47,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         nostrService = appContainer.nostrService,
                         postCardInteractor = appContainer.postCardInteractor,
                         profileFollower = appContainer.profileFollower,
-                        currentProfileCache = appContainer.currentProfileCache,
+                        pubkeyProvider = appContainer.profileCache,
                         profileDao = appContainer.roomDb.profileDao(),
                         eventDao = appContainer.roomDb.eventDao(),
                         context = LocalContext.current,
@@ -64,7 +56,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
-                        currentProfileCache = appContainer.currentProfileCache,
+                        profileCache = appContainer.profileCache,
                         keyManager = appContainer.keyPreferences,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
@@ -74,12 +66,12 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = FeedViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
                         postCardInteractor = appContainer.postCardInteractor,
-                        currentProfileCache = appContainer.currentProfileCache,
+                        profileProvider = appContainer.profileCache,
                     )
                 ),
                 settingsViewModel = viewModel(
                     factory = SettingsViewModel.provideFactory(
-                        currentProfileCache = appContainer.currentProfileCache,
+                        profileCache = appContainer.profileCache,
                         profileDao = appContainer.roomDb.profileDao(),
                         context = LocalContext.current,
                     )
@@ -87,7 +79,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 threadViewModel = viewModel(
                     factory = ThreadViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
-                        currentPubkeyReader = appContainer.currentProfileCache,
+                        pubkeyProvider = appContainer.profileCache,
                         postCardInteractor = appContainer.postCardInteractor,
                     )
                 )
@@ -123,18 +115,6 @@ fun NozzleApp(appContainer: AppContainer) {
                     )
                 }
             }
-        }
-    }
-}
-
-// TODO: Use preferences instead of this mess
-@Composable
-fun SetProfileCache(pubkey: String, profileDao: ProfileDao, profileCache: IProfileCache) {
-    LaunchedEffect(null) {
-        profileDao.getProfile(pubkey)?.let {
-            profileCache.setName(it.name)
-            profileCache.setBio(it.bio)
-            profileCache.setPictureUrl(it.pictureUrl)
         }
     }
 }
