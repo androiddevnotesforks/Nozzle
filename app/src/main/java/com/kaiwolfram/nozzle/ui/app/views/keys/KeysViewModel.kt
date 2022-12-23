@@ -8,7 +8,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorage
+import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileWriter
+import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
 import com.kaiwolfram.nozzle.data.utils.isHex
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,8 @@ data class KeysViewModelState(
 )
 
 class KeysViewModel(
-    private val profileStorage: IPersonalProfileStorage,
+    private val currentProfileCache: IProfileWriter,
+    private val keyManager: IKeyManager,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
@@ -65,8 +67,8 @@ class KeysViewModel(
             val isValid = privkeyInput.length == 64 && privkeyInput.isHex()
             if (isValid) {
                 Log.i(TAG, "Saving new privkey $privkeyInput")
-                profileStorage.setPrivkey(privkeyInput)
-                profileStorage.resetMetaData()
+                keyManager.setPrivkey(privkeyInput)
+                currentProfileCache.reset()
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {
@@ -103,10 +105,10 @@ class KeysViewModel(
 
     private fun useCachedValues() {
         viewModelState.update {
-            privkey = profileStorage.getPrivkey()
+            privkey = keyManager.getPrivkey()
             it.copy(
                 privkeyInput = privkey,
-                pubkey = profileStorage.getPubkey(),
+                pubkey = keyManager.getPubkey(),
                 hasChanges = false,
                 isInvalid = false,
             )
@@ -120,7 +122,8 @@ class KeysViewModel(
 
     companion object {
         fun provideFactory(
-            profileStorage: IPersonalProfileStorage,
+            currentProfileCache: IProfileWriter,
+            keyManager: IKeyManager,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =
@@ -128,7 +131,8 @@ class KeysViewModel(
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return KeysViewModel(
-                        profileStorage = profileStorage,
+                        currentProfileCache = currentProfileCache,
+                        keyManager = keyManager,
                         context = context,
                         clip = clip
                     ) as T

@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileCache
 import com.kaiwolfram.nozzle.data.nostr.isValidUsername
-import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorage
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -30,14 +30,11 @@ data class SettingsViewModelState(
 )
 
 class SettingsViewModel(
-    private val personalProfileStorage: IPersonalProfileStorage,
+    private val currentProfileCache: IProfileCache,
     private val profileDao: ProfileDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(SettingsViewModelState())
-    private var username: String = ""
-    private var bio: String = ""
-    private var pictureUrl: String = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -61,15 +58,15 @@ class SettingsViewModel(
                     Log.i(TAG, "Updating profile")
                     viewModelScope.launch(context = Dispatchers.IO) {
                         profileDao.updateMetaData(
-                            pubkey = personalProfileStorage.getPubkey(),
+                            pubkey = currentProfileCache.getPubkey(),
                             name = it.usernameInput,
                             bio = it.bioInput,
                             pictureUrl = it.pictureUrlInput
                         )
                     }
-                    personalProfileStorage.setName(it.usernameInput)
-                    personalProfileStorage.setBio(it.bioInput)
-                    personalProfileStorage.setPictureUrl(it.pictureUrlInput)
+                    currentProfileCache.setName(it.usernameInput)
+                    currentProfileCache.setBio(it.bioInput)
+                    currentProfileCache.setPictureUrl(it.pictureUrlInput)
                     useCachedValues()
                     Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
                 } else {
@@ -117,9 +114,9 @@ class SettingsViewModel(
 
     private fun setHasChanges() {
         uiState.value.let {
-            val hasChanges = it.usernameInput != username
-                    || it.bioInput != bio
-                    || it.pictureUrlInput != pictureUrl
+            val hasChanges = it.usernameInput != currentProfileCache.getName()
+                    || it.bioInput != currentProfileCache.getBio()
+                    || it.pictureUrlInput != currentProfileCache.getPictureUrl()
             if (hasChanges != it.hasChanges) {
                 viewModelState.update { state ->
                     state.copy(hasChanges = hasChanges)
@@ -129,14 +126,11 @@ class SettingsViewModel(
     }
 
     private fun useCachedValues() {
-        username = personalProfileStorage.getName()
-        bio = personalProfileStorage.getBio()
-        pictureUrl = personalProfileStorage.getPictureUrl()
         viewModelState.update {
             it.copy(
-                usernameInput = username,
-                bioInput = bio,
-                pictureUrlInput = pictureUrl,
+                usernameInput = currentProfileCache.getName(),
+                bioInput = currentProfileCache.getBio(),
+                pictureUrlInput = currentProfileCache.getPictureUrl(),
                 hasChanges = false,
                 isInvalidUsername = false,
                 isInvalidPictureUrl = false
@@ -151,14 +145,14 @@ class SettingsViewModel(
 
     companion object {
         fun provideFactory(
-            personalProfileStorage: IPersonalProfileStorage,
+            currentProfileCache: IProfileCache,
             profileDao: ProfileDao,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return SettingsViewModel(
-                    personalProfileStorage = personalProfileStorage,
+                    currentProfileCache = currentProfileCache,
                     profileDao = profileDao,
                     context = context
                 ) as T

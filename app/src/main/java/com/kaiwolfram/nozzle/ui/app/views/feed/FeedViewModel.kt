@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.data.currentProfileCache.IProfileReader
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
-import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -33,7 +33,7 @@ data class FeedViewModelState(
 class FeedViewModel(
     private val nostrService: INostrService,
     private val postCardInteractor: IPostCardInteractor,
-    private val profileStorageReader: IPersonalProfileStorageReader,
+    private val currentProfileCache: IProfileReader,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -49,8 +49,8 @@ class FeedViewModel(
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelState.update {
             it.copy(
-                pictureUrl = profileStorageReader.getPictureUrl(),
-                pubkey = profileStorageReader.getPubkey()
+                pictureUrl = currentProfileCache.getPictureUrl(),
+                pubkey = currentProfileCache.getPubkey()
             )
         }
 
@@ -69,8 +69,8 @@ class FeedViewModel(
     val onResetProfileIconUiState: () -> Unit = {
         viewModelState.update {
             it.copy(
-                pictureUrl = profileStorageReader.getPictureUrl(),
-                pubkey = profileStorageReader.getPubkey(),
+                pictureUrl = currentProfileCache.getPictureUrl(),
+                pubkey = currentProfileCache.getPubkey(),
             )
         }
     }
@@ -158,14 +158,14 @@ class FeedViewModel(
         fun provideFactory(
             nostrService: INostrService,
             postCardInteractor: IPostCardInteractor,
-            profileStorageReader: IPersonalProfileStorageReader,
+            currentProfileCache: IProfileReader,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return FeedViewModel(
                     nostrService = nostrService,
                     postCardInteractor = postCardInteractor,
-                    profileStorageReader = profileStorageReader,
+                    currentProfileCache = currentProfileCache,
                 ) as T
             }
         }

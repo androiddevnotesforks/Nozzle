@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
-import com.kaiwolfram.nozzle.data.preferences.IPersonalProfileStorageReader
+import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyReader
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
@@ -50,7 +50,7 @@ class ProfileViewModel(
     private val eventDao: EventDao,
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
-    private val profileStorageReader: IPersonalProfileStorageReader,
+    private val currentPubkeyReader: IPubkeyReader,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
@@ -130,7 +130,7 @@ class ProfileViewModel(
         if (!uiState.value.isFollowed) {
             viewModelScope.launch(context = Dispatchers.IO) {
                 profileFollower.follow(
-                    pubkey = profileStorageReader.getPubkey(),
+                    pubkey = currentPubkeyReader.getPubkey(),
                     pubkeyToFollow = pubkeyToFollow
                 )
             }
@@ -144,7 +144,7 @@ class ProfileViewModel(
         if (uiState.value.isFollowed) {
             viewModelScope.launch(context = Dispatchers.IO) {
                 profileFollower.unfollow(
-                    pubkey = profileStorageReader.getPubkey(),
+                    pubkey = currentPubkeyReader.getPubkey(),
                     pubkeyToUnfollow = pubkeyToUnfollow
                 )
             }
@@ -286,7 +286,7 @@ class ProfileViewModel(
             nostrService: INostrService,
             profileFollower: IProfileFollower,
             postCardInteractor: IPostCardInteractor,
-            profileStorageReader: IPersonalProfileStorageReader,
+            currentProfileCache: IPubkeyReader,
             profileDao: ProfileDao,
             eventDao: EventDao,
             context: Context,
@@ -299,7 +299,7 @@ class ProfileViewModel(
                         nostrService = nostrService,
                         profileFollower = profileFollower,
                         postCardInteractor = postCardInteractor,
-                        profileStorageReader = profileStorageReader,
+                        currentPubkeyReader = currentProfileCache,
                         profileDao = profileDao,
                         eventDao = eventDao,
                         context = context,
