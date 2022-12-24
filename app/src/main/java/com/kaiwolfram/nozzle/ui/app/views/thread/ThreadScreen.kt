@@ -5,12 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -79,9 +77,11 @@ private fun ThreadedPosts(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
-        // TODO: Do not reset after swipe refresh, like, or repost
-        val listState = LazyListState(firstVisibleItemIndex = previous.size)
-        LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
+        val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = previous.size)
+        LaunchedEffect(key1 = previous.size) {
+            lazyListState.animateScrollToItem(previous.size)
+        }
+        LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
             itemsIndexed(previous) { index, post ->
                 var threadPosition = ThreadPosition.MIDDLE
                 if (index == 0) {
