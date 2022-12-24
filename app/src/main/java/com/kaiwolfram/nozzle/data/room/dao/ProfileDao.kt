@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
+import com.kaiwolfram.nozzle.model.NameAndPictureUrl
 
 @Dao
 interface ProfileDao {
@@ -22,4 +23,7 @@ interface ProfileDao {
                 "WHERE pubkey = :pubkey"
     )
     suspend fun updateMetaData(pubkey: String, name: String, bio: String, pictureUrl: String)
+
+    @Query("SELECT name, pictureUrl FROM profile WHERE pubkey = :pubkey")
+    suspend fun getName(pubkey: String): NameAndPictureUrl
 }

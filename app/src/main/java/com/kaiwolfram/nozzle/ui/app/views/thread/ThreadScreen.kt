@@ -28,6 +28,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun ThreadScreen(
     uiState: ThreadViewModelState,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onRefreshThreadView: () -> Unit,
@@ -46,6 +47,7 @@ fun ThreadScreen(
                     replies = uiState.replies,
                     currentThreadPosition = uiState.currentThreadPosition,
                     isRefreshing = uiState.isRefreshing,
+                    onPrepareReply = onPrepareReply,
                     onRefresh = onRefreshThreadView,
                     onLike = onLike,
                     onRepost = onRepost,
@@ -65,6 +67,7 @@ private fun ThreadedPosts(
     replies: List<PostWithMeta>,
     currentThreadPosition: ThreadPosition,
     isRefreshing: Boolean,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onRefresh: () -> Unit,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
@@ -92,6 +95,7 @@ private fun ThreadedPosts(
                     post = post,
                     onLike = onLike,
                     onRepost = onRepost,
+                    onPrepareReply = onPrepareReply,
                     threadPosition = threadPosition,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread,
@@ -103,6 +107,7 @@ private fun ThreadedPosts(
                     post = current,
                     onLike = onLike,
                     onRepost = onRepost,
+                    onPrepareReply = onPrepareReply,
                     modifier = Modifier.background(color = LightYellow),
                     threadPosition = currentThreadPosition,
                     onOpenProfile = onNavigateToProfile,
@@ -117,6 +122,7 @@ private fun ThreadedPosts(
                     post = post,
                     onLike = onLike,
                     onRepost = onRepost,
+                    onPrepareReply = onPrepareReply,
                     onOpenProfile = onNavigateToProfile,
                     onNavigateToThread = onOpenThread,
                     onNavigateToReply = onNavigateToReply

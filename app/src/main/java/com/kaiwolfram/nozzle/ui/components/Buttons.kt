@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.ui.theme.LightGray21
 
 @Composable
 fun GoBackButton(onGoBack: () -> Unit) {
@@ -47,6 +48,11 @@ fun SendButton(enabled: Boolean, onSend: () -> Unit, onGoBack: () -> Unit) {
     Button(
         enabled = enabled,
         shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = colors.onBackground,
+            backgroundColor = colors.background,
+            disabledContentColor = LightGray21
+        ),
         onClick = {
             onSend()
             onGoBack()

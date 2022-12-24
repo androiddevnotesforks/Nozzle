@@ -52,6 +52,7 @@ fun NozzleNavGraph(
         composable(NozzleRoute.FEED) {
             FeedRoute(
                 feedViewModel = vmContainer.feedViewModel,
+                onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
                 onOpenDrawer = { scope.launch { drawerState.open() } },
                 onNavigateToProfile = onNavigateToProfile,
                 onNavigateToThread = onNavigateToThread,
@@ -61,6 +62,7 @@ fun NozzleNavGraph(
         composable(NozzleRoute.PROFILE) {
             ProfileRoute(
                 profileViewModel = vmContainer.profileViewModel,
+                onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
                 onNavigateToThread = onNavigateToThread,
                 onNavigateToReply = navActions.navigateToReply,
             )
@@ -85,6 +87,7 @@ fun NozzleNavGraph(
         composable(NozzleRoute.THREAD) {
             ThreadRoute(
                 threadViewModel = vmContainer.threadViewModel,
+                onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
                 onNavigateToProfile = onNavigateToProfile,
                 onNavigateToReply = navActions.navigateToReply,
                 onGoBack = navActions.popStack,

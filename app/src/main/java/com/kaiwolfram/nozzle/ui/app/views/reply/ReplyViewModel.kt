@@ -5,25 +5,32 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
+import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
+import com.kaiwolfram.nozzle.model.PostWithMeta
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 private const val TAG = "ReplyViewModel"
 
 data class ReplyViewModelState(
-    val enabled: Boolean = false,
+    val recipientName: String = "",
     val reply: String = "",
-    val recipient: String = "",
-    val pictureUrl: String = "https://robohash.org/kai",
-    val pubkey: String = "kai",
+    val isSendable: Boolean = false,
+    val pictureUrl: String = "",
+    val pubkey: String = "",
 )
 
 class ReplyViewModel(
-    private val nostrRepository: INostrService,
+    private val nostrService: INostrService,
+    private val profileCache: IProfileCache,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
+    private var recipientPubkey: String = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -36,8 +43,52 @@ class ReplyViewModel(
         Log.i(TAG, "Initialize ReplyViewModel")
     }
 
+    val onPrepareReply: (PostWithMeta) -> Unit = { post ->
+        viewModelScope.launch(context = Dispatchers.IO) {
+            Log.i(TAG, "Setting reply to ${post.pubkey}")
+            viewModelState.update {
+                recipientPubkey = post.pubkey
+                it.copy(
+                    recipientName = post.name,
+                    pictureUrl = post.pictureUrl,
+                    pubkey = profileCache.getPubkey(),
+                    reply = "",
+                    isSendable = false,
+                )
+            }
+        }
+    }
+
+    val onChangeReply: (String) -> Unit = { input ->
+        if (input != uiState.value.reply) {
+            viewModelState.update {
+                it.copy(reply = input, isSendable = input.isNotBlank())
+            }
+        }
+    }
+
     val onSend: () -> Unit = {
-        // TODO
+        uiState.value.let { state ->
+            Log.i(TAG, "Sending reply to ${state.recipientName} ${state.pubkey}")
+            if (state.isSendable) {
+                nostrService.send(
+                    recipientPubkey = recipientPubkey,
+                    reply = state.reply
+                )
+            }
+            reset()
+        }
+    }
+
+    private fun reset() {
+        viewModelState.update {
+            recipientPubkey = ""
+            it.copy(
+                recipientName = "",
+                reply = "",
+                isSendable = false,
+            )
+        }
     }
 
     override fun onCleared() {
@@ -48,11 +99,13 @@ class ReplyViewModel(
     companion object {
         fun provideFactory(
             nostrService: INostrService,
+            profileCache: IProfileCache,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ReplyViewModel(
-                    nostrRepository = nostrService,
+                    nostrService = nostrService,
+                    profileCache = profileCache,
                 ) as T
             }
         }

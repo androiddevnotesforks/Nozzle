@@ -3,10 +3,12 @@ package com.kaiwolfram.nozzle.ui.app.views.profile
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.kaiwolfram.nozzle.model.PostWithMeta
 
 @Composable
 fun ProfileRoute(
     profileViewModel: ProfileViewModel,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToReply: () -> Unit,
 ) {
@@ -14,6 +16,7 @@ fun ProfileRoute(
 
     ProfileScreen(
         uiState = uiState,
+        onPrepareReply = onPrepareReply,
         onLike = profileViewModel.onLike,
         onRepost = profileViewModel.onRepost,
         onFollow = profileViewModel.onFollow,

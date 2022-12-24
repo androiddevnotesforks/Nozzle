@@ -37,6 +37,7 @@ fun PostCardList(
     onRefresh: () -> Unit,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onOpenProfile: ((String) -> Unit)? = null,
     onNavigateToThread: (String) -> Unit,
     onNavigateToReply: () -> Unit,
@@ -52,6 +53,7 @@ fun PostCardList(
                     onLike = onLike,
                     onRepost = onRepost,
                     onOpenProfile = onOpenProfile,
+                    onPrepareReply = onPrepareReply,
                     onNavigateToThread = onNavigateToThread,
                     onNavigateToReply = onNavigateToReply,
                 )
@@ -65,6 +67,7 @@ fun PostCard(
     post: PostWithMeta,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
+    onPrepareReply: (PostWithMeta) -> Unit,
     modifier: Modifier = Modifier,
     threadPosition: ThreadPosition = ThreadPosition.SINGLE,
     onOpenProfile: ((String) -> Unit)? = null,
@@ -164,10 +167,10 @@ fun PostCard(
                 numOfReplies = 0,
                 numOfReposts = 0,
                 numOfLikes = 0,
-                isLikedByMe = post.isLikedByMe,
-                isRepostedByMe = post.isRepostedByMe,
+                post = post,
                 onLike = { onLike(post.id) },
                 onRepost = { onRepost(post.id) },
+                onPrepareReply = onPrepareReply,
                 onNavigateToReply = onNavigateToReply,
             )
         }
@@ -201,10 +204,10 @@ private fun PostCardActions(
     numOfReplies: Int,
     numOfReposts: Int,
     numOfLikes: Int,
-    isLikedByMe: Boolean,
-    isRepostedByMe: Boolean,
+    post: PostWithMeta,
     onLike: () -> Unit,
     onRepost: () -> Unit,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onNavigateToReply: () -> Unit,
 ) {
     Row(
@@ -212,19 +215,26 @@ private fun PostCardActions(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ReplyAction(numOfReplies = numOfReplies, onNavigateToReply = onNavigateToReply)
+        ReplyAction(
+            numOfReplies = numOfReplies,
+            postToReplyTo = post,
+            onPrepareReply = onPrepareReply,
+            onNavigateToReply = onNavigateToReply
+        )
         RepostAction(
             numOfReposts = numOfReposts,
-            isRepostedByMe = isRepostedByMe,
+            isRepostedByMe = post.isRepostedByMe,
             onRepost = onRepost
         )
-        LikeAction(numOfLikes = numOfLikes, isLikedByMe = isLikedByMe, onLike = onLike)
+        LikeAction(numOfLikes = numOfLikes, isLikedByMe = post.isLikedByMe, onLike = onLike)
     }
 }
 
 @Composable
 private fun ReplyAction(
     numOfReplies: Int,
+    postToReplyTo: PostWithMeta,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onNavigateToReply: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -232,10 +242,16 @@ private fun ReplyAction(
             modifier = Modifier
                 .size(sizing.smallIcon)
                 .clip(CircleShape)
-                .clickable { onNavigateToReply() })
+                .clickable {
+                    onPrepareReply(postToReplyTo)
+                    onNavigateToReply()
+                })
         Spacer(Modifier.width(spacing.medium))
         // TODO: Show num
-        Text(text = numOfReplies.toString(), color = Color.Transparent)
+        Text(
+            text = numOfReplies.toString(),
+            color = Color.Transparent
+        )
     }
 }
 
@@ -277,25 +293,6 @@ private fun LikeAction(
         Spacer(Modifier.width(spacing.medium))
         // TODO: Show num
         Text(text = numOfLikes.toString(), color = Color.Transparent)
-    }
-}
-
-
-@Composable
-private fun ReplyingTo(name: String) {
-    Row {
-        Text(
-            text = stringResource(id = R.string.replying_to),
-            color = LightGray21,
-        )
-        Spacer(modifier = Modifier.width(spacing.medium))
-        Text(
-            text = name,
-            color = LightGray21,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 

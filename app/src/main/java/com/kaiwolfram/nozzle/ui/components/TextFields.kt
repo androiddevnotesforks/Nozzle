@@ -4,6 +4,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldColors
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -19,6 +21,7 @@ fun ChangeableTextField(
     errorLabel: String? = null,
     placeholder: String? = null,
     isPassword: Boolean = false,
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     onChangeValue: (String) -> Unit,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
@@ -55,5 +58,6 @@ fun ChangeableTextField(
             VisualTransformation.None
         },
         trailingIcon = trailingIcon,
+        colors = colors,
     )
 }

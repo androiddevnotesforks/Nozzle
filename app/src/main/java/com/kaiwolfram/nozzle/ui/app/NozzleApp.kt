@@ -87,6 +87,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 replyViewModel = viewModel(
                     factory = ReplyViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
+                        profileCache = appContainer.profileCache,
                     )
                 )
             )

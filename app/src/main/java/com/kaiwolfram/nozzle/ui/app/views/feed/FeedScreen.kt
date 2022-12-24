@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.PostCardList
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
@@ -27,6 +28,7 @@ fun FeedScreen(
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onRefreshFeedView: () -> Unit,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
@@ -43,6 +45,7 @@ fun FeedScreen(
             isRefreshing = uiState.isRefreshing,
             onLike = onLike,
             onRepost = onRepost,
+            onPrepareReply = onPrepareReply,
             onRefresh = onRefreshFeedView,
             onOpenProfile = onNavigateToProfile,
             onNavigateToThread = onNavigateToThread,

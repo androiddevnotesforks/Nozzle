@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle
 
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import coil.Coil
@@ -14,6 +15,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = AppContainer(applicationContext)
+
+        // Allow GIFs
         val imageLoader = ImageLoader.Builder(applicationContext)
             .components {
                 if (SDK_INT >= 28) {
@@ -23,6 +26,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }.build()
         Coil.setImageLoader(imageLoader)
+
+        // TODO: Remove deprecated
+        // Shrink composable when keyboard opens
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
         setContent {
             NozzleApp(appContainer = appContainer)
         }

@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.*
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
@@ -23,6 +24,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun ProfileScreen(
     uiState: ProfileViewModelState,
+    onPrepareReply: (PostWithMeta) -> Unit,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onFollow: (String) -> Unit,
@@ -56,6 +58,7 @@ fun ProfileScreen(
             onRefresh = onRefreshProfileView,
             onLike = onLike,
             onRepost = onRepost,
+            onPrepareReply = onPrepareReply,
             onNavigateToThread = onNavigateToThread,
             onNavigateToReply = onNavigateToReply
         )

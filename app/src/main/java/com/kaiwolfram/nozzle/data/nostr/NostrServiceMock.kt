@@ -67,6 +67,11 @@ class NostrServiceMock : INostrService {
         // No return
     }
 
+    override fun send(reply: String, recipientPubkey: String) {
+        // No return
+        // Real implementation should create event, save in db and send to relays
+    }
+
     private fun createRndPost(): EventEntity {
         return EventEntity(
             id = UUID.randomUUID().toString(),

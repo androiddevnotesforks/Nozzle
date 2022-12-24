@@ -14,4 +14,5 @@ interface INostrService {
     fun repost(postId: String)
     fun follow(pubkey: String)
     fun unfollow(pubkey: String)
+    fun send(recipientPubkey: String, reply: String)
 }

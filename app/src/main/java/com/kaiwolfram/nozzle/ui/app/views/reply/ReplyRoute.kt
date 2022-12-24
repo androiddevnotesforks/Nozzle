@@ -13,7 +13,8 @@ fun ReplyRoute(
 
     ReplyScreen(
         uiState = uiState,
+        onChangeReply = replyViewModel.onChangeReply,
+        onSend = replyViewModel.onSend,
         onGoBack = onGoBack,
-        onSend = replyViewModel.onSend
     )
 }
