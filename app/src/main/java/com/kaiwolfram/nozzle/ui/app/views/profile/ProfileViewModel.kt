@@ -39,6 +39,7 @@ data class ProfileViewModelState(
     val pictureUrl: String = "",
     val numOfFollowing: Int = 0,
     val numOfFollowers: Int = 0,
+    val isOneself: Boolean = true,
     val isFollowed: Boolean = false,
     val posts: List<PostWithMeta> = listOf(),
     val isRefreshing: Boolean = false,
@@ -191,6 +192,7 @@ class ProfileViewModel(
                 pictureUrl = profile.pictureUrl,
                 numOfFollowing = profile.numOfFollowing,
                 numOfFollowers = profile.numOfFollowers,
+                isOneself = profile.pubkey == pubkeyProvider.getPubkey(),
                 isFollowed = Random.nextBoolean(),
                 posts = posts.map { post ->
                     PostWithMeta(
@@ -223,6 +225,7 @@ class ProfileViewModel(
                     pictureUrl = cachedProfile.pictureUrl,
                     numOfFollowing = cachedProfile.numOfFollowing,
                     numOfFollowers = cachedProfile.numOfFollowers,
+                    isOneself = cachedProfile.pubkey == pubkeyProvider.getPubkey(),
                     isFollowed = Random.nextBoolean(),
                     posts = cachedPosts.map { post ->
                         PostWithMeta(

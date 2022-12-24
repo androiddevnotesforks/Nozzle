@@ -40,6 +40,7 @@ fun ProfileScreen(
             name = uiState.name,
             bio = uiState.bio,
             pictureUrl = uiState.pictureUrl,
+            isOneself = uiState.isOneself,
             isFollowed = uiState.isFollowed,
             onFollow = onFollow,
             onUnfollow = onUnfollow,
@@ -74,6 +75,7 @@ private fun ProfileData(
     name: String,
     bio: String,
     pictureUrl: String,
+    isOneself: Boolean,
     isFollowed: Boolean,
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
@@ -86,6 +88,7 @@ private fun ProfileData(
         ProfilePictureAndActions(
             pictureUrl = pictureUrl,
             pubkey = pubkey,
+            isOneself = isOneself,
             isFollowed = isFollowed,
             onFollow = onFollow,
             onUnfollow = onUnfollow,
@@ -110,6 +113,7 @@ private fun ProfileData(
 private fun ProfilePictureAndActions(
     pictureUrl: String,
     pubkey: String,
+    isOneself: Boolean,
     isFollowed: Boolean,
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
@@ -129,12 +133,13 @@ private fun ProfilePictureAndActions(
             pictureUrl = pictureUrl,
             pubkey = pubkey,
         )
-        FollowButton(
-            isFollowed = isFollowed,
-            onFollow = { onFollow(pubkey) },
-            onUnfollow = { onUnfollow(pubkey) }
-        )
-
+        if (!isOneself) {
+            FollowButton(
+                isFollowed = isFollowed,
+                onFollow = { onFollow(pubkey) },
+                onUnfollow = { onUnfollow(pubkey) }
+            )
+        }
     }
 }
 
