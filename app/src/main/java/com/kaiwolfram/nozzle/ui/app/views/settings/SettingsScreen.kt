@@ -1,6 +1,8 @@
 package com.kaiwolfram.nozzle.ui.app.views.settings
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,7 +28,11 @@ fun SettingsScreen(
 ) {
     Column {
         TopBar(text = stringResource(id = R.string.settings), onGoBack = onGoBack)
-        Column(modifier = Modifier.padding(spacing.screenEdge)) {
+        Column(modifier = Modifier.padding(spacing.screenEdge)
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .imePadding()
+            .verticalScroll(rememberScrollState())) {
             Username(
                 username = uiState.usernameInput,
                 isInvalid = uiState.isInvalidUsername,
