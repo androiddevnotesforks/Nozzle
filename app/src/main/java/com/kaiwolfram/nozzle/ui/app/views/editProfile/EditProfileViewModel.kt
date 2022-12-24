@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.views.settings
+package com.kaiwolfram.nozzle.ui.app.views.editProfile
 
 import android.content.Context
 import android.util.Log
@@ -18,9 +18,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-private const val TAG = "SettingsViewModel"
+private const val TAG = "EditProfileViewModel"
 
-data class SettingsViewModelState(
+data class EditProfileViewModelState(
     val usernameInput: String = "",
     val bioInput: String = "",
     val pictureUrlInput: String = "",
@@ -29,12 +29,12 @@ data class SettingsViewModelState(
     val isInvalidPictureUrl: Boolean = false,
 )
 
-class SettingsViewModel(
+class EditProfileViewModel(
     private val profileCache: IProfileCache,
     private val profileDao: ProfileDao,
     context: Context,
 ) : ViewModel() {
-    private val viewModelState = MutableStateFlow(SettingsViewModelState())
+    private val viewModelState = MutableStateFlow(EditProfileViewModelState())
 
     val uiState = viewModelState
         .stateIn(
@@ -44,7 +44,7 @@ class SettingsViewModel(
         )
 
     init {
-        Log.i(TAG, "Initialize SettingsViewModel")
+        Log.i(TAG, "Initialize EditProfileViewModel")
         useCachedValues()
     }
 
@@ -151,7 +151,7 @@ class SettingsViewModel(
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SettingsViewModel(
+                return EditProfileViewModel(
                     profileCache = profileCache,
                     profileDao = profileDao,
                     context = context

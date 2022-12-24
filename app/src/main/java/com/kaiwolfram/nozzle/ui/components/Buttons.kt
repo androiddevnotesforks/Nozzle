@@ -63,6 +63,22 @@ fun SendButton(enabled: Boolean, onSend: () -> Unit, onGoBack: () -> Unit) {
 }
 
 @Composable
+fun EditProfileButton(onNavToEditProfile: () -> Unit) {
+    Button(
+        onClick = { onNavToEditProfile() },
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, colors.onBackground),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = colors.onBackground,
+            backgroundColor = colors.background
+        )
+    ) {
+        Text(text = stringResource(id = R.string.edit))
+    }
+}
+
+
+@Composable
 fun FollowButton(
     isFollowed: Boolean,
     onFollow: () -> Unit,

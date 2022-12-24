@@ -33,6 +33,7 @@ fun ProfileScreen(
     onCopyPubkeyAndShowToast: (String) -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToReply: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
 ) {
     Column {
         ProfileData(
@@ -45,6 +46,7 @@ fun ProfileScreen(
             onFollow = onFollow,
             onUnfollow = onUnfollow,
             onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
+            onNavToEditProfile = onNavigateToEditProfile,
         )
         Spacer(Modifier.height(spacing.medium))
         FollowerNumbers(
@@ -80,6 +82,7 @@ private fun ProfileData(
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
     onCopyPubkeyAndShowToast: (String) -> Unit,
+    onNavToEditProfile: () -> Unit,
 ) {
     Column(
         modifier = Modifier.padding(horizontal = spacing.screenEdge),
@@ -92,6 +95,7 @@ private fun ProfileData(
             isFollowed = isFollowed,
             onFollow = onFollow,
             onUnfollow = onUnfollow,
+            onNavToEditProfile = onNavToEditProfile,
         )
         NameAndPubkey(
             name = name,
@@ -117,6 +121,7 @@ private fun ProfilePictureAndActions(
     isFollowed: Boolean,
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
+    onNavToEditProfile: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -133,13 +138,32 @@ private fun ProfilePictureAndActions(
             pictureUrl = pictureUrl,
             pubkey = pubkey,
         )
-        if (!isOneself) {
-            FollowButton(
-                isFollowed = isFollowed,
-                onFollow = { onFollow(pubkey) },
-                onUnfollow = { onUnfollow(pubkey) }
-            )
-        }
+        FollowOrEditButton(
+            isOneself = isOneself,
+            isFollowed = isFollowed,
+            onFollow = { onFollow(pubkey) },
+            onUnfollow = { onUnfollow(pubkey) },
+            onNavToEditProfile = onNavToEditProfile,
+        )
+    }
+}
+
+@Composable
+private fun FollowOrEditButton(
+    isOneself: Boolean,
+    isFollowed: Boolean,
+    onFollow: () -> Unit,
+    onUnfollow: () -> Unit,
+    onNavToEditProfile: () -> Unit,
+) {
+    if (isOneself) {
+        EditProfileButton(onNavToEditProfile = onNavToEditProfile)
+    } else {
+        FollowButton(
+            isFollowed = isFollowed,
+            onFollow = { onFollow() },
+            onUnfollow = { onUnfollow() }
+        )
     }
 }
 

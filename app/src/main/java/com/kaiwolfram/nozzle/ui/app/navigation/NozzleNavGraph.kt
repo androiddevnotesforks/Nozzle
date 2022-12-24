@@ -10,11 +10,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.ui.app.VMContainer
+import com.kaiwolfram.nozzle.ui.app.views.editProfile.EditProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyRoute
-import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsRoute
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadRoute
 import kotlinx.coroutines.launch
 
@@ -65,6 +65,7 @@ fun NozzleNavGraph(
                 onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
                 onNavigateToThread = onNavigateToThread,
                 onNavigateToReply = navActions.navigateToReply,
+                onNavigateToEditProfile = navActions.navigateToEditProfile,
             )
         }
         composable(NozzleRoute.KEYS) {
@@ -72,13 +73,13 @@ fun NozzleNavGraph(
                 keysViewModel = vmContainer.keysViewModel,
                 onResetDrawerUiState = vmContainer.drawerViewModel.onResetUiState,
                 onResetFeedIconUiState = vmContainer.feedViewModel.onResetProfileIconUiState,
-                onResetSettingsUiState = vmContainer.settingsViewModel.onResetUiState,
+                onResetEditProfileUiState = vmContainer.editProfileViewModel.onResetUiState,
                 onGoBack = navActions.popStack,
             )
         }
-        composable(NozzleRoute.SETTINGS) {
-            SettingsRoute(
-                settingsViewModel = vmContainer.settingsViewModel,
+        composable(NozzleRoute.EDIT_PROFILE) {
+            EditProfileRoute(
+                editProfileViewModel = vmContainer.editProfileViewModel,
                 onResetDrawerUiState = vmContainer.drawerViewModel.onResetUiState,
                 onResetFeedIconUiState = vmContainer.feedViewModel.onResetProfileIconUiState,
                 onGoBack = navActions.popStack,

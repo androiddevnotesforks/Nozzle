@@ -11,6 +11,7 @@ fun ProfileRoute(
     onPrepareReply: (PostWithMeta) -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToReply: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
 
@@ -25,5 +26,6 @@ fun ProfileRoute(
         onCopyPubkeyAndShowToast = profileViewModel.onCopyPubkeyAndShowToast,
         onNavigateToThread = onNavigateToThread,
         onNavigateToReply = onNavigateToReply,
+        onNavigateToEditProfile = onNavigateToEditProfile,
     )
 }

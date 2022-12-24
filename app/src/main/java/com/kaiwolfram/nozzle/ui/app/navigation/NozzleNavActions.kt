@@ -23,9 +23,9 @@ class NozzleNavActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToSettings: () -> Unit = {
-        navController.navigate(NozzleRoute.SETTINGS) {
-            setNavOptionsWithPop(optionsBuilder = this)
+    val navigateToEditProfile: () -> Unit = {
+        navController.navigate(NozzleRoute.EDIT_PROFILE) {
+            setSimpleNavOptions(optionsBuilder = this)
         }
     }
 

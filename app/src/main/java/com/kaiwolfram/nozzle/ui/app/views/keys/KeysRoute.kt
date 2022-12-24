@@ -9,7 +9,7 @@ fun KeysRoute(
     keysViewModel: KeysViewModel,
     onResetDrawerUiState: () -> Unit,
     onResetFeedIconUiState: () -> Unit,
-    onResetSettingsUiState: () -> Unit,
+    onResetEditProfileUiState: () -> Unit,
     onGoBack: () -> Unit,
 ) {
     val uiState by keysViewModel.uiState.collectAsState()
@@ -22,7 +22,7 @@ fun KeysRoute(
             keysViewModel.onUpdateKeyPairAndShowToast(toast)
             onResetDrawerUiState()
             onResetFeedIconUiState()
-            onResetSettingsUiState()
+            onResetEditProfileUiState()
         },
         onChangePrivkey = keysViewModel.onChangePrivkey,
         onResetUiState = keysViewModel.onResetUiState,

@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.views.settings
+package com.kaiwolfram.nozzle.ui.app.views.editProfile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,8 +17,8 @@ import com.kaiwolfram.nozzle.ui.components.TopBar
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
-fun SettingsScreen(
-    uiState: SettingsViewModelState,
+fun EditProfileScreen(
+    uiState: EditProfileViewModelState,
     onUpdateProfileAndShowToast: (String) -> Unit,
     onChangeName: (String) -> Unit,
     onChangeBio: (String) -> Unit,
@@ -27,12 +27,15 @@ fun SettingsScreen(
     onGoBack: () -> Unit,
 ) {
     Column {
-        TopBar(text = stringResource(id = R.string.settings), onGoBack = onGoBack)
-        Column(modifier = Modifier.padding(spacing.screenEdge)
-            .fillMaxSize()
-            .navigationBarsPadding()
-            .imePadding()
-            .verticalScroll(rememberScrollState())) {
+        TopBar(text = stringResource(id = R.string.edit_profile), onGoBack = onGoBack)
+        Column(
+            modifier = Modifier
+                .padding(spacing.screenEdge)
+                .fillMaxSize()
+                .navigationBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+        ) {
             Username(
                 username = uiState.usernameInput,
                 isInvalid = uiState.isInvalidUsername,

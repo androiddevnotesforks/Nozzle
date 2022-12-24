@@ -7,7 +7,6 @@ import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Newspaper
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +53,6 @@ fun NozzleDrawerScreen(
             modifier = Modifier.padding(spacing.screenEdge),
             navigateToFeed = navActions.navigateToFeed,
             navigateToKeys = navActions.navigateToKeys,
-            navigateToSettings = navActions.navigateToSettings,
             closeDrawer = closeDrawer
         )
         VersionText()
@@ -114,7 +112,6 @@ private fun ProfileRow(
 private fun MainRows(
     navigateToFeed: () -> Unit,
     navigateToKeys: () -> Unit,
-    navigateToSettings: () -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier,
 ) {
@@ -132,14 +129,6 @@ private fun MainRows(
             label = stringResource(id = R.string.keys),
             action = {
                 navigateToKeys()
-                closeDrawer()
-            }
-        )
-        DrawerRow(
-            imageVector = Icons.Rounded.Settings,
-            label = stringResource(id = R.string.settings),
-            action = {
-                navigateToSettings()
                 closeDrawer()
             }
         )

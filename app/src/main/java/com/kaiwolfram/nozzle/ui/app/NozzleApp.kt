@@ -20,11 +20,11 @@ import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
+import com.kaiwolfram.nozzle.ui.app.views.editProfile.EditProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyViewModel
-import com.kaiwolfram.nozzle.ui.app.views.settings.SettingsViewModel
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
@@ -70,8 +70,8 @@ fun NozzleApp(appContainer: AppContainer) {
                         profileProvider = appContainer.profileCache,
                     )
                 ),
-                settingsViewModel = viewModel(
-                    factory = SettingsViewModel.provideFactory(
+                editProfileViewModel = viewModel(
+                    factory = EditProfileViewModel.provideFactory(
                         profileCache = appContainer.profileCache,
                         profileDao = appContainer.roomDb.profileDao(),
                         context = LocalContext.current,
