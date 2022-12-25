@@ -60,4 +60,5 @@
     <string name="send">Send</string>
     <string name="post_your_reply">Post your reply</string>
     <string name="edit_profile">Edit profile</string>
+    <string name="your_reply_is_empty">Your reply is empty</string>
 </resources>

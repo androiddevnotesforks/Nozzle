@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,22 +45,24 @@ fun CloseButton(onGoBack: () -> Unit) {
 }
 
 @Composable
-fun SendButton(enabled: Boolean, onSend: () -> Unit, onGoBack: () -> Unit) {
-    Button(
-        enabled = enabled,
-        shape = RoundedCornerShape(20.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = colors.onBackground,
-            backgroundColor = colors.background,
-            disabledContentColor = LightGray21
-        ),
-        onClick = {
-            onSend()
-            onGoBack()
-        },
-    ) {
-        Text(text = stringResource(id = R.string.send))
-    }
+fun SendButton(
+    isSendable: Boolean,
+    onSend: () -> Unit,
+    onGoBack: () -> Unit
+) {
+    Icon(
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable {
+                onSend()
+                if (isSendable) {
+                    onGoBack()
+                }
+            },
+        imageVector = Icons.Default.Send,
+        contentDescription = stringResource(id = R.string.send),
+        tint = if (isSendable) colors.surface else LightGray21
+    )
 }
 
 @Composable

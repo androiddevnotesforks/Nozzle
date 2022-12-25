@@ -23,14 +23,19 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 fun ReplyScreen(
     uiState: ReplyViewModelState,
     onChangeReply: (String) -> Unit,
-    onSend: () -> Unit,
+    onSendOrShowErrorToast: (String) -> Unit,
     onGoBack: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
+        val errorToast = stringResource(id = R.string.your_reply_is_empty)
         ClosableTopBar(
             onClose = onGoBack,
             trailingIcon = {
-                SendButton(enabled = uiState.isSendable, onSend = onSend, onGoBack = onGoBack)
+                SendButton(
+                    isSendable = uiState.isSendable,
+                    onSend = { onSendOrShowErrorToast(errorToast) },
+                    onGoBack = onGoBack
+                )
             }
         )
         ReplyingTo(

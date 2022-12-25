@@ -1,6 +1,8 @@
 package com.kaiwolfram.nozzle.ui.app.views.reply
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -28,6 +30,7 @@ data class ReplyViewModelState(
 class ReplyViewModel(
     private val nostrService: INostrService,
     private val profileCache: IProfileCache,
+    context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
     private var recipientPubkey: String = ""
@@ -67,16 +70,18 @@ class ReplyViewModel(
         }
     }
 
-    val onSend: () -> Unit = {
+    val onSendOrShowErrorToast: (String) -> Unit = { errorToast ->
         uiState.value.let { state ->
-            Log.i(TAG, "Sending reply to ${state.recipientName} ${state.pubkey}")
-            if (state.isSendable) {
+            if (!state.isSendable) {
+                Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+            } else {
+                Log.i(TAG, "Sending reply to ${state.recipientName} ${state.pubkey}")
                 nostrService.send(
                     recipientPubkey = recipientPubkey,
                     reply = state.reply
                 )
+                reset()
             }
-            reset()
         }
     }
 
@@ -100,12 +105,14 @@ class ReplyViewModel(
         fun provideFactory(
             nostrService: INostrService,
             profileCache: IProfileCache,
+            context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ReplyViewModel(
                     nostrService = nostrService,
                     profileCache = profileCache,
+                    context = context,
                 ) as T
             }
         }

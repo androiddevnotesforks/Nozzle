@@ -14,7 +14,7 @@ fun ReplyRoute(
     ReplyScreen(
         uiState = uiState,
         onChangeReply = replyViewModel.onChangeReply,
-        onSend = replyViewModel.onSend,
+        onSendOrShowErrorToast = replyViewModel.onSendOrShowErrorToast,
         onGoBack = onGoBack,
     )
 }
