@@ -11,8 +11,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.components.ActionButton
 import com.kaiwolfram.nozzle.ui.components.ChangeableTextField
+import com.kaiwolfram.nozzle.ui.components.CheckButton
 import com.kaiwolfram.nozzle.ui.components.ReturnableTopBar
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -24,12 +24,22 @@ fun EditProfileScreen(
     onChangeBio: (String) -> Unit,
     onChangePictureUrl: (String) -> Unit,
     onResetUiState: () -> Unit,
+    onCanGoBack: () -> Boolean,
     onGoBack: () -> Unit,
 ) {
     Column {
+        val toast = stringResource(id = R.string.profile_updated)
         ReturnableTopBar(
             text = stringResource(id = R.string.edit_profile),
-            onGoBack = onGoBack
+            onGoBack = onGoBack,
+            trailingIcon = {
+                CheckButton(
+                    hasChanges = uiState.hasChanges,
+                    onCheck = { onUpdateProfileAndShowToast(toast) },
+                    onCanGoBack = onCanGoBack,
+                    onGoBack = onGoBack,
+                )
+            }
         )
         Column(
             modifier = Modifier
@@ -55,16 +65,6 @@ fun EditProfileScreen(
                 onChangePictureUrl = onChangePictureUrl
             )
             Spacer(modifier = Modifier.height(spacing.large))
-
-            if (uiState.hasChanges) {
-                val toast = stringResource(id = R.string.profile_updated)
-                ActionButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(id = R.string.update_profile),
-                    onAction = { onUpdateProfileAndShowToast(toast) },
-                    clearFocusAfterAction = true
-                )
-            }
         }
     }
     DisposableEffect(key1 = null) {

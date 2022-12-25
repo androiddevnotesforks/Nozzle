@@ -61,23 +61,23 @@ class KeysViewModel(
         Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
     }
 
-    val onUpdateKeyPairAndShowToast: (String) -> Unit =
-        { toast ->
-            val privkeyInput = uiState.value.privkeyInput
-            val isValid = privkeyInput.length == 64 && privkeyInput.isHex()
-            if (isValid) {
-                Log.i(TAG, "Saving new privkey $privkeyInput")
-                keyManager.setPrivkey(privkeyInput)
+    val onUpdateKeyPairAndShowToast: (String) -> Unit = { toast ->
+        uiState.value.let { state ->
+            val isValid = state.privkeyInput.length == 64 && state.privkeyInput.isHex()
+            if (!isValid) {
+                Log.i(TAG, "New privkey $state.privkeyInput is invalid")
+                viewModelState.update {
+                    state.copy(isInvalid = true)
+                }
+            } else if (uiState.value.hasChanges) {
+                Log.i(TAG, "Saving new privkey $state.privkeyInput")
+                keyManager.setPrivkey(state.privkeyInput)
                 profileCache.reset()
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-            } else {
-                Log.i(TAG, "New privkey $privkeyInput is invalid")
-                viewModelState.update {
-                    it.copy(isInvalid = true)
-                }
             }
         }
+    }
 
     val onChangePrivkey: (String) -> Unit = { newValue ->
         if (privkey == newValue) {
@@ -97,6 +97,12 @@ class KeysViewModel(
                 )
             }
         }
+    }
+
+    val onCanGoBack: () -> Boolean = {
+        val canGoBack = !uiState.value.isInvalid
+        Log.i(TAG, "can go back $canGoBack")
+        canGoBack
     }
 
     val onResetUiState: () -> Unit = {

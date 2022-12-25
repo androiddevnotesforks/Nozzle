@@ -26,6 +26,7 @@ fun KeysRoute(
         },
         onChangePrivkey = keysViewModel.onChangePrivkey,
         onResetUiState = keysViewModel.onResetUiState,
+        onCanGoBack = keysViewModel.onCanGoBack,
         onGoBack = onGoBack,
     )
 }

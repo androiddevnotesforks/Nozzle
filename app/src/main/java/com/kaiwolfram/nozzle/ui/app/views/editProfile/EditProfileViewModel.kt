@@ -48,45 +48,52 @@ class EditProfileViewModel(
         useCachedValues()
     }
 
-    val onUpdateProfileAndShowToast: (String) -> Unit =
-        { toast ->
-            uiState.value.let {
-                val isValidUsername = isValidUsername(it.usernameInput)
-                val isValidUrl = it.pictureUrlInput.isEmpty()
-                        || URLUtil.isValidUrl(it.pictureUrlInput)
-                if (isValidUsername && isValidUrl) {
-                    Log.i(TAG, "Updating profile")
-                    viewModelScope.launch(context = Dispatchers.IO) {
-                        profileDao.updateMetaData(
-                            pubkey = profileCache.getPubkey(),
-                            name = it.usernameInput,
-                            bio = it.bioInput,
-                            pictureUrl = it.pictureUrlInput
-                        )
-                    }
-                    profileCache.setName(it.usernameInput)
-                    profileCache.setBio(it.bioInput)
-                    profileCache.setPictureUrl(it.pictureUrlInput)
-                    useCachedValues()
-                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-                } else {
-                    Log.i(TAG, "New values are invalid")
-                    viewModelState.update { state ->
-                        state.copy(
-                            isInvalidUsername = !isValidUsername,
-                            isInvalidPictureUrl = !isValidUrl
-                        )
-                    }
+    val onUpdateProfileAndShowToast: (String) -> Unit = { toast ->
+        uiState.value.let {
+            if (!it.hasChanges) {
+                Log.i(TAG, "Profile editor has no changes")
+                return@let
+            }
+            val isValidUsername = isValidUsername(it.usernameInput)
+            val isValidUrl = isValidUrl(it.pictureUrlInput)
+            if (isValidUsername && isValidUrl) {
+                Log.i(TAG, "Updating profile")
+                viewModelScope.launch(context = Dispatchers.IO) {
+                    profileDao.updateMetaData(
+                        pubkey = profileCache.getPubkey(),
+                        name = it.usernameInput,
+                        bio = it.bioInput,
+                        pictureUrl = it.pictureUrlInput
+                    )
+                }
+                profileCache.setName(it.usernameInput)
+                profileCache.setBio(it.bioInput)
+                profileCache.setPictureUrl(it.pictureUrlInput)
+                useCachedValues()
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            } else {
+                Log.i(TAG, "New values are invalid")
+                viewModelState.update { state ->
+                    state.copy(
+                        isInvalidUsername = !isValidUsername,
+                        isInvalidPictureUrl = !isValidUrl
+                    )
                 }
             }
         }
+    }
 
     val onChangeName: (String) -> Unit = { input ->
-        if (input != uiState.value.usernameInput) {
+        uiState.value.let { state ->
             viewModelState.update {
                 it.copy(usernameInput = input)
             }
             setHasChanges()
+            if (state.isInvalidUsername && isValidUsername(input)) {
+                viewModelState.update {
+                    it.copy(isInvalidUsername = false)
+                }
+            }
         }
     }
 
@@ -100,17 +107,33 @@ class EditProfileViewModel(
     }
 
     val onChangePictureUrl: (String) -> Unit = { input ->
-        if (input != uiState.value.pictureUrlInput) {
+        uiState.value.let { state ->
             viewModelState.update {
                 it.copy(pictureUrlInput = input)
             }
             setHasChanges()
+            if (state.isInvalidPictureUrl && isValidUrl(input)) {
+                viewModelState.update {
+                    it.copy(isInvalidPictureUrl = false)
+                }
+            }
         }
+    }
+
+    val onCanGoBack: () -> Boolean = {
+        val canGoBack = uiState.value.let { state ->
+            !state.isInvalidUsername && !state.isInvalidPictureUrl
+        }
+        Log.i(TAG, "can go back $canGoBack")
+        canGoBack
     }
 
     val onResetUiState: () -> Unit = {
         useCachedValues()
     }
+
+    private fun isValidUrl(url: String) = url.isEmpty() || URLUtil.isValidUrl(url)
+
 
     private fun setHasChanges() {
         uiState.value.let {

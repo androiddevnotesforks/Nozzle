@@ -34,7 +34,7 @@ fun ReplyScreen(
                 SendButton(
                     isSendable = uiState.isSendable,
                     onSend = { onSendOrShowErrorToast(errorToast) },
-                    onGoBack = onGoBack
+                    onGoBack = onGoBack,
                 )
             }
         )

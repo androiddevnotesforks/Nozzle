@@ -11,12 +11,13 @@ import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
@@ -48,20 +49,58 @@ fun CloseButton(onGoBack: () -> Unit) {
 fun SendButton(
     isSendable: Boolean,
     onSend: () -> Unit,
-    onGoBack: () -> Unit
+    onGoBack: () -> Unit,
+) {
+    TopBarButton(
+        imageVector = Icons.Default.Send,
+        hasChanges = isSendable,
+        description = stringResource(id = R.string.send),
+        onClick = onSend,
+        onCanGoBack = { true },
+        onGoBack = onGoBack,
+    )
+}
+
+@Composable
+fun CheckButton(
+    hasChanges: Boolean,
+    onCheck: () -> Unit,
+    onCanGoBack: (() -> Boolean)? = null,
+    onGoBack: (() -> Unit)? = null,
+) {
+    TopBarButton(
+        imageVector = Icons.Default.Check,
+        hasChanges = hasChanges,
+        description = stringResource(id = R.string.update),
+        onClick = onCheck,
+        onCanGoBack = onCanGoBack,
+        onGoBack = onGoBack,
+    )
+}
+
+@Composable
+private fun TopBarButton(
+    imageVector: ImageVector,
+    hasChanges: Boolean,
+    description: String,
+    onClick: () -> Unit,
+    onCanGoBack: (() -> Boolean)? = null,
+    onGoBack: (() -> Unit)? = null,
 ) {
     Icon(
         modifier = Modifier
             .clip(CircleShape)
             .clickable {
-                onSend()
-                if (isSendable) {
-                    onGoBack()
+                if (hasChanges) {
+                    onClick()
+                    if (onCanGoBack != null && onGoBack != null) {
+                        if (onCanGoBack()) onGoBack()
+                    }
                 }
             },
-        imageVector = Icons.Default.Send,
-        contentDescription = stringResource(id = R.string.send),
-        tint = if (isSendable) colors.surface else LightGray21
+        imageVector = imageVector,
+        contentDescription = description,
+        tint = if (hasChanges) colors.surface else LightGray21
     )
 }
 
@@ -110,26 +149,5 @@ fun FollowButton(
         ) {
             Text(text = stringResource(id = R.string.follow))
         }
-    }
-}
-
-@Composable
-fun ActionButton(
-    text: String,
-    onAction: () -> Unit,
-    modifier: Modifier = Modifier,
-    clearFocusAfterAction: Boolean = false,
-) {
-    val focusManager = LocalFocusManager.current
-    Button(
-        modifier = modifier,
-        onClick = {
-            onAction()
-            if (clearFocusAfterAction) {
-                focusManager.clearFocus()
-            }
-        },
-    ) {
-        Text(text = text)
     }
 }

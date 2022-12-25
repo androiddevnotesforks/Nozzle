@@ -20,10 +20,22 @@ fun KeysScreen(
     onUpdateKeyPairAndShowToast: (String) -> Unit,
     onChangePrivkey: (String) -> Unit,
     onResetUiState: () -> Unit,
+    onCanGoBack: () -> Boolean,
     onGoBack: () -> Unit,
 ) {
     Column {
-        ReturnableTopBar(text = stringResource(id = R.string.keys), onGoBack = onGoBack)
+        val toast = stringResource(id = R.string.key_pair_updated)
+        ReturnableTopBar(
+            text = stringResource(id = R.string.keys),
+            onGoBack = onGoBack,
+            trailingIcon = {
+                CheckButton(
+                    hasChanges = uiState.hasChanges,
+                    onCheck = { onUpdateKeyPairAndShowToast(toast) },
+                    onCanGoBack = onCanGoBack,
+                    onGoBack = onGoBack,
+                )
+            })
         Column(modifier = Modifier.padding(spacing.screenEdge)) {
             Pubkey(
                 pubkey = uiState.pubkey,
@@ -37,15 +49,6 @@ fun KeysScreen(
                 onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast
             )
             Spacer(modifier = Modifier.height(spacing.large))
-            if (uiState.hasChanges) {
-                val toast = stringResource(id = R.string.key_pair_updated)
-                ActionButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(id = R.string.update_key_pair),
-                    onAction = { onUpdateKeyPairAndShowToast(toast) },
-                    clearFocusAfterAction = true,
-                )
-            }
         }
     }
     DisposableEffect(key1 = null) {
