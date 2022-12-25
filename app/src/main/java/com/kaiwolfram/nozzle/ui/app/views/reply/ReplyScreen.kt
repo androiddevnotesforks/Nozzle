@@ -1,16 +1,13 @@
 package com.kaiwolfram.nozzle.ui.app.views.reply
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -30,7 +27,12 @@ fun ReplyScreen(
     onGoBack: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        ReplyTopBar(enabled = uiState.isSendable, onSend = onSend, onGoBack = onGoBack)
+        ClosableTopBar(
+            onClose = onGoBack,
+            trailingIcon = {
+                SendButton(enabled = uiState.isSendable, onSend = onSend, onGoBack = onGoBack)
+            }
+        )
         ReplyingTo(
             modifier = Modifier.padding(top = spacing.medium, start = spacing.screenEdge),
             name = uiState.recipientName
@@ -40,24 +42,6 @@ fun ReplyScreen(
             pubkey = uiState.pubkey,
             onChangeReply = onChangeReply
         )
-    }
-}
-
-@Composable
-private fun ReplyTopBar(enabled: Boolean, onSend: () -> Unit, onGoBack: () -> Unit) {
-    TopAppBar(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = colors.background)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            CloseButton(onGoBack = onGoBack)
-            SendButton(enabled = enabled, onSend = onSend, onGoBack = onGoBack)
-        }
     }
 }
 

@@ -23,7 +23,7 @@ fun KeysScreen(
     onGoBack: () -> Unit,
 ) {
     Column {
-        TopBar(text = stringResource(id = R.string.keys), onGoBack = onGoBack)
+        ReturnableTopBar(text = stringResource(id = R.string.keys), onGoBack = onGoBack)
         Column(modifier = Modifier.padding(spacing.screenEdge)) {
             Pubkey(
                 pubkey = uiState.pubkey,
@@ -101,7 +101,8 @@ private fun Privkey(
         isPassword = !isVisible,
         onChangeValue = onChangePrivkey,
         trailingIcon = {
-            CopyAndVisibilityIcons(isVisible = isVisible,
+            CopyAndVisibilityIcons(
+                isVisible = isVisible,
                 onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast,
                 onToggleVisibility = { isVisible = !isVisible }
             )

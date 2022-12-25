@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ActionButton
 import com.kaiwolfram.nozzle.ui.components.ChangeableTextField
-import com.kaiwolfram.nozzle.ui.components.TopBar
+import com.kaiwolfram.nozzle.ui.components.ReturnableTopBar
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
@@ -27,7 +27,10 @@ fun EditProfileScreen(
     onGoBack: () -> Unit,
 ) {
     Column {
-        TopBar(text = stringResource(id = R.string.edit_profile), onGoBack = onGoBack)
+        ReturnableTopBar(
+            text = stringResource(id = R.string.edit_profile),
+            onGoBack = onGoBack
+        )
         Column(
             modifier = Modifier
                 .padding(spacing.screenEdge)

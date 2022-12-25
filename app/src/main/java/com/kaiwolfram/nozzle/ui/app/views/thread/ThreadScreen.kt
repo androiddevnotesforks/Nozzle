@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +21,7 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.components.PostCard
 import com.kaiwolfram.nozzle.ui.components.PostNotFound
-import com.kaiwolfram.nozzle.ui.components.TopBar
+import com.kaiwolfram.nozzle.ui.components.ReturnableTopBar
 import com.kaiwolfram.nozzle.ui.theme.LightYellow
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -31,12 +34,12 @@ fun ThreadScreen(
     onRepost: (String) -> Unit,
     onRefreshThreadView: () -> Unit,
     onOpenThread: (String) -> Unit,
-    onNavigateToProfile: (String) -> Unit,
     onGoBack: () -> Unit,
+    onNavigateToProfile: (String) -> Unit,
     onNavigateToReply: () -> Unit,
 ) {
     Column {
-        TopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
+        ReturnableTopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
         Column {
             uiState.current?.let {
                 ThreadedPosts(
