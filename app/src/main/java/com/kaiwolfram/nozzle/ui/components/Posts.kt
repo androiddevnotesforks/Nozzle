@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.shapes
 import androidx.compose.material.Text
@@ -71,10 +72,11 @@ fun PostCard(
     onRepost: (String) -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
     modifier: Modifier = Modifier,
+    onNavigateToThread: (String) -> Unit,
+    onNavigateToReply: () -> Unit,
+    isCurrent: Boolean = false,
     threadPosition: ThreadPosition = ThreadPosition.SINGLE,
     onOpenProfile: ((String) -> Unit)? = null,
-    onNavigateToThread: ((String) -> Unit)? = null,
-    onNavigateToReply: () -> Unit,
 ) {
     val x = sizing.profilePicture / 2 + spacing.screenEdge
     val yTop = spacing.screenEdge
@@ -82,11 +84,7 @@ fun PostCard(
     val small = spacing.small
     Row(
         modifier
-            .clickable(enabled = onNavigateToThread != null) {
-                if (onNavigateToThread != null) {
-                    onNavigateToThread(post.id)
-                }
-            }
+            .clickable(enabled = !isCurrent) { onNavigateToThread(post.id) }
             .fillMaxWidth()
             .drawBehind {
                 when (threadPosition) {
@@ -131,37 +129,24 @@ fun PostCard(
             .padding(end = spacing.medium)
             .clipToBounds()
     ) {
-        ProfilePicture(
+        PostCardProfilePicture(
             modifier = Modifier
                 .size(sizing.profilePicture)
                 .clip(CircleShape),
-            pictureUrl = post.pictureUrl,
-            pubkey = post.pubkey,
-            onOpenProfile = if (onOpenProfile != null) {
-                { onOpenProfile(post.pubkey) }
-            } else {
-                null
-            }
+            post = post,
+            onOpenProfile = onOpenProfile
         )
         Spacer(Modifier.width(spacing.large))
         Column {
-            Text(
-                modifier = if (onOpenProfile != null) {
-                    Modifier.clickable { onOpenProfile(post.pubkey) }
-                } else {
-                    Modifier
-                },
-                text = post.name,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            PostCardProfileNameAndContent(
+                post = post,
+                onOpenProfile = onOpenProfile,
             )
-            post.replyToName?.let { ReplyingTo(name = it) }
             Spacer(Modifier.height(spacing.medium))
-            Text(
-                text = post.content,
-                maxLines = 21,
-                overflow = TextOverflow.Ellipsis
+            RepostCardContent(
+                post = post.referencePost,
+                onOpenProfile = onOpenProfile,
+                onNavigateToThread = onNavigateToThread,
             )
             Spacer(Modifier.height(spacing.medium))
             PostCardActions(
@@ -177,6 +162,104 @@ fun PostCard(
             )
         }
     }
+}
+
+@Composable
+private fun PostCardProfileNameAndContent(
+    post: PostWithMeta,
+    onOpenProfile: ((String) -> Unit)?,
+) {
+    Column {
+        PostCardProfileName(post = post, onOpenProfile = onOpenProfile)
+        PostCardContentBase(post = post)
+    }
+}
+
+@Composable
+private fun RepostCardContent(
+    post: PostWithMeta?,
+    onOpenProfile: ((String) -> Unit)?,
+    onNavigateToThread: ((String) -> Unit)?,
+) {
+    post?.let {
+        Column(
+            modifier = Modifier
+                .border(
+                    width = spacing.tiny,
+                    color = LightGray21,
+                    shape = RoundedCornerShape(spacing.large)
+                )
+                .clickable(enabled = onNavigateToThread != null) {
+                    if (onNavigateToThread != null) {
+                        onNavigateToThread(it.id)
+                    }
+                }
+        ) {
+            Column(modifier = Modifier.padding(spacing.large)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    PostCardProfilePicture(
+                        modifier = Modifier
+                            .size(sizing.smallProfilePicture)
+                            .clip(CircleShape),
+                        post = it,
+                        onOpenProfile = onOpenProfile
+                    )
+                    Spacer(modifier = Modifier.width(spacing.medium))
+                    PostCardProfileName(post = it, onOpenProfile = onOpenProfile)
+                }
+                PostCardContentBase(post = it)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PostCardContentBase(
+    post: PostWithMeta,
+) {
+    post.replyToName?.let { ReplyingTo(name = it) }
+    Spacer(Modifier.height(spacing.medium))
+    Text(
+        text = post.content,
+        maxLines = 21,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+private fun PostCardProfilePicture(
+    post: PostWithMeta,
+    onOpenProfile: ((String) -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    ProfilePicture(
+        modifier = modifier,
+        pictureUrl = post.pictureUrl,
+        pubkey = post.pubkey,
+        onOpenProfile = if (onOpenProfile != null) {
+            { onOpenProfile(post.pubkey) }
+        } else {
+            null
+        }
+    )
+}
+
+@Composable
+private fun PostCardProfileName(
+    post: PostWithMeta,
+    onOpenProfile: ((String) -> Unit)?
+) {
+    Text(
+        modifier = if (onOpenProfile != null) {
+            Modifier.clickable { onOpenProfile(post.pubkey) }
+        } else {
+            Modifier
+        },
+        text = post.name,
+        fontWeight = FontWeight.SemiBold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
 
 @Composable

@@ -108,13 +108,15 @@ private fun ThreadedPosts(
             item {
                 PostCard(
                     post = current,
+                    isCurrent = true,
                     onLike = onLike,
                     onRepost = onRepost,
                     onPrepareReply = onPrepareReply,
                     modifier = Modifier.background(color = LightYellow),
                     threadPosition = currentThreadPosition,
                     onOpenProfile = onNavigateToProfile,
-                    onNavigateToReply = onNavigateToReply
+                    onNavigateToReply = onNavigateToReply,
+                    onNavigateToThread = onOpenThread,
                 )
                 Divider()
                 Spacer(modifier = Modifier.height(spacing.tiny))

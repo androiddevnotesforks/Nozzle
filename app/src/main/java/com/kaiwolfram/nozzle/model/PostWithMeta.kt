@@ -11,4 +11,5 @@ data class PostWithMeta(
     val content: String,
     val isLikedByMe: Boolean,
     val isRepostedByMe: Boolean,
+    val referencePost: PostWithMeta? = null,
 )

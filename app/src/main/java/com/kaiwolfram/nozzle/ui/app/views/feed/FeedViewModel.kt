@@ -129,6 +129,18 @@ class FeedViewModel(
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
                         isRepostedByMe = Random.nextBoolean(),
+                        referencePost = PostWithMeta(
+                            name = UUID.randomUUID().toString(),
+                            id = UUID.randomUUID().toString(),
+                            replyToId = UUID.randomUUID().toString(),
+                            replyToName = "Wolfram Kai",
+                            pubkey = derivePubkey(generatePrivkey()),
+                            pictureUrl = "https://cliply.co/wp-content/uploads/2021/02/372102230_BITCOIN_400px.gif",
+                            createdAt = post.createdAt,
+                            content = post.content,
+                            isLikedByMe = Random.nextBoolean(),
+                            isRepostedByMe = Random.nextBoolean(),
+                        )
                     )
                 },
             )
