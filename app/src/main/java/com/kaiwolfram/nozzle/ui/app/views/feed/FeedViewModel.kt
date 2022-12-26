@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
+import com.kaiwolfram.nozzle.data.utils.derivePubkey
+import com.kaiwolfram.nozzle.data.utils.generatePrivkey
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -121,7 +123,7 @@ class FeedViewModel(
                         id = UUID.randomUUID().toString(),
                         replyToId = UUID.randomUUID().toString(),
                         replyToName = "Kai Wolfram",
-                        pubkey = UUID.randomUUID().toString(),
+                        pubkey = derivePubkey(generatePrivkey()),
                         pictureUrl = "https://www.dadant.com/wp-content/uploads/2016/12/honey-production-dadant.jpg",
                         createdAt = post.createdAt,
                         content = post.content,

@@ -23,5 +23,7 @@ fun ReplyingTo(name: String, modifier: Modifier = Modifier) {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = LightGray21)) {
                 append(name)
             }
-        })
+        },
+        maxLines = 1
+    )
 }

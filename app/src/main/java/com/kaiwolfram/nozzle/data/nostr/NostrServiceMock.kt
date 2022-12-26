@@ -1,6 +1,8 @@
 package com.kaiwolfram.nozzle.data.nostr
 
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
+import com.kaiwolfram.nozzle.data.utils.derivePubkey
+import com.kaiwolfram.nozzle.data.utils.generatePrivkey
 import java.util.*
 import kotlin.random.Random
 
@@ -67,7 +69,7 @@ class NostrServiceMock : INostrService {
         // No return
     }
 
-    override fun send(reply: String, recipientPubkey: String) {
+    override fun send(recipientPubkey: String, reply: String) {
         // No return
         // Real implementation should create event, save in db and send to relays
     }
@@ -75,7 +77,7 @@ class NostrServiceMock : INostrService {
     private fun createRndPost(): EventEntity {
         return EventEntity(
             id = UUID.randomUUID().toString(),
-            pubkey = UUID.randomUUID().toString(),
+            pubkey = derivePubkey(generatePrivkey()),
             kind = 3,
             createdAt = System.currentTimeMillis(),
             content = UUID.randomUUID().toString().repeat(Random.nextInt(20))

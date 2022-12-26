@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
+import com.kaiwolfram.nozzle.data.utils.derivePubkey
+import com.kaiwolfram.nozzle.data.utils.generatePrivkey
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -63,7 +65,7 @@ class ThreadViewModel(
                         pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                         replyToId = UUID.randomUUID().toString(),
                         replyToName = "Kai Wolfram",
-                        pubkey = UUID.randomUUID().toString(),
+                        pubkey = derivePubkey(generatePrivkey()),
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
@@ -76,7 +78,7 @@ class ThreadViewModel(
                     replyToId = UUID.randomUUID().toString(),
                     pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                     replyToName = "Kai Wolfram",
-                    pubkey = UUID.randomUUID().toString(),
+                    pubkey = derivePubkey(generatePrivkey()),
                     createdAt = 66666666,
                     content = "post.content",
                     isLikedByMe = Random.nextBoolean(),
@@ -89,7 +91,7 @@ class ThreadViewModel(
                         replyToId = UUID.randomUUID().toString(),
                         pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                         replyToName = "Kai Wolfram",
-                        pubkey = UUID.randomUUID().toString(),
+                        pubkey = derivePubkey(generatePrivkey()),
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
@@ -119,7 +121,7 @@ class ThreadViewModel(
                     replyToId = UUID.randomUUID().toString(),
                     replyToName = "Kai Wolfram",
                     pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                    pubkey = UUID.randomUUID().toString(),
+                    pubkey = derivePubkey(generatePrivkey()),
                     createdAt = post.createdAt,
                     content = post.content,
                     isRepostedByMe = Random.nextBoolean(),
@@ -132,7 +134,7 @@ class ThreadViewModel(
                 replyToId = UUID.randomUUID().toString(),
                 replyToName = "Kai Wolfram",
                 pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                pubkey = UUID.randomUUID().toString(),
+                pubkey = derivePubkey(generatePrivkey()),
                 createdAt = 66666666,
                 content = UUID.randomUUID().toString(),
                 isRepostedByMe = Random.nextBoolean(),
@@ -145,7 +147,7 @@ class ThreadViewModel(
                     replyToId = UUID.randomUUID().toString(),
                     pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
                     replyToName = "Kai Wolfram",
-                    pubkey = UUID.randomUUID().toString(),
+                    pubkey = derivePubkey(generatePrivkey()),
                     createdAt = post.createdAt,
                     content = post.content,
                     isLikedByMe = Random.nextBoolean(),
