@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
-import com.kaiwolfram.nozzle.data.utils.isHex
+import com.kaiwolfram.nozzle.data.utils.isValidPrivkey
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.update
 private const val TAG = "KeysViewModel"
 
 data class KeysViewModelState(
-    val pubkey: String = "",
+    val npub: String = "",
     val privkeyInput: String = "",
     val hasChanges: Boolean = false,
     val isInvalid: Boolean = false,
@@ -47,23 +47,25 @@ class KeysViewModel(
         useCachedValues()
     }
 
-    val onCopyPubkeyAndShowToast: (String) -> Unit = { toast ->
-        val pubkey = uiState.value.pubkey
-        Log.i(TAG, "Copy pubkey $pubkey and show toast '$toast'")
-        clip.setText(AnnotatedString(pubkey))
-        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+    val onCopyNpubAndShowToast: (String) -> Unit = { toast ->
+        uiState.value.npub.let {
+            Log.i(TAG, "Copy npub $it and show toast '$toast'")
+            clip.setText(AnnotatedString(it))
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        }
     }
 
     val onCopyPrivkeyAndShowToast: (String) -> Unit = { toast ->
-        val privkeyInput = uiState.value.privkeyInput
-        Log.i(TAG, "Copy privkey $privkeyInput and show toast '$toast'")
-        clip.setText(AnnotatedString(privkeyInput))
-        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        uiState.value.privkeyInput.let {
+            Log.i(TAG, "Copy privkey $it and show toast '$toast'")
+            clip.setText(AnnotatedString(it))
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        }
     }
 
     val onUpdateKeyPairAndShowToast: (String) -> Unit = { toast ->
         uiState.value.let { state ->
-            val isValid = state.privkeyInput.length == 64 && state.privkeyInput.isHex()
+            val isValid = isValidPrivkey(state.privkeyInput)
             if (!isValid) {
                 Log.i(TAG, "New privkey $state.privkeyInput is invalid")
                 viewModelState.update {
@@ -111,10 +113,9 @@ class KeysViewModel(
 
     private fun useCachedValues() {
         viewModelState.update {
-            privkey = keyManager.getPrivkey()
             it.copy(
-                privkeyInput = privkey,
-                pubkey = keyManager.getPubkey(),
+                privkeyInput = keyManager.getNsec(),
+                npub = keyManager.getNpub(),
                 hasChanges = false,
                 isInvalid = false,
             )

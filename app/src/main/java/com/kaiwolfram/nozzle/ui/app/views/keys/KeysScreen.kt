@@ -15,7 +15,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun KeysScreen(
     uiState: KeysViewModelState,
-    onCopyPubkeyAndShowToast: (String) -> Unit,
+    onCopyNpubAndShowToast: (String) -> Unit,
     onCopyPrivkeyAndShowToast: (String) -> Unit,
     onUpdateKeyPairAndShowToast: (String) -> Unit,
     onChangePrivkey: (String) -> Unit,
@@ -37,9 +37,9 @@ fun KeysScreen(
                 )
             })
         Column(modifier = Modifier.padding(spacing.screenEdge)) {
-            Pubkey(
-                pubkey = uiState.pubkey,
-                onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast
+            Npub(
+                npub = uiState.npub,
+                onCopyNpubAndShowToast = onCopyNpubAndShowToast
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
             Privkey(
@@ -57,9 +57,9 @@ fun KeysScreen(
 }
 
 @Composable
-private fun Pubkey(
-    pubkey: String,
-    onCopyPubkeyAndShowToast: (String) -> Unit
+private fun Npub(
+    npub: String,
+    onCopyNpubAndShowToast: (String) -> Unit
 ) {
     Text(
         text = stringResource(id = R.string.public_key),
@@ -68,13 +68,13 @@ private fun Pubkey(
     Text(text = stringResource(id = R.string.public_key_explanation))
     TextField(
         modifier = Modifier.fillMaxWidth(),
-        value = TextFieldValue(pubkey),
+        value = TextFieldValue(npub),
         enabled = false,
         onValueChange = { /* Always disabled*/ },
         trailingIcon = {
             CopyAndToastIcon(
                 toastText = stringResource(id = R.string.pubkey_copied),
-                onCopyAndShowToast = onCopyPubkeyAndShowToast
+                onCopyAndShowToast = onCopyNpubAndShowToast
             )
         }
     )

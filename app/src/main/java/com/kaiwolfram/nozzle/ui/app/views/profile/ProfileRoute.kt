@@ -23,7 +23,7 @@ fun ProfileRoute(
         onFollow = profileViewModel.onFollow,
         onUnfollow = profileViewModel.onUnfollow,
         onRefreshProfileView = profileViewModel.onRefreshProfileView,
-        onCopyPubkeyAndShowToast = profileViewModel.onCopyPubkeyAndShowToast,
+        onCopyNpubAndShowToast = profileViewModel.onCopyNpubAndShowToast,
         onNavigateToThread = onNavigateToThread,
         onNavigateToReply = onNavigateToReply,
         onNavigateToEditProfile = onNavigateToEditProfile,

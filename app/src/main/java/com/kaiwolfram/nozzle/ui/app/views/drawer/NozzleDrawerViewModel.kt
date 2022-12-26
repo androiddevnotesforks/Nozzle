@@ -16,6 +16,7 @@ private const val TAG = "NozzleDrawerViewModel"
 
 data class NozzleDrawerViewModelState(
     val pubkey: String = "",
+    val npub: String = "",
     val name: String = "",
     val pictureUrl: String = "",
 )
@@ -44,6 +45,7 @@ class NozzleDrawerViewModel(
         viewModelState.update {
             it.copy(
                 pubkey = profileProvider.getPubkey(),
+                npub = profileProvider.getNpub(),
                 name = profileProvider.getName(),
                 pictureUrl = profileProvider.getPictureUrl(),
             )

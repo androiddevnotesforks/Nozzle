@@ -30,7 +30,7 @@ fun ProfileScreen(
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
     onRefreshProfileView: () -> Unit,
-    onCopyPubkeyAndShowToast: (String) -> Unit,
+    onCopyNpubAndShowToast: (String) -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
@@ -38,6 +38,7 @@ fun ProfileScreen(
     Column {
         ProfileData(
             pubkey = uiState.pubkey,
+            npub = uiState.npub,
             name = uiState.name,
             bio = uiState.bio,
             pictureUrl = uiState.pictureUrl,
@@ -45,7 +46,7 @@ fun ProfileScreen(
             isFollowed = uiState.isFollowed,
             onFollow = onFollow,
             onUnfollow = onUnfollow,
-            onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
+            onCopyNpubAndShowToast = onCopyNpubAndShowToast,
             onNavToEditProfile = onNavigateToEditProfile,
         )
         Spacer(Modifier.height(spacing.medium))
@@ -74,6 +75,7 @@ fun ProfileScreen(
 @Composable
 private fun ProfileData(
     pubkey: String,
+    npub: String,
     name: String,
     bio: String,
     pictureUrl: String,
@@ -81,7 +83,7 @@ private fun ProfileData(
     isFollowed: Boolean,
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
-    onCopyPubkeyAndShowToast: (String) -> Unit,
+    onCopyNpubAndShowToast: (String) -> Unit,
     onNavToEditProfile: () -> Unit,
 ) {
     Column(
@@ -97,10 +99,10 @@ private fun ProfileData(
             onUnfollow = onUnfollow,
             onNavToEditProfile = onNavToEditProfile,
         )
-        NameAndPubkey(
+        NameAndNpub(
             name = name,
-            pubkey = pubkey,
-            onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast,
+            npub = npub,
+            onCopyNpubAndShowToast = onCopyNpubAndShowToast,
         )
         Spacer(Modifier.height(spacing.medium))
         if (bio.isNotBlank()) {
@@ -198,10 +200,10 @@ private fun FollowerNumbers(
 }
 
 @Composable
-private fun NameAndPubkey(
+private fun NameAndNpub(
     name: String,
-    pubkey: String,
-    onCopyPubkeyAndShowToast: (String) -> Unit,
+    npub: String,
+    onCopyNpubAndShowToast: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -214,22 +216,22 @@ private fun NameAndPubkey(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.h6,
             )
-            CopyablePubkey(
-                pubkey = pubkey,
-                onCopyPubkeyAndShowToast = onCopyPubkeyAndShowToast
+            CopyableNpub(
+                npub = npub,
+                onCopyNpubAndShowToast = onCopyNpubAndShowToast
             )
         }
     }
 }
 
 @Composable
-private fun CopyablePubkey(
-    pubkey: String,
-    onCopyPubkeyAndShowToast: (String) -> Unit,
+private fun CopyableNpub(
+    npub: String,
+    onCopyNpubAndShowToast: (String) -> Unit,
 ) {
     val toast = stringResource(id = R.string.pubkey_copied)
     Row(
-        Modifier.clickable { onCopyPubkeyAndShowToast(toast) },
+        Modifier.clickable { onCopyNpubAndShowToast(toast) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         CopyIcon(
@@ -238,7 +240,7 @@ private fun CopyablePubkey(
             tint = LightGray21
         )
         Text(
-            text = pubkey,
+            text = npub,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             color = LightGray21,

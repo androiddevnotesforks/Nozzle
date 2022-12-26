@@ -16,6 +16,7 @@ import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.EventEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
+import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -34,6 +35,7 @@ private const val TAG = "ProfileViewModel"
 
 data class ProfileViewModelState(
     val pubkey: String = "",
+    val npub: String = "",
     val name: String = "",
     val bio: String = "",
     val pictureUrl: String = "",
@@ -77,10 +79,12 @@ class ProfileViewModel(
         }
     }
 
-    val onCopyPubkeyAndShowToast: (String) -> Unit = { toast ->
-        Log.i(TAG, "Copy pubkey ${uiState.value.pubkey} and show toast '$toast'")
-        clip.setText(AnnotatedString(uiState.value.pubkey))
-        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+    val onCopyNpubAndShowToast: (String) -> Unit = { toast ->
+        uiState.value.npub.let {
+            Log.i(TAG, "Copy npub $it and show toast '$toast'")
+            clip.setText(AnnotatedString(it))
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        }
     }
 
     val onRefreshProfileView: () -> Unit = {
@@ -187,6 +191,7 @@ class ProfileViewModel(
         viewModelState.update {
             it.copy(
                 pubkey = profile.pubkey,
+                npub = hexToNpub(profile.pubkey),
                 name = profile.name,
                 bio = profile.bio,
                 pictureUrl = profile.pictureUrl,
@@ -220,6 +225,7 @@ class ProfileViewModel(
             viewModelState.update {
                 it.copy(
                     pubkey = pubkey,
+                    npub = hexToNpub(pubkey),
                     name = cachedProfile.name,
                     bio = cachedProfile.bio,
                     pictureUrl = cachedProfile.pictureUrl,
@@ -253,6 +259,7 @@ class ProfileViewModel(
         viewModelState.update {
             it.copy(
                 pubkey = pubkey,
+                npub = hexToNpub(pubkey),
                 name = "",
                 bio = "",
                 pictureUrl = "",

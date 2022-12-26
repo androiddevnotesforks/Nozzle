@@ -23,6 +23,8 @@ class ProfileCache(
 
     override fun getPubkey() = pubkeyProvider.getPubkey()
 
+    override fun getNpub() = pubkeyProvider.getNpub()
+
     override fun getName() = preferences.getString(NAME, "") ?: ""
 
     override fun getBio() = preferences.getString(BIO, "") ?: ""

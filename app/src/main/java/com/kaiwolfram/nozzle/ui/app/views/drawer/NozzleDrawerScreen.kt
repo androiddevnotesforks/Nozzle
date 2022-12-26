@@ -37,6 +37,7 @@ fun NozzleDrawerScreen(
             modifier = Modifier.padding(horizontal = spacing.medium),
             pictureUrl = uiState.pictureUrl,
             pubkey = uiState.pubkey,
+            npub = uiState.npub,
             profileName = uiState.name,
             navigateToProfile = {
                 onSetPubkey(uiState.pubkey)
@@ -63,6 +64,7 @@ fun NozzleDrawerScreen(
 private fun ProfileRow(
     pictureUrl: String,
     pubkey: String,
+    npub: String,
     profileName: String,
     navigateToProfile: () -> Unit,
     closeDrawer: () -> Unit,
@@ -97,7 +99,7 @@ private fun ProfileRow(
                 )
                 Spacer(Modifier.width(spacing.large))
                 Text(
-                    text = profileName.ifEmpty { pubkey },
+                    text = profileName.ifEmpty { npub },
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.h6,

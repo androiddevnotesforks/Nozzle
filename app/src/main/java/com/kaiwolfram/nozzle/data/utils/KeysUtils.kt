@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.data
+package com.kaiwolfram.nozzle.data.utils
 
 import fr.acinq.secp256k1.Secp256k1
 import java.security.SecureRandom
@@ -20,6 +20,22 @@ fun derivePubkey(privkey: String): String {
         .copyOfRange(1, 33)
         .toHex()
 }
+
+// TODO: Real implementations
+fun hexToNpub(pubkey: String) = "npub$pubkey"
+fun hexToNsec(privkey: String) = "nsec$privkey"
+fun npubToHex(npub: String) = npub.substring(4)
+fun nsecToHex(nsec: String) = nsec.substring(4)
+
+fun privkeyToHex(privkey: String): String {
+    return if (privkey.startsWith("nsec")) nsecToHex(privkey) else privkey
+}
+
+fun isValidPrivkey(privkey: String): Boolean {
+    val hex = privkeyToHex(privkey)
+    return hex.length == 64 && hex.isHex()
+}
+
 
 private fun ByteArray.toHex(): String {
     return this.joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
