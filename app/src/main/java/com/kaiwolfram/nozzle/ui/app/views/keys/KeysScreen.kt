@@ -20,7 +20,6 @@ fun KeysScreen(
     onUpdateKeyPairAndShowToast: (String) -> Unit,
     onChangePrivkey: (String) -> Unit,
     onResetUiState: () -> Unit,
-    onCanGoBack: () -> Boolean,
     onGoBack: () -> Unit,
 ) {
     Column {
@@ -32,8 +31,6 @@ fun KeysScreen(
                 CheckButton(
                     hasChanges = uiState.hasChanges,
                     onCheck = { onUpdateKeyPairAndShowToast(toast) },
-                    onCanGoBack = onCanGoBack,
-                    onGoBack = onGoBack,
                 )
             })
         Column(modifier = Modifier.padding(spacing.screenEdge)) {

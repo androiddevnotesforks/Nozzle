@@ -101,12 +101,6 @@ class KeysViewModel(
         }
     }
 
-    val onCanGoBack: () -> Boolean = {
-        val canGoBack = !uiState.value.isInvalid
-        Log.i(TAG, "can go back $canGoBack")
-        canGoBack
-    }
-
     val onResetUiState: () -> Unit = {
         useCachedValues()
     }
