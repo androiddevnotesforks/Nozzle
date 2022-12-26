@@ -114,7 +114,7 @@ class KeysViewModel(
     private fun useCachedValues() {
         viewModelState.update {
             it.copy(
-                privkeyInput = keyManager.getNsec(),
+                privkeyInput = keyManager.getPrivkey(),
                 npub = keyManager.getNpub(),
                 hasChanges = false,
                 isInvalid = false,

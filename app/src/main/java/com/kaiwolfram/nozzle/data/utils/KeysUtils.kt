@@ -5,6 +5,8 @@ import java.security.SecureRandom
 
 private val rnd = SecureRandom()
 private val secp256k1 = Secp256k1.get()
+private const val NPUB = "npub"
+private const val NSEC = "nsec"
 
 fun generatePrivkey(): String {
     val bytes = ByteArray(32)
@@ -21,21 +23,15 @@ fun derivePubkey(privkey: String): String {
         .toHex()
 }
 
-// TODO: Real implementations
-fun hexToNpub(pubkey: String) = "npub$pubkey"
-fun hexToNsec(privkey: String) = "nsec$privkey"
-fun npubToHex(npub: String) = npub.substring(4)
-fun nsecToHex(nsec: String) = nsec.substring(4)
-
-fun privkeyToHex(privkey: String): String {
-    return if (privkey.startsWith("nsec")) nsecToHex(privkey) else privkey
+fun hexToNpub(pubkey: String): String {
+    return Bech32.encode(NPUB, pubkey.decodeHex())
 }
 
 fun isValidPrivkey(privkey: String): Boolean {
-    val hex = privkeyToHex(privkey)
-    return hex.length == 64 && hex.isHex()
+    return privkey.length == 64 && privkey.isHex()
 }
 
+// TODO: Figure out how nsec to hex works
 
 private fun ByteArray.toHex(): String {
     return this.joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
