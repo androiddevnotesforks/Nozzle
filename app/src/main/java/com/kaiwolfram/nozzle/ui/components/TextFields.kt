@@ -18,6 +18,7 @@ fun ChangeableTextField(
     maxLines: Int = 1,
     isError: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
+    keyboardImeAction: ImeAction = ImeAction.Done,
     errorLabel: String? = null,
     placeholder: String? = null,
     isPassword: Boolean = false,
@@ -48,7 +49,7 @@ fun ChangeableTextField(
         },
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
-            imeAction = ImeAction.Done,
+            imeAction = keyboardImeAction,
             autoCorrect = false,
         ),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),

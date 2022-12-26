@@ -23,6 +23,7 @@ fun EditProfileRoute(
         onChangeName = editProfileViewModel.onChangeName,
         onChangeBio = editProfileViewModel.onChangeBio,
         onChangePictureUrl = editProfileViewModel.onChangePictureUrl,
+        onChangeNip05 = editProfileViewModel.onChangeNip05,
         onResetUiState = editProfileViewModel.onResetUiState,
         onCanGoBack = editProfileViewModel.onCanGoBack,
         onGoBack = onGoBack,

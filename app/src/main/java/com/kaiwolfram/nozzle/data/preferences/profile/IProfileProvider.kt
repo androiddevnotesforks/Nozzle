@@ -6,4 +6,5 @@ interface IProfileProvider : IPubkeyProvider {
     fun getName(): String
     fun getBio(): String
     fun getPictureUrl(): String
+    fun getNip05(): String
 }

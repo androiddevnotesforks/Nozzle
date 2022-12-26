@@ -82,7 +82,7 @@ private fun ThreadedPosts(
     ) {
         val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = previous.size)
         LaunchedEffect(key1 = previous.size) {
-            lazyListState.animateScrollToItem(previous.size)
+            lazyListState.scrollToItem(previous.size)
         }
         LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
             itemsIndexed(previous) { index, post ->

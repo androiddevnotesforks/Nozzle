@@ -9,6 +9,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ChangeableTextField
@@ -23,6 +24,7 @@ fun EditProfileScreen(
     onChangeName: (String) -> Unit,
     onChangeBio: (String) -> Unit,
     onChangePictureUrl: (String) -> Unit,
+    onChangeNip05: (String) -> Unit,
     onResetUiState: () -> Unit,
     onCanGoBack: () -> Boolean,
     onGoBack: () -> Unit,
@@ -64,7 +66,12 @@ fun EditProfileScreen(
                 isInvalid = uiState.isInvalidPictureUrl,
                 onChangePictureUrl = onChangePictureUrl
             )
-            Spacer(modifier = Modifier.height(spacing.large))
+            Spacer(modifier = Modifier.height(spacing.xxl))
+
+            Nip05(
+                nip05 = uiState.nip05Input,
+                onChangeNip05 = onChangeNip05
+            )
         }
     }
     DisposableEffect(key1 = null) {
@@ -85,6 +92,7 @@ private fun Username(
         isError = isInvalid,
         placeholder = stringResource(id = R.string.enter_your_username),
         errorLabel = stringResource(id = R.string.invalid_username),
+        keyboardImeAction = ImeAction.Next,
         onChangeValue = onChangeName,
     )
 }
@@ -101,6 +109,7 @@ private fun Bio(
         maxLines = 3,
         placeholder = stringResource(id = R.string.describe_yourself),
         errorLabel = stringResource(id = R.string.invalid_username),
+        keyboardImeAction = ImeAction.Next,
         onChangeValue = onChangeBio,
     )
 }
@@ -120,6 +129,23 @@ private fun ProfilePictureUrl(
         placeholder = stringResource(id = R.string.enter_a_picture_url),
         errorLabel = stringResource(id = R.string.invalid_url),
         keyboardType = KeyboardType.Uri,
+        keyboardImeAction = ImeAction.Next,
         onChangeValue = onChangePictureUrl,
+    )
+}
+
+@Composable
+private fun Nip05(
+    nip05: String,
+    onChangeNip05: (String) -> Unit,
+) {
+    Text(text = stringResource(id = R.string.nip05_identifier), fontWeight = FontWeight.Bold)
+    ChangeableTextField(
+        modifier = Modifier.fillMaxWidth(),
+        value = nip05,
+        maxLines = 3,
+        placeholder = stringResource(id = R.string.enter_nip05),
+        keyboardType = KeyboardType.Uri,
+        onChangeValue = onChangeNip05,
     )
 }

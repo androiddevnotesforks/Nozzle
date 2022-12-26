@@ -11,6 +11,7 @@ private const val TAG: String = "ProfileCache"
 private const val NAME: String = "name"
 private const val BIO: String = "bio"
 private const val PICTURE_URL: String = "picture_url"
+private const val NIP05: String = "nip05"
 
 class ProfileCache(
     private val pubkeyProvider: IPubkeyProvider,
@@ -31,6 +32,8 @@ class ProfileCache(
 
     override fun getPictureUrl() = preferences.getString(PICTURE_URL, "") ?: ""
 
+    override fun getNip05() = preferences.getString(NIP05, "") ?: ""
+
     override fun setName(name: String) {
         Log.i(TAG, "Set name $name")
         preferences.edit()
@@ -49,6 +52,13 @@ class ProfileCache(
         Log.i(TAG, "Set pictureUrl $pictureUrl")
         preferences.edit()
             .putString(PICTURE_URL, pictureUrl)
+            .apply()
+    }
+
+    override fun setNip05(nip05: String) {
+        Log.i(TAG, "Set nip05 $nip05")
+        preferences.edit()
+            .putString(NIP05, nip05)
             .apply()
     }
 

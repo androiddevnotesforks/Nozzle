@@ -62,4 +62,6 @@
     <string name="edit_profile">Edit profile</string>
     <string name="your_reply_is_empty">Your reply is empty</string>
     <string name="update">Update</string>
+    <string name="nip05_identifier">nip-05 identifier</string>
+    <string name="enter_nip05">e.g. username@nozzle.chat</string>
 </resources>

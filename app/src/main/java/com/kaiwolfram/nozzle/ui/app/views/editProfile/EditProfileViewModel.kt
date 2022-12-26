@@ -24,6 +24,7 @@ data class EditProfileViewModelState(
     val usernameInput: String = "",
     val bioInput: String = "",
     val pictureUrlInput: String = "",
+    val nip05Input: String = "",
     val hasChanges: Boolean = false,
     val isInvalidUsername: Boolean = false,
     val isInvalidPictureUrl: Boolean = false,
@@ -69,6 +70,7 @@ class EditProfileViewModel(
                 profileCache.setName(it.usernameInput)
                 profileCache.setBio(it.bioInput)
                 profileCache.setPictureUrl(it.pictureUrlInput)
+                profileCache.setNip05(it.nip05Input)
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {
@@ -120,6 +122,13 @@ class EditProfileViewModel(
         }
     }
 
+    val onChangeNip05: (String) -> Unit = { input ->
+        viewModelState.update {
+            it.copy(nip05Input = input)
+        }
+        setHasChanges()
+    }
+
     val onCanGoBack: () -> Boolean = {
         val canGoBack = uiState.value.let { state ->
             !state.isInvalidUsername && !state.isInvalidPictureUrl
@@ -140,6 +149,7 @@ class EditProfileViewModel(
             val hasChanges = it.usernameInput != profileCache.getName()
                     || it.bioInput != profileCache.getBio()
                     || it.pictureUrlInput != profileCache.getPictureUrl()
+                    || it.nip05Input != profileCache.getNip05()
             if (hasChanges != it.hasChanges) {
                 viewModelState.update { state ->
                     state.copy(hasChanges = hasChanges)
@@ -154,6 +164,7 @@ class EditProfileViewModel(
                 usernameInput = profileCache.getName(),
                 bioInput = profileCache.getBio(),
                 pictureUrlInput = profileCache.getPictureUrl(),
+                nip05Input = profileCache.getNip05(),
                 hasChanges = false,
                 isInvalidUsername = false,
                 isInvalidPictureUrl = false
