@@ -9,10 +9,12 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 fun FeedRoute(
     feedViewModel: FeedViewModel,
     onPrepareReply: (PostWithMeta) -> Unit,
+    onPreparePost: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToReply: () -> Unit,
+    onNavigateToPost: () -> Unit,
 ) {
     val uiState by feedViewModel.uiState.collectAsState()
 
@@ -21,10 +23,12 @@ fun FeedRoute(
         onLike = feedViewModel.onLike,
         onRepost = feedViewModel.onRepost,
         onPrepareReply = onPrepareReply,
+        onPreparePost = onPreparePost,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onOpenDrawer = onOpenDrawer,
         onNavigateToProfile = onNavigateToProfile,
         onNavigateToThread = onNavigateToThread,
         onNavigateToReply = onNavigateToReply,
+        onNavigateToPost = onNavigateToPost,
     )
 }

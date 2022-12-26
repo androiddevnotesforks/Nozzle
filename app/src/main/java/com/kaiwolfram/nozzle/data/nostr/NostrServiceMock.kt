@@ -69,9 +69,13 @@ class NostrServiceMock : INostrService {
         // No return
     }
 
-    override fun send(recipientPubkey: String, reply: String) {
+    override fun reply(recipientPubkey: String, reply: String) {
         // No return
         // Real implementation should create event, save in db and send to relays
+    }
+
+    override fun send(content: String) {
+        // No return
     }
 
     private fun createRndPost(): EventEntity {

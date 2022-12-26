@@ -41,6 +41,12 @@ class NozzleNavActions(private val navController: NavHostController) {
         }
     }
 
+    val navigateToPost: () -> Unit = {
+        navController.navigate(NozzleRoute.POST) {
+            setSimpleNavOptions(optionsBuilder = this)
+        }
+    }
+
     val popStack: () -> Unit = {
         navController.popBackStack()
     }

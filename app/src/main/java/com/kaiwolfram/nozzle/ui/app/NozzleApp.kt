@@ -18,11 +18,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.kaiwolfram.nozzle.AppContainer
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
+import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavGraph
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerRoute
 import com.kaiwolfram.nozzle.ui.app.views.drawer.NozzleDrawerViewModel
 import com.kaiwolfram.nozzle.ui.app.views.editProfile.EditProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedViewModel
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
+import com.kaiwolfram.nozzle.ui.app.views.post.PostViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyViewModel
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadViewModel
@@ -87,7 +89,14 @@ fun NozzleApp(appContainer: AppContainer) {
                 replyViewModel = viewModel(
                     factory = ReplyViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
-                        profileCache = appContainer.profileCache,
+                        profileProvider = appContainer.profileCache,
+                        context = LocalContext.current,
+                    )
+                ),
+                postViewModel = viewModel(
+                    factory = PostViewModel.provideFactory(
+                        nostrService = appContainer.nostrService,
+                        profileProvider = appContainer.profileCache,
                         context = LocalContext.current,
                     )
                 )
@@ -115,7 +124,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         .fillMaxSize()
                         .statusBarsPadding()
                 ) {
-                    NozzleScaffold(
+                    NozzleNavGraph(
                         vmContainer = vmContainer,
                         navController = navController,
                         navActions = navActions,

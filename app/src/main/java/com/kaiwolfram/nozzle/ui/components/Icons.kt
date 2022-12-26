@@ -102,6 +102,18 @@ fun LikeIcon(
 }
 
 @Composable
+fun AddIcon(
+    modifier: Modifier = Modifier,
+    description: String? = stringResource(id = R.string.add),
+) {
+    Icon(
+        modifier = modifier,
+        imageVector = Icons.Default.Add,
+        contentDescription = description,
+    )
+}
+
+@Composable
 fun VisibilityIcon(isVisible: Boolean, onToggle: () -> Unit) {
     Icon(
         modifier = Modifier

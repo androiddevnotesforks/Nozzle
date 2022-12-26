@@ -3,8 +3,10 @@ package com.kaiwolfram.nozzle.ui.app.views.feed
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.ui.components.AddIcon
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.PostCardList
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
@@ -29,31 +32,48 @@ fun FeedScreen(
     onRepost: (String) -> Unit,
     onRefreshFeedView: () -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
+    onPreparePost: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToReply: () -> Unit,
+    onNavigateToPost: () -> Unit,
 ) {
-    Column {
-        FeedTopBar(
-            pictureUrl = uiState.pictureUrl,
-            pubkey = uiState.pubkey,
-            onPictureClick = onOpenDrawer,
-        )
-        PostCardList(
-            posts = uiState.posts,
-            isRefreshing = uiState.isRefreshing,
-            onLike = onLike,
-            onRepost = onRepost,
-            onPrepareReply = onPrepareReply,
-            onRefresh = onRefreshFeedView,
-            onOpenProfile = onNavigateToProfile,
-            onNavigateToThread = onNavigateToThread,
-            onNavigateToReply = onNavigateToReply,
-        )
-    }
-    if (uiState.posts.isEmpty()) {
-        NoPostsHint()
+    Scaffold(
+        topBar = {
+            FeedTopBar(
+                pictureUrl = uiState.pictureUrl,
+                pubkey = uiState.pubkey,
+                onPictureClick = onOpenDrawer,
+            )
+        },
+        floatingActionButton = {
+            FeedFab(onPrepareNewPost = {
+                onPreparePost()
+                onNavigateToPost()
+            })
+        },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
+            PostCardList(
+                posts = uiState.posts,
+                isRefreshing = uiState.isRefreshing,
+                onLike = onLike,
+                onRepost = onRepost,
+                onPrepareReply = onPrepareReply,
+                onRefresh = onRefreshFeedView,
+                onOpenProfile = onNavigateToProfile,
+                onNavigateToThread = onNavigateToThread,
+                onNavigateToReply = onNavigateToReply,
+            )
+        }
+        if (uiState.posts.isEmpty()) {
+            NoPostsHint()
+        }
     }
 }
 
@@ -92,5 +112,14 @@ private fun FeedTopBar(
                 Spacer(modifier = Modifier.width(spacing.large))
             }
         }
+    }
+}
+
+@Composable
+private fun FeedFab(
+    onPrepareNewPost: () -> Unit
+) {
+    FloatingActionButton(onClick = { onPrepareNewPost() }) {
+        AddIcon()
     }
 }

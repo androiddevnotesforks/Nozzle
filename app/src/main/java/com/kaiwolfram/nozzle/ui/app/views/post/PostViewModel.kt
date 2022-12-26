@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.app.views.reply
+package com.kaiwolfram.nozzle.ui.app.views.post
 
 import android.content.Context
 import android.util.Log
@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
-import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,23 +16,21 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-private const val TAG = "ReplyViewModel"
+private const val TAG = "PostViewModel"
 
-data class ReplyViewModelState(
-    val recipientName: String = "",
-    val reply: String = "",
+data class PostViewModelState(
+    val content: String = "",
     val isSendable: Boolean = false,
     val pictureUrl: String = "",
     val pubkey: String = "",
 )
 
-class ReplyViewModel(
+class PostViewModel(
     private val nostrService: INostrService,
     private val profileProvider: IProfileProvider,
     context: Context,
 ) : ViewModel() {
-    private val viewModelState = MutableStateFlow(ReplyViewModelState())
-    private var recipientPubkey: String = ""
+    private val viewModelState = MutableStateFlow(PostViewModelState())
 
     val uiState = viewModelState
         .stateIn(
@@ -46,26 +43,24 @@ class ReplyViewModel(
         Log.i(TAG, "Initialize ReplyViewModel")
     }
 
-    val onPrepareReply: (PostWithMeta) -> Unit = { post ->
+    val onPreparePost: () -> Unit = {
         viewModelScope.launch(context = Dispatchers.IO) {
-            Log.i(TAG, "Setting reply to ${post.pubkey}")
+            Log.i(TAG, "Preparing new post")
             viewModelState.update {
-                recipientPubkey = post.pubkey
                 it.copy(
-                    recipientName = post.name,
-                    pictureUrl = post.pictureUrl,
+                    pictureUrl = profileProvider.getPictureUrl(),
                     pubkey = profileProvider.getPubkey(),
-                    reply = "",
+                    content = "",
                     isSendable = false,
                 )
             }
         }
     }
 
-    val onChangeReply: (String) -> Unit = { input ->
-        if (input != uiState.value.reply) {
+    val onChangeContent: (String) -> Unit = { input ->
+        if (input != uiState.value.content) {
             viewModelState.update {
-                it.copy(reply = input, isSendable = input.isNotBlank())
+                it.copy(content = input, isSendable = input.isNotBlank())
             }
         }
     }
@@ -75,11 +70,8 @@ class ReplyViewModel(
             if (!state.isSendable) {
                 Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
-                Log.i(TAG, "Sending reply to ${state.recipientName} ${state.pubkey}")
-                nostrService.reply(
-                    recipientPubkey = recipientPubkey,
-                    reply = state.reply
-                )
+                Log.i(TAG, "Sending post")
+                nostrService.send(content = state.content)
                 reset()
             }
         }
@@ -87,10 +79,8 @@ class ReplyViewModel(
 
     private fun reset() {
         viewModelState.update {
-            recipientPubkey = ""
             it.copy(
-                recipientName = "",
-                reply = "",
+                content = "",
                 isSendable = false,
             )
         }
@@ -109,7 +99,7 @@ class ReplyViewModel(
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ReplyViewModel(
+                return PostViewModel(
                     nostrService = nostrService,
                     profileProvider = profileProvider,
                     context = context,

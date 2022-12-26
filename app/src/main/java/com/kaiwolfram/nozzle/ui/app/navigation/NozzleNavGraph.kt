@@ -13,6 +13,7 @@ import com.kaiwolfram.nozzle.ui.app.VMContainer
 import com.kaiwolfram.nozzle.ui.app.views.editProfile.EditProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
 import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
+import com.kaiwolfram.nozzle.ui.app.views.post.PostRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyRoute
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadRoute
@@ -53,10 +54,12 @@ fun NozzleNavGraph(
             FeedRoute(
                 feedViewModel = vmContainer.feedViewModel,
                 onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
+                onPreparePost = vmContainer.postViewModel.onPreparePost,
                 onOpenDrawer = { scope.launch { drawerState.open() } },
                 onNavigateToProfile = onNavigateToProfile,
                 onNavigateToThread = onNavigateToThread,
                 onNavigateToReply = navActions.navigateToReply,
+                onNavigateToPost = navActions.navigateToPost,
             )
         }
         composable(NozzleRoute.PROFILE) {
@@ -97,6 +100,12 @@ fun NozzleNavGraph(
         composable(NozzleRoute.REPLY) {
             ReplyRoute(
                 replyViewModel = vmContainer.replyViewModel,
+                onGoBack = navActions.popStack,
+            )
+        }
+        composable(NozzleRoute.POST) {
+            PostRoute(
+                postViewModel = vmContainer.postViewModel,
                 onGoBack = navActions.popStack,
             )
         }

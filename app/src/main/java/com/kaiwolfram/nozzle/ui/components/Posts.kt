@@ -38,11 +38,13 @@ fun PostCardList(
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
-    onOpenProfile: ((String) -> Unit)? = null,
     onNavigateToThread: (String) -> Unit,
     onNavigateToReply: () -> Unit,
+    modifier: Modifier = Modifier,
+    onOpenProfile: ((String) -> Unit)? = null,
 ) {
     SwipeRefresh(
+        modifier = modifier,
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
