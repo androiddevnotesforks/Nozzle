@@ -55,14 +55,6 @@ class KeysViewModel(
         }
     }
 
-    val onCopyPrivkeyAndShowToast: (String) -> Unit = { toast ->
-        uiState.value.privkeyInput.let {
-            Log.i(TAG, "Copy privkey $it and show toast '$toast'")
-            clip.setText(AnnotatedString(it))
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     val onUpdateKeyPairAndShowToast: (String) -> Unit = { toast ->
         uiState.value.let { state ->
             val isValid = isValidPrivkey(state.privkeyInput)

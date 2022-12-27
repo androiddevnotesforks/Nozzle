@@ -116,9 +116,7 @@ private fun FeedTopBar(
 }
 
 @Composable
-private fun FeedFab(
-    onPrepareNewPost: () -> Unit
-) {
+private fun FeedFab(onPrepareNewPost: () -> Unit) {
     FloatingActionButton(onClick = { onPrepareNewPost() }) {
         AddIcon()
     }

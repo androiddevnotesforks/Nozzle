@@ -16,7 +16,6 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 fun KeysScreen(
     uiState: KeysViewModelState,
     onCopyNpubAndShowToast: (String) -> Unit,
-    onCopyPrivkeyAndShowToast: (String) -> Unit,
     onUpdateKeyPairAndShowToast: (String) -> Unit,
     onChangePrivkey: (String) -> Unit,
     onResetUiState: () -> Unit,
@@ -43,7 +42,6 @@ fun KeysScreen(
                 privkey = uiState.privkeyInput,
                 isInvalid = uiState.isInvalid,
                 onChangePrivkey = onChangePrivkey,
-                onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast
             )
             Spacer(modifier = Modifier.height(spacing.large))
         }
@@ -82,7 +80,6 @@ private fun Privkey(
     privkey: String,
     isInvalid: Boolean,
     onChangePrivkey: (String) -> Unit,
-    onCopyPrivkeyAndShowToast: (String) -> Unit,
 ) {
     var isVisible by remember { mutableStateOf(false) }
     Text(
@@ -101,29 +98,9 @@ private fun Privkey(
         isPassword = !isVisible,
         onChangeValue = onChangePrivkey,
         trailingIcon = {
-            CopyAndVisibilityIcons(
+            VisibilityIcon(
                 isVisible = isVisible,
-                onCopyPrivkeyAndShowToast = onCopyPrivkeyAndShowToast,
-                onToggleVisibility = { isVisible = !isVisible }
-            )
+                onToggle = { isVisible = !isVisible })
         },
     )
-}
-
-@Composable
-private fun CopyAndVisibilityIcons(
-    isVisible: Boolean,
-    onCopyPrivkeyAndShowToast: (String) -> Unit,
-    onToggleVisibility: () -> Unit
-) {
-    Row {
-        VisibilityIcon(
-            isVisible = isVisible,
-            onToggle = { onToggleVisibility() })
-        Spacer(modifier = Modifier.width(spacing.small))
-        CopyAndToastIcon(
-            toastText = stringResource(id = R.string.privkey_copied),
-            onCopyAndShowToast = onCopyPrivkeyAndShowToast
-        )
-    }
 }
