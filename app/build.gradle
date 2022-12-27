@@ -105,5 +105,4 @@ dependencies {
 
     // secp256k1
     implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:0.7.0")
-
 }
