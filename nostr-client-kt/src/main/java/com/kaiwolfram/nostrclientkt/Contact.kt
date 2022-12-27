@@ -1,4 +1,4 @@
-package com.kaiwolfram.lib
+package com.kaiwolfram.nostrclientkt
 
 import java.net.URL
 

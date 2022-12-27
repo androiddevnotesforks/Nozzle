@@ -1,4 +1,4 @@
-package com.kaiwolfram.lib
+package com.kaiwolfram.nostrclientkt
 
 data class Post(
     val replyTos: List<String>,

@@ -1,4 +1,4 @@
-package com.kaiwolfram.lib
+package com.kaiwolfram.nostrclientkt
 
 import com.google.gson.annotations.SerializedName
 
