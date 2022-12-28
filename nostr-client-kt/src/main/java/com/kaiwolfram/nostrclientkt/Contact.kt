@@ -1,9 +1,7 @@
 package com.kaiwolfram.nostrclientkt
 
-import java.net.URL
-
 data class Contact(
     val pubkey: String,
-    val relay: URL,
+    val relay: String,
     val alias: String,
 )

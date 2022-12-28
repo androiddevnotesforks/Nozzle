@@ -1,5 +1,6 @@
 package com.kaiwolfram.nostrclientkt
 
+import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 
 typealias Tag = List<String>
@@ -22,6 +23,10 @@ class Event(
 
     companion object {
         fun fromJson(json: String): Result<Event> {
+            return kotlin.runCatching { gson.fromJson(json, Event::class.java) }
+        }
+
+        fun fromJson(json: JsonElement): Result<Event> {
             return kotlin.runCatching { gson.fromJson(json, Event::class.java) }
         }
 

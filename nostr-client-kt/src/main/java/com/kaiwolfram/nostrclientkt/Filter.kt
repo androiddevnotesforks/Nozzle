@@ -12,5 +12,5 @@ class Filter(
     val until: Long? = null,
     val limit: Int? = null
 ) {
-    fun toJson() = gson.toJson(this)
+    fun toJson(): String = gson.toJson(this)
 }
