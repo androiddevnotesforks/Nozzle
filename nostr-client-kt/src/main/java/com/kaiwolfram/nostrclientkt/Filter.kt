@@ -1,6 +1,7 @@
 package com.kaiwolfram.nostrclientkt
 
 import com.google.gson.annotations.SerializedName
+import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 
 class Filter(
     val ids: List<String>? = null,

@@ -3,7 +3,7 @@ package com.kaiwolfram.nostrclientkt.net
 import com.google.gson.JsonElement
 import com.kaiwolfram.nostrclientkt.Event
 import com.kaiwolfram.nostrclientkt.Filter
-import com.kaiwolfram.nostrclientkt.gson
+import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 import okhttp3.*
 import java.util.*
 
@@ -55,12 +55,17 @@ class Client {
         }
     }
 
+    // TODO: Map subs and use it for new relays
     fun subscribe(filters: List<Filter>): String {
         val subscriptionId = UUID.randomUUID().toString()
-        val request = """["REQ",$subscriptionId,${filters.joinToString(",") { it.toJson() }}]"""
+        val request = createSubscriptionRequest(subscriptionId, filters)
         sockets.values.forEach { it.send(request) }
 
         return subscriptionId
+    }
+
+    private fun createSubscriptionRequest(subscriptionId: String, filters: List<Filter>): String {
+        return """["REQ",$subscriptionId,${filters.joinToString(",") { it.toJson() }}]"""
     }
 
     fun unsubscribe(subscriptionId: String) {

@@ -1,8 +1,8 @@
 package com.kaiwolfram.nostrclientkt
 
 data class MetaData(
-    val name: String?,
-    val about: String?,
-    val picture: String?,
-    val nip05: String?,
+    val name: String? = null,
+    val about: String? = null,
+    val picture: String? = null,
+    val nip05: String? = null,
 )
