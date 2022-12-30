@@ -52,17 +52,17 @@ fun EditProfileScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Username(
-                username = uiState.usernameInput,
+                username = uiState.nameInput,
                 isInvalid = uiState.isInvalidUsername,
                 onChangeName = onChangeName
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
 
-            Bio(bio = uiState.bioInput, onChangeBio = onChangeBio)
+            Bio(bio = uiState.aboutInput, onChangeBio = onChangeBio)
             Spacer(modifier = Modifier.height(spacing.xxl))
 
             ProfilePictureUrl(
-                pictureUrl = uiState.pictureUrlInput,
+                pictureUrl = uiState.pictureInput,
                 isInvalid = uiState.isInvalidPictureUrl,
                 onChangePictureUrl = onChangePictureUrl
             )

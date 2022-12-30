@@ -8,7 +8,7 @@ import com.kaiwolfram.nozzle.data.room.entity.*
 @Database(
     entities = [
         ContactEntity::class,
-        EventEntity::class,
+        PostEntity::class,
         ProfileEntity::class,
         ReactionEntity::class,
         RepostEntity::class

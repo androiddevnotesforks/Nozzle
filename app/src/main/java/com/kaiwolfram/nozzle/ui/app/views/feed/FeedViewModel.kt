@@ -7,8 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
-import com.kaiwolfram.nozzle.data.utils.derivePubkey
-import com.kaiwolfram.nozzle.data.utils.generatePrivkey
+import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -19,9 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.random.Random
 
 private const val TAG = "FeedViewModel"
 
@@ -33,9 +30,9 @@ data class FeedViewModelState(
 )
 
 class FeedViewModel(
-    private val nostrService: INostrService,
     private val postCardInteractor: IPostCardInteractor,
     private val profileProvider: IProfileProvider,
+    private val eventDao: EventDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -63,7 +60,7 @@ class FeedViewModel(
             viewModelScope.launch(context = Dispatchers.IO) {
                 Log.i(TAG, "Refresh feed view")
                 setRefresh(true)
-                fetchAndUseNostrData()
+                updateFeed()
             }
         }
     }
@@ -111,42 +108,9 @@ class FeedViewModel(
         }
     }
 
-    private fun fetchAndUseNostrData() {
-        Log.i(TAG, "Fetching nostr data for feed")
-        isSyncing.set(true)
-        val posts = nostrService.listPosts()
-        viewModelState.update {
-            it.copy(
-                posts = posts.map { post ->
-                    PostWithMeta(
-                        name = UUID.randomUUID().toString(),
-                        id = UUID.randomUUID().toString(),
-                        replyToId = UUID.randomUUID().toString(),
-                        replyToName = "Kai Wolfram",
-                        pubkey = derivePubkey(generatePrivkey()),
-                        pictureUrl = "https://www.dadant.com/wp-content/uploads/2016/12/honey-production-dadant.jpg",
-                        createdAt = post.createdAt,
-                        content = post.content,
-                        isLikedByMe = Random.nextBoolean(),
-                        isRepostedByMe = Random.nextBoolean(),
-                        referencePost = PostWithMeta(
-                            name = UUID.randomUUID().toString(),
-                            id = UUID.randomUUID().toString(),
-                            replyToId = UUID.randomUUID().toString(),
-                            replyToName = "Wolfram Kai",
-                            pubkey = derivePubkey(generatePrivkey()),
-                            pictureUrl = "https://cliply.co/wp-content/uploads/2021/02/372102230_BITCOIN_400px.gif",
-                            createdAt = post.createdAt,
-                            content = post.content,
-                            isLikedByMe = Random.nextBoolean(),
-                            isRepostedByMe = Random.nextBoolean(),
-                        )
-                    )
-                },
-            )
-        }
-        isSyncing.set(false)
-        setRefresh(false)
+    private fun updateFeed() {
+        Log.i(TAG, "Update feed")
+        val posts = eventDao.getFeed(profileProvider.getPubkey())
     }
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {

@@ -4,10 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "event")
-data class EventEntity(
+data class PostEntity(
     @PrimaryKey(autoGenerate = false) val id: String,
     val pubkey: String,
-    val kind: Int,
+    val replyTo: String?,
     val createdAt: Long,
     val content: String,
 )

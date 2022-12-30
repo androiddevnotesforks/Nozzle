@@ -42,6 +42,7 @@ class NozzleDrawerViewModel(
     }
 
     private fun useCachedValues() {
+        Log.i(TAG, "Set cached values")
         viewModelState.update {
             it.copy(
                 pubkey = profileProvider.getPubkey(),

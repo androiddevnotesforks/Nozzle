@@ -7,7 +7,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.nostr.isValidUsername
+import com.kaiwolfram.nostrclientkt.utils.NostrUtils.isValidUsername
+import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import kotlinx.coroutines.Dispatchers
@@ -21,9 +22,9 @@ import kotlinx.coroutines.launch
 private const val TAG = "EditProfileViewModel"
 
 data class EditProfileViewModelState(
-    val usernameInput: String = "",
-    val bioInput: String = "",
-    val pictureUrlInput: String = "",
+    val nameInput: String = "",
+    val aboutInput: String = "",
+    val pictureInput: String = "",
     val nip05Input: String = "",
     val hasChanges: Boolean = false,
     val isInvalidUsername: Boolean = false,
@@ -33,6 +34,7 @@ data class EditProfileViewModelState(
 class EditProfileViewModel(
     private val profileCache: IProfileCache,
     private val profileDao: ProfileDao,
+    private val nostrService: INostrService,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(EditProfileViewModelState())
@@ -55,22 +57,13 @@ class EditProfileViewModel(
                 Log.i(TAG, "Profile editor has no changes")
                 return@let
             }
-            val isValidUsername = isValidUsername(it.usernameInput)
-            val isValidUrl = isValidUrl(it.pictureUrlInput)
+            val isValidUsername = isValidUsername(it.nameInput)
+            val isValidUrl = isValidUrl(it.pictureInput)
             if (isValidUsername && isValidUrl) {
-                Log.i(TAG, "Updating profile")
-                viewModelScope.launch(context = Dispatchers.IO) {
-                    profileDao.updateMetaData(
-                        pubkey = profileCache.getPubkey(),
-                        name = it.usernameInput,
-                        bio = it.bioInput,
-                        pictureUrl = it.pictureUrlInput
-                    )
-                }
-                profileCache.setName(it.usernameInput)
-                profileCache.setBio(it.bioInput)
-                profileCache.setPictureUrl(it.pictureUrlInput)
-                profileCache.setNip05(it.nip05Input)
+                Log.i(TAG, "Update profile")
+                updateMetadataInDb(it)
+                updateMetadataOverNostr(it)
+                updateMetadataInProfileCache(it)
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {
@@ -88,7 +81,7 @@ class EditProfileViewModel(
     val onChangeName: (String) -> Unit = { input ->
         uiState.value.let { state ->
             viewModelState.update {
-                it.copy(usernameInput = input)
+                it.copy(nameInput = input)
             }
             setHasChanges()
             if (state.isInvalidUsername && isValidUsername(input)) {
@@ -100,9 +93,9 @@ class EditProfileViewModel(
     }
 
     val onChangeBio: (String) -> Unit = { input ->
-        if (input != uiState.value.bioInput) {
+        if (input != uiState.value.aboutInput) {
             viewModelState.update {
-                it.copy(bioInput = input)
+                it.copy(aboutInput = input)
             }
             setHasChanges()
         }
@@ -111,7 +104,7 @@ class EditProfileViewModel(
     val onChangePictureUrl: (String) -> Unit = { input ->
         uiState.value.let { state ->
             viewModelState.update {
-                it.copy(pictureUrlInput = input)
+                it.copy(pictureInput = input)
             }
             setHasChanges()
             if (state.isInvalidPictureUrl && isValidUrl(input)) {
@@ -141,14 +134,44 @@ class EditProfileViewModel(
         useCachedValues()
     }
 
-    private fun isValidUrl(url: String) = url.isEmpty() || URLUtil.isValidUrl(url)
+    private fun updateMetadataInDb(state: EditProfileViewModelState) {
+        Log.i(TAG, "Update profile in DB")
+        viewModelScope.launch(context = Dispatchers.IO) {
+            profileDao.updateMetadata(
+                pubkey = profileCache.getPubkey(),
+                name = state.nameInput,
+                about = state.aboutInput,
+                picture = state.pictureInput,
+                nip05 = state.nip05Input
+            )
+        }
+    }
 
+    private fun updateMetadataInProfileCache(state: EditProfileViewModelState) {
+        Log.i(TAG, "Update profile in profile cache")
+        profileCache.setName(state.nameInput)
+        profileCache.setBio(state.aboutInput)
+        profileCache.setPictureUrl(state.pictureInput)
+        profileCache.setNip05(state.nip05Input)
+    }
+
+    private fun updateMetadataOverNostr(state: EditProfileViewModelState) {
+        Log.i(TAG, "Update profile over nostr")
+        nostrService.publishProfile(
+            name = state.nameInput,
+            about = state.aboutInput,
+            picture = state.pictureInput,
+            nip05 = state.nip05Input
+        )
+    }
+
+    private fun isValidUrl(url: String) = url.isEmpty() || URLUtil.isValidUrl(url)
 
     private fun setHasChanges() {
         uiState.value.let {
-            val hasChanges = it.usernameInput != profileCache.getName()
-                    || it.bioInput != profileCache.getBio()
-                    || it.pictureUrlInput != profileCache.getPictureUrl()
+            val hasChanges = it.nameInput != profileCache.getName()
+                    || it.aboutInput != profileCache.getBio()
+                    || it.pictureInput != profileCache.getPictureUrl()
                     || it.nip05Input != profileCache.getNip05()
             if (hasChanges != it.hasChanges) {
                 viewModelState.update { state ->
@@ -159,11 +182,12 @@ class EditProfileViewModel(
     }
 
     private fun useCachedValues() {
+        Log.i(TAG, "Use cached values")
         viewModelState.update {
             it.copy(
-                usernameInput = profileCache.getName(),
-                bioInput = profileCache.getBio(),
-                pictureUrlInput = profileCache.getPictureUrl(),
+                nameInput = profileCache.getName(),
+                aboutInput = profileCache.getBio(),
+                pictureInput = profileCache.getPictureUrl(),
                 nip05Input = profileCache.getNip05(),
                 hasChanges = false,
                 isInvalidUsername = false,
@@ -181,6 +205,7 @@ class EditProfileViewModel(
         fun provideFactory(
             profileCache: IProfileCache,
             profileDao: ProfileDao,
+            nostrService: INostrService,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -188,6 +213,7 @@ class EditProfileViewModel(
                 return EditProfileViewModel(
                     profileCache = profileCache,
                     profileDao = profileDao,
+                    nostrService = nostrService,
                     context = context
                 ) as T
             }

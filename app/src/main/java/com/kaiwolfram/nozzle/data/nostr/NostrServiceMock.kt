@@ -1,6 +1,7 @@
 package com.kaiwolfram.nozzle.data.nostr
 
-import com.kaiwolfram.nozzle.data.room.entity.EventEntity
+import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.utils.derivePubkey
 import com.kaiwolfram.nozzle.data.utils.generatePrivkey
 import java.util.*
@@ -17,12 +18,12 @@ class NostrServiceMock : INostrService {
         return Random.nextInt(2000)
     }
 
-    override fun getProfile(pubkey: String): NostrProfile {
+    override fun getProfile(pubkey: String): Profile {
         return createRndProfile(pubkey)
     }
 
-    override fun listPosts(pubkey: String): List<EventEntity> {
-        val result = mutableListOf<EventEntity>()
+    override fun listPosts(pubkey: String): List<PostEntity> {
+        val result = mutableListOf<PostEntity>()
         val max = Random.nextInt(15)
         if (max != 0) {
             for (i in 0..max) {
@@ -33,12 +34,12 @@ class NostrServiceMock : INostrService {
         return result
     }
 
-    override fun listPosts(): List<EventEntity> {
+    override fun listPosts(): List<PostEntity> {
         return listPosts("lol what")
     }
 
-    override fun listFollowedProfiles(pubKey: String): List<NostrProfile> {
-        val result = mutableListOf<NostrProfile>()
+    override fun listFollowedProfiles(pubKey: String): List<Profile> {
+        val result = mutableListOf<Profile>()
         val max = Random.nextInt(15)
         if (max != 0) {
             for (i in 0..max) {
@@ -49,7 +50,7 @@ class NostrServiceMock : INostrService {
         return result
     }
 
-    override fun getPost(postId: String): EventEntity {
+    override fun getPost(postId: String): PostEntity {
         return createRndPost()
     }
 
@@ -78,8 +79,8 @@ class NostrServiceMock : INostrService {
         // No return
     }
 
-    private fun createRndPost(): EventEntity {
-        return EventEntity(
+    private fun createRndPost(): PostEntity {
+        return PostEntity(
             id = UUID.randomUUID().toString(),
             pubkey = derivePubkey(generatePrivkey()),
             kind = 3,
@@ -88,16 +89,18 @@ class NostrServiceMock : INostrService {
         )
     }
 
-    private fun createRndProfile(pubkey: String): NostrProfile {
-        return NostrProfile(
-            name = UUID.randomUUID().toString(),
+    private fun createRndProfile(pubkey: String): Profile {
+        return Profile(
             pubkey = pubkey,
-            about = UUID.randomUUID().toString().repeat(Random.nextInt(15)),
-            picture = "$baseUrl${UUID.randomUUID()}"
+            metadata = Metadata(
+                name = UUID.randomUUID().toString(),
+                about = UUID.randomUUID().toString().repeat(Random.nextInt(15)),
+                picture = "$baseUrl${UUID.randomUUID()}"
+            )
         )
     }
 
-    private fun createRndProfile(): NostrProfile {
+    private fun createRndProfile(): Profile {
         return createRndProfile(UUID.randomUUID().toString())
     }
 }

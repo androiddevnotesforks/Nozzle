@@ -20,7 +20,7 @@ class Event(
     val sig: String,
 ) {
     object Kind {
-        const val SET_META_DATA = 0
+        const val SET_METADATA = 0
         const val TEXT_NOTE = 1
         const val CONTACT_LIST = 3
         const val REACTION = 7
@@ -76,11 +76,11 @@ class Event(
             )
         }
 
-        fun createMetaDataEvent(metaData: MetaData, keys: Keys): Event {
+        fun createMetadataEvent(metadata: Metadata, keys: Keys): Event {
             return create(
-                kind = Kind.SET_META_DATA,
+                kind = Kind.SET_METADATA,
                 tags = listOf(),
-                content = gson.toJson(metaData),
+                content = gson.toJson(metadata),
                 keys = keys
             )
         }

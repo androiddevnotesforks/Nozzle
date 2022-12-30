@@ -1,19 +1,5 @@
 package com.kaiwolfram.nozzle.data.nostr
 
-import com.kaiwolfram.nozzle.data.room.entity.EventEntity
-
 interface INostrService {
-    fun getFollowerCount(pubkey: String): Int
-    fun getFollowingCount(pubkey: String): Int
-    fun getProfile(pubkey: String): NostrProfile?
-    fun listPosts(pubkey: String): List<EventEntity>
-    fun listFollowedProfiles(pubKey: String): List<NostrProfile>
-    fun listPosts(): List<EventEntity>
-    fun getPost(postId: String): EventEntity
-    fun likePost(postId: String)
-    fun repost(postId: String)
-    fun follow(pubkey: String)
-    fun unfollow(pubkey: String)
-    fun reply(recipientPubkey: String, reply: String)
-    fun send(content: String)
+    fun publishProfile(name: String, about: String, picture: String, nip05: String)
 }

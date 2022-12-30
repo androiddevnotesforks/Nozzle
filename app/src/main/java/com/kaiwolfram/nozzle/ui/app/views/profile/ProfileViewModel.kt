@@ -14,7 +14,7 @@ import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.room.dao.EventDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
-import com.kaiwolfram.nozzle.data.room.entity.EventEntity
+import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
@@ -169,8 +169,8 @@ class ProfileViewModel(
             val profile = ProfileEntity(
                 pubkey = pubkey,
                 name = nostrProfile.name,
-                bio = nostrProfile.about,
-                pictureUrl = nostrProfile.picture,
+                about = nostrProfile.about,
+                picture = nostrProfile.picture,
                 numOfFollowing = numOfFollowing,
                 numOfFollowers = numOfFollowers,
             )
@@ -183,7 +183,7 @@ class ProfileViewModel(
 
     private suspend fun useAndCacheProfile(
         profile: ProfileEntity,
-        posts: List<EventEntity>,
+        posts: List<PostEntity>,
     ) {
         Log.i(TAG, "Caching fetched profile of ${profile.pubkey}")
         profileDao.insert(profile)
@@ -193,8 +193,8 @@ class ProfileViewModel(
                 pubkey = profile.pubkey,
                 npub = hexToNpub(profile.pubkey),
                 name = profile.name,
-                bio = profile.bio,
-                pictureUrl = profile.pictureUrl,
+                bio = profile.about,
+                pictureUrl = profile.picture,
                 numOfFollowing = profile.numOfFollowing,
                 numOfFollowers = profile.numOfFollowers,
                 isOneself = profile.pubkey == pubkeyProvider.getPubkey(),
@@ -206,7 +206,7 @@ class ProfileViewModel(
                         replyToId = UUID.randomUUID().toString(),
                         replyToName = UUID.randomUUID().toString(),
                         pubkey = profile.pubkey,
-                        pictureUrl = profile.pictureUrl,
+                        pictureUrl = profile.picture,
                         createdAt = post.createdAt,
                         content = post.content,
                         isLikedByMe = Random.nextBoolean(),
@@ -227,8 +227,8 @@ class ProfileViewModel(
                     pubkey = pubkey,
                     npub = hexToNpub(pubkey),
                     name = cachedProfile.name,
-                    bio = cachedProfile.bio,
-                    pictureUrl = cachedProfile.pictureUrl,
+                    bio = cachedProfile.about,
+                    pictureUrl = cachedProfile.picture,
                     numOfFollowing = cachedProfile.numOfFollowing,
                     numOfFollowers = cachedProfile.numOfFollowers,
                     isOneself = cachedProfile.pubkey == pubkeyProvider.getPubkey(),

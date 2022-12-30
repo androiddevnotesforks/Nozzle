@@ -22,7 +22,13 @@ interface ProfileDao {
                 "pictureUrl = :pictureUrl " +
                 "WHERE pubkey = :pubkey"
     )
-    suspend fun updateMetaData(pubkey: String, name: String, bio: String, pictureUrl: String)
+    suspend fun updateMetadata(
+        pubkey: String,
+        name: String,
+        about: String,
+        picture: String,
+        nip05: String
+    )
 
     @Query("SELECT name, pictureUrl FROM profile WHERE pubkey = :pubkey")
     suspend fun getName(pubkey: String): NameAndPictureUrl

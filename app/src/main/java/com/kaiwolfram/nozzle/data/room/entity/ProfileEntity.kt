@@ -7,8 +7,9 @@ import androidx.room.PrimaryKey
 data class ProfileEntity(
     @PrimaryKey val pubkey: String,
     val name: String,
-    val bio: String,
-    val pictureUrl: String,
+    val about: String,
+    val picture: String,
+    val nip05: String,
     val numOfFollowing: Int,
     val numOfFollowers: Int,
 )

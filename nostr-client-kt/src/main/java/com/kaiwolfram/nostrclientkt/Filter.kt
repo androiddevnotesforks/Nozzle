@@ -14,4 +14,46 @@ class Filter(
     val limit: Int? = null
 ) {
     fun toJson(): String = gson.toJson(this)
+
+    companion object {
+        fun createProfileFilter(
+            pubkey: String,
+        ): Filter {
+            return Filter(
+                authors = listOf(pubkey),
+                kinds = listOf(Event.Kind.CONTACT_LIST),
+                limit = 1
+            )
+        }
+
+        fun createPersonalPostsFilter(
+            pubkey: String,
+            since: Long? = null,
+            until: Long? = null,
+            limit: Int? = null
+        ): Filter {
+            return Filter(
+                authors = listOf(pubkey),
+                kinds = listOf(Event.Kind.TEXT_NOTE),
+                since = since,
+                until = until,
+                limit = limit
+            )
+        }
+
+        fun createPersonalContactListFilter(
+            pubkey: String,
+            since: Long? = null,
+            until: Long? = null,
+            limit: Int? = null
+        ): Filter {
+            return Filter(
+                authors = listOf(pubkey),
+                kinds = listOf(Event.Kind.CONTACT_LIST),
+                since = since,
+                until = until,
+                limit = limit
+            )
+        }
+    }
 }
