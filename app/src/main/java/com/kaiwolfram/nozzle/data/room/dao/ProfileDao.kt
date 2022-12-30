@@ -9,6 +9,8 @@ import com.kaiwolfram.nozzle.model.NameAndPictureUrl
 
 @Dao
 interface ProfileDao {
+    // TODO: ProfileCount?
+    // TODO: IsFollowed?
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
     suspend fun getProfile(pubkey: String): ProfileEntity?
 
@@ -18,8 +20,9 @@ interface ProfileDao {
     @Query(
         "UPDATE profile " +
                 "SET name = :name, " +
-                "bio = :bio, " +
-                "pictureUrl = :pictureUrl " +
+                "about = :about, " +
+                "picture = :picture, " +
+                "nip05 = :nip05 " +
                 "WHERE pubkey = :pubkey"
     )
     suspend fun updateMetadata(
@@ -30,6 +33,6 @@ interface ProfileDao {
         nip05: String
     )
 
-    @Query("SELECT name, pictureUrl FROM profile WHERE pubkey = :pubkey")
+    @Query("SELECT name, picture FROM profile WHERE pubkey = :pubkey")
     suspend fun getName(pubkey: String): NameAndPictureUrl
 }

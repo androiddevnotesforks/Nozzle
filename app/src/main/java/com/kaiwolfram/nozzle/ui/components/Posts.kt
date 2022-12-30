@@ -33,6 +33,9 @@ import com.kaiwolfram.nozzle.ui.theme.*
 
 @Composable
 fun PostCardList(
+    /**
+     * First post will be displayed first
+     */
     posts: List<PostWithMeta>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
@@ -49,7 +52,7 @@ fun PostCardList(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
-        LazyColumn(Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.fillMaxSize(), reverseLayout = true) {
             items(posts) { post ->
                 PostCard(
                     post = post,

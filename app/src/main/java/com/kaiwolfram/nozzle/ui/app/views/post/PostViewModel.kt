@@ -26,8 +26,8 @@ data class PostViewModelState(
 )
 
 class PostViewModel(
-    private val nostrService: INostrService,
     private val profileProvider: IProfileProvider,
+    private val nostrService: INostrService,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(PostViewModelState())
@@ -40,12 +40,12 @@ class PostViewModel(
         )
 
     init {
-        Log.i(TAG, "Initialize ReplyViewModel")
+        Log.i(TAG, "Initialize PostViewModel")
     }
 
     val onPreparePost: () -> Unit = {
         viewModelScope.launch(context = Dispatchers.IO) {
-            Log.i(TAG, "Preparing new post")
+            Log.i(TAG, "Prepare new post")
             viewModelState.update {
                 it.copy(
                     pictureUrl = profileProvider.getPictureUrl(),
@@ -68,10 +68,12 @@ class PostViewModel(
     val onSendOrShowErrorToast: (String) -> Unit = { errorToast ->
         uiState.value.let { state ->
             if (!state.isSendable) {
+                Log.i(TAG, "Post is not sendable")
+
                 Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
-                Log.i(TAG, "Sending post")
-                nostrService.send(content = state.content)
+                Log.i(TAG, "Send post")
+                nostrService.sendPost(content = state.content)
                 reset()
             }
         }
@@ -79,10 +81,7 @@ class PostViewModel(
 
     private fun reset() {
         viewModelState.update {
-            it.copy(
-                content = "",
-                isSendable = false,
-            )
+            it.copy(content = "", isSendable = false)
         }
     }
 

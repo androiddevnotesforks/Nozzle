@@ -49,10 +49,10 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = ProfileViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
                         postCardInteractor = appContainer.postCardInteractor,
+                        feedProvider = appContainer.feedProvider,
                         profileFollower = appContainer.profileFollower,
                         pubkeyProvider = appContainer.profileCache,
                         profileDao = appContainer.roomDb.profileDao(),
-                        eventDao = appContainer.roomDb.eventDao(),
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
@@ -67,22 +67,22 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory(
-                        nostrService = appContainer.nostrService,
-                        postCardInteractor = appContainer.postCardInteractor,
                         profileProvider = appContainer.profileCache,
+                        feedProvider = appContainer.feedProvider,
+                        postCardInteractor = appContainer.postCardInteractor,
                     )
                 ),
                 editProfileViewModel = viewModel(
                     factory = EditProfileViewModel.provideFactory(
                         profileCache = appContainer.profileCache,
                         profileDao = appContainer.roomDb.profileDao(),
+                        nostrService = appContainer.nostrService,
                         context = LocalContext.current,
                     )
                 ),
                 threadViewModel = viewModel(
                     factory = ThreadViewModel.provideFactory(
-                        nostrService = appContainer.nostrService,
-                        pubkeyProvider = appContainer.profileCache,
+                        threadProvider = appContainer.threadProvider,
                         postCardInteractor = appContainer.postCardInteractor,
                     )
                 ),

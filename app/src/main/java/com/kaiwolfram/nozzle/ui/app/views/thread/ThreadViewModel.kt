@@ -4,11 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
-import com.kaiwolfram.nozzle.data.utils.derivePubkey
-import com.kaiwolfram.nozzle.data.utils.generatePrivkey
+import com.kaiwolfram.nozzle.data.provider.IThreadProvider
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -20,9 +17,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.random.Random
 
 private const val TAG = "ThreadViewModel"
 
@@ -35,12 +30,12 @@ data class ThreadViewModelState(
 )
 
 class ThreadViewModel(
-    private val nostrRepository: INostrService,
-    private val pubkeyProvider: IPubkeyProvider,
+    private val threadProvider: IThreadProvider,
     private val postCardInteractor: IPostCardInteractor,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ThreadViewModelState())
     private var isSyncing = AtomicBoolean(false)
+    private var currentEventId = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -53,51 +48,20 @@ class ThreadViewModel(
         Log.i(TAG, "Initialize ThreadViewModel")
     }
 
+    val onOpenThread: (String) -> Unit = { id ->
+        Log.i(TAG, "Open thread of post $id")
+        currentEventId = id
+        onRefreshThreadView()
+    }
+
     val onRefreshThreadView: () -> Unit = {
         execWhenSyncingNotBlocked {
             viewModelScope.launch(context = Dispatchers.IO) {
                 Log.i(TAG, "Refresh thread view")
                 setRefresh(true)
-                val previous = nostrRepository.listPosts().map { post ->
-                    PostWithMeta(
-                        name = UUID.randomUUID().toString(),
-                        id = UUID.randomUUID().toString(),
-                        pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                        replyToId = UUID.randomUUID().toString(),
-                        replyToName = "Kai Wolfram",
-                        pubkey = derivePubkey(generatePrivkey()),
-                        createdAt = post.createdAt,
-                        content = post.content,
-                        isLikedByMe = Random.nextBoolean(),
-                        isRepostedByMe = Random.nextBoolean(),
-                    )
-                }
-                val current = PostWithMeta(
-                    name = UUID.randomUUID().toString(),
-                    id = UUID.randomUUID().toString(),
-                    replyToId = UUID.randomUUID().toString(),
-                    pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                    replyToName = "Kai Wolfram",
-                    pubkey = derivePubkey(generatePrivkey()),
-                    createdAt = 66666666,
-                    content = "post.content",
-                    isLikedByMe = Random.nextBoolean(),
-                    isRepostedByMe = Random.nextBoolean(),
-                )
-                val replies = nostrRepository.listPosts().map { post ->
-                    PostWithMeta(
-                        name = UUID.randomUUID().toString(),
-                        id = UUID.randomUUID().toString(),
-                        replyToId = UUID.randomUUID().toString(),
-                        pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                        replyToName = "Kai Wolfram",
-                        pubkey = derivePubkey(generatePrivkey()),
-                        createdAt = post.createdAt,
-                        content = post.content,
-                        isLikedByMe = Random.nextBoolean(),
-                        isRepostedByMe = Random.nextBoolean(),
-                    )
-                }
+                val previous = threadProvider.listPrevious(currentEventId)
+                val current = threadProvider.getCurrent(currentEventId)
+                val replies = threadProvider.listReplies(currentEventId)
                 viewModelState.update {
                     it.copy(
                         previous = previous,
@@ -107,91 +71,37 @@ class ThreadViewModel(
                     )
                 }
                 setRefresh(false)
+                isSyncing.set(false)
             }
         }
     }
 
-    val onOpenThread: (String) -> Unit = { id ->
-        viewModelScope.launch(context = Dispatchers.IO) {
-            Log.i(TAG, "Open thread of post $id")
-            val previous = nostrRepository.listPosts().map { post ->
-                PostWithMeta(
-                    name = UUID.randomUUID().toString(),
-                    id = UUID.randomUUID().toString(),
-                    replyToId = UUID.randomUUID().toString(),
-                    replyToName = "Kai Wolfram",
-                    pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                    pubkey = derivePubkey(generatePrivkey()),
-                    createdAt = post.createdAt,
-                    content = post.content,
-                    isRepostedByMe = Random.nextBoolean(),
-                    isLikedByMe = Random.nextBoolean(),
-                )
-            }
-            val current = PostWithMeta(
-                name = UUID.randomUUID().toString(),
-                id = UUID.randomUUID().toString(),
-                replyToId = UUID.randomUUID().toString(),
-                replyToName = "Kai Wolfram",
-                pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                pubkey = derivePubkey(generatePrivkey()),
-                createdAt = 66666666,
-                content = UUID.randomUUID().toString(),
-                isRepostedByMe = Random.nextBoolean(),
-                isLikedByMe = Random.nextBoolean(),
-            )
-            val replies = nostrRepository.listPosts().map { post ->
-                PostWithMeta(
-                    name = UUID.randomUUID().toString(),
-                    id = UUID.randomUUID().toString(),
-                    replyToId = UUID.randomUUID().toString(),
-                    pictureUrl = "https://avatars.githubusercontent.com/u/48265657?v=4",
-                    replyToName = "Kai Wolfram",
-                    pubkey = derivePubkey(generatePrivkey()),
-                    createdAt = post.createdAt,
-                    content = post.content,
-                    isLikedByMe = Random.nextBoolean(),
-                    isRepostedByMe = Random.nextBoolean(),
-                )
-            }
-            Log.i(TAG, "Previous: ${previous.size}, replies: ${replies.size}")
-            viewModelState.update {
-                it.copy(
-                    previous = previous,
-                    current = current,
-                    replies = replies,
-                    currentThreadPosition = getThreadPosition(previous)
-                )
-            }
-        }
-    }
-
-    val onLike: (String) -> Unit = { id ->
+    val onLike: (String) -> Unit = { postId ->
         // TODO: This sucks lol
         var needsUpdate = false
         uiState.value.let { state ->
-            if (state.current != null && state.current.id == id) {
+            if (state.current != null && state.current.id == postId) {
                 needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         current = state.current.copy(isLikedByMe = true),
                     )
                 }
-            } else if (state.previous.any { post -> post.id == id }) {
+            } else if (state.previous.any { post -> post.id == postId }) {
                 needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         previous = state.previous.map { toMap ->
-                            mapToLikedPost(toMap = toMap, id = id)
+                            mapToLikedPost(toMap = toMap, id = postId)
                         },
                     )
                 }
-            } else if (state.replies.any { post -> post.id == id }) {
+            } else if (state.replies.any { post -> post.id == postId }) {
                 needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         replies = state.replies.map { toMap ->
-                            mapToLikedPost(toMap = toMap, id = id)
+                            mapToLikedPost(toMap = toMap, id = postId)
                         },
                     )
                 }
@@ -199,37 +109,37 @@ class ThreadViewModel(
         }
         if (needsUpdate) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.like(pubkey = pubkeyProvider.getPubkey(), postId = id)
+                postCardInteractor.like(postId)
             }
         }
     }
 
-    val onRepost: (String) -> Unit = { id ->
+    val onRepost: (String) -> Unit = { postId ->
         // TODO: This sucks lol
         var needsUpdate = false
         uiState.value.let { state ->
-            if (state.current != null && state.current.id == id) {
+            if (state.current != null && state.current.id == postId) {
                 needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         current = state.current.copy(isRepostedByMe = true),
                     )
                 }
-            } else if (state.previous.any { post -> post.id == id }) {
+            } else if (state.previous.any { post -> post.id == postId }) {
                 needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         previous = state.previous.map { toMap ->
-                            mapToRepostedPost(toMap = toMap, id = id)
+                            mapToRepostedPost(toMap = toMap, id = postId)
                         },
                     )
                 }
-            } else if (state.replies.any { post -> post.id == id }) {
+            } else if (state.replies.any { post -> post.id == postId }) {
                 needsUpdate = true
                 viewModelState.update {
                     it.copy(
                         replies = state.replies.map { toMap ->
-                            mapToRepostedPost(toMap = toMap, id = id)
+                            mapToRepostedPost(toMap = toMap, id = postId)
                         },
                     )
                 }
@@ -237,7 +147,7 @@ class ThreadViewModel(
         }
         if (needsUpdate) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.repost(pubkey = pubkeyProvider.getPubkey(), postId = id)
+                postCardInteractor.repost(postId = postId)
             }
         }
     }
@@ -260,6 +170,7 @@ class ThreadViewModel(
         if (isSyncing.get()) {
             Log.i(TAG, "Blocked by active sync process")
         } else {
+            isSyncing.set(true)
             exec()
         }
     }
@@ -271,15 +182,13 @@ class ThreadViewModel(
 
     companion object {
         fun provideFactory(
-            nostrService: INostrService,
-            pubkeyProvider: IPubkeyProvider,
+            threadProvider: IThreadProvider,
             postCardInteractor: IPostCardInteractor,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ThreadViewModel(
-                    nostrRepository = nostrService,
-                    pubkeyProvider = pubkeyProvider,
+                    threadProvider = threadProvider,
                     postCardInteractor = postCardInteractor,
                 ) as T
             }

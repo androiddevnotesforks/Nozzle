@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "962819ce7429ceb90f704555bd9ea06b",
+    "identityHash": "b09a7cd20076abd0fa936cee0e2c94be",
     "entities": [
       {
         "tableName": "contact",
@@ -33,7 +33,7 @@
       },
       {
         "tableName": "event",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `kind` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `replyTo` TEXT, `createdAt` INTEGER NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -48,10 +48,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "kind",
-            "columnName": "kind",
-            "affinity": "INTEGER",
-            "notNull": true
+            "fieldPath": "replyTo",
+            "columnName": "replyTo",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "createdAt",
@@ -77,7 +77,7 @@
       },
       {
         "tableName": "profile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `name` TEXT NOT NULL, `bio` TEXT NOT NULL, `pictureUrl` TEXT NOT NULL, `numOfFollowing` INTEGER NOT NULL, `numOfFollowers` INTEGER NOT NULL, PRIMARY KEY(`pubkey`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `name` TEXT NOT NULL, `about` TEXT NOT NULL, `picture` TEXT NOT NULL, `nip05` TEXT NOT NULL, `numOfFollowing` INTEGER NOT NULL, `numOfFollowers` INTEGER NOT NULL, `isFollowedByMe` INTEGER NOT NULL, PRIMARY KEY(`pubkey`))",
         "fields": [
           {
             "fieldPath": "pubkey",
@@ -92,14 +92,20 @@
             "notNull": true
           },
           {
-            "fieldPath": "bio",
-            "columnName": "bio",
+            "fieldPath": "about",
+            "columnName": "about",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "pictureUrl",
-            "columnName": "pictureUrl",
+            "fieldPath": "picture",
+            "columnName": "picture",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nip05",
+            "columnName": "nip05",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -112,6 +118,12 @@
           {
             "fieldPath": "numOfFollowers",
             "columnName": "numOfFollowers",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFollowedByMe",
+            "columnName": "isFollowedByMe",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -199,7 +211,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '962819ce7429ceb90f704555bd9ea06b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b09a7cd20076abd0fa936cee0e2c94be')"
     ]
   }
 }

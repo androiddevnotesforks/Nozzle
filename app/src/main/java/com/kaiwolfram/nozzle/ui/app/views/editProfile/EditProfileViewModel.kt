@@ -60,10 +60,10 @@ class EditProfileViewModel(
             val isValidUsername = isValidUsername(it.nameInput)
             val isValidUrl = isValidUrl(it.pictureInput)
             if (isValidUsername && isValidUrl) {
-                Log.i(TAG, "Update profile")
+                Log.i(TAG, "New values are valid. Update profile")
                 updateMetadataInDb(it)
-                updateMetadataOverNostr(it)
                 updateMetadataInProfileCache(it)
+                updateMetadataOverNostr(it)
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {
@@ -149,10 +149,12 @@ class EditProfileViewModel(
 
     private fun updateMetadataInProfileCache(state: EditProfileViewModelState) {
         Log.i(TAG, "Update profile in profile cache")
-        profileCache.setName(state.nameInput)
-        profileCache.setBio(state.aboutInput)
-        profileCache.setPictureUrl(state.pictureInput)
-        profileCache.setNip05(state.nip05Input)
+        profileCache.setMeta(
+            name = state.nameInput,
+            about = state.aboutInput,
+            picture = state.pictureInput,
+            nip05 = state.nip05Input
+        )
     }
 
     private fun updateMetadataOverNostr(state: EditProfileViewModelState) {

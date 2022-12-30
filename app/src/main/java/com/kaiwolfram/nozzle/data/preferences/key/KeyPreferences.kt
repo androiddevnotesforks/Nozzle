@@ -4,10 +4,12 @@ import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.kaiwolfram.nostrclientkt.Keys
 import com.kaiwolfram.nozzle.data.preferences.PreferenceFileNames
 import com.kaiwolfram.nozzle.data.utils.derivePubkey
 import com.kaiwolfram.nozzle.data.utils.generatePrivkey
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
+import fr.acinq.secp256k1.Hex
 
 
 private const val TAG: String = "KeyPreferences"
@@ -51,6 +53,13 @@ class KeyPreferences(context: Context) : IKeyManager {
         preferences.edit()
             .putString(PRIVKEY, privkey)
             .apply()
+    }
+
+    override fun getKeys(): Keys {
+        return Keys(
+            privkey = Hex.decode(getPrivkey()),
+            pubkey = Hex.decode(getPubkey())
+        )
     }
 
 }

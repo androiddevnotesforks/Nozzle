@@ -12,4 +12,5 @@ data class ProfileEntity(
     val nip05: String,
     val numOfFollowing: Int,
     val numOfFollowers: Int,
+    val isFollowedByMe: Boolean,
 )

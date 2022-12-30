@@ -39,8 +39,8 @@ class NostrService(keyManager: IKeyManager) : INostrService {
             Log.i(TAG, "Closed relay connection: $reason")
         }
 
-        override fun onFailure(message: String?) {
-            Log.i(TAG, "Relay failure error: $message")
+        override fun onFailure(msg: String?) {
+            Log.i(TAG, "Relay failure error: $msg")
         }
 
     }
@@ -51,10 +51,42 @@ class NostrService(keyManager: IKeyManager) : INostrService {
     }
 
     override fun publishProfile(name: String, about: String, picture: String, nip05: String) {
+        Log.i(TAG, "Publish profile")
         val event = Event.createMetadataEvent(
             metadata = Metadata(name, about, picture, nip05),
             keys = keys
         )
         client.publish(event)
+    }
+
+    override fun sendPost(content: String) {
+        Log.i(TAG, "Send post '${content.take(50)}'")
+        TODO("Not yet implemented")
+    }
+
+    override fun sendRepost(postId: String, quote: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendLike(postId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendReply(recipientPubkey: String, content: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun subscribeToProfileMetadata(pubkey: String) {
+        Log.i(TAG, "Subscribe metadata for $pubkey")
+        // TODO: save in db
+        TODO("Not yet implemented")
+    }
+
+    override fun follow(pubkey: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun unfollow(pubkey: String) {
+        TODO("Not yet implemented")
     }
 }

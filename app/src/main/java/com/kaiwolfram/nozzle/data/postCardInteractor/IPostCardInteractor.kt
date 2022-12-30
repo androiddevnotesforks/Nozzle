@@ -1,7 +1,7 @@
 package com.kaiwolfram.nozzle.data.postCardInteractor
 
 interface IPostCardInteractor {
-    suspend fun like(pubkey: String, postId: String)
-    suspend fun repost(pubkey: String, postId: String)
-    suspend fun reply(pubkey: String, replyTo: String, content: String)
+    suspend fun like(postId: String)
+    suspend fun repost(postId: String)
+    suspend fun reply(replyTo: String, content: String)
 }

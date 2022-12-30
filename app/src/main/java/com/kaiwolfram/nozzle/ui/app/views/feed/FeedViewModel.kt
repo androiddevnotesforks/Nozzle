@@ -4,10 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
-import com.kaiwolfram.nozzle.data.room.dao.EventDao
+import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -23,16 +22,19 @@ import java.util.concurrent.atomic.AtomicBoolean
 private const val TAG = "FeedViewModel"
 
 data class FeedViewModelState(
-    val posts: List<PostWithMeta> = listOf(),
+    /**
+     * Current posts sorted from oldest to newest
+     */
+    val posts: List<PostWithMeta> = mutableListOf(),
     val isRefreshing: Boolean = false,
     val pictureUrl: String = "",
     val pubkey: String = "",
 )
 
 class FeedViewModel(
-    private val postCardInteractor: IPostCardInteractor,
     private val profileProvider: IProfileProvider,
-    private val eventDao: EventDao,
+    private val feedProvider: IFeedProvider,
+    private val postCardInteractor: IPostCardInteractor,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     private var isSyncing = AtomicBoolean(false)
@@ -78,7 +80,7 @@ class FeedViewModel(
         uiState.value.let { state ->
             if (state.posts.any { post -> post.id == id }) {
                 viewModelScope.launch(context = Dispatchers.IO) {
-                    postCardInteractor.like(pubkey = uiState.value.pubkey, postId = id)
+                    postCardInteractor.like(postId = id)
                 }
                 viewModelState.update {
                     it.copy(
@@ -95,7 +97,7 @@ class FeedViewModel(
         uiState.value.let { state ->
             if (state.posts.any { post -> post.id == id }) {
                 viewModelScope.launch(context = Dispatchers.IO) {
-                    postCardInteractor.repost(pubkey = uiState.value.pubkey, postId = id)
+                    postCardInteractor.repost(postId = id)
                 }
                 viewModelState.update {
                     it.copy(
@@ -110,7 +112,42 @@ class FeedViewModel(
 
     private fun updateFeed() {
         Log.i(TAG, "Update feed")
-        val posts = eventDao.getFeed(profileProvider.getPubkey())
+        uiState.value.posts.let { posts ->
+            if (posts.isEmpty()) {
+                setInitialFeed()
+            } else {
+                addNewPostsToFeed()
+            }
+        }
+    }
+
+    private fun setInitialFeed() {
+        Log.i(TAG, "Set initial feed")
+        viewModelScope.launch(context = Dispatchers.IO) {
+            viewModelState.update {
+                it.copy(posts = feedProvider.getFeed(profileProvider.getPubkey()))
+            }
+        }
+    }
+
+    private fun addNewPostsToFeed() {
+        Log.i(TAG, "Add new posts to feed")
+        viewModelScope.launch(context = Dispatchers.IO) {
+            val currentFeed = uiState.value.posts
+            val newPosts = feedProvider.getFeedSince(
+                pubkey = profileProvider.getPubkey(),
+                since = currentFeed.first().createdAt
+            )
+            Log.i(TAG, "Found ${newPosts.size} new posts to add to feed")
+            if (newPosts.isNotEmpty()) {
+                val newFeed = mutableListOf<PostWithMeta>()
+                newFeed.addAll(currentFeed)
+                newFeed.addAll(newPosts)
+                viewModelState.update {
+                    it.copy(posts = newFeed)
+                }
+            }
+        }
     }
 
     private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
@@ -134,16 +171,16 @@ class FeedViewModel(
 
     companion object {
         fun provideFactory(
-            nostrService: INostrService,
-            postCardInteractor: IPostCardInteractor,
             profileProvider: IProfileProvider,
+            feedProvider: IFeedProvider,
+            postCardInteractor: IPostCardInteractor,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return FeedViewModel(
-                    nostrService = nostrService,
-                    postCardInteractor = postCardInteractor,
                     profileProvider = profileProvider,
+                    feedProvider = feedProvider,
+                    postCardInteractor = postCardInteractor,
                 ) as T
             }
         }

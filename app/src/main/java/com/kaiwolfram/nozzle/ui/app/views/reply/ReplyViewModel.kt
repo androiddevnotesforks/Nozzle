@@ -48,7 +48,7 @@ class ReplyViewModel(
 
     val onPrepareReply: (PostWithMeta) -> Unit = { post ->
         viewModelScope.launch(context = Dispatchers.IO) {
-            Log.i(TAG, "Setting reply to ${post.pubkey}")
+            Log.i(TAG, "Set reply to ${post.pubkey}")
             viewModelState.update {
                 recipientPubkey = post.pubkey
                 it.copy(
@@ -73,12 +73,13 @@ class ReplyViewModel(
     val onSendOrShowErrorToast: (String) -> Unit = { errorToast ->
         uiState.value.let { state ->
             if (!state.isSendable) {
+                Log.i(TAG, "Reply is not sendable")
                 Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
-                Log.i(TAG, "Sending reply to ${state.recipientName} ${state.pubkey}")
-                nostrService.reply(
+                Log.i(TAG, "Send reply to ${state.recipientName} ${state.pubkey}")
+                nostrService.sendReply(
                     recipientPubkey = recipientPubkey,
-                    reply = state.reply
+                    content = state.reply
                 )
                 reset()
             }

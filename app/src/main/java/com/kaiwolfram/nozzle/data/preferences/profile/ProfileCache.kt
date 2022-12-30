@@ -9,8 +9,8 @@ import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 private const val TAG: String = "ProfileCache"
 
 private const val NAME: String = "name"
-private const val BIO: String = "bio"
-private const val PICTURE_URL: String = "picture_url"
+private const val ABOUT: String = "about"
+private const val PICTURE: String = "picture"
 private const val NIP05: String = "nip05"
 
 class ProfileCache(
@@ -28,9 +28,9 @@ class ProfileCache(
 
     override fun getName() = preferences.getString(NAME, "") ?: ""
 
-    override fun getBio() = preferences.getString(BIO, "") ?: ""
+    override fun getBio() = preferences.getString(ABOUT, "") ?: ""
 
-    override fun getPictureUrl() = preferences.getString(PICTURE_URL, "") ?: ""
+    override fun getPictureUrl() = preferences.getString(PICTURE, "") ?: ""
 
     override fun getNip05() = preferences.getString(NIP05, "") ?: ""
 
@@ -41,17 +41,17 @@ class ProfileCache(
             .apply()
     }
 
-    override fun setBio(bio: String) {
+    override fun setAbout(bio: String) {
         Log.i(TAG, "Set bio $bio")
         preferences.edit()
-            .putString(BIO, bio)
+            .putString(ABOUT, bio)
             .apply()
     }
 
-    override fun setPictureUrl(pictureUrl: String) {
+    override fun setPicture(pictureUrl: String) {
         Log.i(TAG, "Set pictureUrl $pictureUrl")
         preferences.edit()
-            .putString(PICTURE_URL, pictureUrl)
+            .putString(PICTURE, pictureUrl)
             .apply()
     }
 
@@ -66,8 +66,18 @@ class ProfileCache(
         Log.i(TAG, "Reset values")
         preferences.edit().apply {
             putString(NAME, "")
-            putString(BIO, "")
-            putString(PICTURE_URL, "")
+            putString(ABOUT, "")
+            putString(PICTURE, "")
         }.apply()
+    }
+
+    override fun setMeta(name: String, about: String, picture: String, nip05: String) {
+        Log.i(TAG, "Set name $name, about $about, picture $picture and nip05 $nip05")
+        preferences.edit()
+            .putString(NAME, name)
+            .putString(ABOUT, about)
+            .putString(PICTURE, picture)
+            .putString(NIP05, nip05)
+            .apply()
     }
 }
