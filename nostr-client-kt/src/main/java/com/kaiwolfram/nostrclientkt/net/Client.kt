@@ -1,5 +1,6 @@
 package com.kaiwolfram.nostrclientkt.net
 
+import android.util.Log
 import com.google.gson.JsonElement
 import com.kaiwolfram.nostrclientkt.Event
 import com.kaiwolfram.nostrclientkt.Filter
@@ -7,52 +8,51 @@ import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 import okhttp3.*
 import java.util.*
 
+private const val TAG = "Client"
+
 class Client {
     private val httpClient = OkHttpClient()
     private val sockets: HashMap<String, WebSocket> = HashMap()
     private val subscriptions: HashMap<String, List<Filter>> = HashMap()
-    private val nostrListeners = HashSet<NostrListener>()
-    private val socketListener = object : WebSocketListener() {
+    private var nostrListener: NostrListener? = null
+    private val baseListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            nostrListeners.forEach { it.onOpen(response.message) }
+            Log.i(TAG, "onOpen")
+            nostrListener?.onOpen(response.message)
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
+            Log.i(TAG, "onMessage: $text")
             try {
                 val msg = gson.fromJson(text, JsonElement::class.java).asJsonArray
                 val type = msg[0].asString
                 when (type) {
                     "EVENT" -> {
                         Event.fromJson(msg[2]).onSuccess { event ->
-                            nostrListeners.forEach {
-                                it.onEvent(
-                                    subscriptionId = msg[1].asString,
-                                    event = event
-                                )
-                            }
+                            nostrListener?.onEvent(
+                                subscriptionId = msg[1].asString,
+                                event = event
+                            )
                         }
                     }
-                    "NOTICE" -> nostrListeners.forEach {
-                        it.onError(msg = msg[1].asString)
-                    }
-                    "EOSE" -> nostrListeners.forEach {
-                        it.onEOSE(subscriptionId = msg[1].asString)
-                    }
-                    else -> nostrListeners.forEach {
-                        it.onError(msg = "Unknown type $type. Msg was $text")
-                    }
+                    "NOTICE" -> nostrListener?.onError(msg = msg[1].asString)
+                    "EOSE" -> nostrListener?.onEOSE(subscriptionId = msg[1].asString)
+                    else -> nostrListener?.onError(msg = "Unknown type $type. Msg was $text")
+
                 }
             } catch (t: Throwable) {
-                nostrListeners.forEach { it.onError("Problem with $text") }
+                nostrListener?.onError("Problem with $text")
             }
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            nostrListeners.forEach { it.onClose(reason) }
+            Log.i(TAG, "onClosing: $reason")
+            nostrListener?.onClose(reason)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            nostrListeners.forEach { it.onFailure(t.message) }
+            Log.i(TAG, "onFailure: ${response?.message.orEmpty()}")
+            nostrListener?.onFailure(t.message)
         }
     }
 
@@ -65,6 +65,8 @@ class Client {
         val request = createSubscriptionRequest(subscriptionId, filters)
         sockets.values.forEach { it.send(request) }
 
+        Log.i(TAG, "Subscribe to $subscriptionId")
+
         return subscriptionId
     }
 
@@ -73,12 +75,16 @@ class Client {
     }
 
     fun unsubscribe(subscriptionId: String) {
+        Log.i(TAG, "Unsubscribe from $subscriptionId")
+
         val request = """["CLOSE",$subscriptionId]"""
         sockets.values.forEach { it.send(request) }
         subscriptions.remove(subscriptionId)
     }
 
     fun publish(event: Event) {
+        Log.i(TAG, "Publish event kind ${event.kind}, ID ${event.id}, '${event.content}'")
+
         val request = """["EVENT",${event.toJson()}]"""
         sockets.values.forEach { it.send(request) }
     }
@@ -88,11 +94,13 @@ class Client {
     }
 
     fun addRelay(url: String) {
+        Log.i(TAG, "Add relay $url")
+
         if (sockets.containsKey(url)) {
             return
         }
         val request = Request.Builder().url(url).build()
-        val socket = httpClient.newWebSocket(request = request, listener = socketListener)
+        val socket = httpClient.newWebSocket(request = request, listener = baseListener)
         subscriptions.forEach { (id, filters) ->
             socket.send(
                 createSubscriptionRequest(
@@ -105,18 +113,27 @@ class Client {
     }
 
     fun removeRelay(url: String) {
+        Log.i(TAG, "Remove relay $url")
+
         sockets[url]?.close(1000, "Normal closure")
     }
 
-    fun register(listener: NostrListener) {
-        nostrListeners.add(listener)
+    fun setListener(listener: NostrListener) {
+        Log.i(TAG, "Set listener")
+
+        nostrListener = listener
     }
 
-    fun unregister(listener: NostrListener) {
-        nostrListeners.remove(listener)
+    fun removeListener() {
+        Log.i(TAG, "Remove listener")
+
+        nostrListener = null
     }
 
+    // TODO: Call on end of lifecycle
     fun close() {
+        Log.i(TAG, "Close client")
+
         sockets.keys.forEach { removeRelay(it) }
         httpClient.dispatcher.executorService.shutdown()
     }

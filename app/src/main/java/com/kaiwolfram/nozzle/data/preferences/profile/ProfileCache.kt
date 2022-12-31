@@ -34,34 +34,6 @@ class ProfileCache(
 
     override fun getNip05() = preferences.getString(NIP05, "") ?: ""
 
-    override fun setName(name: String) {
-        Log.i(TAG, "Set name $name")
-        preferences.edit()
-            .putString(NAME, name)
-            .apply()
-    }
-
-    override fun setAbout(bio: String) {
-        Log.i(TAG, "Set bio $bio")
-        preferences.edit()
-            .putString(ABOUT, bio)
-            .apply()
-    }
-
-    override fun setPicture(pictureUrl: String) {
-        Log.i(TAG, "Set pictureUrl $pictureUrl")
-        preferences.edit()
-            .putString(PICTURE, pictureUrl)
-            .apply()
-    }
-
-    override fun setNip05(nip05: String) {
-        Log.i(TAG, "Set nip05 $nip05")
-        preferences.edit()
-            .putString(NIP05, nip05)
-            .apply()
-    }
-
     override fun reset() {
         Log.i(TAG, "Reset values")
         preferences.edit().apply {

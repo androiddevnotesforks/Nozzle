@@ -10,10 +10,11 @@ private const val TAG = "NostrService"
 
 class NostrService(keyManager: IKeyManager) : INostrService {
     private val keys: Keys = keyManager.getKeys()
+    private val eventQueue = EventQueue() // TODO: Process events
     private val client = Client()
     private val relays = listOf(
         "wss://nostr-2.zebedee.cloud",
-        "wss://relay.damus.io",
+        "wss://nostr.fmt.wiz.biz",
         "wss://nostr.einundzwanzig.space"
     )
     private val listener = object : NostrListener {
@@ -23,8 +24,12 @@ class NostrService(keyManager: IKeyManager) : INostrService {
 
         override fun onEvent(subscriptionId: String, event: Event) {
             Log.i(TAG, "Received event ${event.id} in subscription $subscriptionId")
-            // TODO: Save in db if new or more recent
-            TODO()
+            val hasBeenAdded = eventQueue.add(event)
+            if (hasBeenAdded) {
+                Log.i(TAG, "Added Event ${event.id} kind ${event.kind} to queue")
+            } else {
+                Log.i(TAG, "Could not add Event ${event.id} kind ${event.kind} to queue")
+            }
         }
 
         override fun onError(msg: String) {
@@ -46,19 +51,14 @@ class NostrService(keyManager: IKeyManager) : INostrService {
     }
 
     init {
-        client.register(listener)
+        client.setListener(listener)
         client.addRelays(relays)
     }
 
-    override fun publishProfile(
-        name: String,
-        about: String,
-        picture: String,
-        nip05: String
-    ): Event {
+    override fun publishProfile(metadata: Metadata): Event {
         Log.i(TAG, "Publish profile")
         val event = Event.createMetadataEvent(
-            metadata = Metadata(name, about, picture, nip05),
+            metadata = metadata,
             keys = keys,
         )
         client.publish(event)
@@ -81,6 +81,7 @@ class NostrService(keyManager: IKeyManager) : INostrService {
         Log.i(TAG, "Send repost of $postId")
         val event = Event.createTextNoteEvent(
             post = Post(
+                // TODO: Set author pubkey as mention
                 // TODO: real relay
                 repostId = RepostId(repostId = postId, relayUrl = relays.first()),
                 msg = quote
@@ -105,15 +106,10 @@ class NostrService(keyManager: IKeyManager) : INostrService {
         return event
     }
 
-    override fun sendReply(postId: String, content: String): Event {
-        Log.i(TAG, "Send reply to $postId")
-        // TODO: Set p tag to notify OG Post author?
+    override fun sendReply(replyTo: ReplyTo, content: String): Event {
+        Log.i(TAG, "Send reply to ${replyTo.replyTo} of root ${replyTo.replyToRoot}")
         val event = Event.createTextNoteEvent(
-            post = Post(
-                // TODO: real relay
-                replyTo = ReplyTo(replyTo = postId, relayUrl = relays.first()),
-                msg = content,
-            ),
+            post = Post(replyTo = replyTo, msg = content),
             keys = keys,
         )
         client.publish(event)

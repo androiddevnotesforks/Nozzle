@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -34,6 +35,7 @@ class ReplyViewModel(
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
     private var recipientPubkey: String = ""
+    private var postToReplyTo: PostWithMeta? = null
 
     val uiState = viewModelState
         .stateIn(
@@ -47,6 +49,7 @@ class ReplyViewModel(
     }
 
     val onPrepareReply: (PostWithMeta) -> Unit = { post ->
+        postToReplyTo = post
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set reply to ${post.pubkey}")
             viewModelState.update {
@@ -76,10 +79,14 @@ class ReplyViewModel(
                 Log.i(TAG, "Reply is not sendable")
                 Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
-                // TODO: Reply to event not author (or AND author)
                 Log.i(TAG, "Send reply to ${state.recipientName} ${state.pubkey}")
+                val replyTo = ReplyTo(
+                    replyToRoot = postToReplyTo?.replyToRootId,
+                    replyTo = postToReplyTo?.replyToId.orEmpty(),
+                    relayUrl = postToReplyTo?.relayUrl.orEmpty(),
+                )
                 nostrService.sendReply(
-                    postId = recipientPubkey, // TODO: This is wrong af
+                    replyTo = replyTo,
                     content = state.reply
                 )
                 reset()

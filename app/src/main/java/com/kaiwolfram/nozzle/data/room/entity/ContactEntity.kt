@@ -6,4 +6,5 @@ import androidx.room.Entity
 data class ContactEntity(
     val pubkey: String,
     val contactPubkey: String,
+    val createdAt: Long,
 )

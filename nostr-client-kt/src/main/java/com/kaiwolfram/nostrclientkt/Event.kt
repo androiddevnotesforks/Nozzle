@@ -88,7 +88,7 @@ class Event(
         fun createContactListEvent(contacts: List<String>, keys: Keys): Event {
             return create(
                 kind = Kind.CONTACT_LIST,
-                // TODO: Set relayUrl and Petname?
+                // TODO: Set relayUrl
                 tags = contacts.map { listOf("p", it, "", "") },
                 content = "",
                 keys = keys
@@ -98,6 +98,9 @@ class Event(
         fun createTextNoteEvent(post: Post, keys: Keys): Event {
             val tags = mutableListOf<List<String>>()
 
+            post.replyTo?.replyToRoot?.let { replyToRoot ->
+                post.replyTo.let { tags.add(listOf("e", replyToRoot, it.relayUrl, "root")) }
+            }
             post.replyTo?.let { tags.add(listOf("e", it.replyTo, it.relayUrl, "reply")) }
             post.repostId?.let { tags.add(listOf("e", it.repostId, it.relayUrl)) }
 
@@ -114,8 +117,8 @@ class Event(
         }
 
         fun createReactionEvent(
-            eventId: String,
-            eventPubkey: String,
+            eventId: String, // Must be last e tag
+            eventPubkey: String, // Must be last p tag
             isPositive: Boolean,
             keys: Keys
         ): Event {
@@ -137,4 +140,9 @@ class Event(
         }
         return secp256k1.verifySchnorr(Hex.decode(sig), Hex.decode(id), Hex.decode(pubkey))
     }
+
+    fun isReaction() = this.kind == Kind.REACTION
+    fun isPost() = this.kind == Kind.TEXT_NOTE
+    fun isMetadata() = this.kind == Kind.SET_METADATA
+    fun isContactList() = this.kind == Kind.CONTACT_LIST
 }

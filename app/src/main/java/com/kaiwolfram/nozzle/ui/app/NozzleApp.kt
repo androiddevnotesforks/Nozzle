@@ -53,6 +53,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         profileFollower = appContainer.profileFollower,
                         pubkeyProvider = appContainer.profileCache,
                         profileDao = appContainer.roomDb.profileDao(),
+                        contactDao = appContainer.roomDb.contactDao(),
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )

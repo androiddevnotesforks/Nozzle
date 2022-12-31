@@ -14,28 +14,30 @@ class ProfileFollower(
     private val pubkeyProvider: IPubkeyProvider,
     private val contactDao: ContactDao,
 ) : IProfileFollower {
+
     override suspend fun follow(pubkeyToFollow: String) {
         Log.i(TAG, "Follow $pubkeyToFollow")
-        contactDao.insertContact(
+        contactDao.insert(
             ContactEntity(
                 pubkey = pubkeyProvider.getPubkey(),
-                contactPubkey = pubkeyToFollow
+                contactPubkey = pubkeyToFollow,
+                createdAt = 0
             )
         )
-        val contacts = contactDao.listContacts(pubkey = pubkeyProvider.getPubkey())
-        nostrService.updateContactList(contacts = contacts)
+        val contacts = contactDao.listContactPubkeys(pubkey = pubkeyProvider.getPubkey())
+        val event = nostrService.updateContactList(contacts = contacts)
+        contactDao.updateTime(pubkey = pubkeyProvider.getPubkey(), createdAt = event.createdAt)
     }
 
     override suspend fun unfollow(pubkeyToUnfollow: String) {
         Log.i(TAG, "Unfollow $pubkeyToUnfollow")
         contactDao.deleteContact(
-            ContactEntity(
-                pubkey = pubkeyProvider.getPubkey(),
-                contactPubkey = pubkeyToUnfollow
-            )
+            pubkey = pubkeyProvider.getPubkey(),
+            contactPubkey = pubkeyToUnfollow
         )
-        val contacts = contactDao.listContacts(pubkey = pubkeyProvider.getPubkey())
-        nostrService.updateContactList(contacts = contacts)
+        val contacts = contactDao.listContactPubkeys(pubkey = pubkeyProvider.getPubkey())
+        val event = nostrService.updateContactList(contacts = contacts)
+        contactDao.updateTime(pubkey = pubkeyProvider.getPubkey(), createdAt = event.createdAt)
     }
 
 }

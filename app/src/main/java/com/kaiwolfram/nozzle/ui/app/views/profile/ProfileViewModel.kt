@@ -13,6 +13,7 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
+import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
@@ -48,6 +49,7 @@ data class ProfileViewModelState(
 class ProfileViewModel(
     private val nostrService: INostrService,
     private val profileDao: ProfileDao,
+    private val contactDao: ContactDao,
     private val feedProvider: IFeedProvider,
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
@@ -156,6 +158,13 @@ class ProfileViewModel(
 
     private suspend fun useCachedValues(pubkey: String) {
         val cachedProfile = profileDao.getProfile(pubkey)
+        // TODO: Move into separate class FollowProvider
+        val numOfFollowing = contactDao.getNumberOfFollowing(pubkey)
+        val numOfFollowers = contactDao.getNumberOfFollowers(pubkey)
+        val isFollowedByMe = contactDao.isFollowed(
+            pubkey = pubkeyProvider.getPubkey(),
+            contactPubkey = pubkey
+        )
         val cachedPosts = feedProvider.getFeedWithSingleAuthor(pubkey)
         if (cachedProfile != null) {
             Log.i(TAG, "Use cached values")
@@ -166,10 +175,10 @@ class ProfileViewModel(
                     name = cachedProfile.name,
                     about = cachedProfile.about,
                     picture = cachedProfile.picture,
-                    numOfFollowing = cachedProfile.numOfFollowing,
-                    numOfFollowers = cachedProfile.numOfFollowers,
+                    numOfFollowing = numOfFollowing,
+                    numOfFollowers = numOfFollowers,
                     isOneself = cachedProfile.pubkey == pubkeyProvider.getPubkey(),
-                    isFollowed = cachedProfile.isFollowedByMe,
+                    isFollowed = isFollowedByMe,
                     posts = cachedPosts
                 )
             }
@@ -225,6 +234,7 @@ class ProfileViewModel(
             postCardInteractor: IPostCardInteractor,
             pubkeyProvider: IPubkeyProvider,
             profileDao: ProfileDao,
+            contactDao: ContactDao,
             feedProvider: IFeedProvider,
             context: Context,
             clip: ClipboardManager,
@@ -238,6 +248,7 @@ class ProfileViewModel(
                         postCardInteractor = postCardInteractor,
                         pubkeyProvider = pubkeyProvider,
                         profileDao = profileDao,
+                        contactDao = contactDao,
                         feedProvider = feedProvider,
                         context = context,
                         clip = clip,

@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nostrclientkt.utils.NostrUtils.isValidUsername
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
@@ -159,12 +160,13 @@ class EditProfileViewModel(
 
     private fun updateMetadataOverNostr(state: EditProfileViewModelState) {
         Log.i(TAG, "Update profile over nostr")
-        nostrService.publishProfile(
+        val metadata = Metadata(
             name = state.nameInput,
             about = state.aboutInput,
             picture = state.pictureInput,
             nip05 = state.nip05Input
         )
+        nostrService.publishProfile(metadata = metadata)
     }
 
     private fun isValidUrl(url: String) = url.isEmpty() || URLUtil.isValidUrl(url)

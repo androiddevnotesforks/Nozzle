@@ -13,10 +13,6 @@ class PostCardInteractor(
     private val repostDao: RepostDao,
 ) : IPostCardInteractor {
 
-    init {
-        Log.i(TAG, "Initialize PostCardInteractor")
-    }
-
     override suspend fun like(postId: String, postPubkey: String) {
         Log.i(TAG, "Like $postId")
         val event = nostrService.sendLike(postId, postPubkey)
