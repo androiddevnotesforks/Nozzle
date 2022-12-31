@@ -109,7 +109,8 @@ class ThreadViewModel(
         }
         if (needsUpdate) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.like(postId)
+                // TODO: set correct pubkey
+                postCardInteractor.like(postId = postId, postPubkey = "FIXME")
             }
         }
     }

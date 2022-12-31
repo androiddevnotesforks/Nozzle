@@ -1,8 +1,8 @@
 package com.kaiwolfram.nostrclientkt
 
 data class Post(
-    val replyTos: List<String>,
-    val relayUrl: String,
-    val mentions: List<String>,
+    val replyTo: ReplyTo? = null,
+    val mentions: List<String> = listOf(),
+    val repostId: RepostId? = null,
     val msg: String,
 )

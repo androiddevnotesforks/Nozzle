@@ -1,9 +1,7 @@
 package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.Event
-import com.kaiwolfram.nostrclientkt.Keys
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.*
 import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
 import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
@@ -25,6 +23,8 @@ class NostrService(keyManager: IKeyManager) : INostrService {
 
         override fun onEvent(subscriptionId: String, event: Event) {
             Log.i(TAG, "Received event ${event.id} in subscription $subscriptionId")
+            // TODO: Save in db if new or more recent
+            TODO()
         }
 
         override fun onError(msg: String) {
@@ -50,43 +50,94 @@ class NostrService(keyManager: IKeyManager) : INostrService {
         client.addRelays(relays)
     }
 
-    override fun publishProfile(name: String, about: String, picture: String, nip05: String) {
+    override fun publishProfile(
+        name: String,
+        about: String,
+        picture: String,
+        nip05: String
+    ): Event {
         Log.i(TAG, "Publish profile")
         val event = Event.createMetadataEvent(
             metadata = Metadata(name, about, picture, nip05),
-            keys = keys
+            keys = keys,
         )
         client.publish(event)
+
+        return event
     }
 
-    override fun sendPost(content: String) {
+    override fun sendPost(content: String): Event {
         Log.i(TAG, "Send post '${content.take(50)}'")
-        TODO("Not yet implemented")
+        val event = Event.createTextNoteEvent(
+            post = Post(msg = content),
+            keys = keys,
+        )
+        client.publish(event)
+
+        return event
     }
 
-    override fun sendRepost(postId: String, quote: String) {
-        TODO("Not yet implemented")
+    override fun sendRepost(postId: String, quote: String): Event {
+        Log.i(TAG, "Send repost of $postId")
+        val event = Event.createTextNoteEvent(
+            post = Post(
+                // TODO: real relay
+                repostId = RepostId(repostId = postId, relayUrl = relays.first()),
+                msg = quote
+            ),
+            keys = keys,
+        )
+        client.publish(event)
+
+        return event
     }
 
-    override fun sendLike(postId: String) {
-        TODO("Not yet implemented")
+    override fun sendLike(postId: String, postPubkey: String): Event {
+        Log.i(TAG, "Send like reaction to $postId")
+        val event = Event.createReactionEvent(
+            eventId = postId,
+            eventPubkey = postPubkey,
+            isPositive = true,
+            keys = keys,
+        )
+        client.publish(event)
+
+        return event
     }
 
-    override fun sendReply(recipientPubkey: String, content: String) {
-        TODO("Not yet implemented")
+    override fun sendReply(postId: String, content: String): Event {
+        Log.i(TAG, "Send reply to $postId")
+        // TODO: Set p tag to notify OG Post author?
+        val event = Event.createTextNoteEvent(
+            post = Post(
+                // TODO: real relay
+                replyTo = ReplyTo(replyTo = postId, relayUrl = relays.first()),
+                msg = content,
+            ),
+            keys = keys,
+        )
+        client.publish(event)
+
+        return event
     }
 
-    override fun subscribeToProfileMetadata(pubkey: String) {
-        Log.i(TAG, "Subscribe metadata for $pubkey")
-        // TODO: save in db
-        TODO("Not yet implemented")
+    override fun updateContactList(contacts: List<String>): Event {
+        Log.i(TAG, "Update contact list with ${contacts.size} contacts")
+        val event = Event.createContactListEvent(
+            contacts = contacts,
+            keys = keys,
+        )
+        client.publish(event)
+
+        return event
     }
 
-    override fun follow(pubkey: String) {
-        TODO("Not yet implemented")
+    override fun subscribeToProfileMetadataAndContactList(pubkey: String): String {
+        Log.i(TAG, "Subscribe metadata and contact list for $pubkey")
+        val profileFilter = Filter.createProfileFilter(pubkey = pubkey)
+        val contactListFilter = Filter.createContactListFilter(pubkey = pubkey)
+
+        return client.subscribe(filters = listOf(profileFilter, contactListFilter))
     }
 
-    override fun unfollow(pubkey: String) {
-        TODO("Not yet implemented")
-    }
 }

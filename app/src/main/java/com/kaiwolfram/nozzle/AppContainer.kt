@@ -38,7 +38,6 @@ class AppContainer(context: Context) {
     }
     val postCardInteractor: IPostCardInteractor = PostCardInteractor(
         nostrService = nostrService,
-        pubkeyProvider = keyPreferences,
         reactionDao = roomDb.reactionDao(),
         repostDao = roomDb.repostDao()
     )

@@ -72,8 +72,8 @@ class ProfileViewModel(
     val onSetPubkey: (String) -> Unit = { pubkey ->
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set UI data for $pubkey")
-            // TODO: unsubscribe on dispose
-            nostrService.subscribeToProfileMetadata(pubkey)
+            // TODO: Unsubscribe on dispose
+            nostrService.subscribeToProfileMetadataAndContactList(pubkey)
             // TODO: Livedata with flow
             useCachedValues(pubkey)
         }
@@ -100,9 +100,9 @@ class ProfileViewModel(
 
     val onLike: (String) -> Unit = { id ->
         uiState.value.let { state ->
-            if (state.posts.any { post -> post.id == id }) {
+            state.posts.find { it.id == id }?.let {
                 viewModelScope.launch(context = Dispatchers.IO) {
-                    postCardInteractor.like(postId = id)
+                    postCardInteractor.like(postId = id, postPubkey = it.pubkey)
                 }
                 viewModelState.update {
                     it.copy(

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b09a7cd20076abd0fa936cee0e2c94be",
+    "identityHash": "8e90b39ac895fae7819919a12bddbfcd",
     "entities": [
       {
         "tableName": "contact",
@@ -139,7 +139,7 @@
       },
       {
         "tableName": "reaction",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eventId` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `content` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eventId` TEXT NOT NULL, `pubkey` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -156,12 +156,6 @@
           {
             "fieldPath": "pubkey",
             "columnName": "pubkey",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "content",
-            "columnName": "content",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -211,7 +205,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b09a7cd20076abd0fa936cee0e2c94be')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8e90b39ac895fae7819919a12bddbfcd')"
     ]
   }
 }

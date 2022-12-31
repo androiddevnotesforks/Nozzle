@@ -8,5 +8,4 @@ data class ReactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val eventId: String,
     val pubkey: String,
-    val content: String,
 )

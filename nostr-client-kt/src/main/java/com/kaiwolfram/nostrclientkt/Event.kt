@@ -85,10 +85,11 @@ class Event(
             )
         }
 
-        fun createContactListEvent(contacts: List<Contact>, keys: Keys): Event {
+        fun createContactListEvent(contacts: List<String>, keys: Keys): Event {
             return create(
                 kind = Kind.CONTACT_LIST,
-                tags = contacts.map { listOf("p", it.pubkey, it.relay, it.alias) },
+                // TODO: Set relayUrl and Petname?
+                tags = contacts.map { listOf("p", it, "", "") },
                 content = "",
                 keys = keys
             )
@@ -96,7 +97,9 @@ class Event(
 
         fun createTextNoteEvent(post: Post, keys: Keys): Event {
             val tags = mutableListOf<List<String>>()
-            post.replyTos.forEach { tags.add(listOf("e", it, post.relayUrl, "reply")) }
+
+            post.replyTo?.let { tags.add(listOf("e", it.replyTo, it.relayUrl, "reply")) }
+            post.repostId?.let { tags.add(listOf("e", it.repostId, it.relayUrl)) }
 
             val mentionTag = mutableListOf("p")
             post.mentions.forEach { mentionTag.add(it) }

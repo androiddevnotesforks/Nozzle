@@ -76,9 +76,10 @@ class ReplyViewModel(
                 Log.i(TAG, "Reply is not sendable")
                 Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
+                // TODO: Reply to event not author (or AND author)
                 Log.i(TAG, "Send reply to ${state.recipientName} ${state.pubkey}")
                 nostrService.sendReply(
-                    recipientPubkey = recipientPubkey,
+                    postId = recipientPubkey, // TODO: This is wrong af
                     content = state.reply
                 )
                 reset()

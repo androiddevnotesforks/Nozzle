@@ -16,17 +16,15 @@ class Filter(
     fun toJson(): String = gson.toJson(this)
 
     companion object {
-        fun createProfileFilter(
-            pubkey: String,
-        ): Filter {
+        fun createProfileFilter(pubkey: String): Filter {
             return Filter(
                 authors = listOf(pubkey),
-                kinds = listOf(Event.Kind.CONTACT_LIST),
+                kinds = listOf(Event.Kind.SET_METADATA),
                 limit = 1
             )
         }
 
-        fun createPersonalPostsFilter(
+        fun createPostFilter(
             pubkey: String,
             since: Long? = null,
             until: Long? = null,
@@ -41,7 +39,7 @@ class Filter(
             )
         }
 
-        fun createPersonalContactListFilter(
+        fun createContactListFilter(
             pubkey: String,
             since: Long? = null,
             until: Long? = null,
