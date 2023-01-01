@@ -57,6 +57,9 @@ class FeedViewModel(
             )
         }
         handleNostrSubscription()
+        viewModelScope.launch(context = Dispatchers.IO) {
+            setInitialFeed()
+        }
     }
 
     val onRefreshFeedView: () -> Unit = {
@@ -132,7 +135,6 @@ class FeedViewModel(
         } else {
             addNewPostsToFeed()
         }
-
     }
 
     private suspend fun setInitialFeed() {

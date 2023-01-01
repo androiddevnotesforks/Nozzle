@@ -6,7 +6,7 @@ import android.util.Log
 import com.kaiwolfram.nozzle.data.preferences.PreferenceFileNames
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 
-private const val TAG: String = "ProfileCache"
+private const val TAG: String = "ProfilePreferences"
 
 private const val NAME: String = "name"
 private const val ABOUT: String = "about"
