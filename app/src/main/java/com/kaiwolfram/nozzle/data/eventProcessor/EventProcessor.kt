@@ -47,8 +47,8 @@ class EventProcessor(
         postDao.insert(
             id = event.id,
             pubkey = event.pubkey,
-            replyTo = null, // TODO: Read value from tags
-            replyToRoot = null,
+            replyTo = event.getReplyId(),
+            replyToRoot = event.getRootReplyId(),
             content = event.content,
             createdAt = event.createdAt,
         )

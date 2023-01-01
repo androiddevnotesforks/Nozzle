@@ -140,6 +140,14 @@ class Event(
         return secp256k1.verifySchnorr(Hex.decode(sig), Hex.decode(id), Hex.decode(pubkey))
     }
 
+    fun getReplyId(): String? {
+        return tags.find { it.size == 4 && it[0] == "e" && it[3] == "reply" }?.get(1)
+    }
+
+    fun getRootReplyId(): String? {
+        return tags.find { it.size == 4 && it[0] == "e" && it[3] == "root" }?.get(1)
+    }
+
     fun isReaction() = this.kind == Kind.REACTION
     fun isPost() = this.kind == Kind.TEXT_NOTE
     fun isProfileMetadata() = this.kind == Kind.SET_METADATA
