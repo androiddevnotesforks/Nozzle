@@ -12,4 +12,5 @@ interface INostrService {
     fun sendReply(replyTo: ReplyTo, content: String): Event
     fun updateContactList(contacts: List<String>): Event
     fun subscribeToProfileMetadataAndContactList(pubkey: String): String
+    fun subscribeToFeed(contactPubkeys: List<String>, since: Long? = null): String
 }

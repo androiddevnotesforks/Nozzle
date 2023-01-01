@@ -9,5 +9,5 @@ interface ReactionDao {
         "INSERT INTO reaction (eventId, pubkey) " +
                 "VALUES (:eventId, :pubkey)"
     )
-    suspend fun like(eventId: String, pubkey: String)
+    fun like(eventId: String, pubkey: String)
 }

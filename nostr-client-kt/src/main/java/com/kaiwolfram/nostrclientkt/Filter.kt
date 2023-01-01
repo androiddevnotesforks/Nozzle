@@ -25,13 +25,13 @@ class Filter(
         }
 
         fun createPostFilter(
-            pubkey: String,
+            pubkeys: List<String>,
             since: Long? = null,
             until: Long? = null,
             limit: Int? = null
         ): Filter {
             return Filter(
-                authors = listOf(pubkey),
+                authors = pubkeys,
                 kinds = listOf(Event.Kind.TEXT_NOTE),
                 since = since,
                 until = until,

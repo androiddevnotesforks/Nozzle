@@ -4,7 +4,6 @@ import android.util.Log
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
-import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 
 private const val TAG = "ProfileFollower"
 
@@ -18,12 +17,11 @@ class ProfileFollower(
     override suspend fun follow(pubkeyToFollow: String) {
         Log.i(TAG, "Follow $pubkeyToFollow")
         contactDao.insert(
-            ContactEntity(
-                pubkey = pubkeyProvider.getPubkey(),
-                contactPubkey = pubkeyToFollow,
-                createdAt = 0
-            )
+            pubkey = pubkeyProvider.getPubkey(),
+            contactPubkey = pubkeyToFollow,
+            createdAt = 0
         )
+
         val contacts = contactDao.listContactPubkeys(pubkey = pubkeyProvider.getPubkey())
         val event = nostrService.updateContactList(contacts = contacts)
         contactDao.updateTime(pubkey = pubkeyProvider.getPubkey(), createdAt = event.createdAt)

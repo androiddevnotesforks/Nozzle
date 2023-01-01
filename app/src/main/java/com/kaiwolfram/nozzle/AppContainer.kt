@@ -2,6 +2,8 @@ package com.kaiwolfram.nozzle
 
 import android.content.Context
 import androidx.room.Room
+import com.kaiwolfram.nozzle.data.eventProcessor.EventProcessor
+import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.nostr.NostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
@@ -20,15 +22,6 @@ import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
 
-    val keyPreferences: IKeyManager = KeyPreferences(context = context)
-
-    val nostrService: INostrService = NostrService(keyManager = keyPreferences)
-
-    val profileCache: IProfileCache = ProfileCache(
-        pubkeyProvider = keyPreferences,
-        context = context
-    )
-
     val roomDb: AppDatabase by lazy {
         Room.databaseBuilder(
             context = context,
@@ -36,6 +29,26 @@ class AppContainer(context: Context) {
             name = "nozzle_database"
         ).build()
     }
+
+    val keyPreferences: IKeyManager = KeyPreferences(context = context)
+
+    val eventProcessor: IEventProcessor = EventProcessor(
+        reactionDao = roomDb.reactionDao(),
+        profileDao = roomDb.profileDao(),
+        contactDao = roomDb.contactDao(),
+        postDao = roomDb.postDao(),
+    )
+
+    val nostrService: INostrService = NostrService(
+        keyManager = keyPreferences,
+        eventProcessor = eventProcessor
+    )
+
+    val profileCache: IProfileCache = ProfileCache(
+        pubkeyProvider = keyPreferences,
+        context = context
+    )
+
     val postCardInteractor: IPostCardInteractor = PostCardInteractor(
         nostrService = nostrService,
         reactionDao = roomDb.reactionDao(),
@@ -48,7 +61,11 @@ class AppContainer(context: Context) {
         contactDao = roomDb.contactDao()
     )
 
-    val feedProvider: IFeedProvider = FeedProvider()
+    val feedProvider: IFeedProvider = FeedProvider(
+        pubkeyProvider = keyPreferences,
+        postDao = roomDb.postDao(),
+        contactDao = roomDb.contactDao()
+    )
 
     val threadProvider: IThreadProvider = ThreadProvider()
 }

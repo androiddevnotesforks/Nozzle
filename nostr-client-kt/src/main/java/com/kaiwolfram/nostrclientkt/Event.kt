@@ -143,6 +143,6 @@ class Event(
 
     fun isReaction() = this.kind == Kind.REACTION
     fun isPost() = this.kind == Kind.TEXT_NOTE
-    fun isMetadata() = this.kind == Kind.SET_METADATA
+    fun isProfileMetadata() = this.kind == Kind.SET_METADATA
     fun isContactList() = this.kind == Kind.CONTACT_LIST
 }

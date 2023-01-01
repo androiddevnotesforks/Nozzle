@@ -71,6 +71,8 @@ fun NozzleApp(appContainer: AppContainer) {
                         profileProvider = appContainer.profileCache,
                         feedProvider = appContainer.feedProvider,
                         postCardInteractor = appContainer.postCardInteractor,
+                        nostrService = appContainer.nostrService,
+                        contactDao = appContainer.roomDb.contactDao()
                     )
                 ),
                 editProfileViewModel = viewModel(

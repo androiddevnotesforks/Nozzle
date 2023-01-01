@@ -17,7 +17,7 @@ class Client {
     private var nostrListener: NostrListener? = null
     private val baseListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            Log.i(TAG, "onOpen")
+            Log.i(TAG, "onOpen: $response")
             nostrListener?.onOpen(response.message)
         }
 
@@ -41,17 +41,18 @@ class Client {
 
                 }
             } catch (t: Throwable) {
-                nostrListener?.onError("Problem with $text")
+                nostrListener?.onError("Problem with $text, $t")
+                nostrListener?.onError("Queue size ${webSocket.queueSize()}")
             }
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            Log.i(TAG, "onClosing: $reason")
+            Log.i(TAG, "onClosing: $reason, $code")
             nostrListener?.onClose(reason)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            Log.i(TAG, "onFailure: ${response?.message.orEmpty()}")
+            Log.i(TAG, "onFailure: $t, $response")
             nostrListener?.onFailure(t.message)
         }
     }
@@ -63,6 +64,7 @@ class Client {
         val subscriptionId = UUID.randomUUID().toString()
         subscriptions[subscriptionId] = filters
         val request = createSubscriptionRequest(subscriptionId, filters)
+        Log.i(TAG, "Send $request to ${sockets.values.size} relays")
         sockets.values.forEach { it.send(request) }
 
         Log.i(TAG, "Subscribe to $subscriptionId")
@@ -71,7 +73,7 @@ class Client {
     }
 
     private fun createSubscriptionRequest(subscriptionId: String, filters: List<Filter>): String {
-        return """["REQ",$subscriptionId,${filters.joinToString(",") { it.toJson() }}]"""
+        return """["REQ","$subscriptionId",${filters.joinToString(",") { it.toJson() }}]"""
     }
 
     fun unsubscribe(subscriptionId: String) {

@@ -1,9 +1,7 @@
 package com.kaiwolfram.nozzle.data.room.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
-import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 
 @Dao
 interface ContactDao {
@@ -15,8 +13,17 @@ interface ContactDao {
     )
     suspend fun listContactPubkeys(pubkey: String): List<String>
 
-    @Insert
-    suspend fun insert(vararg contactEntity: ContactEntity)
+    @Query(
+        "INSERT INTO contact (pubkey, contactPubkey, createdAt) " +
+                "VALUES (:pubkey, :contactPubkeys, :createdAt)"
+    )
+    fun insert(pubkey: String, contactPubkeys: List<String>, createdAt: Long)
+
+    @Query(
+        "INSERT INTO contact (pubkey, contactPubkey, createdAt) " +
+                "VALUES (:pubkey, :contactPubkey, :createdAt)"
+    )
+    fun insert(pubkey: String, contactPubkey: String, createdAt: Long)
 
     @Query(
         "DELETE FROM contact " +
@@ -51,4 +58,10 @@ interface ContactDao {
                 "WHERE pubkey = :pubkey AND contactPubkey = :contactPubkey)"
     )
     suspend fun isFollowed(pubkey: String, contactPubkey: String): Boolean
+
+    @Query(
+        "DELETE FROM contact " +
+                "WHERE pubkey = :pubkey AND createdAt < :createdAt"
+    )
+    fun deleteIfOutdated(pubkey: String, createdAt: Long)
 }

@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nozzle.data.nostr.INostrService
-import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
+import com.kaiwolfram.nozzle.data.preferences.profile.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -30,7 +30,7 @@ data class ReplyViewModelState(
 
 class ReplyViewModel(
     private val nostrService: INostrService,
-    private val profileProvider: IProfileProvider,
+    private val profileProvider: IPersonalProfileProvider,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
@@ -113,7 +113,7 @@ class ReplyViewModel(
     companion object {
         fun provideFactory(
             nostrService: INostrService,
-            profileProvider: IProfileProvider,
+            profileProvider: IPersonalProfileProvider,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")

@@ -4,18 +4,21 @@ import android.util.Log
 import com.kaiwolfram.nostrclientkt.*
 import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
+import com.kaiwolfram.nozzle.data.defaultPubkeys
+import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
 import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
 
 private const val TAG = "NostrService"
 
-class NostrService(keyManager: IKeyManager) : INostrService {
+class NostrService(
+    keyManager: IKeyManager,
+    private val eventProcessor: IEventProcessor
+) : INostrService {
     private val keys: Keys = keyManager.getKeys()
-    private val eventQueue = EventQueue() // TODO: Process events
     private val client = Client()
     private val relays = listOf(
-        "wss://nostr-2.zebedee.cloud",
         "wss://nostr.fmt.wiz.biz",
-        "wss://nostr.einundzwanzig.space"
+        "wss://nostr.einundzwanzig.space",
     )
     private val listener = object : NostrListener {
         override fun onOpen(msg: String) {
@@ -24,12 +27,7 @@ class NostrService(keyManager: IKeyManager) : INostrService {
 
         override fun onEvent(subscriptionId: String, event: Event) {
             Log.i(TAG, "Received event ${event.id} in subscription $subscriptionId")
-            val hasBeenAdded = eventQueue.add(event)
-            if (hasBeenAdded) {
-                Log.i(TAG, "Added Event ${event.id} kind ${event.kind} to queue")
-            } else {
-                Log.i(TAG, "Could not add Event ${event.id} kind ${event.kind} to queue")
-            }
+            eventProcessor.process(event)
         }
 
         override fun onError(msg: String) {
@@ -136,4 +134,13 @@ class NostrService(keyManager: IKeyManager) : INostrService {
         return client.subscribe(filters = listOf(profileFilter, contactListFilter))
     }
 
+    override fun subscribeToFeed(contactPubkeys: List<String>, since: Long?): String {
+        Log.i(TAG, "Subscribe to feed of ${contactPubkeys.size} contacts")
+        // TODO: Remove defaultPubkeys after user discovery implementation
+        val pubkeys = contactPubkeys.ifEmpty { defaultPubkeys }
+        val limit = if (since == null) 150 else null
+        val postFilter = Filter.createPostFilter(pubkeys = pubkeys, since = since, limit = limit)
+
+        return client.subscribe(filters = listOf(postFilter))
+    }
 }

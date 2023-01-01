@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
-import com.kaiwolfram.nozzle.data.preferences.profile.IProfileProvider
+import com.kaiwolfram.nozzle.data.preferences.profile.IPersonalProfileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ data class PostViewModelState(
 )
 
 class PostViewModel(
-    private val profileProvider: IProfileProvider,
+    private val profileProvider: IPersonalProfileProvider,
     private val nostrService: INostrService,
     context: Context,
 ) : ViewModel() {
@@ -93,7 +93,7 @@ class PostViewModel(
     companion object {
         fun provideFactory(
             nostrService: INostrService,
-            profileProvider: IProfileProvider,
+            profileProvider: IPersonalProfileProvider,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
