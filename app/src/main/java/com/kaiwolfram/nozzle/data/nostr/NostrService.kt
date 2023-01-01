@@ -26,7 +26,7 @@ class NostrService(
         }
 
         override fun onEvent(subscriptionId: String, event: Event) {
-            Log.i(TAG, "Received event ${event.id} in subscription $subscriptionId")
+            Log.i(TAG, "Received event $event in subscription $subscriptionId")
             eventProcessor.process(event)
         }
 
@@ -54,7 +54,7 @@ class NostrService(
     }
 
     override fun publishProfile(metadata: Metadata): Event {
-        Log.i(TAG, "Publish profile")
+        Log.i(TAG, "Publish profile $metadata")
         val event = Event.createMetadataEvent(
             metadata = metadata,
             keys = keys,

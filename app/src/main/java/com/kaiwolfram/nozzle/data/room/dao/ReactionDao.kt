@@ -6,7 +6,7 @@ import androidx.room.Query
 @Dao
 interface ReactionDao {
     @Query(
-        "INSERT INTO reaction (eventId, pubkey) " +
+        "INSERT OR IGNORE INTO reaction (eventId, pubkey) " +
                 "VALUES (:eventId, :pubkey)"
     )
     fun like(eventId: String, pubkey: String)

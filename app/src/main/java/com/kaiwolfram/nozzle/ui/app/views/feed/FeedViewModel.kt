@@ -24,7 +24,7 @@ private const val TAG = "FeedViewModel"
 
 data class FeedViewModelState(
     /**
-     * Current posts sorted from oldest to newest
+     * Current posts sorted from newest to oldest
      */
     val posts: List<PostWithMeta> = mutableListOf(),
     val isRefreshing: Boolean = false,
@@ -67,7 +67,6 @@ class FeedViewModel(
                 updateFeed()
                 setRefresh(false)
             }
-            // TODO: Update subscription?
         }
     }
 

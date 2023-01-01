@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Query
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 
+// TODO: How to sort?
+
 @Dao
 interface PostDao {
     /**
