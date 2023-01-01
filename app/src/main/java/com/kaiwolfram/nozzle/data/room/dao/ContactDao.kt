@@ -46,21 +46,21 @@ interface ContactDao {
                 "FROM contact " +
                 "WHERE pubkey = :pubkey"
     )
-    suspend fun getNumberOfFollowing(pubkey: String): Int
+    fun getNumberOfFollowing(pubkey: String): Int
 
     @Query(
         "SELECT COUNT(*) " +
                 "FROM contact " +
                 "WHERE contactPubkey = :pubkey"
     )
-    suspend fun getNumberOfFollowers(pubkey: String): Int
+    fun getNumberOfFollowers(pubkey: String): Int
 
     @Query(
         "SELECT EXISTS(SELECT * " +
                 "FROM contact " +
                 "WHERE pubkey = :pubkey AND contactPubkey = :contactPubkey)"
     )
-    suspend fun isFollowed(pubkey: String, contactPubkey: String): Boolean
+    fun isFollowed(pubkey: String, contactPubkey: String): Boolean
 
     @Query(
         "DELETE FROM contact " +

@@ -10,11 +10,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
-import com.kaiwolfram.nozzle.data.room.dao.ContactDao
-import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
+import com.kaiwolfram.nozzle.data.provider.IProfileProvider
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
@@ -48,12 +46,10 @@ data class ProfileViewModelState(
 
 class ProfileViewModel(
     private val nostrService: INostrService,
-    private val profileDao: ProfileDao,
-    private val contactDao: ContactDao,
     private val feedProvider: IFeedProvider,
+    private val profileProvider: IProfileProvider,
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
-    private val pubkeyProvider: IPubkeyProvider,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
@@ -157,29 +153,21 @@ class ProfileViewModel(
     }
 
     private suspend fun useCachedValues(pubkey: String) {
-        val cachedProfile = profileDao.getProfile(pubkey)
-        // TODO: Move into separate class FollowProvider
-        val numOfFollowing = contactDao.getNumberOfFollowing(pubkey)
-        val numOfFollowers = contactDao.getNumberOfFollowers(pubkey)
-        val isFollowedByMe = contactDao.isFollowed(
-            pubkey = pubkeyProvider.getPubkey(),
-            contactPubkey = pubkey
-        )
-        val cachedPosts = feedProvider.getFeedWithSingleAuthor(pubkey)
+        val cachedProfile = profileProvider.getProfile(pubkey)
         if (cachedProfile != null) {
             Log.i(TAG, "Use cached values")
             viewModelState.update {
                 it.copy(
                     pubkey = pubkey,
-                    npub = hexToNpub(pubkey),
-                    name = cachedProfile.name,
-                    about = cachedProfile.about,
-                    picture = cachedProfile.picture,
-                    numOfFollowing = numOfFollowing,
-                    numOfFollowers = numOfFollowers,
-                    isOneself = cachedProfile.pubkey == pubkeyProvider.getPubkey(),
-                    isFollowed = isFollowedByMe,
-                    posts = cachedPosts
+                    npub = cachedProfile.npub,
+                    name = cachedProfile.metadata.name.orEmpty(),
+                    about = cachedProfile.metadata.about.orEmpty(),
+                    picture = cachedProfile.metadata.picture.orEmpty(),
+                    numOfFollowing = cachedProfile.numOfFollowing,
+                    numOfFollowers = cachedProfile.numOfFollowers,
+                    isOneself = cachedProfile.isOneself,
+                    isFollowed = cachedProfile.isFollowedByMe,
+                    posts = feedProvider.getFeedWithSingleAuthor(pubkey)
                 )
             }
         } else {
@@ -232,10 +220,8 @@ class ProfileViewModel(
             nostrService: INostrService,
             profileFollower: IProfileFollower,
             postCardInteractor: IPostCardInteractor,
-            pubkeyProvider: IPubkeyProvider,
-            profileDao: ProfileDao,
-            contactDao: ContactDao,
             feedProvider: IFeedProvider,
+            profileProvider: IProfileProvider,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =
@@ -246,10 +232,8 @@ class ProfileViewModel(
                         nostrService = nostrService,
                         profileFollower = profileFollower,
                         postCardInteractor = postCardInteractor,
-                        pubkeyProvider = pubkeyProvider,
-                        profileDao = profileDao,
-                        contactDao = contactDao,
                         feedProvider = feedProvider,
+                        profileProvider = profileProvider,
                         context = context,
                         clip = clip,
                     ) as T

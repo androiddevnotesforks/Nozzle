@@ -14,10 +14,7 @@ import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.preferences.profile.ProfileCache
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.profileFollower.ProfileFollower
-import com.kaiwolfram.nozzle.data.provider.FeedProvider
-import com.kaiwolfram.nozzle.data.provider.IFeedProvider
-import com.kaiwolfram.nozzle.data.provider.IThreadProvider
-import com.kaiwolfram.nozzle.data.provider.ThreadProvider
+import com.kaiwolfram.nozzle.data.provider.*
 import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
@@ -64,6 +61,12 @@ class AppContainer(context: Context) {
     val feedProvider: IFeedProvider = FeedProvider(
         pubkeyProvider = keyPreferences,
         postDao = roomDb.postDao(),
+        contactDao = roomDb.contactDao()
+    )
+
+    val profileProvider: IProfileProvider = ProfileProvider(
+        pubkeyProvider = keyPreferences,
+        profileDao = roomDb.profileDao(),
         contactDao = roomDb.contactDao()
     )
 

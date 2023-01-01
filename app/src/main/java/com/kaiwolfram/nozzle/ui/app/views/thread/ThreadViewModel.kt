@@ -77,7 +77,7 @@ class ThreadViewModel(
     }
 
     val onLike: (String) -> Unit = { postId ->
-        // TODO: This sucks lol
+        // TODO: This sucks lol. Maybe PostWithMeta instead of only id?
         var needsUpdate = false
         uiState.value.let { state ->
             if (state.current != null && state.current.id == postId) {
@@ -109,14 +109,14 @@ class ThreadViewModel(
         }
         if (needsUpdate) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                // TODO: set correct pubkey
+                // TODO: set correct pubkey OR no pubkey if nip doesnt require it
                 postCardInteractor.like(postId = postId, postPubkey = "FIXME")
             }
         }
     }
 
     val onRepost: (String) -> Unit = { postId ->
-        // TODO: This sucks lol
+        // TODO: This sucks lol. Maybe PostWithMeta instead of only id?
         var needsUpdate = false
         uiState.value.let { state ->
             if (state.current != null && state.current.id == postId) {

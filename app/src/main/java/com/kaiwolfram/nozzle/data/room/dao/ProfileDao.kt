@@ -9,7 +9,7 @@ import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 @Dao
 interface ProfileDao {
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
-    suspend fun getProfile(pubkey: String): ProfileEntity?
+    fun getProfile(pubkey: String): ProfileEntity?
 
     @Query(
         "UPDATE profile " +

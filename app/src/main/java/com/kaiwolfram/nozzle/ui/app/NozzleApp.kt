@@ -50,10 +50,8 @@ fun NozzleApp(appContainer: AppContainer) {
                         nostrService = appContainer.nostrService,
                         postCardInteractor = appContainer.postCardInteractor,
                         feedProvider = appContainer.feedProvider,
+                        profileProvider = appContainer.profileProvider,
                         profileFollower = appContainer.profileFollower,
-                        pubkeyProvider = appContainer.profileCache,
-                        profileDao = appContainer.roomDb.profileDao(),
-                        contactDao = appContainer.roomDb.contactDao(),
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
