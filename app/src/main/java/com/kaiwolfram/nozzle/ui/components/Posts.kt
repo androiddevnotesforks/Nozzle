@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -332,11 +331,7 @@ private fun ReplyAction(
                     onNavigateToReply()
                 })
         Spacer(Modifier.width(spacing.medium))
-        // TODO: Show num
-        Text(
-            text = numOfReplies.toString(),
-            color = Color.Transparent
-        )
+        Text(text = numOfReplies.toString())
     }
 }
 
@@ -355,8 +350,7 @@ private fun RepostAction(
             tint = if (isRepostedByMe) Green21 else colors.onBackground
         )
         Spacer(Modifier.width(spacing.medium))
-        // TODO: Show num
-        Text(text = numOfReposts.toString(), color = Color.Transparent)
+        Text(text = numOfReposts.toString())
     }
 }
 
@@ -376,8 +370,7 @@ private fun LikeAction(
             tint = if (isLikedByMe) Red21 else colors.onBackground
         )
         Spacer(Modifier.width(spacing.medium))
-        // TODO: Show num
-        Text(text = numOfLikes.toString(), color = Color.Transparent)
+        Text(text = numOfLikes.toString())
     }
 }
 

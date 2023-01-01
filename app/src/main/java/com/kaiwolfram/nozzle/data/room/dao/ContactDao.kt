@@ -3,6 +3,8 @@ package com.kaiwolfram.nozzle.data.room.dao
 import androidx.room.Dao
 import androidx.room.Query
 
+// TODO: Prevent duplicate primary key constraint in all Inserts
+
 @Dao
 interface ContactDao {
 
