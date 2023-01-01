@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.data.preferences.key
+package com.kaiwolfram.nozzle.data.provider
 
 interface IPubkeyProvider {
     fun getPubkey(): String

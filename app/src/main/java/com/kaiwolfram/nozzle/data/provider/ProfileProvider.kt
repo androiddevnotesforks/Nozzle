@@ -1,6 +1,5 @@
 package com.kaiwolfram.nozzle.data.provider
 
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.utils.hexToNpub

@@ -3,7 +3,7 @@ package com.kaiwolfram.nozzle.data.profileFollower
 import android.util.Log
 import com.kaiwolfram.nostrclientkt.Event
 import com.kaiwolfram.nozzle.data.nostr.INostrService
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
+import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 

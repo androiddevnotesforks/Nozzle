@@ -11,7 +11,7 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.PostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
 import com.kaiwolfram.nozzle.data.preferences.key.KeyPreferences
 import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
-import com.kaiwolfram.nozzle.data.preferences.profile.ProfileCache
+import com.kaiwolfram.nozzle.data.preferences.profile.ProfilePreferences
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.profileFollower.ProfileFollower
 import com.kaiwolfram.nozzle.data.provider.*
@@ -41,7 +41,7 @@ class AppContainer(context: Context) {
         eventProcessor = eventProcessor
     )
 
-    val profileCache: IProfileCache = ProfileCache(
+    val profilePreferences: IProfileCache = ProfilePreferences(
         pubkeyProvider = keyPreferences,
         context = context
     )

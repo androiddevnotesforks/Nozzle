@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nozzle.data.nostr.INostrService
-import com.kaiwolfram.nozzle.data.preferences.profile.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel

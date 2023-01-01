@@ -1,6 +1,4 @@
-package com.kaiwolfram.nozzle.data.preferences.profile
-
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
+package com.kaiwolfram.nozzle.data.provider
 
 interface IPersonalProfileProvider : IPubkeyProvider {
     fun getName(): String

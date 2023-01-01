@@ -2,7 +2,6 @@ package com.kaiwolfram.nozzle.data.provider
 
 import android.util.Log
 import com.kaiwolfram.nozzle.data.defaultPubkeys
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.model.PostWithMeta

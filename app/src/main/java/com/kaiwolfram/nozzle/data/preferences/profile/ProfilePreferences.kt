@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.kaiwolfram.nozzle.data.preferences.PreferenceFileNames
-import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
+import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 
 private const val TAG: String = "ProfileCache"
 
@@ -13,7 +13,7 @@ private const val ABOUT: String = "about"
 private const val PICTURE: String = "picture"
 private const val NIP05: String = "nip05"
 
-class ProfileCache(
+class ProfilePreferences(
     private val pubkeyProvider: IPubkeyProvider,
     context: Context,
 ) : IProfileCache {
