@@ -1,9 +1,11 @@
 package com.kaiwolfram.nozzle.data.profileFollower
 
 import android.util.Log
+import com.kaiwolfram.nostrclientkt.Event
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.preferences.key.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
+import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 
 private const val TAG = "ProfileFollower"
 
@@ -14,16 +16,18 @@ class ProfileFollower(
     private val contactDao: ContactDao,
 ) : IProfileFollower {
 
-    override suspend fun follow(pubkeyToFollow: String) {
+    override suspend fun follow(pubkeyToFollow: String, relayUrl: String, petname: String) {
         Log.i(TAG, "Follow $pubkeyToFollow")
         contactDao.insert(
             pubkey = pubkeyProvider.getPubkey(),
             contactPubkey = pubkeyToFollow,
+            relayUrl = relayUrl,
+            petname = petname,
             createdAt = 0
         )
 
-        val contacts = contactDao.listContactPubkeys(pubkey = pubkeyProvider.getPubkey())
-        val event = nostrService.updateContactList(contacts = contacts)
+        val contacts = contactDao.listContacts(pubkey = pubkeyProvider.getPubkey())
+        val event = updateContactListViaNostr(contacts)
         contactDao.updateTime(pubkey = pubkeyProvider.getPubkey(), createdAt = event.createdAt)
     }
 
@@ -33,9 +37,15 @@ class ProfileFollower(
             pubkey = pubkeyProvider.getPubkey(),
             contactPubkey = pubkeyToUnfollow
         )
-        val contacts = contactDao.listContactPubkeys(pubkey = pubkeyProvider.getPubkey())
-        val event = nostrService.updateContactList(contacts = contacts)
+        val contacts = contactDao.listContacts(pubkey = pubkeyProvider.getPubkey())
+        val event = updateContactListViaNostr(contacts)
         contactDao.updateTime(pubkey = pubkeyProvider.getPubkey(), createdAt = event.createdAt)
+    }
+
+    private fun updateContactListViaNostr(contactEntities: List<ContactEntity>): Event {
+        return nostrService.updateContactList(
+            contacts = contactEntities.map { it.toContactListEntry() }
+        )
     }
 
 }

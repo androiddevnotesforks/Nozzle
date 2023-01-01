@@ -135,9 +135,10 @@ class ProfileViewModel(
     }
 
     val onFollow: (String) -> Unit = { pubkeyToFollow ->
+        // TODO: Set correct relayUrl and petname
         if (!uiState.value.isFollowed) {
             viewModelScope.launch(context = Dispatchers.IO) {
-                profileFollower.follow(pubkeyToFollow = pubkeyToFollow)
+                profileFollower.follow(pubkeyToFollow = pubkeyToFollow, relayUrl = "", petname = "")
             }
             viewModelState.update {
                 it.copy(isFollowed = true)

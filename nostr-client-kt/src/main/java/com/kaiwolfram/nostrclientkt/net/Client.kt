@@ -116,7 +116,6 @@ class Client {
 
     fun removeRelay(url: String) {
         Log.i(TAG, "Remove relay $url")
-
         sockets[url]?.close(1000, "Normal closure")
     }
 
@@ -132,10 +131,8 @@ class Client {
         nostrListener = null
     }
 
-    // TODO: Call on end of lifecycle
     fun close() {
-        Log.i(TAG, "Close client")
-
+        Log.i(TAG, "Close connections")
         sockets.keys.forEach { removeRelay(it) }
         httpClient.dispatcher.executorService.shutdown()
     }

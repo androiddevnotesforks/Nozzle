@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5da826fd81656506e2b4ecf471e3998e",
+    "identityHash": "15e011ad21ac490f1bea805570d3ef5e",
     "entities": [
       {
         "tableName": "contact",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `contactPubkey` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`pubkey`, `contactPubkey`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `contactPubkey` TEXT NOT NULL, `relayUrl` TEXT NOT NULL, `petname` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`pubkey`, `contactPubkey`))",
         "fields": [
           {
             "fieldPath": "pubkey",
@@ -17,6 +17,18 @@
           {
             "fieldPath": "contactPubkey",
             "columnName": "contactPubkey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "relayUrl",
+            "columnName": "relayUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "petname",
+            "columnName": "petname",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -195,7 +207,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5da826fd81656506e2b4ecf471e3998e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '15e011ad21ac490f1bea805570d3ef5e')"
     ]
   }
 }

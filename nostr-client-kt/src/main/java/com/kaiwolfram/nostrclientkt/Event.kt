@@ -85,11 +85,10 @@ class Event(
             )
         }
 
-        fun createContactListEvent(contacts: List<String>, keys: Keys): Event {
+        fun createContactListEvent(contacts: List<ContactListEntry>, keys: Keys): Event {
             return create(
                 kind = Kind.CONTACT_LIST,
-                // TODO: Set relayUrl
-                tags = contacts.map { listOf("p", it, "", "") },
+                tags = contacts.map { listOf("p", it.pubkey, it.relayUrl, it.petname) },
                 content = "",
                 keys = keys
             )

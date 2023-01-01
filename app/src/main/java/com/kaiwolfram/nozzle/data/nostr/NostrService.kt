@@ -115,7 +115,7 @@ class NostrService(
         return event
     }
 
-    override fun updateContactList(contacts: List<String>): Event {
+    override fun updateContactList(contacts: List<ContactListEntry>): Event {
         Log.i(TAG, "Update contact list with ${contacts.size} contacts")
         val event = Event.createContactListEvent(
             contacts = contacts,
@@ -142,5 +142,11 @@ class NostrService(
         val postFilter = Filter.createPostFilter(pubkeys = pubkeys, since = since, limit = limit)
 
         return client.subscribe(filters = listOf(postFilter))
+    }
+
+    // TODO: Call on end of lifecycle
+    override fun close() {
+        Log.i(TAG, "Close connections")
+        client.close()
     }
 }

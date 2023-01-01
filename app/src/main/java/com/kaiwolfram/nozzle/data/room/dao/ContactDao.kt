@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 
 // TODO: Prevent duplicate primary key constraint in all Inserts
 
@@ -16,16 +17,29 @@ interface ContactDao {
     suspend fun listContactPubkeys(pubkey: String): List<String>
 
     @Query(
+        "SELECT * " +
+                "FROM contact " +
+                "WHERE pubkey = :pubkey"
+    )
+    suspend fun listContacts(pubkey: String): List<ContactEntity>
+
+    @Query(
         "INSERT INTO contact (pubkey, contactPubkey, createdAt) " +
                 "VALUES (:pubkey, :contactPubkeys, :createdAt)"
     )
     fun insert(pubkey: String, contactPubkeys: List<String>, createdAt: Long)
 
     @Query(
-        "INSERT INTO contact (pubkey, contactPubkey, createdAt) " +
-                "VALUES (:pubkey, :contactPubkey, :createdAt)"
+        "INSERT INTO contact (pubkey, contactPubkey, relayUrl, petname, createdAt) " +
+                "VALUES (:pubkey, :contactPubkey, :relayUrl, :petname, :createdAt)"
     )
-    fun insert(pubkey: String, contactPubkey: String, createdAt: Long)
+    fun insert(
+        pubkey: String,
+        contactPubkey: String,
+        relayUrl: String,
+        petname: String,
+        createdAt: Long,
+    )
 
     @Query(
         "DELETE FROM contact " +
