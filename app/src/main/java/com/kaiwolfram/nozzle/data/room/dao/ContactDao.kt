@@ -1,10 +1,11 @@
 package com.kaiwolfram.nozzle.data.room.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 
-// TODO: Prevent duplicate primary key constraint in all Inserts
 
 @Dao
 interface ContactDao {
@@ -23,22 +24,9 @@ interface ContactDao {
     )
     suspend fun listContacts(pubkey: String): List<ContactEntity>
 
-    @Query(
-        "INSERT INTO contact (pubkey, contactPubkey, createdAt) " +
-                "VALUES (:pubkey, :contactPubkeys, :createdAt)"
-    )
-    fun insert(pubkey: String, contactPubkeys: List<String>, createdAt: Long)
-
-    @Query(
-        "INSERT INTO contact (pubkey, contactPubkey, relayUrl, createdAt) " +
-                "VALUES (:pubkey, :contactPubkey, :relayUrl, :createdAt)"
-    )
-    fun insert(
-        pubkey: String,
-        contactPubkey: String,
-        relayUrl: String,
-        createdAt: Long,
-    )
+    // TODO: Replace if createdAt is larger
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrReplaceIfNewer(vararg contacts: ContactEntity)
 
     @Query(
         "DELETE FROM contact " +

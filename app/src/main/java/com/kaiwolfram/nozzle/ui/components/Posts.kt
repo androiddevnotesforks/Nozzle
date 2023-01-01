@@ -149,10 +149,9 @@ fun PostCard(
             )
             Spacer(Modifier.height(spacing.medium))
             PostCardActions(
-                // TODO: Real counts
-                numOfReplies = 0,
-                numOfReposts = 0,
-                numOfLikes = 0,
+                numOfReplies = post.numOfReplies,
+                numOfReposts = post.numOfReposts,
+                numOfLikes = post.numOfLikes,
                 post = post,
                 onLike = { onLike(post.id) },
                 onRepost = { onRepost(post.id) },

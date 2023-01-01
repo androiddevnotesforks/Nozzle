@@ -18,13 +18,14 @@ class ProfileFollower(
 
     override suspend fun follow(pubkeyToFollow: String, relayUrl: String) {
         Log.i(TAG, "Follow $pubkeyToFollow")
-        contactDao.insert(
-            pubkey = pubkeyProvider.getPubkey(),
-            contactPubkey = pubkeyToFollow,
-            relayUrl = relayUrl,
-            createdAt = 0
+        contactDao.insertOrReplaceIfNewer(
+            ContactEntity(
+                pubkey = pubkeyProvider.getPubkey(),
+                contactPubkey = pubkeyToFollow,
+                relayUrl = relayUrl,
+                createdAt = 0
+            )
         )
-
         val contacts = contactDao.listContacts(pubkey = pubkeyProvider.getPubkey())
         val event = updateContactListViaNostr(contacts)
         contactDao.updateTime(pubkey = pubkeyProvider.getPubkey(), createdAt = event.createdAt)

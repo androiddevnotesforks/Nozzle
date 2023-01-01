@@ -17,6 +17,7 @@ class FeedProvider(
 ) : IFeedProvider {
 
     override suspend fun getFeed(): List<PostWithMeta> {
+        Log.i(TAG, "Get feed")
         val followingCount = contactDao.getNumberOfFollowing(pubkey = pubkeyProvider.getPubkey())
         val posts = if (followingCount > 0) {
             postDao.getLatestFeed(pubkey = pubkeyProvider.getPubkey())
@@ -24,8 +25,6 @@ class FeedProvider(
             Log.i(TAG, "Use default contacts")
             postDao.getLatestFeedOfCustomContacts(contactPubkeys = defaultPubkeys)
         }.reversed()
-
-        Log.i(TAG, "Fetched feed with ${posts.size} posts")
 
         return posts.map {
             PostWithMeta(
@@ -42,6 +41,9 @@ class FeedProvider(
                 isLikedByMe = false,
                 isRepostedByMe = false,
                 referencePost = null,
+                numOfLikes = 0, // TODO: Real values
+                numOfReposts = 0,
+                numOfReplies = 0,
             )
         }
     }
@@ -72,6 +74,9 @@ class FeedProvider(
                 isLikedByMe = false,
                 isRepostedByMe = false,
                 referencePost = null,
+                numOfLikes = 0, // TODO: Real values
+                numOfReposts = 0,
+                numOfReplies = 0,
             )
         }
     }

@@ -9,6 +9,9 @@ import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.dao.ReactionDao
+import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
+import com.kaiwolfram.nozzle.data.room.entity.PostEntity
+import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 
 private const val TAG = "EventProcessor"
 
@@ -44,13 +47,15 @@ class EventProcessor(
         if (!verify(event)) {
             return
         }
-        postDao.insert(
-            id = event.id,
-            pubkey = event.pubkey,
-            replyTo = event.getReplyId(),
-            replyToRoot = event.getRootReplyId(),
-            content = event.content,
-            createdAt = event.createdAt,
+        postDao.insertIfNotPresent(
+            PostEntity(
+                id = event.id,
+                pubkey = event.pubkey,
+                replyTo = event.getReplyId(),
+                replyToRoot = event.getRootReplyId(),
+                content = event.content,
+                createdAt = event.createdAt,
+            )
         )
     }
 
@@ -70,11 +75,15 @@ class EventProcessor(
             return
         }
         contactDao.deleteIfOutdated(pubkey = event.pubkey, createdAt = event.createdAt)
-        contactDao.insert(
-            pubkey = event.pubkey,
-            contactPubkeys = getContactPubkeys(event.tags),
-            createdAt = event.createdAt
-        )
+        val contacts = getContactPubkeysAndRelayUrls(event.tags).map {
+            ContactEntity(
+                pubkey = event.pubkey,
+                contactPubkey = it.first,
+                relayUrl = it.second,
+                createdAt = event.createdAt
+            )
+        }
+        contactDao.insertOrReplaceIfNewer(*contacts.toTypedArray())
     }
 
     private fun processMetadata(event: Event) {
@@ -83,13 +92,15 @@ class EventProcessor(
         }
         deserializeMetadata(event.content)?.let {
             profileDao.deleteIfOutdated(pubkey = event.pubkey, createdAt = event.createdAt)
-            profileDao.insert(
-                pubkey = event.pubkey,
-                name = it.name.orEmpty(),
-                about = it.about.orEmpty(),
-                picture = it.picture.orEmpty(),
-                nip05 = it.nip05.orEmpty(),
-                createdAt = event.createdAt,
+            profileDao.insertOrReplaceIfNewer(
+                ProfileEntity(
+                    pubkey = event.pubkey,
+                    name = it.name.orEmpty(),
+                    about = it.about.orEmpty(),
+                    picture = it.picture.orEmpty(),
+                    nip05 = it.nip05.orEmpty(),
+                    createdAt = event.createdAt,
+                )
             )
         }
     }
@@ -111,11 +122,11 @@ class EventProcessor(
         return null
     }
 
-    private fun getContactPubkeys(tags: List<Tag>): List<String> {
-        val result = mutableListOf<String>()
+    private fun getContactPubkeysAndRelayUrls(tags: List<Tag>): List<Pair<String, String>> {
+        val result = mutableListOf<Pair<String, String>>()
         for (tag in tags) {
-            if (tag.size >= 2 && tag[0] == "p") {
-                result.add(tag[1])
+            if (tag.size >= 3 && tag[0] == "p") {
+                result.add(Pair(tag[1], tag[2]))
             }
         }
         return result

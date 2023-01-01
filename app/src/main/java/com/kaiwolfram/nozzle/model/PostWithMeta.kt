@@ -13,5 +13,8 @@ data class PostWithMeta(
     val pictureUrl: String,
     val isLikedByMe: Boolean,
     val isRepostedByMe: Boolean,
-    val referencePost: PostWithMeta? = null,
+    val referencePost: PostWithMeta?,
+    val numOfLikes: Int,
+    val numOfReposts: Int,
+    val numOfReplies: Int,
 )

@@ -1,6 +1,8 @@
 package com.kaiwolfram.nozzle.data.room.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 
@@ -25,18 +27,9 @@ interface ProfileDao {
         nip05: String,
     )
 
-    @Query(
-        "INSERT INTO profile (pubkey, name, about, picture, nip05, createdAt)" +
-                "VALUES (:pubkey, :name, :about, :picture, :nip05, :createdAt)"
-    )
-    fun insert(
-        pubkey: String,
-        name: String,
-        about: String,
-        picture: String,
-        nip05: String,
-        createdAt: Long,
-    )
+    // TODO: Replace if createdAt is larger
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrReplaceIfNewer(vararg profile: ProfileEntity)
 
     @Query(
         "DELETE FROM profile " +
