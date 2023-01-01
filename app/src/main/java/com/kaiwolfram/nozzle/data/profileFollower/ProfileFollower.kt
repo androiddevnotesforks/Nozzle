@@ -16,13 +16,12 @@ class ProfileFollower(
     private val contactDao: ContactDao,
 ) : IProfileFollower {
 
-    override suspend fun follow(pubkeyToFollow: String, relayUrl: String, petname: String) {
+    override suspend fun follow(pubkeyToFollow: String, relayUrl: String) {
         Log.i(TAG, "Follow $pubkeyToFollow")
         contactDao.insert(
             pubkey = pubkeyProvider.getPubkey(),
             contactPubkey = pubkeyToFollow,
             relayUrl = relayUrl,
-            petname = petname,
             createdAt = 0
         )
 

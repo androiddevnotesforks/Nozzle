@@ -88,7 +88,7 @@ class Event(
         fun createContactListEvent(contacts: List<ContactListEntry>, keys: Keys): Event {
             return create(
                 kind = Kind.CONTACT_LIST,
-                tags = contacts.map { listOf("p", it.pubkey, it.relayUrl, it.petname) },
+                tags = contacts.map { listOf("p", it.pubkey, it.relayUrl, "") }, // Empty petname
                 content = "",
                 keys = keys
             )

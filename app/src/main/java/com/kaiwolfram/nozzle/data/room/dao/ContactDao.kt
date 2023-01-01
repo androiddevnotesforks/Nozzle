@@ -30,14 +30,13 @@ interface ContactDao {
     fun insert(pubkey: String, contactPubkeys: List<String>, createdAt: Long)
 
     @Query(
-        "INSERT INTO contact (pubkey, contactPubkey, relayUrl, petname, createdAt) " +
-                "VALUES (:pubkey, :contactPubkey, :relayUrl, :petname, :createdAt)"
+        "INSERT INTO contact (pubkey, contactPubkey, relayUrl, createdAt) " +
+                "VALUES (:pubkey, :contactPubkey, :relayUrl, :createdAt)"
     )
     fun insert(
         pubkey: String,
         contactPubkey: String,
         relayUrl: String,
-        petname: String,
         createdAt: Long,
     )
 
