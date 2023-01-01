@@ -106,7 +106,6 @@ private fun FeedTopBar(
                 style = typography.h6,
                 color = colors.background
             )
-            // TODO: Replace with settings icon
             Row {
                 Spacer(modifier = Modifier.size(sizing.smallProfilePicture))
                 Spacer(modifier = Modifier.width(spacing.large))

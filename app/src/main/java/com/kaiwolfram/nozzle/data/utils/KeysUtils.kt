@@ -31,8 +31,6 @@ fun isValidPrivkey(privkey: String): Boolean {
     return privkey.length == 64 && privkey.isHex()
 }
 
-// TODO: Figure out how nsec to hex works
-
 private fun ByteArray.toHex(): String {
     return this.joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 }

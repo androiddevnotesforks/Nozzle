@@ -18,7 +18,7 @@ class EventProcessor(
     private val profileDao: ProfileDao,
     private val postDao: PostDao,
 ) : IEventProcessor {
-    private val gson = Gson() // TODO: Use from nostr module and remove from dependencies
+    private val gson = Gson()
     override fun process(event: Event) {
         Log.i(TAG, "Process event ${event.id} kind ${event.kind}")
         if (event.isPost()) {

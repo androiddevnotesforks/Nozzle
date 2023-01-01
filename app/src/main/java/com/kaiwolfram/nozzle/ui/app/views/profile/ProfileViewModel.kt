@@ -76,7 +76,6 @@ class ProfileViewModel(
             Log.i(TAG, "Set UI data for $pubkey")
             // TODO: Unsubscribe on dispose
             nostrService.subscribeToProfileMetadataAndContactList(pubkey)
-            // TODO: Livedata with flow
             useCachedValues(pubkey)
         }
     }

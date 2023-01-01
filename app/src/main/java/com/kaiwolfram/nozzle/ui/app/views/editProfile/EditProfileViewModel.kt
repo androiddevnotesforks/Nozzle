@@ -138,13 +138,12 @@ class EditProfileViewModel(
     private fun updateMetadataInDb(state: EditProfileViewModelState) {
         Log.i(TAG, "Update profile in DB")
         viewModelScope.launch(context = Dispatchers.IO) {
-            profileDao.update(
+            profileDao.updateMetadata(
                 pubkey = profileCache.getPubkey(),
                 name = state.nameInput,
                 about = state.aboutInput,
                 picture = state.pictureInput,
                 nip05 = state.nip05Input,
-                createdAt = 0 // TODO: Get value from nostr service by creating event
             )
         }
     }

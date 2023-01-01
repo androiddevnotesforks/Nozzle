@@ -14,17 +14,15 @@ interface ProfileDao {
                 "SET name = :name, " +
                 "about = :about, " +
                 "picture = :picture, " +
-                "nip05 = :nip05, " +
-                "createdAt = :createdAt " +
+                "nip05 = :nip05 " +
                 "WHERE pubkey = :pubkey"
     )
-    suspend fun update(
+    suspend fun updateMetadata(
         pubkey: String,
         name: String,
         about: String,
         picture: String,
         nip05: String,
-        createdAt: Long,
     )
 
     @Query(

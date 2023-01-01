@@ -79,8 +79,6 @@ class NostrService(
         Log.i(TAG, "Send repost of $postId")
         val event = Event.createTextNoteEvent(
             post = Post(
-                // TODO: Set author pubkey as mention
-                // TODO: real relay
                 repostId = RepostId(repostId = postId, relayUrl = relays.first()),
                 msg = quote
             ),
@@ -136,7 +134,6 @@ class NostrService(
 
     override fun subscribeToFeed(contactPubkeys: List<String>, since: Long?): String {
         Log.i(TAG, "Subscribe to feed of ${contactPubkeys.size} contacts")
-        // TODO: Remove defaultPubkeys after user discovery implementation
         val pubkeys = contactPubkeys.ifEmpty { defaultPubkeys }
         val limit = if (since == null) 150 else null
         val postFilter = Filter.createPostFilter(pubkeys = pubkeys, since = since, limit = limit)
