@@ -2,6 +2,6 @@ package com.kaiwolfram.nozzle.data.provider
 
 import com.kaiwolfram.nozzle.model.ProfileWithFollowerInfo
 
-interface IProfileProvider {
+interface IProfileWithFollowerProvider {
     fun getProfile(pubkey: String): ProfileWithFollowerInfo?
 }

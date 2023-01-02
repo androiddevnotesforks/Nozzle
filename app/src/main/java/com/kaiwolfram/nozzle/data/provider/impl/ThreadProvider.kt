@@ -1,5 +1,6 @@
-package com.kaiwolfram.nozzle.data.provider
+package com.kaiwolfram.nozzle.data.provider.impl
 
+import com.kaiwolfram.nozzle.data.provider.IThreadProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 class ThreadProvider : IThreadProvider {

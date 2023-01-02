@@ -14,7 +14,14 @@ import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
 import com.kaiwolfram.nozzle.data.preferences.profile.ProfilePreferences
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.profileFollower.ProfileFollower
-import com.kaiwolfram.nozzle.data.provider.*
+import com.kaiwolfram.nozzle.data.provider.IFeedProvider
+import com.kaiwolfram.nozzle.data.provider.IInteractionCountProvider
+import com.kaiwolfram.nozzle.data.provider.IProfileWithFollowerProvider
+import com.kaiwolfram.nozzle.data.provider.IThreadProvider
+import com.kaiwolfram.nozzle.data.provider.impl.FeedProvider
+import com.kaiwolfram.nozzle.data.provider.impl.InteractionCountProvider
+import com.kaiwolfram.nozzle.data.provider.impl.ProfileWithFollowerProvider
+import com.kaiwolfram.nozzle.data.provider.impl.ThreadProvider
 import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
@@ -58,13 +65,17 @@ class AppContainer(context: Context) {
         contactDao = roomDb.contactDao()
     )
 
+    val interactionCountProvider: IInteractionCountProvider = InteractionCountProvider(
+    )
+
     val feedProvider: IFeedProvider = FeedProvider(
         pubkeyProvider = keyPreferences,
+        interactionCountProvider = interactionCountProvider,
         postDao = roomDb.postDao(),
         contactDao = roomDb.contactDao()
     )
 
-    val profileProvider: IProfileProvider = ProfileProvider(
+    val profileWithFollowerProvider: IProfileWithFollowerProvider = ProfileWithFollowerProvider(
         pubkeyProvider = keyPreferences,
         profileDao = roomDb.profileDao(),
         contactDao = roomDb.contactDao()

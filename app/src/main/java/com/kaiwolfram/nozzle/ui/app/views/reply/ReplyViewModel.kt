@@ -83,7 +83,7 @@ class ReplyViewModel(
                 val replyTo = ReplyTo(
                     replyToRoot = postToReplyTo?.replyToRootId,
                     replyTo = postToReplyTo?.replyToId.orEmpty(),
-                    relayUrl = postToReplyTo?.relayUrl.orEmpty(),
+                    relayUrl = "", // TODO: Set real relayUrl, or use one of your relays and republish that post to it
                 )
                 nostrService.sendReply(
                     replyTo = replyTo,

@@ -180,7 +180,7 @@ class FeedViewModel(
 
     companion object {
         fun provideFactory(
-            profileProvider: IPersonalProfileProvider,
+            personalProfileProvider: IPersonalProfileProvider,
             feedProvider: IFeedProvider,
             postCardInteractor: IPostCardInteractor,
             nostrService: INostrService,
@@ -189,7 +189,7 @@ class FeedViewModel(
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return FeedViewModel(
-                    personalProfileProvider = profileProvider,
+                    personalProfileProvider = personalProfileProvider,
                     feedProvider = feedProvider,
                     postCardInteractor = postCardInteractor,
                     nostrService = nostrService,

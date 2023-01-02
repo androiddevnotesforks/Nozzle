@@ -13,6 +13,7 @@ private const val ABOUT: String = "about"
 private const val PICTURE: String = "picture"
 private const val NIP05: String = "nip05"
 
+// TODO: Delete this. DAO is better
 class ProfilePreferences(
     private val pubkeyProvider: IPubkeyProvider,
     context: Context,

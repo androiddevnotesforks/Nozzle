@@ -50,7 +50,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         nostrService = appContainer.nostrService,
                         postCardInteractor = appContainer.postCardInteractor,
                         feedProvider = appContainer.feedProvider,
-                        profileProvider = appContainer.profileProvider,
+                        profileProvider = appContainer.profileWithFollowerProvider,
                         profileFollower = appContainer.profileFollower,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
@@ -66,7 +66,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory(
-                        profileProvider = appContainer.profilePreferences,
+                        personalProfileProvider = appContainer.profilePreferences,
                         feedProvider = appContainer.feedProvider,
                         postCardInteractor = appContainer.postCardInteractor,
                         nostrService = appContainer.nostrService,

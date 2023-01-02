@@ -12,7 +12,7 @@ import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
-import com.kaiwolfram.nozzle.data.provider.IProfileProvider
+import com.kaiwolfram.nozzle.data.provider.IProfileWithFollowerProvider
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
@@ -47,7 +47,7 @@ data class ProfileViewModelState(
 class ProfileViewModel(
     private val nostrService: INostrService,
     private val feedProvider: IFeedProvider,
-    private val profileProvider: IProfileProvider,
+    private val profileProvider: IProfileWithFollowerProvider,
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
     context: Context,
@@ -221,7 +221,7 @@ class ProfileViewModel(
             profileFollower: IProfileFollower,
             postCardInteractor: IPostCardInteractor,
             feedProvider: IFeedProvider,
-            profileProvider: IProfileProvider,
+            profileProvider: IProfileWithFollowerProvider,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =

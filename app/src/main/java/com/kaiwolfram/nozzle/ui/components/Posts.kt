@@ -143,7 +143,7 @@ fun PostCard(
             )
             Spacer(Modifier.height(spacing.medium))
             RepostCardContent(
-                post = post.referencePost,
+                post = post.repost,
                 onOpenProfile = onOpenProfile,
                 onNavigateToThread = onNavigateToThread,
             )

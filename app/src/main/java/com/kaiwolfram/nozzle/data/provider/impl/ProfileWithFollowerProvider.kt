@@ -1,15 +1,17 @@
-package com.kaiwolfram.nozzle.data.provider
+package com.kaiwolfram.nozzle.data.provider.impl
 
+import com.kaiwolfram.nozzle.data.provider.IProfileWithFollowerProvider
+import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.ProfileWithFollowerInfo
 
-class ProfileProvider(
+class ProfileWithFollowerProvider(
     private val pubkeyProvider: IPubkeyProvider,
     private val profileDao: ProfileDao,
     private val contactDao: ContactDao
-) : IProfileProvider {
+) : IProfileWithFollowerProvider {
 
     override fun getProfile(pubkey: String): ProfileWithFollowerInfo? {
         val profile = profileDao.getProfile(pubkey) ?: return null
