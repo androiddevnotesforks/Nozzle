@@ -20,6 +20,7 @@ class NostrService(
         "wss://nostr.fmt.wiz.biz",
         "wss://nostr.einundzwanzig.space",
     )
+    private val unsubOnEOSE = mutableSetOf<String>()
     private val listener = object : NostrListener {
         override fun onOpen(msg: String) {
             Log.i(TAG, "Relay is ready: $msg")
@@ -36,6 +37,10 @@ class NostrService(
 
         override fun onEOSE(subscriptionId: String) {
             Log.i(TAG, "EOSE on subscription $subscriptionId")
+            if (unsubOnEOSE.remove(subscriptionId)) {
+                Log.i(TAG, "Unsubscribe onEOSE $subscriptionId")
+                client.unsubscribe(subscriptionId)
+            }
         }
 
         override fun onClose(reason: String) {
@@ -124,15 +129,17 @@ class NostrService(
         return event
     }
 
-    override fun subscribeToProfileMetadataAndContactList(pubkey: String): String {
+    override fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String> {
         Log.i(TAG, "Subscribe metadata and contact list for $pubkey")
         val profileFilter = Filter.createProfileFilter(pubkey = pubkey)
         val contactListFilter = Filter.createContactListFilter(pubkey = pubkey)
+        val subscriptionIds = client.subscribe(filters = listOf(profileFilter, contactListFilter))
+        unsubOnEOSE.addAll(subscriptionIds)
 
-        return client.subscribe(filters = listOf(profileFilter, contactListFilter))
+        return subscriptionIds
     }
 
-    override fun subscribeToFeed(contactPubkeys: List<String>, since: Long?): String {
+    override fun subscribeToFeed(contactPubkeys: List<String>, since: Long?): List<String> {
         Log.i(TAG, "Subscribe to feed of ${contactPubkeys.size} contacts")
         val pubkeys = contactPubkeys.ifEmpty { defaultPubkeys }
         val limit = if (since == null) 150 else null

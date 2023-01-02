@@ -61,6 +61,9 @@ class AppContainer(context: Context) {
     )
 
     val interactionCountProvider: IInteractionCountProvider = InteractionCountProvider(
+        reactionDao = roomDb.reactionDao(),
+        repostDao = roomDb.repostDao(),
+        postDao = roomDb.postDao()
     )
 
     val feedProvider: IFeedProvider = FeedProvider(

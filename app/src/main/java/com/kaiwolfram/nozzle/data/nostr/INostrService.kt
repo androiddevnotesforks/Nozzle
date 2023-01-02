@@ -12,7 +12,7 @@ interface INostrService {
     fun sendLike(postId: String, postPubkey: String): Event
     fun sendReply(replyTo: ReplyTo, content: String): Event
     fun updateContactList(contacts: List<ContactListEntry>): Event
-    fun subscribeToProfileMetadataAndContactList(pubkey: String): String
-    fun subscribeToFeed(contactPubkeys: List<String>, since: Long? = null): String
+    fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String>
+    fun subscribeToFeed(contactPubkeys: List<String>, since: Long? = null): List<String>
     fun close()
 }
