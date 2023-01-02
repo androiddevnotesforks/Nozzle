@@ -9,6 +9,7 @@ data class PostEntity(
     val pubkey: String,
     val replyTo: String?,
     val replyToRoot: String?,
+    val repostedId: String?,
     val content: String,
     val createdAt: Long,
 )

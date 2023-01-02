@@ -3,7 +3,7 @@ package com.kaiwolfram.nozzle.data.provider.impl
 import android.util.Log
 import com.kaiwolfram.nozzle.data.defaultPubkeys
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
-import com.kaiwolfram.nozzle.data.provider.IInteractionCountProvider
+import com.kaiwolfram.nozzle.data.provider.IInteractionStatsProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
@@ -13,7 +13,7 @@ private const val TAG = "FeedProvider"
 
 class FeedProvider(
     private val pubkeyProvider: IPubkeyProvider,
-    private val interactionCountProvider: IInteractionCountProvider,
+    private val interactionStatsProvider: IInteractionStatsProvider,
     private val postDao: PostDao,
     private val contactDao: ContactDao
 ) : IFeedProvider {
@@ -27,7 +27,7 @@ class FeedProvider(
             Log.i(TAG, "Use default contacts")
             postDao.getLatestFeedOfCustomContacts(contactPubkeys = defaultPubkeys)
         }
-        val counts = interactionCountProvider.getCounts(posts.map { it.id })
+        val stats = interactionStatsProvider.getStats(posts.map { it.id })
 
         return posts.map {
             PostWithMeta(
@@ -42,12 +42,12 @@ class FeedProvider(
                 name = "TODO",
                 pictureUrl = "https://64.media.tumblr.com/a727acf2c19888056b03500a89227cd4/0f1f0b7b20b511df-c9/s400x600/afeb2ab1cf61c2e4e93b6fba00c983a6a8cb9d60.gifv",
                 replyToName = "TODO",
-                isLikedByMe = false,
-                isRepostedByMe = false,
-                repost = null,
-                numOfLikes = counts.countLikes(it.id),
-                numOfReposts = counts.countReposts(it.id),
-                numOfReplies = counts.countReplies(it.id),
+                repost = null, // it.repostedId
+                isLikedByMe = stats.isLikedByMe(it.id),
+                isRepostedByMe = stats.isRepostedByMe(it.id),
+                numOfLikes = stats.getNumOfLikes(it.id),
+                numOfReposts = stats.getNumOfReposts(it.id),
+                numOfReplies = stats.getNumOfReplies(it.id),
             )
         }
     }
@@ -61,7 +61,7 @@ class FeedProvider(
             Log.i(TAG, "Use default contacts")
             postDao.getFeedOfCustomContactsSince(contactPubkeys = defaultPubkeys, since = since)
         }
-        val counts = interactionCountProvider.getCounts(posts.map { it.id })
+        val stats = interactionStatsProvider.getStats(posts.map { it.id })
 
         return posts.map {
             PostWithMeta(
@@ -74,12 +74,12 @@ class FeedProvider(
                 replyToName = "TODO",
                 name = "TODO",
                 pictureUrl = "https://64.media.tumblr.com/a727acf2c19888056b03500a89227cd4/0f1f0b7b20b511df-c9/s400x600/afeb2ab1cf61c2e4e93b6fba00c983a6a8cb9d60.gifv",
-                isLikedByMe = false,
-                isRepostedByMe = false,
                 repost = null,
-                numOfLikes = counts.countLikes(it.id),
-                numOfReposts = counts.countReposts(it.id),
-                numOfReplies = counts.countReplies(it.id),
+                isLikedByMe = stats.isLikedByMe(it.id),
+                isRepostedByMe = stats.isRepostedByMe(it.id),
+                numOfLikes = stats.getNumOfLikes(it.id),
+                numOfReposts = stats.getNumOfReposts(it.id),
+                numOfReplies = stats.getNumOfReplies(it.id),
             )
         }
     }
