@@ -9,7 +9,6 @@ import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 
 private const val TAG = "ProfileFollower"
 
-// TODO: Synchronize Contact list in nostr and db
 class ProfileFollower(
     private val nostrService: INostrService,
     private val pubkeyProvider: IPubkeyProvider,
