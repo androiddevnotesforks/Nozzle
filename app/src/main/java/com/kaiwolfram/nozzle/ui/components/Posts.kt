@@ -27,6 +27,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.RepostPreview
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.theme.*
 
@@ -132,7 +133,8 @@ fun PostCard(
             modifier = Modifier
                 .size(sizing.profilePicture)
                 .clip(CircleShape),
-            post = post,
+            pictureUrl = post.pictureUrl,
+            pubkey = post.pubkey,
             onOpenProfile = onOpenProfile
         )
         Spacer(Modifier.width(spacing.large))
@@ -168,14 +170,14 @@ private fun PostCardProfileNameAndContent(
     onOpenProfile: ((String) -> Unit)?,
 ) {
     Column {
-        PostCardProfileName(post = post, onOpenProfile = onOpenProfile)
-        PostCardContentBase(post = post)
+        PostCardProfileName(name = post.name, pubkey = post.pubkey, onOpenProfile = onOpenProfile)
+        PostCardContentBase(replyToName = post.replyToName, content = post.content)
     }
 }
 
 @Composable
 private fun RepostCardContent(
-    post: PostWithMeta?,
+    post: RepostPreview?,
     onOpenProfile: ((String) -> Unit)?,
     onNavigateToThread: ((String) -> Unit)?,
 ) {
@@ -199,13 +201,18 @@ private fun RepostCardContent(
                         modifier = Modifier
                             .size(sizing.smallProfilePicture)
                             .clip(CircleShape),
-                        post = it,
+                        pictureUrl = it.pictureUrl,
+                        pubkey = it.pubkey,
                         onOpenProfile = onOpenProfile
                     )
                     Spacer(modifier = Modifier.width(spacing.medium))
-                    PostCardProfileName(post = it, onOpenProfile = onOpenProfile)
+                    PostCardProfileName(
+                        name = it.name,
+                        pubkey = it.pubkey,
+                        onOpenProfile = onOpenProfile
+                    )
                 }
-                PostCardContentBase(post = it)
+                PostCardContentBase(replyToName = null, content = it.content)
             }
         }
     }
@@ -213,12 +220,13 @@ private fun RepostCardContent(
 
 @Composable
 private fun PostCardContentBase(
-    post: PostWithMeta,
+    replyToName: String?,
+    content: String,
 ) {
-    post.replyToName?.let { ReplyingTo(name = it) }
+    replyToName?.let { ReplyingTo(name = it) }
     Spacer(Modifier.height(spacing.medium))
     Text(
-        text = post.content,
+        text = content,
         maxLines = 21,
         overflow = TextOverflow.Ellipsis
     )
@@ -226,16 +234,17 @@ private fun PostCardContentBase(
 
 @Composable
 private fun PostCardProfilePicture(
-    post: PostWithMeta,
+    pictureUrl: String,
+    pubkey: String,
     onOpenProfile: ((String) -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     ProfilePicture(
         modifier = modifier,
-        pictureUrl = post.pictureUrl,
-        pubkey = post.pubkey,
+        pictureUrl = pictureUrl,
+        pubkey = pubkey,
         onOpenProfile = if (onOpenProfile != null) {
-            { onOpenProfile(post.pubkey) }
+            { onOpenProfile(pubkey) }
         } else {
             null
         }
@@ -244,16 +253,17 @@ private fun PostCardProfilePicture(
 
 @Composable
 private fun PostCardProfileName(
-    post: PostWithMeta,
+    name: String,
+    pubkey: String,
     onOpenProfile: ((String) -> Unit)?
 ) {
     Text(
         modifier = if (onOpenProfile != null) {
-            Modifier.clickable { onOpenProfile(post.pubkey) }
+            Modifier.clickable { onOpenProfile(pubkey) }
         } else {
             Modifier
         },
-        text = post.name,
+        text = name,
         fontWeight = FontWeight.SemiBold,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,

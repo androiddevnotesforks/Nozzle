@@ -15,5 +15,5 @@ data class PostWithMeta(
     val numOfLikes: Int,
     val numOfReposts: Int,
     val numOfReplies: Int,
-    val repost: PostWithMeta?,
+    val repost: RepostPreview?,
 )
