@@ -22,7 +22,7 @@ data class NozzleDrawerViewModelState(
 )
 
 class NozzleDrawerViewModel(
-    private val profileProvider: IPersonalProfileProvider,
+    private val personalProfileProvider: IPersonalProfileProvider,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(NozzleDrawerViewModelState())
     val uiState = viewModelState
@@ -45,10 +45,10 @@ class NozzleDrawerViewModel(
         Log.i(TAG, "Set cached values")
         viewModelState.update {
             it.copy(
-                pubkey = profileProvider.getPubkey(),
-                npub = profileProvider.getNpub(),
-                name = profileProvider.getName(),
-                pictureUrl = profileProvider.getPictureUrl(),
+                pubkey = personalProfileProvider.getPubkey(),
+                npub = personalProfileProvider.getNpub(),
+                name = personalProfileProvider.getName(),
+                pictureUrl = personalProfileProvider.getPicture(),
             )
         }
     }
@@ -59,12 +59,12 @@ class NozzleDrawerViewModel(
     }
 
     companion object {
-        fun provideFactory(profileProvider: IPersonalProfileProvider): ViewModelProvider.Factory =
+        fun provideFactory(personalProfileProvider: IPersonalProfileProvider): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return NozzleDrawerViewModel(
-                        profileProvider = profileProvider,
+                        personalProfileProvider = personalProfileProvider,
                     ) as T
                 }
             }

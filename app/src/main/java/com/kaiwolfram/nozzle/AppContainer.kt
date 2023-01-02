@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.room.Room
 import com.kaiwolfram.nozzle.data.eventProcessor.EventProcessor
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
+import com.kaiwolfram.nozzle.data.manager.IKeyManager
+import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
+import com.kaiwolfram.nozzle.data.manager.impl.KeyManager
+import com.kaiwolfram.nozzle.data.manager.impl.PersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.nostr.NostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.postCardInteractor.PostCardInteractor
-import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
-import com.kaiwolfram.nozzle.data.preferences.key.KeyPreferences
-import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
-import com.kaiwolfram.nozzle.data.preferences.profile.ProfilePreferences
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.profileFollower.ProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
@@ -34,7 +34,7 @@ class AppContainer(context: Context) {
         ).build()
     }
 
-    val keyPreferences: IKeyManager = KeyPreferences(context = context)
+    val keyManager: IKeyManager = KeyManager(context = context)
 
     val eventProcessor: IEventProcessor = EventProcessor(
         reactionDao = roomDb.reactionDao(),
@@ -44,13 +44,8 @@ class AppContainer(context: Context) {
     )
 
     val nostrService: INostrService = NostrService(
-        keyManager = keyPreferences,
+        keyManager = keyManager,
         eventProcessor = eventProcessor
-    )
-
-    val profilePreferences: IProfileCache = ProfilePreferences(
-        pubkeyProvider = keyPreferences,
-        context = context
     )
 
     val postCardInteractor: IPostCardInteractor = PostCardInteractor(
@@ -61,7 +56,7 @@ class AppContainer(context: Context) {
 
     val profileFollower: IProfileFollower = ProfileFollower(
         nostrService = nostrService,
-        pubkeyProvider = keyPreferences,
+        pubkeyProvider = keyManager,
         contactDao = roomDb.contactDao()
     )
 
@@ -69,17 +64,19 @@ class AppContainer(context: Context) {
     )
 
     val feedProvider: IFeedProvider = FeedProvider(
-        pubkeyProvider = keyPreferences,
+        pubkeyProvider = keyManager,
         interactionCountProvider = interactionCountProvider,
         postDao = roomDb.postDao(),
         contactDao = roomDb.contactDao()
     )
 
     val profileWithFollowerProvider: IProfileWithFollowerProvider = ProfileWithFollowerProvider(
-        pubkeyProvider = keyPreferences,
+        pubkeyProvider = keyManager,
         profileDao = roomDb.profileDao(),
         contactDao = roomDb.contactDao()
     )
+
+    val personalProfileManager: IPersonalProfileManager = PersonalProfileManager()
 
     val threadProvider: IThreadProvider = ThreadProvider()
 }

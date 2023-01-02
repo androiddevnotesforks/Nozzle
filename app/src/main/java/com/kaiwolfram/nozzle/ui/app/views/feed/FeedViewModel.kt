@@ -52,7 +52,7 @@ class FeedViewModel(
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelState.update {
             it.copy(
-                pictureUrl = personalProfileProvider.getPictureUrl(),
+                pictureUrl = personalProfileProvider.getPicture(),
                 pubkey = personalProfileProvider.getPubkey()
             )
         }
@@ -76,7 +76,7 @@ class FeedViewModel(
     val onResetProfileIconUiState: () -> Unit = {
         viewModelState.update {
             it.copy(
-                pictureUrl = personalProfileProvider.getPictureUrl(),
+                pictureUrl = personalProfileProvider.getPicture(),
                 pubkey = personalProfileProvider.getPubkey(),
             )
         }

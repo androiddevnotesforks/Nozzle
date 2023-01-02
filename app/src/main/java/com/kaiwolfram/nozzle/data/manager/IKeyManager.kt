@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.data.preferences.key
+package com.kaiwolfram.nozzle.data.manager
 
 import com.kaiwolfram.nostrclientkt.Keys
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider

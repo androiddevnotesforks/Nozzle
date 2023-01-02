@@ -26,7 +26,7 @@ data class PostViewModelState(
 )
 
 class PostViewModel(
-    private val profileProvider: IPersonalProfileProvider,
+    private val personalProfileProvider: IPersonalProfileProvider,
     private val nostrService: INostrService,
     context: Context,
 ) : ViewModel() {
@@ -48,8 +48,8 @@ class PostViewModel(
             Log.i(TAG, "Prepare new post")
             viewModelState.update {
                 it.copy(
-                    pictureUrl = profileProvider.getPictureUrl(),
-                    pubkey = profileProvider.getPubkey(),
+                    pictureUrl = personalProfileProvider.getPicture(),
+                    pubkey = personalProfileProvider.getPubkey(),
                     content = "",
                     isSendable = false,
                 )
@@ -92,15 +92,15 @@ class PostViewModel(
 
     companion object {
         fun provideFactory(
+            personalProfileProvider: IPersonalProfileProvider,
             nostrService: INostrService,
-            profileProvider: IPersonalProfileProvider,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return PostViewModel(
                     nostrService = nostrService,
-                    profileProvider = profileProvider,
+                    personalProfileProvider = personalProfileProvider,
                     context = context,
                 ) as T
             }

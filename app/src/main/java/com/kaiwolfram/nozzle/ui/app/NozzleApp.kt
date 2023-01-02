@@ -42,7 +42,7 @@ fun NozzleApp(appContainer: AppContainer) {
             val vmContainer = VMContainer(
                 drawerViewModel = viewModel(
                     factory = NozzleDrawerViewModel.provideFactory(
-                        profileProvider = appContainer.profilePreferences,
+                        personalProfileProvider = appContainer.personalProfileManager,
                     )
                 ),
                 profileViewModel = viewModel(
@@ -58,15 +58,14 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
-                        profileCache = appContainer.profilePreferences,
-                        keyManager = appContainer.keyPreferences,
+                        keyManager = appContainer.keyManager,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
                 ),
                 feedViewModel = viewModel(
                     factory = FeedViewModel.provideFactory(
-                        personalProfileProvider = appContainer.profilePreferences,
+                        personalProfileProvider = appContainer.personalProfileManager,
                         feedProvider = appContainer.feedProvider,
                         postCardInteractor = appContainer.postCardInteractor,
                         nostrService = appContainer.nostrService,
@@ -75,8 +74,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 editProfileViewModel = viewModel(
                     factory = EditProfileViewModel.provideFactory(
-                        profileCache = appContainer.profilePreferences,
-                        profileDao = appContainer.roomDb.profileDao(),
+                        personalProfileManager = appContainer.personalProfileManager,
                         nostrService = appContainer.nostrService,
                         context = LocalContext.current,
                     )
@@ -90,14 +88,14 @@ fun NozzleApp(appContainer: AppContainer) {
                 replyViewModel = viewModel(
                     factory = ReplyViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
-                        profileProvider = appContainer.profilePreferences,
+                        pubkeyProvider = appContainer.keyManager,
                         context = LocalContext.current,
                     )
                 ),
                 postViewModel = viewModel(
                     factory = PostViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
-                        profileProvider = appContainer.profilePreferences,
+                        personalProfileProvider = appContainer.personalProfileManager,
                         context = LocalContext.current,
                     )
                 )

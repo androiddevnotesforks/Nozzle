@@ -9,9 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nostrclientkt.utils.NostrUtils.isValidUsername
+import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrService
-import com.kaiwolfram.nozzle.data.preferences.profile.IProfileCache
-import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,8 +32,7 @@ data class EditProfileViewModelState(
 )
 
 class EditProfileViewModel(
-    private val profileCache: IProfileCache,
-    private val profileDao: ProfileDao,
+    private val personalProfileManager: IPersonalProfileManager,
     private val nostrService: INostrService,
     context: Context,
 ) : ViewModel() {
@@ -138,8 +136,7 @@ class EditProfileViewModel(
     private fun updateMetadataInDb(state: EditProfileViewModelState) {
         Log.i(TAG, "Update profile in DB")
         viewModelScope.launch(context = Dispatchers.IO) {
-            profileDao.updateMetadata(
-                pubkey = profileCache.getPubkey(),
+            personalProfileManager.setMeta(
                 name = state.nameInput,
                 about = state.aboutInput,
                 picture = state.pictureInput,
@@ -150,7 +147,7 @@ class EditProfileViewModel(
 
     private fun updateMetadataInProfileCache(state: EditProfileViewModelState) {
         Log.i(TAG, "Update profile in profile cache")
-        profileCache.setMeta(
+        personalProfileManager.setMeta(
             name = state.nameInput,
             about = state.aboutInput,
             picture = state.pictureInput,
@@ -173,10 +170,10 @@ class EditProfileViewModel(
 
     private fun setHasChanges() {
         uiState.value.let {
-            val hasChanges = it.nameInput != profileCache.getName()
-                    || it.aboutInput != profileCache.getBio()
-                    || it.pictureInput != profileCache.getPictureUrl()
-                    || it.nip05Input != profileCache.getNip05()
+            val hasChanges = it.nameInput != personalProfileManager.getName()
+                    || it.aboutInput != personalProfileManager.getAbout()
+                    || it.pictureInput != personalProfileManager.getPicture()
+                    || it.nip05Input != personalProfileManager.getNip05()
             if (hasChanges != it.hasChanges) {
                 viewModelState.update { state ->
                     state.copy(hasChanges = hasChanges)
@@ -189,10 +186,10 @@ class EditProfileViewModel(
         Log.i(TAG, "Use cached values")
         viewModelState.update {
             it.copy(
-                nameInput = profileCache.getName(),
-                aboutInput = profileCache.getBio(),
-                pictureInput = profileCache.getPictureUrl(),
-                nip05Input = profileCache.getNip05(),
+                nameInput = personalProfileManager.getName(),
+                aboutInput = personalProfileManager.getAbout(),
+                pictureInput = personalProfileManager.getPicture(),
+                nip05Input = personalProfileManager.getNip05(),
                 hasChanges = false,
                 isInvalidUsername = false,
                 isInvalidPictureUrl = false
@@ -207,16 +204,14 @@ class EditProfileViewModel(
 
     companion object {
         fun provideFactory(
-            profileCache: IProfileCache,
-            profileDao: ProfileDao,
+            personalProfileManager: IPersonalProfileManager,
             nostrService: INostrService,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return EditProfileViewModel(
-                    profileCache = profileCache,
-                    profileDao = profileDao,
+                    personalProfileManager = personalProfileManager,
                     nostrService = nostrService,
                     context = context
                 ) as T

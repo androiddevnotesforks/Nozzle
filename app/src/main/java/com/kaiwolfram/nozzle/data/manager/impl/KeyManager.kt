@@ -1,23 +1,24 @@
-package com.kaiwolfram.nozzle.data.preferences.key
+package com.kaiwolfram.nozzle.data.manager.impl
 
 import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.kaiwolfram.nostrclientkt.Keys
-import com.kaiwolfram.nozzle.data.preferences.PreferenceFileNames
+import com.kaiwolfram.nozzle.data.PreferenceFileNames
+import com.kaiwolfram.nozzle.data.manager.IKeyManager
 import com.kaiwolfram.nozzle.data.utils.derivePubkey
 import com.kaiwolfram.nozzle.data.utils.generatePrivkey
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import fr.acinq.secp256k1.Hex
 
 
-private const val TAG: String = "KeyPreferences"
+private const val TAG: String = "KeyManager"
 
 private const val PRIVKEY: String = "privkey"
 
 
-class KeyPreferences(context: Context) : IKeyManager {
+class KeyManager(context: Context) : IKeyManager {
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()

@@ -2,7 +2,7 @@ package com.kaiwolfram.nozzle.data.provider
 
 interface IPersonalProfileProvider : IPubkeyProvider {
     fun getName(): String
-    fun getBio(): String
-    fun getPictureUrl(): String
+    fun getPicture(): String
+    fun getAbout(): String
     fun getNip05(): String
 }

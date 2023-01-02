@@ -6,7 +6,7 @@ import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
 import com.kaiwolfram.nozzle.data.defaultPubkeys
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
-import com.kaiwolfram.nozzle.data.preferences.key.IKeyManager
+import com.kaiwolfram.nozzle.data.manager.IKeyManager
 
 private const val TAG = "NostrService"
 

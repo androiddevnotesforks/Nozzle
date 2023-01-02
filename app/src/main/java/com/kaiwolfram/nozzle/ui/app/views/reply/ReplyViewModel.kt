@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nozzle.data.nostr.INostrService
-import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -30,7 +30,7 @@ data class ReplyViewModelState(
 
 class ReplyViewModel(
     private val nostrService: INostrService,
-    private val profileProvider: IPersonalProfileProvider,
+    private val pubkeyProvider: IPubkeyProvider,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
@@ -57,7 +57,7 @@ class ReplyViewModel(
                 it.copy(
                     recipientName = post.name,
                     pictureUrl = post.pictureUrl,
-                    pubkey = profileProvider.getPubkey(),
+                    pubkey = pubkeyProvider.getPubkey(),
                     reply = "",
                     isSendable = false,
                 )
@@ -113,14 +113,14 @@ class ReplyViewModel(
     companion object {
         fun provideFactory(
             nostrService: INostrService,
-            profileProvider: IPersonalProfileProvider,
+            pubkeyProvider: IPubkeyProvider,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ReplyViewModel(
                     nostrService = nostrService,
-                    profileProvider = profileProvider,
+                    pubkeyProvider = pubkeyProvider,
                     context = context,
                 ) as T
             }
