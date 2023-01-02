@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 data class PostEntity(
     @PrimaryKey(autoGenerate = false) val id: String,
     val pubkey: String,
-    val replyTo: String?,
-    val replyToRoot: String?,
+    val replyToId: String?,
+    val replyToRootId: String?,
     val repostedId: String?,
     val content: String,
     val createdAt: Long,

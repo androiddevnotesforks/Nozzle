@@ -63,9 +63,12 @@ class AppContainer(context: Context) {
 
     val postProvider: IPostProvider = PostProvider()
 
+    val profileProvider: IProfileProvider = ProfileProvider()
+
     val feedProvider: IFeedProvider = FeedProvider(
         pubkeyProvider = keyManager,
         postProvider = postProvider,
+        profileProvider = profileProvider,
         interactionStatsProvider = interactionStatsProvider,
         postDao = roomDb.postDao(),
         contactDao = roomDb.contactDao()

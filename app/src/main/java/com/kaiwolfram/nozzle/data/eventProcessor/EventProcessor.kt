@@ -51,8 +51,8 @@ class EventProcessor(
             PostEntity(
                 id = event.id,
                 pubkey = event.pubkey,
-                replyTo = event.getReplyId(),
-                replyToRoot = event.getRootReplyId(),
+                replyToId = event.getReplyId(),
+                replyToRootId = event.getRootReplyId(),
                 repostedId = event.getRepostedId(),
                 content = event.content,
                 createdAt = event.createdAt,

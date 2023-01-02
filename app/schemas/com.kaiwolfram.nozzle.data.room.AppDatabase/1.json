@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d1686fea753210c7e86e4da9691607b3",
+    "identityHash": "f07bba549a13990eb303832832bf8333",
     "entities": [
       {
         "tableName": "contact",
@@ -45,7 +45,7 @@
       },
       {
         "tableName": "post",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `replyTo` TEXT, `replyToRoot` TEXT, `repostedId` TEXT, `content` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `replyToId` TEXT, `replyToRootId` TEXT, `repostedId` TEXT, `content` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -60,14 +60,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "replyTo",
-            "columnName": "replyTo",
+            "fieldPath": "replyToId",
+            "columnName": "replyToId",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "replyToRoot",
-            "columnName": "replyToRoot",
+            "fieldPath": "replyToRootId",
+            "columnName": "replyToRootId",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -207,7 +207,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd1686fea753210c7e86e4da9691607b3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f07bba549a13990eb303832832bf8333')"
     ]
   }
 }
