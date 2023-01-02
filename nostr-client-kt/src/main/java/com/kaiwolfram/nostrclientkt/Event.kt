@@ -148,6 +148,10 @@ class Event(
         return tags.find { it.size == 4 && it[0] == "e" && it[3] == "root" }?.get(1)
     }
 
+    fun getRepostedId(): String? {
+        return tags.find { it.size == 3 && it[0] == "e" }?.get(1)
+    }
+
     fun isReaction() = this.kind == Kind.REACTION
     fun isPost() = this.kind == Kind.TEXT_NOTE
     fun isProfileMetadata() = this.kind == Kind.SET_METADATA

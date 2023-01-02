@@ -42,7 +42,7 @@ class FeedProvider(
                 name = "TODO",
                 pictureUrl = "https://64.media.tumblr.com/a727acf2c19888056b03500a89227cd4/0f1f0b7b20b511df-c9/s400x600/afeb2ab1cf61c2e4e93b6fba00c983a6a8cb9d60.gifv",
                 replyToName = "TODO",
-                repost = null, // it.repostedId
+                repost = null, // it.repostedId + PostProvider
                 isLikedByMe = stats.isLikedByMe(it.id),
                 isRepostedByMe = stats.isRepostedByMe(it.id),
                 numOfLikes = stats.getNumOfLikes(it.id),

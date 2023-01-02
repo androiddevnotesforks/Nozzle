@@ -53,7 +53,7 @@ class EventProcessor(
                 pubkey = event.pubkey,
                 replyTo = event.getReplyId(),
                 replyToRoot = event.getRootReplyId(),
-                repostedId = null, // TODO: get ID from event
+                repostedId = event.getRepostedId(),
                 content = event.content,
                 createdAt = event.createdAt,
             )
