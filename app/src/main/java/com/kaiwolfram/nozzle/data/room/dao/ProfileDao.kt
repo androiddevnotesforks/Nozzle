@@ -11,6 +11,18 @@ interface ProfileDao {
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
     fun getProfile(pubkey: String): ProfileEntity?
 
+    @Query("SELECT name FROM profile WHERE pubkey = :pubkey")
+    fun getName(pubkey: String): String?
+
+    @Query("SELECT picture FROM profile WHERE pubkey = :pubkey")
+    fun getPicture(pubkey: String): String?
+
+    @Query("SELECT about FROM profile WHERE pubkey = :pubkey")
+    fun getAbout(pubkey: String): String?
+
+    @Query("SELECT nip05 FROM profile WHERE pubkey = :pubkey")
+    fun getNip05(pubkey: String): String?
+
     @Query(
         "UPDATE profile " +
                 "SET name = :name, " +
@@ -19,7 +31,7 @@ interface ProfileDao {
                 "nip05 = :nip05 " +
                 "WHERE pubkey = :pubkey"
     )
-    suspend fun updateMetadata(
+    fun updateMetadata(
         pubkey: String,
         name: String,
         about: String,

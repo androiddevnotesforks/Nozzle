@@ -76,7 +76,10 @@ class AppContainer(context: Context) {
         contactDao = roomDb.contactDao()
     )
 
-    val personalProfileManager: IPersonalProfileManager = PersonalProfileManager()
+    val personalProfileManager: IPersonalProfileManager = PersonalProfileManager(
+        pubkeyProvider = keyManager,
+        profileDao = roomDb.profileDao()
+    )
 
     val threadProvider: IThreadProvider = ThreadProvider()
 }
