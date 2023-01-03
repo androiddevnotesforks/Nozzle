@@ -89,7 +89,7 @@ class Client {
     }
 
     fun publish(event: Event) {
-        Log.i(TAG, "Publish event $event")
+        Log.i(TAG, "Publish kind ${event.kind} event ${event.id}")
 
         val request = """["EVENT",${event.toJson()}]"""
         sockets.values.forEach { it.send(request) }

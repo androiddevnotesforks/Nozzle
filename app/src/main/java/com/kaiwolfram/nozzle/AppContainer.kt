@@ -14,8 +14,14 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.postCardInteractor.PostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.profileFollower.ProfileFollower
-import com.kaiwolfram.nozzle.data.provider.*
-import com.kaiwolfram.nozzle.data.provider.impl.*
+import com.kaiwolfram.nozzle.data.provider.IFeedProvider
+import com.kaiwolfram.nozzle.data.provider.IInteractionStatsProvider
+import com.kaiwolfram.nozzle.data.provider.IProfileWithFollowerProvider
+import com.kaiwolfram.nozzle.data.provider.IThreadProvider
+import com.kaiwolfram.nozzle.data.provider.impl.FeedProvider
+import com.kaiwolfram.nozzle.data.provider.impl.InteractionStatsProvider
+import com.kaiwolfram.nozzle.data.provider.impl.ProfileWithFollowerProvider
+import com.kaiwolfram.nozzle.data.provider.impl.ThreadProvider
 import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
@@ -58,20 +64,16 @@ class AppContainer(context: Context) {
         pubkeyProvider = keyManager,
         reactionDao = roomDb.reactionDao(),
         repostDao = roomDb.repostDao(),
-        postDao = roomDb.postDao()
+        replyDao = roomDb.replyDao()
     )
-
-    val postProvider: IPostProvider = PostProvider()
-
-    val profileProvider: IProfileProvider = ProfileProvider()
 
     val feedProvider: IFeedProvider = FeedProvider(
         pubkeyProvider = keyManager,
-        postProvider = postProvider,
-        profileProvider = profileProvider,
         interactionStatsProvider = interactionStatsProvider,
         postDao = roomDb.postDao(),
-        contactDao = roomDb.contactDao()
+        repostDao = roomDb.repostDao(),
+        contactDao = roomDb.contactDao(),
+        profileDao = roomDb.profileDao()
     )
 
     val profileWithFollowerProvider: IProfileWithFollowerProvider = ProfileWithFollowerProvider(

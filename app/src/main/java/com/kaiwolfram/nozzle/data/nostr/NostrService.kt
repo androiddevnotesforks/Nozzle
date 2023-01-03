@@ -27,7 +27,7 @@ class NostrService(
         }
 
         override fun onEvent(subscriptionId: String, event: Event) {
-            Log.i(TAG, "Received event $event in subscription $subscriptionId")
+            Log.i(TAG, "Received event ${event.id} in subscription $subscriptionId")
             eventProcessor.process(event)
         }
 

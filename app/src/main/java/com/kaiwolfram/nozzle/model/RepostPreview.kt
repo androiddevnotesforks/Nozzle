@@ -5,5 +5,5 @@ data class RepostPreview(
     val pubkey: String,
     val content: String,
     val name: String,
-    val pictureUrl: String,
+    val picture: String,
 )

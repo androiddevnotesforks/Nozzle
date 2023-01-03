@@ -201,7 +201,7 @@ private fun RepostCardContent(
                         modifier = Modifier
                             .size(sizing.smallProfilePicture)
                             .clip(CircleShape),
-                        pictureUrl = it.pictureUrl,
+                        pictureUrl = it.picture,
                         pubkey = it.pubkey,
                         onOpenProfile = onOpenProfile
                     )

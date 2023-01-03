@@ -27,7 +27,7 @@ class EventProcessor(
     private val scope = CoroutineScope(Dispatchers.IO)
     private val gson = Gson()
     override fun process(event: Event) {
-        Log.i(TAG, "Process event ${event.id} kind ${event.kind}")
+        Log.i(TAG, "Process kind ${event.kind} event ${event.id}")
         if (event.isPost()) {
             processPost(event)
             return
@@ -51,6 +51,7 @@ class EventProcessor(
         if (!verify(event)) {
             return
         }
+        // TODO: is reply? repost?
         scope.launch {
             postDao.insertIfNotPresent(
                 PostEntity(

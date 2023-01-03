@@ -33,7 +33,7 @@ interface PostDao {
                 "LIMIT :limit"
     )
     suspend fun getLatestFeedOfCustomContacts(
-        contactPubkeys: List<String>,
+        vararg contactPubkeys: String,
         limit: Int = 100
     ): List<PostEntity>
 

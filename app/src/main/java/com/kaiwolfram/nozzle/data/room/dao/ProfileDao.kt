@@ -1,17 +1,16 @@
 package com.kaiwolfram.nozzle.data.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
+import com.kaiwolfram.nozzle.model.NameAndPicture
 
 @Dao
 interface ProfileDao {
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
     suspend fun getProfile(pubkey: String): ProfileEntity?
 
+    @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
     suspend fun getMetadata(pubkey: String): Metadata?
 
@@ -40,4 +39,12 @@ interface ProfileDao {
                 "WHERE pubkey = :pubkey AND createdAt < :createdAt"
     )
     suspend fun deleteIfOutdated(pubkey: String, createdAt: Long)
+
+    @MapInfo(keyColumn = "pubkey")
+    @Query(
+        "SELECT * " +
+                "FROM profile " +
+                "WHERE pubkey IN (:pubkeys) "
+    )
+    suspend fun getNamesAndPicturesMap(pubkeys: List<String>): Map<String, NameAndPicture>
 }

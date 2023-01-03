@@ -2,20 +2,24 @@ package com.kaiwolfram.nozzle.data.provider.impl
 
 import android.util.Log
 import com.kaiwolfram.nozzle.data.defaultPubkeys
-import com.kaiwolfram.nozzle.data.provider.*
+import com.kaiwolfram.nozzle.data.provider.IFeedProvider
+import com.kaiwolfram.nozzle.data.provider.IInteractionStatsProvider
+import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
+import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
+import com.kaiwolfram.nozzle.data.room.dao.RepostDao
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 private const val TAG = "FeedProvider"
 
 class FeedProvider(
     private val pubkeyProvider: IPubkeyProvider,
-    private val postProvider: IPostProvider,
-    private val profileProvider: IProfileProvider,
     private val interactionStatsProvider: IInteractionStatsProvider,
     private val postDao: PostDao,
-    private val contactDao: ContactDao
+    private val repostDao: RepostDao,
+    private val contactDao: ContactDao,
+    private val profileDao: ProfileDao,
 ) : IFeedProvider {
 
     override suspend fun getFeed(): List<PostWithMeta> {
@@ -25,11 +29,11 @@ class FeedProvider(
             postDao.getLatestFeed(pubkey = pubkeyProvider.getPubkey())
         } else {
             Log.i(TAG, "Use default contacts")
-            postDao.getLatestFeedOfCustomContacts(contactPubkeys = defaultPubkeys)
+            postDao.getLatestFeedOfCustomContacts(*defaultPubkeys.toTypedArray())
         }
         val stats = interactionStatsProvider.getStats(posts.map { it.id })
-        val reposts = postProvider.getRepostsMap(posts.mapNotNull { it.repostedId })
-        val namesAndPictures = profileProvider.getNamesAndPicturesMap(posts.map { it.pubkey })
+        val reposts = repostDao.getRepostsMap(posts.mapNotNull { it.repostedId })
+        val namesAndPictures = profileDao.getNamesAndPicturesMap(posts.map { it.pubkey })
 
         return posts.map {
             PostWithMeta(
@@ -39,10 +43,9 @@ class FeedProvider(
                 pubkey = it.pubkey,
                 createdAt = it.createdAt,
                 content = it.content,
-                // TODO: real values
                 name = namesAndPictures[it.pubkey]?.name.orEmpty(),
                 pictureUrl = namesAndPictures[it.pubkey]?.picture.orEmpty(),
-                replyToName = "replyToId -> pubkey -> name",
+                replyToName = "replyToId -> pubkey -> name", // TODO
                 repost = it.repostedId?.let { repostedId -> reposts[repostedId] },
                 isLikedByMe = stats.isLikedByMe(it.id),
                 isRepostedByMe = stats.isRepostedByMe(it.id),
@@ -63,8 +66,8 @@ class FeedProvider(
             postDao.getFeedOfCustomContactsSince(contactPubkeys = defaultPubkeys, since = since)
         }
         val stats = interactionStatsProvider.getStats(posts.map { it.id })
-        val reposts = postProvider.getRepostsMap(posts.mapNotNull { it.repostedId })
-        val namesAndPictures = profileProvider.getNamesAndPicturesMap(posts.map { it.pubkey })
+        val reposts = repostDao.getRepostsMap(posts.mapNotNull { it.repostedId })
+        val namesAndPictures = profileDao.getNamesAndPicturesMap(posts.map { it.pubkey })
 
         return posts.map {
             PostWithMeta(
@@ -94,10 +97,10 @@ class FeedProvider(
     override suspend fun getFeedWithSingleAuthor(pubkey: String): List<PostWithMeta> {
         Log.i(TAG, "Get feed of author $pubkey")
         // TODO: Subscribe to pubkey
-        val posts = postDao.getLatestFeedOfCustomContacts(contactPubkeys = defaultPubkeys)
+        val posts = postDao.getLatestFeedOfCustomContacts(pubkey)
         val stats = interactionStatsProvider.getStats(posts.map { it.id })
-        val reposts = postProvider.getRepostsMap(posts.mapNotNull { it.repostedId })
-        val namesAndPictures = profileProvider.getNamesAndPicturesMap(posts.map { it.pubkey })
+        val reposts = repostDao.getRepostsMap(posts.mapNotNull { it.repostedId })
+        val namesAndPictures = profileDao.getNamesAndPicturesMap(posts.map { it.pubkey })
 
         return posts.map {
             PostWithMeta(

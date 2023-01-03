@@ -11,6 +11,7 @@ import com.kaiwolfram.nozzle.data.room.entity.*
         PostEntity::class,
         ProfileEntity::class,
         ReactionEntity::class,
+        ReplyEntity::class,
         RepostEntity::class
     ],
     version = 1
@@ -20,5 +21,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun profileDao(): ProfileDao
     abstract fun postDao(): PostDao
     abstract fun reactionDao(): ReactionDao
+    abstract fun replyDao(): ReplyDao
     abstract fun repostDao(): RepostDao
 }
