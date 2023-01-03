@@ -79,5 +79,5 @@ interface PostDao {
     suspend fun getLatestTimestampOfFeed(pubkey: String): Long?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertIfNotPresent(vararg post: PostEntity)
+    suspend fun insertIfNotPresent(vararg post: PostEntity)
 }

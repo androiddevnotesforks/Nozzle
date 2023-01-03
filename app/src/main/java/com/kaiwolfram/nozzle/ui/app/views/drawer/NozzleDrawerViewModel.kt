@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 private const val TAG = "NozzleDrawerViewModel"
 
@@ -34,21 +36,27 @@ class NozzleDrawerViewModel(
 
     init {
         Log.i(TAG, "Initialize NozzleDrawerViewModel")
-        useCachedValues()
+        viewModelScope.launch(context = Dispatchers.IO) {
+            useCachedValues()
+        }
     }
 
     val onResetUiState: () -> Unit = {
-        useCachedValues()
+        Log.i(TAG, "Reset UI")
+        viewModelScope.launch(context = Dispatchers.IO) {
+            useCachedValues()
+        }
     }
 
-    private fun useCachedValues() {
+    private suspend fun useCachedValues() {
         Log.i(TAG, "Set cached values")
+        val meta = personalProfileProvider.getMetadata()
         viewModelState.update {
             it.copy(
                 pubkey = personalProfileProvider.getPubkey(),
                 npub = personalProfileProvider.getNpub(),
-                name = personalProfileProvider.getName(),
-                pictureUrl = personalProfileProvider.getPicture(),
+                name = meta?.name.orEmpty(),
+                pictureUrl = meta?.picture.orEmpty(),
             )
         }
     }

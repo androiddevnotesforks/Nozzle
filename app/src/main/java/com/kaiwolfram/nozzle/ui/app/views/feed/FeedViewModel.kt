@@ -50,12 +50,16 @@ class FeedViewModel(
 
     init {
         Log.i(TAG, "Initialize FeedViewModel")
-        viewModelState.update {
-            it.copy(
-                pictureUrl = personalProfileProvider.getPicture(),
-                pubkey = personalProfileProvider.getPubkey()
-            )
+        viewModelScope.launch(context = Dispatchers.IO) {
+            viewModelState.update {
+                it.copy(
+                    // TODO: Write dao method for getting picture only
+                    pictureUrl = personalProfileProvider.getMetadata()?.picture.orEmpty(),
+                    pubkey = personalProfileProvider.getPubkey()
+                )
+            }
         }
+
         handleNostrSubscription()
         viewModelScope.launch(context = Dispatchers.IO) {
             setInitialFeed()
@@ -74,11 +78,13 @@ class FeedViewModel(
     }
 
     val onResetProfileIconUiState: () -> Unit = {
-        viewModelState.update {
-            it.copy(
-                pictureUrl = personalProfileProvider.getPicture(),
-                pubkey = personalProfileProvider.getPubkey(),
-            )
+        viewModelScope.launch(context = Dispatchers.IO) {
+            viewModelState.update {
+                it.copy(
+                    pictureUrl = personalProfileProvider.getMetadata()?.picture.orEmpty(),
+                    pubkey = personalProfileProvider.getPubkey(),
+                )
+            }
         }
     }
 

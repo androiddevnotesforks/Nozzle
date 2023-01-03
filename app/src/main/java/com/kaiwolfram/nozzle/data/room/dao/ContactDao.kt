@@ -26,7 +26,7 @@ interface ContactDao {
 
     // TODO: Replace if createdAt is larger
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrReplaceIfNewer(vararg contacts: ContactEntity)
+    suspend fun insertOrReplaceIfNewer(vararg contacts: ContactEntity)
 
     @Query(
         "DELETE FROM contact " +
@@ -46,25 +46,25 @@ interface ContactDao {
                 "FROM contact " +
                 "WHERE pubkey = :pubkey"
     )
-    fun getNumberOfFollowing(pubkey: String): Int
+    suspend fun getNumberOfFollowing(pubkey: String): Int
 
     @Query(
         "SELECT COUNT(*) " +
                 "FROM contact " +
                 "WHERE contactPubkey = :pubkey"
     )
-    fun getNumberOfFollowers(pubkey: String): Int
+    suspend fun getNumberOfFollowers(pubkey: String): Int
 
     @Query(
         "SELECT EXISTS(SELECT * " +
                 "FROM contact " +
                 "WHERE pubkey = :pubkey AND contactPubkey = :contactPubkey)"
     )
-    fun isFollowed(pubkey: String, contactPubkey: String): Boolean
+    suspend fun isFollowed(pubkey: String, contactPubkey: String): Boolean
 
     @Query(
         "DELETE FROM contact " +
                 "WHERE pubkey = :pubkey AND createdAt < :createdAt"
     )
-    fun deleteIfOutdated(pubkey: String, createdAt: Long)
+    suspend fun deleteIfOutdated(pubkey: String, createdAt: Long)
 }

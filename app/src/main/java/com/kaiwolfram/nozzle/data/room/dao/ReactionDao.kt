@@ -9,5 +9,5 @@ interface ReactionDao {
         "INSERT OR IGNORE INTO reaction (eventId, pubkey) " +
                 "VALUES (:eventId, :pubkey)"
     )
-    fun like(eventId: String, pubkey: String)
+    suspend fun like(eventId: String, pubkey: String)
 }

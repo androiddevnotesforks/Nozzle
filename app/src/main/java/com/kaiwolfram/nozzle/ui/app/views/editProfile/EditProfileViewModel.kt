@@ -37,6 +37,7 @@ class EditProfileViewModel(
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(EditProfileViewModelState())
+    private var metadata: Metadata? = null
 
     val uiState = viewModelState
         .stateIn(
@@ -47,7 +48,9 @@ class EditProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize EditProfileViewModel")
-        useCachedValues()
+        viewModelScope.launch(context = Dispatchers.IO) {
+            useCachedValues()
+        }
     }
 
     val onUpdateProfileAndShowToast: (String) -> Unit = { toast ->
@@ -60,11 +63,14 @@ class EditProfileViewModel(
             val isValidUrl = isValidUrl(it.pictureInput)
             if (isValidUsername && isValidUrl) {
                 Log.i(TAG, "New values are valid. Update profile")
-                updateMetadataInDb(it)
-                updateMetadataInProfileCache(it)
-                updateMetadataOverNostr(it)
-                useCachedValues()
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                viewModelScope.launch(context = Dispatchers.IO) {
+                    updateMetadataInDb(it)
+                    updateMetadataInProfileCache(it)
+                    updateMetadataOverNostr(it)
+                    useCachedValues()
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                }
+
             } else {
                 Log.i(TAG, "New values are invalid")
                 viewModelState.update { state ->
@@ -130,22 +136,22 @@ class EditProfileViewModel(
     }
 
     val onResetUiState: () -> Unit = {
-        useCachedValues()
-    }
-
-    private fun updateMetadataInDb(state: EditProfileViewModelState) {
-        Log.i(TAG, "Update profile in DB")
         viewModelScope.launch(context = Dispatchers.IO) {
-            personalProfileManager.setMeta(
-                name = state.nameInput,
-                about = state.aboutInput,
-                picture = state.pictureInput,
-                nip05 = state.nip05Input,
-            )
+            useCachedValues()
         }
     }
 
-    private fun updateMetadataInProfileCache(state: EditProfileViewModelState) {
+    private suspend fun updateMetadataInDb(state: EditProfileViewModelState) {
+        Log.i(TAG, "Update profile in DB")
+        personalProfileManager.setMeta(
+            name = state.nameInput,
+            about = state.aboutInput,
+            picture = state.pictureInput,
+            nip05 = state.nip05Input,
+        )
+    }
+
+    private suspend fun updateMetadataInProfileCache(state: EditProfileViewModelState) {
         Log.i(TAG, "Update profile in profile cache")
         personalProfileManager.setMeta(
             name = state.nameInput,
@@ -170,10 +176,10 @@ class EditProfileViewModel(
 
     private fun setHasChanges() {
         uiState.value.let {
-            val hasChanges = it.nameInput != personalProfileManager.getName()
-                    || it.aboutInput != personalProfileManager.getAbout()
-                    || it.pictureInput != personalProfileManager.getPicture()
-                    || it.nip05Input != personalProfileManager.getNip05()
+            val hasChanges = it.nameInput != metadata?.name.orEmpty()
+                    || it.aboutInput != metadata?.about.orEmpty()
+                    || it.pictureInput != metadata?.picture.orEmpty()
+                    || it.nip05Input != metadata?.nip05.orEmpty()
             if (hasChanges != it.hasChanges) {
                 viewModelState.update { state ->
                     state.copy(hasChanges = hasChanges)
@@ -182,14 +188,15 @@ class EditProfileViewModel(
         }
     }
 
-    private fun useCachedValues() {
+    private suspend fun useCachedValues() {
         Log.i(TAG, "Use cached values")
+        metadata = personalProfileManager.getMetadata()
         viewModelState.update {
             it.copy(
-                nameInput = personalProfileManager.getName(),
-                aboutInput = personalProfileManager.getAbout(),
-                pictureInput = personalProfileManager.getPicture(),
-                nip05Input = personalProfileManager.getNip05(),
+                nameInput = metadata?.name.orEmpty(),
+                aboutInput = metadata?.about.orEmpty(),
+                pictureInput = metadata?.picture.orEmpty(),
+                nip05Input = metadata?.nip05.orEmpty(),
                 hasChanges = false,
                 isInvalidUsername = false,
                 isInvalidPictureUrl = false
