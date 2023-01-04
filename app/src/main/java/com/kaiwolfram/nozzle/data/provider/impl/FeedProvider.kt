@@ -31,19 +31,6 @@ class FeedProvider(
         return postMapper.mapToPostsWithMeta(posts)
     }
 
-    override suspend fun getFeedSince(since: Long): List<PostWithMeta> {
-        Log.i(TAG, "Fetch feed since $since")
-        val followingCount = contactDao.getNumberOfFollowing(pubkey = pubkeyProvider.getPubkey())
-        val posts = if (followingCount == 0) {
-            postDao.getFeedSince(pubkey = pubkeyProvider.getPubkey(), since = since)
-        } else {
-            Log.i(TAG, "Use default contacts")
-            postDao.getFeedOfCustomContactsSince(contactPubkeys = defaultPubkeys, since = since)
-        }
-
-        return postMapper.mapToPostsWithMeta(posts)
-    }
-
     override suspend fun getLatestTimestamp(): Long? {
         return postDao.getLatestTimestampOfFeed(pubkey = pubkeyProvider.getPubkey())
     }

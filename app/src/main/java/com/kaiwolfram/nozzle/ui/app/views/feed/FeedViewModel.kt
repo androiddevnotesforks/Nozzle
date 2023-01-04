@@ -62,7 +62,7 @@ class FeedViewModel(
 
         handleNostrSubscription()
         viewModelScope.launch(context = Dispatchers.IO) {
-            setInitialFeed()
+            setFeed()
         }
     }
 
@@ -131,37 +131,19 @@ class FeedViewModel(
                 ),
                 since = feedProvider.getLatestTimestamp()
             )
+            // TODO: Subscribe until latestTimestamp in case we follow new people, limit to 100
         }
     }
 
     private suspend fun updateFeed() {
         Log.i(TAG, "Update feed")
-        if (uiState.value.posts.isEmpty()) {
-            setInitialFeed()
-        } else {
-            addNewPostsToFeed()
-        }
+        setFeed()
     }
 
-    private suspend fun setInitialFeed() {
-        Log.i(TAG, "Set initial feed")
+    private suspend fun setFeed() {
+        Log.i(TAG, "Set feed")
         viewModelState.update {
             it.copy(posts = feedProvider.getFeed())
-        }
-    }
-
-    private suspend fun addNewPostsToFeed() {
-        Log.i(TAG, "Add new posts to feed")
-        val currentFeed = uiState.value.posts
-        val newPosts = feedProvider.getFeedSince(since = currentFeed.last().createdAt)
-        Log.i(TAG, "Found ${newPosts.size} new posts to add to feed")
-        if (newPosts.isNotEmpty()) {
-            val newFeed = mutableListOf<PostWithMeta>()
-            newFeed.addAll(currentFeed)
-            newFeed.addAll(newPosts)
-            viewModelState.update {
-                it.copy(posts = newFeed)
-            }
         }
     }
 

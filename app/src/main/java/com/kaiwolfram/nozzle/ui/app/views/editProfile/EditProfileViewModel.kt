@@ -68,9 +68,8 @@ class EditProfileViewModel(
                     updateMetadataInProfileCache(it)
                     updateMetadataOverNostr(it)
                     useCachedValues()
-                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
                 }
-
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             } else {
                 Log.i(TAG, "New values are invalid")
                 viewModelState.update { state ->
