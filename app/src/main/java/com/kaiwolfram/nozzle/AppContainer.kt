@@ -8,6 +8,8 @@ import com.kaiwolfram.nozzle.data.manager.IKeyManager
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.manager.impl.KeyManager
 import com.kaiwolfram.nozzle.data.manager.impl.PersonalProfileManager
+import com.kaiwolfram.nozzle.data.mapper.IPostMapper
+import com.kaiwolfram.nozzle.data.mapper.PostMapper
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.nostr.NostrService
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
@@ -67,13 +69,17 @@ class AppContainer(context: Context) {
         replyDao = roomDb.replyDao()
     )
 
+    val postMapper: IPostMapper = PostMapper(
+        interactionStatsProvider = interactionStatsProvider,
+        repostDao = roomDb.repostDao(),
+        profileDao = roomDb.profileDao()
+    )
+
     val feedProvider: IFeedProvider = FeedProvider(
         pubkeyProvider = keyManager,
-        interactionStatsProvider = interactionStatsProvider,
+        postMapper = postMapper,
         postDao = roomDb.postDao(),
-        repostDao = roomDb.repostDao(),
         contactDao = roomDb.contactDao(),
-        profileDao = roomDb.profileDao()
     )
 
     val profileWithFollowerProvider: IProfileWithFollowerProvider = ProfileWithFollowerProvider(
@@ -87,5 +93,8 @@ class AppContainer(context: Context) {
         profileDao = roomDb.profileDao()
     )
 
-    val threadProvider: IThreadProvider = ThreadProvider()
+    val threadProvider: IThreadProvider = ThreadProvider(
+        postMapper = postMapper,
+        postDao = roomDb.postDao()
+    )
 }

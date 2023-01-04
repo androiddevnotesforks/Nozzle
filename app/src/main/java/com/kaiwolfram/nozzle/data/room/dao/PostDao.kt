@@ -80,4 +80,12 @@ interface PostDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIfNotPresent(vararg post: PostEntity)
+
+    @Query(
+        "SELECT * " +
+                "FROM post " +
+                "WHERE replyToRootId = (SELECT replyToRootId FROM post WHERE id = :currentPostId) " +
+                "AND replyToRootId IS NOT NULL"
+    )
+    suspend fun getWholeThread(currentPostId: String): List<PostEntity>
 }

@@ -28,7 +28,7 @@ data class ThreadViewModelState(
     val currentThreadPosition: ThreadPosition = ThreadPosition.SINGLE,
     val isRefreshing: Boolean = false,
 )
-
+// TODO: Subscribe to thread
 class ThreadViewModel(
     private val threadProvider: IThreadProvider,
     private val postCardInteractor: IPostCardInteractor,
@@ -59,15 +59,13 @@ class ThreadViewModel(
             viewModelScope.launch(context = Dispatchers.IO) {
                 Log.i(TAG, "Refresh thread view")
                 setRefresh(true)
-                val previous = threadProvider.listPrevious(currentEventId)
-                val current = threadProvider.getCurrent(currentEventId)
-                val replies = threadProvider.listReplies(currentEventId)
+                val thread = threadProvider.getThread(currentEventId)
                 viewModelState.update {
                     it.copy(
-                        previous = previous,
-                        current = current,
-                        replies = replies,
-                        currentThreadPosition = getThreadPosition(previous)
+                        previous = thread.previous,
+                        current = thread.current,
+                        replies = thread.replies,
+                        currentThreadPosition = getThreadPosition(thread.previous)
                     )
                 }
                 setRefresh(false)
