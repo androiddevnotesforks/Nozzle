@@ -53,7 +53,6 @@ class FeedViewModel(
         viewModelScope.launch(context = Dispatchers.IO) {
             viewModelState.update {
                 it.copy(
-                    // TODO: Write dao method for getting picture only
                     pictureUrl = personalProfileProvider.getMetadata()?.picture.orEmpty(),
                     pubkey = personalProfileProvider.getPubkey()
                 )
@@ -131,7 +130,6 @@ class FeedViewModel(
                 ),
                 since = feedProvider.getLatestTimestamp()
             )
-            // TODO: Subscribe until latestTimestamp in case we follow new people, limit to 100
         }
     }
 

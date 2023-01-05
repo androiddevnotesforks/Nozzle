@@ -24,7 +24,6 @@ interface ContactDao {
     )
     suspend fun listContacts(pubkey: String): List<ContactEntity>
 
-    // TODO: Replace if createdAt is larger
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrReplaceIfNewer(vararg contacts: ContactEntity)
 

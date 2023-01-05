@@ -148,7 +148,6 @@ class NostrService(
         return client.subscribe(filters = listOf(postFilter))
     }
 
-    // TODO: Call on end of lifecycle
     override fun close() {
         Log.i(TAG, "Close connections")
         client.close()

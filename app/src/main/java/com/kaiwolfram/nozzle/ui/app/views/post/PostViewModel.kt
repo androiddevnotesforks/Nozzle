@@ -48,7 +48,6 @@ class PostViewModel(
             Log.i(TAG, "Prepare new post")
             viewModelState.update {
                 it.copy(
-                    // TODO: DAO method for getting picture only
                     pictureUrl = personalProfileProvider.getMetadata()?.picture.orEmpty(),
                     pubkey = personalProfileProvider.getPubkey(),
                     content = "",

@@ -2,15 +2,16 @@ package com.kaiwolfram.nozzle.data.postCardInteractor
 
 import android.util.Log
 import com.kaiwolfram.nozzle.data.nostr.INostrService
+import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.ReactionDao
-import com.kaiwolfram.nozzle.data.room.dao.RepostDao
+import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 
 private const val TAG = "PostCardInteractor"
 
 class PostCardInteractor(
     private val nostrService: INostrService,
     private val reactionDao: ReactionDao,
-    private val repostDao: RepostDao,
+    private val postDao: PostDao,
 ) : IPostCardInteractor {
 
     override suspend fun like(postId: String, postPubkey: String) {
@@ -22,6 +23,6 @@ class PostCardInteractor(
     override suspend fun repost(postId: String) {
         Log.i(TAG, "Repost $postId")
         val event = nostrService.sendRepost(postId = postId, quote = "")
-        repostDao.repost(eventId = postId, pubkey = event.pubkey)
+        postDao.insertIfNotPresent(PostEntity.fromEvent(event))
     }
 }

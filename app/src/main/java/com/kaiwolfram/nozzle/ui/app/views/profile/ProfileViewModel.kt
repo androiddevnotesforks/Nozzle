@@ -42,7 +42,6 @@ data class ProfileViewModelState(
     val isRefreshing: Boolean = false,
 )
 
-// TODO: This whole viewmodel kinda sucks. Needs better implementation
 
 class ProfileViewModel(
     private val nostrService: INostrService,
@@ -70,7 +69,6 @@ class ProfileViewModel(
     val onSetPubkey: (String) -> Unit = { pubkey ->
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set UI data for $pubkey")
-            // TODO: Unsubscribe on dispose
             nostrService.subscribeToProfileMetadataAndContactList(pubkey)
             useCachedValues(pubkey)
         }
@@ -130,7 +128,6 @@ class ProfileViewModel(
     }
 
     val onFollow: (String) -> Unit = { pubkeyToFollow ->
-        // TODO: Set correct relayUrl
         if (!uiState.value.isFollowed) {
             viewModelScope.launch(context = Dispatchers.IO) {
                 profileFollower.follow(pubkeyToFollow = pubkeyToFollow, relayUrl = "")

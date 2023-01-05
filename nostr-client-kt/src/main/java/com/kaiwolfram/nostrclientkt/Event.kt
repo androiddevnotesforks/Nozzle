@@ -20,7 +20,7 @@ class Event(
     val sig: String,
 ) {
     object Kind {
-        const val SET_METADATA = 0
+        const val METADATA = 0
         const val TEXT_NOTE = 1
         const val CONTACT_LIST = 3
         const val REACTION = 7
@@ -78,7 +78,7 @@ class Event(
 
         fun createMetadataEvent(metadata: Metadata, keys: Keys): Event {
             return create(
-                kind = Kind.SET_METADATA,
+                kind = Kind.METADATA,
                 tags = listOf(),
                 content = gson.toJson(metadata),
                 keys = keys
@@ -97,15 +97,15 @@ class Event(
         fun createTextNoteEvent(post: Post, keys: Keys): Event {
             val tags = mutableListOf<List<String>>()
 
-            post.replyTo?.replyToRoot?.let { replyToRoot ->
-                post.replyTo.let { tags.add(listOf("e", replyToRoot, it.relayUrl, "root")) }
+            post.replyTo?.let { replyTo ->
+                replyTo.replyToRoot?.let { tags.add(listOf("e", it, replyTo.relayUrl, "root")) }
             }
             post.replyTo?.let { tags.add(listOf("e", it.replyTo, it.relayUrl, "reply")) }
-            post.repostId?.let { tags.add(listOf("e", it.repostId, it.relayUrl)) }
+            post.repostId?.let { tags.add(listOf("e", it.repostId, it.relayUrl, "mention")) }
 
             val mentionTag = mutableListOf("p")
             post.mentions.forEach { mentionTag.add(it) }
-            tags.add(mentionTag)
+            if (mentionTag.size > 1) tags.add(mentionTag)
 
             return create(
                 kind = Kind.TEXT_NOTE,
@@ -141,19 +141,43 @@ class Event(
     }
 
     fun getReplyId(): String? {
-        return tags.find { it.size == 4 && it[0] == "e" && it[3] == "reply" }?.get(1)
+        val eventTags = tags.filter { it.size >= 2 && it[0] == "e" }
+        if (eventTags.isEmpty()) return null
+
+        val nip10Marked = eventTags.find { it.size == 4 && it[3] == "reply" }
+        if (nip10Marked != null) return nip10Marked[1]
+
+        // nip10 relational
+        return when (eventTags.size) {
+            1 -> eventTags[0][1]
+            else -> eventTags[1][1]
+        }
     }
 
     fun getRootReplyId(): String? {
-        return tags.find { it.size == 4 && it[0] == "e" && it[3] == "root" }?.get(1)
+        val eventTags = tags.filter { it.size >= 2 && it[0] == "e" }
+        if (eventTags.isEmpty()) return null
+
+        val nip10Marked = eventTags.find { it.size == 4 && it[3] == "root" }
+        if (nip10Marked != null) return nip10Marked[1]
+
+        // nip10 relational
+        return eventTags[0][1]
     }
 
     fun getRepostedId(): String? {
-        return tags.find { it.size == 3 && it[0] == "e" }?.get(1)
+        val eventTags = tags.filter { it.size >= 2 && it[0] == "e" }
+        if (eventTags.isEmpty()) return null
+
+        val astralCompliant = eventTags.find { it.size == 4 && it[3] == "mention" }
+        if (astralCompliant != null) return astralCompliant[1]
+
+        // Are there other markers?
+        return null
     }
 
     fun isReaction() = this.kind == Kind.REACTION
     fun isPost() = this.kind == Kind.TEXT_NOTE
-    fun isProfileMetadata() = this.kind == Kind.SET_METADATA
+    fun isProfileMetadata() = this.kind == Kind.METADATA
     fun isContactList() = this.kind == Kind.CONTACT_LIST
 }

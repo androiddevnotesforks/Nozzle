@@ -30,7 +30,6 @@ interface ProfileDao {
         nip05: String,
     )
 
-    // TODO: Replace if createdAt is larger
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrReplaceIfNewer(vararg profile: ProfileEntity)
 
@@ -47,4 +46,14 @@ interface ProfileDao {
                 "WHERE pubkey IN (:pubkeys) "
     )
     suspend fun getNamesAndPicturesMap(pubkeys: List<String>): Map<String, NameAndPicture>
+
+
+    @MapInfo(keyColumn = "postId", valueColumn = "name")
+    @Query(
+        "SELECT id AS postId, name " +
+                "FROM profile " +
+                "JOIN post ON post.pubkey = profile.pubkey " +
+                "WHERE postId IN (:postIds) "
+    )
+    suspend fun getAuthorNamesMap(postIds: List<String>): Map<String, String>
 }

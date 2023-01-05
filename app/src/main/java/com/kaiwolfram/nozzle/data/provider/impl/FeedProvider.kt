@@ -37,7 +37,6 @@ class FeedProvider(
 
     override suspend fun getFeedWithSingleAuthor(pubkey: String): List<PostWithMeta> {
         Log.i(TAG, "Get feed of author $pubkey")
-        // TODO: Subscribe to pubkey
         val posts = postDao.getLatestFeedOfCustomContacts(pubkey)
 
         return postMapper.mapToPostsWithMeta(posts)

@@ -51,7 +51,6 @@ class EventProcessor(
         if (!verify(event)) {
             return
         }
-        // TODO: is reply? repost?
         scope.launch {
             postDao.insertIfNotPresent(
                 PostEntity(

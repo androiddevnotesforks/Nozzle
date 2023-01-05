@@ -14,9 +14,8 @@ class ProfileWithFollowerProvider(
 ) : IProfileWithFollowerProvider {
 
     override suspend fun getProfile(pubkey: String): ProfileWithFollowerInfo? {
-        val profile = profileDao.getProfile(pubkey) ?: return null // TODO: Subscribe when null
+        val profile = profileDao.getProfile(pubkey) ?: return null
 
-        // TODO: combine in one db query
         val numOfFollowing = contactDao.getNumberOfFollowing(pubkey)
         val numOfFollowers = contactDao.getNumberOfFollowers(pubkey)
         val isFollowedByMe = contactDao.isFollowed(

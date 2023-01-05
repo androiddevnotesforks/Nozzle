@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "80513176f5ab3fe243c093b8a5330af8",
+    "identityHash": "286f25ede032f6b13a95267769361313",
     "entities": [
       {
         "tableName": "contact",
@@ -175,66 +175,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "reply",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `pubkey` TEXT NOT NULL, PRIMARY KEY(`eventId`, `pubkey`))",
-        "fields": [
-          {
-            "fieldPath": "eventId",
-            "columnName": "eventId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "pubkey",
-            "columnName": "pubkey",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "eventId",
-            "pubkey"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "repost",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `pubkey` TEXT NOT NULL, PRIMARY KEY(`eventId`, `pubkey`))",
-        "fields": [
-          {
-            "fieldPath": "eventId",
-            "columnName": "eventId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "pubkey",
-            "columnName": "pubkey",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "eventId",
-            "pubkey"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '80513176f5ab3fe243c093b8a5330af8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '286f25ede032f6b13a95267769361313')"
     ]
   }
 }

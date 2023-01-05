@@ -53,7 +53,7 @@ class AppContainer(context: Context) {
     val postCardInteractor: IPostCardInteractor = PostCardInteractor(
         nostrService = nostrService,
         reactionDao = roomDb.reactionDao(),
-        repostDao = roomDb.repostDao()
+        postDao = roomDb.postDao()
     )
 
     val profileFollower: IProfileFollower = ProfileFollower(
@@ -65,13 +65,12 @@ class AppContainer(context: Context) {
     val interactionStatsProvider: IInteractionStatsProvider = InteractionStatsProvider(
         pubkeyProvider = keyManager,
         reactionDao = roomDb.reactionDao(),
-        repostDao = roomDb.repostDao(),
-        replyDao = roomDb.replyDao()
+        postDao = roomDb.postDao()
     )
 
     val postMapper: IPostMapper = PostMapper(
         interactionStatsProvider = interactionStatsProvider,
-        repostDao = roomDb.repostDao(),
+        postDao = roomDb.postDao(),
         profileDao = roomDb.profileDao()
     )
 

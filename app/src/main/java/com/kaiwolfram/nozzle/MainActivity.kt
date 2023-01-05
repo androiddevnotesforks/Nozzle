@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
             }.build()
         Coil.setImageLoader(imageLoader)
 
-        // TODO: Remove deprecated
         // Shrink composable when keyboard opens
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 

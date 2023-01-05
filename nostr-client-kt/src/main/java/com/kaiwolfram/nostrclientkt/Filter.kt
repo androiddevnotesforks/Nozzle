@@ -19,7 +19,7 @@ class Filter(
         fun createProfileFilter(pubkey: String): Filter {
             return Filter(
                 authors = listOf(pubkey),
-                kinds = listOf(Event.Kind.SET_METADATA),
+                kinds = listOf(Event.Kind.METADATA),
                 limit = 1
             )
         }

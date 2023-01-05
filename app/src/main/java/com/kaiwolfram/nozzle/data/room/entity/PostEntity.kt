@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.data.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.kaiwolfram.nostrclientkt.Event
 
 @Entity(tableName = "post")
 data class PostEntity(
@@ -12,4 +13,18 @@ data class PostEntity(
     val repostedId: String?,
     val content: String,
     val createdAt: Long,
-)
+) {
+    companion object {
+        fun fromEvent(event: Event): PostEntity {
+            return PostEntity(
+                id = event.id,
+                pubkey = event.pubkey,
+                replyToId = event.getReplyId(),
+                replyToRootId = event.getRootReplyId(),
+                repostedId = event.getRepostedId(),
+                content = event.content,
+                createdAt = event.createdAt,
+            )
+        }
+    }
+}
