@@ -103,9 +103,11 @@ class Event(
             post.replyTo?.let { tags.add(listOf("e", it.replyTo, it.relayUrl, "reply")) }
             post.repostId?.let { tags.add(listOf("e", it.repostId, it.relayUrl, "mention")) }
 
-            val mentionTag = mutableListOf("p")
-            post.mentions.forEach { mentionTag.add(it) }
-            if (mentionTag.size > 1) tags.add(mentionTag)
+            if (post.mentions.isNotEmpty()) {
+                val mentionTag = mutableListOf("p")
+                post.mentions.forEach { mentionTag.add(it) }
+                tags.add(mentionTag)
+            }
 
             return create(
                 kind = Kind.TEXT_NOTE,
