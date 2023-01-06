@@ -143,10 +143,14 @@ class Event(
     }
 
     fun getReplyId(): String? {
-        val eventTags = tags.filter { it.size >= 2 && it[0] == "e" }
+        val eventTags = tags.filter {
+            it.size in 2..4
+                    && it[0] == "e"
+                    && (it.getOrNull(3) == "reply" || it.getOrNull(3) == null)
+        }
         if (eventTags.isEmpty()) return null
 
-        val nip10Marked = eventTags.find { it.size == 4 && it[3] == "reply" }
+        val nip10Marked = eventTags.find { it.getOrNull(3) == "reply" }
         if (nip10Marked != null) return nip10Marked[1]
 
         // nip10 relational
@@ -157,10 +161,14 @@ class Event(
     }
 
     fun getRootReplyId(): String? {
-        val eventTags = tags.filter { it.size >= 2 && it[0] == "e" }
+        val eventTags = tags.filter {
+            it.size in 2..4
+                    && it[0] == "e"
+                    && (it.getOrNull(3) == "root" || it.getOrNull(3) == null)
+        }
         if (eventTags.isEmpty()) return null
 
-        val nip10Marked = eventTags.find { it.size == 4 && it[3] == "root" }
+        val nip10Marked = eventTags.find { it.getOrNull(3) == "root" }
         if (nip10Marked != null) return nip10Marked[1]
 
         // nip10 relational
@@ -168,14 +176,12 @@ class Event(
     }
 
     fun getRepostedId(): String? {
-        val eventTags = tags.filter { it.size >= 2 && it[0] == "e" }
-        if (eventTags.isEmpty()) return null
-
-        val astralCompliant = eventTags.find { it.size == 4 && it[3] == "mention" }
-        if (astralCompliant != null) return astralCompliant[1]
-
-        // Are there other markers?
-        return null
+        val astralCompliant = tags.find {
+            it.size == 4
+                    && it[0] == "e"
+                    && it[3] == "mention"
+        }
+        return astralCompliant?.get(1)
     }
 
     fun isReaction() = this.kind == Kind.REACTION
