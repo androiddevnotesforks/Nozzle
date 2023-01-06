@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
+import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.utils.isValidPrivkey
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,11 +28,12 @@ data class KeysViewModelState(
 
 class KeysViewModel(
     private val keyManager: IKeyManager,
+    private val nostrService: INostrService,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(KeysViewModelState())
-    private var privkey: String = ""
+    private var privkey = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -64,6 +66,7 @@ class KeysViewModel(
             } else if (uiState.value.hasChanges) {
                 Log.i(TAG, "Saving new privkey $state.privkeyInput")
                 keyManager.setPrivkey(state.privkeyInput)
+                nostrService.subscribeToProfileMetadataAndContactList(keyManager.getPubkey())
                 useCachedValues()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
@@ -103,6 +106,7 @@ class KeysViewModel(
                 isInvalid = false,
             )
         }
+        privkey = keyManager.getPrivkey()
     }
 
     override fun onCleared() {
@@ -113,6 +117,7 @@ class KeysViewModel(
     companion object {
         fun provideFactory(
             keyManager: IKeyManager,
+            nostrService: INostrService,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =
@@ -121,6 +126,7 @@ class KeysViewModel(
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return KeysViewModel(
                         keyManager = keyManager,
+                        nostrService = nostrService,
                         context = context,
                         clip = clip
                     ) as T

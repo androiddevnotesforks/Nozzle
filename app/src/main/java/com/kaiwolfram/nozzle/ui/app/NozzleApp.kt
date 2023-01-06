@@ -59,6 +59,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
                         keyManager = appContainer.keyManager,
+                        nostrService = appContainer.nostrService,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )

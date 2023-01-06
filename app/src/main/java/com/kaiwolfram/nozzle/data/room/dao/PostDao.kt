@@ -35,40 +35,6 @@ interface PostDao {
         limit: Int = 100
     ): List<PostEntity>
 
-    /**
-     * Sorted from newest to oldest
-     */
-    @Query(
-        "SELECT * FROM (" +
-                "SELECT * " +
-                "FROM post " +
-                "WHERE createdAt >= :since " +
-                "AND pubkey IN (SELECT contactPubkey FROM contact WHERE pubkey = :pubkey) " +
-                "ORDER BY createdAt " +
-                "LIMIT :limit" +
-                ") ORDER BY createdAt DESC"
-    )
-    suspend fun getFeedSince(pubkey: String, since: Long, limit: Int = 100): List<PostEntity>
-
-    /**
-     * Sorted from newest to oldest
-     */
-    @Query(
-        "SELECT * FROM (" +
-                "SELECT * " +
-                "FROM post " +
-                "WHERE createdAt >= :since " +
-                "AND pubkey IN (:contactPubkeys) " +
-                "ORDER BY createdAt " +
-                "LIMIT :limit" +
-                ") ORDER BY createdAt DESC"
-    )
-    suspend fun getFeedOfCustomContactsSince(
-        contactPubkeys: List<String>,
-        since: Long,
-        limit: Int = 100
-    ): List<PostEntity>
-
     @Query(
         "SELECT MAX(createdAt) " +
                 "FROM post " +

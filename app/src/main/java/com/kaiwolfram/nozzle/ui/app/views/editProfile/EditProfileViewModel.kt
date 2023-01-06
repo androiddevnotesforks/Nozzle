@@ -48,6 +48,7 @@ class EditProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize EditProfileViewModel")
+        nostrService.subscribeToProfileMetadataAndContactList(personalProfileManager.getPubkey())
         viewModelScope.launch(context = Dispatchers.IO) {
             useCachedValues()
         }

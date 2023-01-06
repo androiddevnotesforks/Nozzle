@@ -1,11 +1,9 @@
 package com.kaiwolfram.nozzle.data.provider.impl
 
 import android.util.Log
-import com.kaiwolfram.nozzle.data.defaultPubkeys
 import com.kaiwolfram.nozzle.data.mapper.IPostMapper
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
-import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
@@ -15,18 +13,11 @@ class FeedProvider(
     private val pubkeyProvider: IPubkeyProvider,
     private val postMapper: IPostMapper,
     private val postDao: PostDao,
-    private val contactDao: ContactDao,
 ) : IFeedProvider {
 
     override suspend fun getFeed(): List<PostWithMeta> {
         Log.i(TAG, "Get feed")
-        val followingCount = contactDao.getNumberOfFollowing(pubkey = pubkeyProvider.getPubkey())
-        val posts = if (followingCount > 0) {
-            postDao.getLatestFeed(pubkey = pubkeyProvider.getPubkey())
-        } else {
-            Log.i(TAG, "Use default contacts")
-            postDao.getLatestFeedOfCustomContacts(*defaultPubkeys.toTypedArray())
-        }
+        val posts = postDao.getLatestFeed(pubkey = pubkeyProvider.getPubkey())
 
         return postMapper.mapToPostsWithMeta(posts)
     }

@@ -38,7 +38,7 @@ class AppContainer(context: Context) {
 
     val keyManager: IKeyManager = KeyManager(context = context)
 
-    val eventProcessor: IEventProcessor = EventProcessor(
+    private val eventProcessor: IEventProcessor = EventProcessor(
         reactionDao = roomDb.reactionDao(),
         profileDao = roomDb.profileDao(),
         contactDao = roomDb.contactDao(),
@@ -62,13 +62,13 @@ class AppContainer(context: Context) {
         contactDao = roomDb.contactDao()
     )
 
-    val interactionStatsProvider: IInteractionStatsProvider = InteractionStatsProvider(
+    private val interactionStatsProvider: IInteractionStatsProvider = InteractionStatsProvider(
         pubkeyProvider = keyManager,
         reactionDao = roomDb.reactionDao(),
         postDao = roomDb.postDao()
     )
 
-    val postMapper: IPostMapper = PostMapper(
+    private val postMapper: IPostMapper = PostMapper(
         interactionStatsProvider = interactionStatsProvider,
         postDao = roomDb.postDao(),
         profileDao = roomDb.profileDao()
@@ -78,7 +78,6 @@ class AppContainer(context: Context) {
         pubkeyProvider = keyManager,
         postMapper = postMapper,
         postDao = roomDb.postDao(),
-        contactDao = roomDb.contactDao(),
     )
 
     val profileWithFollowerProvider: IProfileWithFollowerProvider = ProfileWithFollowerProvider(

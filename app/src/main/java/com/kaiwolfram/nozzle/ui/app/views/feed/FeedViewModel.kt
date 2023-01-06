@@ -121,13 +121,21 @@ class FeedViewModel(
         }
     }
 
+    val onSubscribeToFeed: () -> Unit = {
+        handleNostrSubscription()
+    }
+
     private fun handleNostrSubscription() {
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Handle nostr subscription")
-            nostrService.subscribeToFeed(
-                contactPubkeys = contactDao.listContactPubkeys(
+            val pubkeys = mutableListOf(personalProfileProvider.getPubkey())
+            pubkeys.addAll(
+                contactDao.listContactPubkeys(
                     pubkey = personalProfileProvider.getPubkey()
-                ),
+                )
+            )
+            nostrService.subscribeToFeed(
+                contactPubkeys = pubkeys,
                 since = feedProvider.getLatestTimestamp()
             )
         }

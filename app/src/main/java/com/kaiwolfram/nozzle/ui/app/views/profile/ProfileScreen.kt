@@ -40,7 +40,7 @@ fun ProfileScreen(
             pubkey = uiState.pubkey,
             npub = uiState.npub,
             name = uiState.name,
-            bio = uiState.about,
+            about = uiState.about,
             pictureUrl = uiState.picture,
             isOneself = uiState.isOneself,
             isFollowed = uiState.isFollowed,
@@ -77,7 +77,7 @@ private fun ProfileData(
     pubkey: String,
     npub: String,
     name: String,
-    bio: String,
+    about: String,
     pictureUrl: String,
     isOneself: Boolean,
     isFollowed: Boolean,
@@ -105,9 +105,9 @@ private fun ProfileData(
             onCopyNpubAndShowToast = onCopyNpubAndShowToast,
         )
         Spacer(Modifier.height(spacing.medium))
-        if (bio.isNotBlank()) {
+        if (about.isNotBlank()) {
             Text(
-                text = bio,
+                text = about,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )

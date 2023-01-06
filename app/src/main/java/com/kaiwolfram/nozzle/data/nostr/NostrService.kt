@@ -4,7 +4,6 @@ import android.util.Log
 import com.kaiwolfram.nostrclientkt.*
 import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
-import com.kaiwolfram.nozzle.data.defaultPubkeys
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
 
@@ -19,6 +18,8 @@ class NostrService(
     private val relays = listOf(
         "wss://nostr.fmt.wiz.biz",
         "wss://nostr.einundzwanzig.space",
+        "wss://nostr-pub.wellorder.net",
+        "wss://relay.damus.io",
     )
     private val unsubOnEOSE = mutableSetOf<String>()
     private val listener = object : NostrListener {
@@ -141,9 +142,9 @@ class NostrService(
 
     override fun subscribeToFeed(contactPubkeys: List<String>, since: Long?): List<String> {
         Log.i(TAG, "Subscribe to feed of ${contactPubkeys.size} contacts")
-        val pubkeys = contactPubkeys.ifEmpty { defaultPubkeys }
-        val limit = if (since == null) 150 else null
-        val postFilter = Filter.createPostFilter(pubkeys = pubkeys, since = since, limit = limit)
+        val limit = if (since == null) 250 else null
+        val postFilter =
+            Filter.createPostFilter(pubkeys = contactPubkeys, since = since, limit = limit)
 
         return client.subscribe(filters = listOf(postFilter))
     }
