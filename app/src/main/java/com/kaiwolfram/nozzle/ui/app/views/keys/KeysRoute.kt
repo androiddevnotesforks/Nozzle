@@ -17,8 +17,8 @@ fun KeysRoute(
     KeysScreen(
         uiState = uiState,
         onCopyNpubAndShowToast = keysViewModel.onCopyNpubAndShowToast,
-        onUpdateKeyPairAndShowToast = { toast ->
-            keysViewModel.onUpdateKeyPairAndShowToast(toast)
+        onUpdateKeyPairAndShowToast = { focusManager, toast ->
+            keysViewModel.onUpdateKeyPairAndShowToast(focusManager, toast)
             onResetDrawerUiState()
             onResetFeedIconUiState()
             onResetEditProfileUiState()

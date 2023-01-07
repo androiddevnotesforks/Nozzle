@@ -5,6 +5,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -16,20 +18,21 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 fun KeysScreen(
     uiState: KeysViewModelState,
     onCopyNpubAndShowToast: (String) -> Unit,
-    onUpdateKeyPairAndShowToast: (String) -> Unit,
+    onUpdateKeyPairAndShowToast: (FocusManager, String) -> Unit,
     onChangePrivkey: (String) -> Unit,
     onResetUiState: () -> Unit,
     onGoBack: () -> Unit,
 ) {
     Column {
         val toast = stringResource(id = R.string.key_pair_updated)
+        val focusManager = LocalFocusManager.current
         ReturnableTopBar(
             text = stringResource(id = R.string.keys),
             onGoBack = onGoBack,
             trailingIcon = {
                 CheckButton(
                     hasChanges = uiState.hasChanges,
-                    onCheck = { onUpdateKeyPairAndShowToast(toast) },
+                    onCheck = { onUpdateKeyPairAndShowToast(focusManager, toast) },
                 )
             })
         Column(modifier = Modifier.padding(spacing.screenEdge)) {

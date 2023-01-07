@@ -10,9 +10,11 @@ fun ReplyRoute(
     onGoBack: () -> Unit,
 ) {
     val uiState by replyViewModel.uiState.collectAsState()
+    val metadataState by replyViewModel.metadataState.collectAsState()
 
     ReplyScreen(
         uiState = uiState,
+        metadataState = metadataState,
         onChangeReply = replyViewModel.onChangeReply,
         onSendOrShowErrorToast = replyViewModel.onSendOrShowErrorToast,
         onGoBack = onGoBack,

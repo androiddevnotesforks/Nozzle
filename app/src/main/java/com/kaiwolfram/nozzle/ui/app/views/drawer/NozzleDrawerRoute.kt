@@ -15,11 +15,13 @@ fun NozzleDrawerRoute(
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val uiState by nozzleDrawerViewModel.uiState.collectAsState()
+    val pubkeyState by nozzleDrawerViewModel.pubkeyState.collectAsState()
+    val metadataState by nozzleDrawerViewModel.metadataState.collectAsState()
 
     NozzleDrawerScreen(
         modifier = modifier,
-        uiState = uiState,
+        pubkeyState = pubkeyState,
+        metadataState = metadataState,
         navActions = navActions,
         onSetPubkey = onSetPubkey,
         closeDrawer = closeDrawer,

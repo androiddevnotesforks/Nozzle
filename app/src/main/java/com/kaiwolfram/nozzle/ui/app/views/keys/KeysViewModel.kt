@@ -3,12 +3,14 @@ package com.kaiwolfram.nozzle.ui.app.views.keys
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
+import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.utils.isValidPrivkey
 import kotlinx.coroutines.cancel
@@ -28,13 +30,13 @@ data class KeysViewModelState(
 
 class KeysViewModel(
     private val keyManager: IKeyManager,
+    private val personalProfileManager: IPersonalProfileManager,
     private val nostrSubscriber: INostrSubscriber,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(KeysViewModelState())
     private var privkey = ""
-
 
     val uiState = viewModelState
         .stateIn(
@@ -56,7 +58,7 @@ class KeysViewModel(
         }
     }
 
-    val onUpdateKeyPairAndShowToast: (String) -> Unit = { toast ->
+    val onUpdateKeyPairAndShowToast: (FocusManager, String) -> Unit = { focusManager, toast ->
         uiState.value.let { state ->
             val isValid = isValidPrivkey(state.privkeyInput)
             if (!isValid) {
@@ -67,8 +69,10 @@ class KeysViewModel(
             } else if (uiState.value.hasChanges) {
                 Log.i(TAG, "Saving new privkey $state.privkeyInput")
                 keyManager.setPrivkey(state.privkeyInput)
+                personalProfileManager.updateMetadata()
                 nostrSubscriber.subscribeToProfileMetadataAndContactList(keyManager.getPubkey())
                 useCachedValues()
+                focusManager.clearFocus()
                 Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
             }
         }
@@ -118,6 +122,7 @@ class KeysViewModel(
     companion object {
         fun provideFactory(
             keyManager: IKeyManager,
+            personalProfileManager: IPersonalProfileManager,
             nostrSubscriber: INostrSubscriber,
             context: Context,
             clip: ClipboardManager,
@@ -127,6 +132,7 @@ class KeysViewModel(
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return KeysViewModel(
                         keyManager = keyManager,
+                        personalProfileManager = personalProfileManager,
                         nostrSubscriber = nostrSubscriber,
                         context = context,
                         clip = clip

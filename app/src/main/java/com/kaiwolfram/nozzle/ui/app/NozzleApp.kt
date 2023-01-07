@@ -47,7 +47,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
-                        nostrService = appContainer.nostrService,
+                        nostrSubscriber = appContainer.nostrSubscriber,
                         postCardInteractor = appContainer.postCardInteractor,
                         feedProvider = appContainer.feedProvider,
                         profileProvider = appContainer.profileWithFollowerProvider,
@@ -59,6 +59,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
                         keyManager = appContainer.keyManager,
+                        personalProfileManager = appContainer.personalProfileManager,
                         nostrSubscriber = appContainer.nostrSubscriber,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
@@ -77,6 +78,7 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = EditProfileViewModel.provideFactory(
                         personalProfileManager = appContainer.personalProfileManager,
                         nostrService = appContainer.nostrService,
+                        nostrSubscriber = appContainer.nostrSubscriber,
                         context = LocalContext.current,
                     )
                 ),
@@ -89,7 +91,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 replyViewModel = viewModel(
                     factory = ReplyViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
-                        pubkeyProvider = appContainer.keyManager,
+                        personalProfileProvider = appContainer.personalProfileManager,
                         context = LocalContext.current,
                     )
                 ),

@@ -21,7 +21,6 @@ private const val TAG = "PostViewModel"
 data class PostViewModelState(
     val content: String = "",
     val isSendable: Boolean = false,
-    val pictureUrl: String = "",
     val pubkey: String = "",
 )
 
@@ -31,6 +30,13 @@ class PostViewModel(
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(PostViewModelState())
+
+    val metadataState = personalProfileProvider.getMetadata()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            null
+        )
 
     val uiState = viewModelState
         .stateIn(
@@ -48,7 +54,6 @@ class PostViewModel(
             Log.i(TAG, "Prepare new post")
             viewModelState.update {
                 it.copy(
-                    pictureUrl = personalProfileProvider.getMetadata()?.picture.orEmpty(),
                     pubkey = personalProfileProvider.getPubkey(),
                     content = "",
                     isSendable = false,

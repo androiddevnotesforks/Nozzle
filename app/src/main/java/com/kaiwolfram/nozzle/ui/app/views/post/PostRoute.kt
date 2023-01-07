@@ -10,9 +10,11 @@ fun PostRoute(
     onGoBack: () -> Unit,
 ) {
     val uiState by postViewModel.uiState.collectAsState()
+    val metadataState by postViewModel.metadataState.collectAsState()
 
     PostScreen(
         uiState = uiState,
+        metadataState = metadataState,
         onChangeContent = postViewModel.onChangeContent,
         onSendOrShowErrorToast = postViewModel.onSendOrShowErrorToast,
         onGoBack = onGoBack,

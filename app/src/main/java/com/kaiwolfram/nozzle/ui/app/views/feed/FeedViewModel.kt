@@ -28,7 +28,6 @@ data class FeedViewModelState(
      */
     val posts: List<PostWithMeta> = mutableListOf(),
     val isRefreshing: Boolean = false,
-    val pictureUrl: String = "",
     val pubkey: String = "",
 )
 
@@ -41,6 +40,12 @@ class FeedViewModel(
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
 
+    var metadataState = personalProfileProvider.getMetadata()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            null
+        )
 
     val uiState = viewModelState
         .stateIn(
@@ -54,7 +59,6 @@ class FeedViewModel(
         viewModelScope.launch(context = Dispatchers.IO) {
             viewModelState.update {
                 it.copy(
-                    pictureUrl = personalProfileProvider.getMetadata()?.picture.orEmpty(),
                     pubkey = personalProfileProvider.getPubkey()
                 )
             }
@@ -78,14 +82,20 @@ class FeedViewModel(
     }
 
     val onResetProfileIconUiState: () -> Unit = {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            viewModelState.update {
-                it.copy(
-                    pictureUrl = personalProfileProvider.getMetadata()?.picture.orEmpty(),
-                    pubkey = personalProfileProvider.getPubkey(),
-                )
-            }
+        Log.i(TAG, "Reset profile icon")
+
+        metadataState = personalProfileProvider.getMetadata()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Lazily,
+                null
+            )
+        viewModelState.update {
+            it.copy(
+                pubkey = personalProfileProvider.getPubkey(),
+            )
         }
+
     }
 
     val onLike: (String) -> Unit = { id ->

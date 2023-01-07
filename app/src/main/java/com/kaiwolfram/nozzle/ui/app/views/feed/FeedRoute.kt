@@ -17,9 +17,11 @@ fun FeedRoute(
     onNavigateToPost: () -> Unit,
 ) {
     val uiState by feedViewModel.uiState.collectAsState()
+    val metadataState by feedViewModel.metadataState.collectAsState()
 
     FeedScreen(
         uiState = uiState,
+        metadataState = metadataState,
         onLike = feedViewModel.onLike,
         onRepost = feedViewModel.onRepost,
         onPrepareReply = onPrepareReply,

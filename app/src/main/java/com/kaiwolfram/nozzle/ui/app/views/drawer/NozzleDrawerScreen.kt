@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.app.navigation.NozzleNavActions
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
@@ -22,7 +23,8 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun NozzleDrawerScreen(
-    uiState: NozzleDrawerViewModelState,
+    pubkeyState: DrawerViewModelState,
+    metadataState: Metadata?,
     navActions: NozzleNavActions,
     onSetPubkey: (String) -> Unit,
     closeDrawer: () -> Unit,
@@ -35,12 +37,12 @@ fun NozzleDrawerScreen(
     ) {
         ProfileRow(
             modifier = Modifier.padding(horizontal = spacing.medium),
-            pictureUrl = uiState.pictureUrl,
-            pubkey = uiState.pubkey,
-            npub = uiState.npub,
-            profileName = uiState.name,
+            picture = metadataState?.picture.orEmpty(),
+            pubkey = pubkeyState.pubkey,
+            npub = pubkeyState.npub,
+            profileName = metadataState?.name.orEmpty(),
             navigateToProfile = {
-                onSetPubkey(uiState.pubkey)
+                onSetPubkey(pubkeyState.pubkey)
                 navActions.navigateToProfile()
             },
             closeDrawer = closeDrawer
@@ -62,7 +64,7 @@ fun NozzleDrawerScreen(
 
 @Composable
 private fun ProfileRow(
-    pictureUrl: String,
+    picture: String,
     pubkey: String,
     npub: String,
     profileName: String,
@@ -94,7 +96,7 @@ private fun ProfileRow(
                         .fillMaxWidth(0.20f)
                         .aspectRatio(1f)
                         .clip(CircleShape),
-                    pictureUrl = pictureUrl,
+                    pictureUrl = picture,
                     pubkey = pubkey,
                 )
                 Spacer(Modifier.width(spacing.large))

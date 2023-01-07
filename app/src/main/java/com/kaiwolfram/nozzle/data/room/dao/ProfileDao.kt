@@ -4,6 +4,7 @@ import androidx.room.*
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import com.kaiwolfram.nozzle.model.NameAndPicture
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProfileDao {
@@ -12,7 +13,7 @@ interface ProfileDao {
 
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
-    suspend fun getMetadata(pubkey: String): Metadata?
+    fun getMetadata(pubkey: String): Flow<Metadata?>
 
     @Query(
         "UPDATE profile " +

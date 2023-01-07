@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nozzle.data.nostr.INostrService
-import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
+import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -24,18 +24,24 @@ data class ReplyViewModelState(
     val recipientName: String = "",
     val reply: String = "",
     val isSendable: Boolean = false,
-    val pictureUrl: String = "",
     val pubkey: String = "",
 )
 
 class ReplyViewModel(
     private val nostrService: INostrService,
-    private val pubkeyProvider: IPubkeyProvider,
+    private val personalProfileProvider: IPersonalProfileProvider,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
     private var recipientPubkey: String = ""
     private var postToReplyTo: PostWithMeta? = null
+
+    var metadataState = personalProfileProvider.getMetadata()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            null
+        )
 
     val uiState = viewModelState
         .stateIn(
@@ -56,8 +62,7 @@ class ReplyViewModel(
                 recipientPubkey = post.pubkey
                 it.copy(
                     recipientName = post.name,
-                    pictureUrl = post.pictureUrl,
-                    pubkey = pubkeyProvider.getPubkey(),
+                    pubkey = personalProfileProvider.getPubkey(),
                     reply = "",
                     isSendable = false,
                 )
@@ -113,14 +118,14 @@ class ReplyViewModel(
     companion object {
         fun provideFactory(
             nostrService: INostrService,
-            pubkeyProvider: IPubkeyProvider,
+            personalProfileProvider: IPersonalProfileProvider,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ReplyViewModel(
                     nostrService = nostrService,
-                    pubkeyProvider = pubkeyProvider,
+                    personalProfileProvider = personalProfileProvider,
                     context = context,
                 ) as T
             }

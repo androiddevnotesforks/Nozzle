@@ -11,6 +11,7 @@ import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nostrclientkt.utils.NostrUtils.isValidUsername
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrService
+import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,11 +34,18 @@ data class EditProfileViewModelState(
 
 class EditProfileViewModel(
     private val personalProfileManager: IPersonalProfileManager,
+    private val nostrSubscriber: INostrSubscriber,
     private val nostrService: INostrService,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(EditProfileViewModelState())
-    private var metadata: Metadata? = null
+
+    private var metadataState = personalProfileManager.getMetadata()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            null
+        )
 
     val uiState = viewModelState
         .stateIn(
@@ -48,7 +56,7 @@ class EditProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize EditProfileViewModel")
-        nostrService.subscribeToProfileMetadataAndContactList(personalProfileManager.getPubkey())
+        nostrSubscriber.subscribeToProfileMetadataAndContactList(personalProfileManager.getPubkey())
         viewModelScope.launch(context = Dispatchers.IO) {
             useCachedValues()
         }
@@ -136,9 +144,13 @@ class EditProfileViewModel(
     }
 
     val onResetUiState: () -> Unit = {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            useCachedValues()
-        }
+        metadataState = personalProfileManager.getMetadata()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Lazily,
+                null
+            )
+        useCachedValues()
     }
 
     private suspend fun updateMetadataInDb(state: EditProfileViewModelState) {
@@ -175,32 +187,35 @@ class EditProfileViewModel(
     private fun isValidUrl(url: String) = url.isEmpty() || URLUtil.isValidUrl(url)
 
     private fun setHasChanges() {
-        uiState.value.let {
-            val hasChanges = it.nameInput != metadata?.name.orEmpty()
-                    || it.aboutInput != metadata?.about.orEmpty()
-                    || it.pictureInput != metadata?.picture.orEmpty()
-                    || it.nip05Input != metadata?.nip05.orEmpty()
-            if (hasChanges != it.hasChanges) {
-                viewModelState.update { state ->
-                    state.copy(hasChanges = hasChanges)
+        metadataState.value.let { metadata ->
+            uiState.value.let {
+                val hasChanges = it.nameInput != metadata?.name.orEmpty()
+                        || it.aboutInput != metadata?.about.orEmpty()
+                        || it.pictureInput != metadata?.picture.orEmpty()
+                        || it.nip05Input != metadata?.nip05.orEmpty()
+                if (hasChanges != it.hasChanges) {
+                    viewModelState.update { state ->
+                        state.copy(hasChanges = hasChanges)
+                    }
                 }
             }
         }
     }
 
-    private suspend fun useCachedValues() {
+    private fun useCachedValues() {
         Log.i(TAG, "Use cached values")
-        metadata = personalProfileManager.getMetadata()
-        viewModelState.update {
-            it.copy(
-                nameInput = metadata?.name.orEmpty(),
-                aboutInput = metadata?.about.orEmpty(),
-                pictureInput = metadata?.picture.orEmpty(),
-                nip05Input = metadata?.nip05.orEmpty(),
-                hasChanges = false,
-                isInvalidUsername = false,
-                isInvalidPictureUrl = false
-            )
+        metadataState.value.let { metadata ->
+            viewModelState.update {
+                it.copy(
+                    nameInput = metadata?.name.orEmpty(),
+                    aboutInput = metadata?.about.orEmpty(),
+                    pictureInput = metadata?.picture.orEmpty(),
+                    nip05Input = metadata?.nip05.orEmpty(),
+                    hasChanges = false,
+                    isInvalidUsername = false,
+                    isInvalidPictureUrl = false
+                )
+            }
         }
     }
 
@@ -212,6 +227,7 @@ class EditProfileViewModel(
     companion object {
         fun provideFactory(
             personalProfileManager: IPersonalProfileManager,
+            nostrSubscriber: INostrSubscriber,
             nostrService: INostrService,
             context: Context,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -219,6 +235,7 @@ class EditProfileViewModel(
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return EditProfileViewModel(
                     personalProfileManager = personalProfileManager,
+                    nostrSubscriber = nostrSubscriber,
                     nostrService = nostrService,
                     context = context
                 ) as T

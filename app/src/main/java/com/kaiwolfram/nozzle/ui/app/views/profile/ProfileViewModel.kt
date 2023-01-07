@@ -8,7 +8,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.nostr.INostrService
+import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
@@ -44,7 +44,7 @@ data class ProfileViewModelState(
 
 
 class ProfileViewModel(
-    private val nostrService: INostrService,
+    private val nostrSubscriber: INostrSubscriber,
     private val feedProvider: IFeedProvider,
     private val profileProvider: IProfileWithFollowerProvider,
     private val profileFollower: IProfileFollower,
@@ -69,7 +69,7 @@ class ProfileViewModel(
     val onSetPubkey: (String) -> Unit = { pubkey ->
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set UI data for $pubkey")
-            nostrService.subscribeToProfileMetadataAndContactList(pubkey)
+            nostrSubscriber.subscribeToProfileMetadataAndContactList(pubkey)
             useCachedValues(pubkey)
         }
     }
@@ -214,7 +214,7 @@ class ProfileViewModel(
 
     companion object {
         fun provideFactory(
-            nostrService: INostrService,
+            nostrSubscriber: INostrSubscriber,
             profileFollower: IProfileFollower,
             postCardInteractor: IPostCardInteractor,
             feedProvider: IFeedProvider,
@@ -226,7 +226,7 @@ class ProfileViewModel(
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProfileViewModel(
-                        nostrService = nostrService,
+                        nostrSubscriber = nostrSubscriber,
                         profileFollower = profileFollower,
                         postCardInteractor = postCardInteractor,
                         feedProvider = feedProvider,

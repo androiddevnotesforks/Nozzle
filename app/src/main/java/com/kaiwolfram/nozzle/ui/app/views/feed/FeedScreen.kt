@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
+import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.AddIcon
@@ -29,6 +30,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun FeedScreen(
     uiState: FeedViewModelState,
+    metadataState: Metadata?,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onSubscribeToFeed: () -> Unit,
@@ -44,7 +46,7 @@ fun FeedScreen(
     Scaffold(
         topBar = {
             FeedTopBar(
-                pictureUrl = uiState.pictureUrl,
+                picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
                 onPictureClick = onOpenDrawer,
             )
@@ -85,7 +87,7 @@ fun FeedScreen(
 
 @Composable
 private fun FeedTopBar(
-    pictureUrl: String,
+    picture: String,
     pubkey: String,
     onPictureClick: () -> Unit
 ) {
@@ -98,7 +100,7 @@ private fun FeedTopBar(
             Row {
                 Spacer(modifier = Modifier.width(spacing.large))
                 ProfilePicture(
-                    pictureUrl = pictureUrl,
+                    pictureUrl = picture,
                     pubkey = pubkey,
                     modifier = Modifier
                         .size(sizing.smallProfilePicture)

@@ -16,22 +16,28 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "NozzleDrawerViewModel"
 
-data class NozzleDrawerViewModelState(
+data class DrawerViewModelState(
     val pubkey: String = "",
     val npub: String = "",
-    val name: String = "",
-    val pictureUrl: String = "",
 )
 
 class NozzleDrawerViewModel(
     private val personalProfileProvider: IPersonalProfileProvider,
 ) : ViewModel() {
-    private val viewModelState = MutableStateFlow(NozzleDrawerViewModelState())
-    val uiState = viewModelState
+    private val drawerViewModelState = MutableStateFlow(DrawerViewModelState())
+
+    var metadataState = personalProfileProvider.getMetadata()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            null
+        )
+
+    val pubkeyState = drawerViewModelState
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value
+            drawerViewModelState.value
         )
 
     init {
@@ -43,20 +49,22 @@ class NozzleDrawerViewModel(
 
     val onResetUiState: () -> Unit = {
         Log.i(TAG, "Reset UI")
-        viewModelScope.launch(context = Dispatchers.IO) {
-            useCachedValues()
-        }
+
+        metadataState = personalProfileProvider.getMetadata()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                null
+            )
+        useCachedValues()
     }
 
-    private suspend fun useCachedValues() {
+    private fun useCachedValues() {
         Log.i(TAG, "Set cached values")
-        val meta = personalProfileProvider.getMetadata()
-        viewModelState.update {
+        drawerViewModelState.update {
             it.copy(
                 pubkey = personalProfileProvider.getPubkey(),
                 npub = personalProfileProvider.getNpub(),
-                name = meta?.name.orEmpty(),
-                pictureUrl = meta?.picture.orEmpty(),
             )
         }
     }

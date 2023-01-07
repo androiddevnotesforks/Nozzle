@@ -17,7 +17,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun InputBox(
-    pictureUrl: String,
+    picture: String,
     pubkey: String,
     placeholder: String,
     onChangeInput: (String) -> Unit,
@@ -35,7 +35,7 @@ fun InputBox(
                 modifier = Modifier
                     .padding(start = spacing.screenEdge, top = spacing.large)
                     .size(sizing.profilePicture),
-                pictureUrl = pictureUrl,
+                pictureUrl = picture,
                 pubkey = pubkey
             )
             ChangeableTextField(
