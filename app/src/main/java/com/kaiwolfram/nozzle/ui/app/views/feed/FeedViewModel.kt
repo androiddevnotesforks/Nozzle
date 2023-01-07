@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nozzle.data.nostr.INostrService
+import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
@@ -36,10 +36,11 @@ class FeedViewModel(
     private val personalProfileProvider: IPersonalProfileProvider,
     private val feedProvider: IFeedProvider,
     private val postCardInteractor: IPostCardInteractor,
-    private val nostrService: INostrService,
+    private val nostrSubscriber: INostrSubscriber,
     private val contactDao: ContactDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
+
 
     val uiState = viewModelState
         .stateIn(
@@ -134,7 +135,7 @@ class FeedViewModel(
                     pubkey = personalProfileProvider.getPubkey()
                 )
             )
-            nostrService.subscribeToFeed(
+            nostrSubscriber.subscribeToFeed(
                 contactPubkeys = pubkeys,
                 since = feedProvider.getLatestTimestamp()
             )
@@ -177,7 +178,7 @@ class FeedViewModel(
             personalProfileProvider: IPersonalProfileProvider,
             feedProvider: IFeedProvider,
             postCardInteractor: IPostCardInteractor,
-            nostrService: INostrService,
+            nostrSubscriber: INostrSubscriber,
             contactDao: ContactDao,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -186,7 +187,7 @@ class FeedViewModel(
                     personalProfileProvider = personalProfileProvider,
                     feedProvider = feedProvider,
                     postCardInteractor = postCardInteractor,
-                    nostrService = nostrService,
+                    nostrSubscriber = nostrSubscriber,
                     contactDao = contactDao
                 ) as T
             }

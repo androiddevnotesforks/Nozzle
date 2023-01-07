@@ -21,7 +21,7 @@ class NostrService(
         "wss://nostr-pub.wellorder.net",
         "wss://relay.damus.io",
     )
-    private val unsubOnEOSE = mutableSetOf<String>()
+    private val unsubOnEOSECache = mutableSetOf<String>()
     private val listener = object : NostrListener {
         override fun onOpen(msg: String) {
             Log.i(TAG, "Relay is ready: $msg")
@@ -38,7 +38,7 @@ class NostrService(
 
         override fun onEOSE(subscriptionId: String) {
             Log.i(TAG, "EOSE on subscription $subscriptionId")
-            if (unsubOnEOSE.remove(subscriptionId)) {
+            if (unsubOnEOSECache.remove(subscriptionId)) {
                 Log.i(TAG, "Unsubscribe onEOSE $subscriptionId")
                 client.unsubscribe(subscriptionId)
             }
@@ -130,23 +130,13 @@ class NostrService(
         return event
     }
 
-    override fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String> {
-        Log.i(TAG, "Subscribe metadata and contact list for $pubkey")
-        val profileFilter = Filter.createProfileFilter(pubkey = pubkey)
-        val contactListFilter = Filter.createContactListFilter(pubkey = pubkey)
-        val subscriptionIds = client.subscribe(filters = listOf(profileFilter, contactListFilter))
-        unsubOnEOSE.addAll(subscriptionIds)
+    override fun subscribe(filters: List<Filter>, unsubOnEOSE: Boolean): List<String> {
+        val subscriptionIds = client.subscribe(filters)
+        if (subscriptionIds.isNotEmpty() && unsubOnEOSE) {
+            unsubOnEOSECache.addAll(subscriptionIds)
+        }
 
         return subscriptionIds
-    }
-
-    override fun subscribeToFeed(contactPubkeys: List<String>, since: Long?): List<String> {
-        Log.i(TAG, "Subscribe to feed of ${contactPubkeys.size} contacts")
-        val limit = if (since == null) 250 else null
-        val postFilter =
-            Filter.createPostFilter(pubkeys = contactPubkeys, since = since, limit = limit)
-
-        return client.subscribe(filters = listOf(postFilter))
     }
 
     override fun close() {

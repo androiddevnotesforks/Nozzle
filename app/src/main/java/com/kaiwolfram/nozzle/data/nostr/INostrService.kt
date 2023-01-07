@@ -1,9 +1,6 @@
 package com.kaiwolfram.nozzle.data.nostr
 
-import com.kaiwolfram.nostrclientkt.ContactListEntry
-import com.kaiwolfram.nostrclientkt.Event
-import com.kaiwolfram.nostrclientkt.Metadata
-import com.kaiwolfram.nostrclientkt.ReplyTo
+import com.kaiwolfram.nostrclientkt.*
 
 interface INostrService {
     fun publishProfile(metadata: Metadata): Event
@@ -12,7 +9,6 @@ interface INostrService {
     fun sendLike(postId: String, postPubkey: String): Event
     fun sendReply(replyTo: ReplyTo, content: String): Event
     fun updateContactList(contacts: List<ContactListEntry>): Event
-    fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String>
-    fun subscribeToFeed(contactPubkeys: List<String>, since: Long? = null): List<String>
+    fun subscribe(filters: List<Filter>, unsubOnEOSE: Boolean = false): List<String>
     fun close()
 }

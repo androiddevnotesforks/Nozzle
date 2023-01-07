@@ -59,7 +59,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 keysViewModel = viewModel(
                     factory = KeysViewModel.provideFactory(
                         keyManager = appContainer.keyManager,
-                        nostrService = appContainer.nostrService,
+                        nostrSubscriber = appContainer.nostrSubscriber,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
@@ -69,7 +69,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         personalProfileProvider = appContainer.personalProfileManager,
                         feedProvider = appContainer.feedProvider,
                         postCardInteractor = appContainer.postCardInteractor,
-                        nostrService = appContainer.nostrService,
+                        nostrSubscriber = appContainer.nostrSubscriber,
                         contactDao = appContainer.roomDb.contactDao()
                     )
                 ),

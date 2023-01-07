@@ -11,7 +11,9 @@ import com.kaiwolfram.nozzle.data.manager.impl.PersonalProfileManager
 import com.kaiwolfram.nozzle.data.mapper.IPostMapper
 import com.kaiwolfram.nozzle.data.mapper.PostMapper
 import com.kaiwolfram.nozzle.data.nostr.INostrService
+import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.nostr.NostrService
+import com.kaiwolfram.nozzle.data.nostr.NostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.postCardInteractor.PostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
@@ -48,6 +50,10 @@ class AppContainer(context: Context) {
     val nostrService: INostrService = NostrService(
         keyManager = keyManager,
         eventProcessor = eventProcessor
+    )
+
+    val nostrSubscriber: INostrSubscriber = NostrSubscriber(
+        nostrService = nostrService,
     )
 
     val postCardInteractor: IPostCardInteractor = PostCardInteractor(
