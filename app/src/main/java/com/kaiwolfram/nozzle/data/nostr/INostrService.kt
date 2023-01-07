@@ -10,5 +10,6 @@ interface INostrService {
     fun sendReply(replyTo: ReplyTo, content: String): Event
     fun updateContactList(contacts: List<ContactListEntry>): Event
     fun subscribe(filters: List<Filter>, unsubOnEOSE: Boolean = false): List<String>
+    fun unsubscribe(subscriptionIds: List<String>)
     fun close()
 }

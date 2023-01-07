@@ -14,6 +14,7 @@ import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -57,15 +58,11 @@ class FeedViewModel(
     init {
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelScope.launch(context = Dispatchers.IO) {
+            renewNostrSubscription()
             viewModelState.update {
-                it.copy(
-                    pubkey = personalProfileProvider.getPubkey()
-                )
+                it.copy(pubkey = personalProfileProvider.getPubkey())
             }
-        }
-
-        handleNostrSubscription()
-        viewModelScope.launch(context = Dispatchers.IO) {
+            delay(1000)
             setFeed()
         }
     }
@@ -75,7 +72,9 @@ class FeedViewModel(
             viewModelScope.launch(context = Dispatchers.IO) {
                 Log.i(TAG, "Refresh feed view")
                 setRefresh(true)
-                updateFeed()
+                renewNostrSubscription()
+                delay(1000)
+                setFeed()
                 setRefresh(false)
             }
         }
@@ -132,29 +131,19 @@ class FeedViewModel(
         }
     }
 
-    val onSubscribeToFeed: () -> Unit = {
-        handleNostrSubscription()
-    }
-
-    private fun handleNostrSubscription() {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            Log.i(TAG, "Handle nostr subscription")
-            val pubkeys = mutableListOf(personalProfileProvider.getPubkey())
-            pubkeys.addAll(
-                contactDao.listContactPubkeys(
-                    pubkey = personalProfileProvider.getPubkey()
-                )
+    private suspend fun renewNostrSubscription() {
+        Log.i(TAG, "Renew nostr subscription")
+        val pubkeys = mutableListOf(personalProfileProvider.getPubkey())
+        pubkeys.addAll(
+            contactDao.listContactPubkeys(
+                pubkey = personalProfileProvider.getPubkey()
             )
-            nostrSubscriber.subscribeToFeed(
-                contactPubkeys = pubkeys,
-                since = feedProvider.getLatestTimestamp()
-            )
-        }
-    }
-
-    private suspend fun updateFeed() {
-        Log.i(TAG, "Update feed")
-        setFeed()
+        )
+        nostrSubscriber.unsubscribeFeeds()
+        nostrSubscriber.subscribeToFeed(
+            contactPubkeys = pubkeys,
+            since = feedProvider.getLatestTimestamp()
+        )
     }
 
     private suspend fun setFeed() {

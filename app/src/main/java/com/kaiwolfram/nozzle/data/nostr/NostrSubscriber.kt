@@ -6,6 +6,8 @@ import com.kaiwolfram.nostrclientkt.Filter
 private const val TAG = "NostrSubscriber"
 
 class NostrSubscriber(private val nostrService: INostrService) : INostrSubscriber {
+    private val feedSubscriptions = mutableListOf<String>()
+
     override fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String> {
         Log.i(TAG, "Subscribe metadata and contact list for $pubkey")
         val profileFilter = Filter.createProfileFilter(pubkey = pubkey)
@@ -26,6 +28,14 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
             limit = limit
         )
 
-        return nostrService.subscribe(filters = listOf(postFilter))
+        val ids = nostrService.subscribe(filters = listOf(postFilter))
+        feedSubscriptions.addAll(ids)
+
+        return ids
+    }
+
+    override fun unsubscribeFeeds() {
+        nostrService.unsubscribe(feedSubscriptions)
+        feedSubscriptions.clear()
     }
 }

@@ -26,7 +26,6 @@ fun FeedRoute(
         onRepost = feedViewModel.onRepost,
         onPrepareReply = onPrepareReply,
         onPreparePost = onPreparePost,
-        onSubscribeToFeed = feedViewModel.onSubscribeToFeed,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onOpenDrawer = onOpenDrawer,
         onNavigateToProfile = onNavigateToProfile,

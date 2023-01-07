@@ -139,6 +139,14 @@ class NostrService(
         return subscriptionIds
     }
 
+    override fun unsubscribe(subscriptionIds: List<String>) {
+        if (subscriptionIds.isNotEmpty()) {
+            subscriptionIds.forEach {
+                client.unsubscribe(it)
+            }
+        }
+    }
+
     override fun close() {
         Log.i(TAG, "Close connections")
         client.close()

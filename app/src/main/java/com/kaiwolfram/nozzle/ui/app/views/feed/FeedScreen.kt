@@ -10,7 +10,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +32,6 @@ fun FeedScreen(
     metadataState: Metadata?,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
-    onSubscribeToFeed: () -> Unit,
     onRefreshFeedView: () -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
     onPreparePost: () -> Unit,
@@ -78,10 +76,6 @@ fun FeedScreen(
         if (uiState.posts.isEmpty()) {
             NoPostsHint()
         }
-    }
-
-    LaunchedEffect(uiState.pubkey) {
-        onSubscribeToFeed()
     }
 }
 
