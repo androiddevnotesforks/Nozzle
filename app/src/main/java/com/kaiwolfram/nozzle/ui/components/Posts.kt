@@ -184,6 +184,7 @@ private fun RepostCardContent(
     post?.let {
         Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .border(
                     width = spacing.tiny,
                     color = LightGray21,
