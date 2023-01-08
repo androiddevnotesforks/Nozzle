@@ -9,10 +9,12 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
+import com.kaiwolfram.nozzle.data.utils.listInvolvedPubkeys
+import com.kaiwolfram.nozzle.data.utils.listReferencedPostIds
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,23 +59,21 @@ class FeedViewModel(
 
     init {
         Log.i(TAG, "Initialize FeedViewModel")
-        viewModelScope.launch(context = Dispatchers.IO) {
-            renewNostrSubscription()
+        viewModelScope.launch(context = IO) {
+            renewSubscriptions()
             viewModelState.update {
                 it.copy(pubkey = personalProfileProvider.getPubkey())
             }
-            delay(1000)
             setFeed()
         }
     }
 
     val onRefreshFeedView: () -> Unit = {
         execWhenNoActiveRefresh {
-            viewModelScope.launch(context = Dispatchers.IO) {
+            viewModelScope.launch(context = IO) {
                 Log.i(TAG, "Refresh feed view")
                 setRefresh(true)
-                renewNostrSubscription()
-                delay(1000)
+                renewSubscriptions()
                 setFeed()
                 setRefresh(false)
             }
@@ -83,6 +83,10 @@ class FeedViewModel(
     val onResetProfileIconUiState: () -> Unit = {
         Log.i(TAG, "Reset profile icon")
 
+        viewModelScope.launch(context = IO) {
+            renewSubscriptions()
+            setFeed()
+        }
         metadataState = personalProfileProvider.getMetadata()
             .stateIn(
                 viewModelScope,
@@ -94,13 +98,12 @@ class FeedViewModel(
                 pubkey = personalProfileProvider.getPubkey(),
             )
         }
-
     }
 
     val onLike: (String) -> Unit = { id ->
         uiState.value.let { state ->
             state.posts.find { it.id == id }?.let {
-                viewModelScope.launch(context = Dispatchers.IO) {
+                viewModelScope.launch(context = IO) {
                     postCardInteractor.like(postId = id, postPubkey = it.pubkey)
                 }
                 viewModelState.update {
@@ -117,7 +120,7 @@ class FeedViewModel(
     val onRepost: (String) -> Unit = { id ->
         uiState.value.let { state ->
             if (state.posts.any { post -> post.id == id }) {
-                viewModelScope.launch(context = Dispatchers.IO) {
+                viewModelScope.launch(context = IO) {
                     postCardInteractor.repost(postId = id)
                 }
                 viewModelState.update {
@@ -131,8 +134,15 @@ class FeedViewModel(
         }
     }
 
-    private suspend fun renewNostrSubscription() {
-        Log.i(TAG, "Renew nostr subscription")
+    private suspend fun renewSubscriptions() {
+        subscribeToFeed()
+        delay(1000)
+        subscribeToAdditionalFeedData()
+        delay(1000)
+    }
+
+    private suspend fun subscribeToFeed() {
+        Log.i(TAG, "Subscribe to feed")
         val pubkeys = mutableListOf(personalProfileProvider.getPubkey())
         pubkeys.addAll(
             contactDao.listContactPubkeys(
@@ -142,7 +152,18 @@ class FeedViewModel(
         nostrSubscriber.unsubscribeFeeds()
         nostrSubscriber.subscribeToFeed(
             contactPubkeys = pubkeys,
-            since = feedProvider.getLatestTimestamp()
+            since = null
+        )
+    }
+
+    private suspend fun subscribeToAdditionalFeedData() {
+        Log.i(TAG, "Subscribe to additional feed data")
+        val posts = feedProvider.getFeed()
+        nostrSubscriber.unsubscribeAdditionalFeedData()
+
+        nostrSubscriber.subscribeToAdditionalFeedData(
+            involvedPubkeys = listInvolvedPubkeys(posts),
+            referencedPostIds = listReferencedPostIds(posts)
         )
     }
 

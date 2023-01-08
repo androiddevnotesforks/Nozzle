@@ -18,19 +18,21 @@ class PostMapper(
         val stats = interactionStatsProvider.getStats(posts.map { it.id })
         val reposts = postDao.getRepostsPreviewMap(posts.mapNotNull { it.repostedId })
         val namesAndPictures = profileDao.getNamesAndPicturesMap(posts.map { it.pubkey })
-        val replyRecipients = profileDao.getAuthorNamesMap(posts.mapNotNull { it.replyToId })
+        val replyRecipients =
+            profileDao.getAuthorNamesAndPubkeysMap(posts.mapNotNull { it.replyToId })
 
         return posts.map {
             PostWithMeta(
                 id = it.id,
                 replyToId = it.replyToId,
                 replyToRootId = it.replyToRootId,
+                replyToName = replyRecipients[it.replyToId]?.name,
+                replyToPubkey = replyRecipients[it.replyToId]?.pubkey,
                 pubkey = it.pubkey,
                 createdAt = it.createdAt,
                 content = it.content,
                 name = namesAndPictures[it.pubkey]?.name.orEmpty(),
                 pictureUrl = namesAndPictures[it.pubkey]?.picture.orEmpty(),
-                replyToName = replyRecipients[it.replyToId],
                 repost = it.repostedId?.let { repostedId -> reposts[repostedId] },
                 isLikedByMe = stats.isLikedByMe(it.id),
                 isRepostedByMe = stats.isRepostedByMe(it.id),

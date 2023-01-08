@@ -7,6 +7,7 @@ private const val TAG = "NostrSubscriber"
 
 class NostrSubscriber(private val nostrService: INostrService) : INostrSubscriber {
     private val feedSubscriptions = mutableListOf<String>()
+    private val additionalFeedDataSubscriptions = mutableListOf<String>()
 
     override fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String> {
         Log.i(TAG, "Subscribe metadata and contact list for $pubkey")
@@ -34,8 +35,36 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         return ids
     }
 
+    override fun subscribeToAdditionalFeedData(
+        involvedPubkeys: Set<String>,
+        referencedPostIds: Set<String>
+    ): List<String> {
+        Log.i(
+            TAG,
+            "Subscribe to additional feed data of ${involvedPubkeys.size} pubkeys " +
+                    "and ${referencedPostIds.size} referenced posts"
+        )
+        if (involvedPubkeys.isEmpty() && referencedPostIds.isEmpty()) return listOf()
+
+        val profileFilter = Filter.createProfileFilter(pubkeys = involvedPubkeys.toList())
+        val postFilter = Filter.createPostFilter(ids = referencedPostIds.toList())
+
+        val ids = nostrService.subscribe(
+            filters = listOf(profileFilter, postFilter),
+            unsubOnEOSE = true
+        )
+        additionalFeedDataSubscriptions.addAll(ids)
+
+        return ids
+    }
+
     override fun unsubscribeFeeds() {
         nostrService.unsubscribe(feedSubscriptions)
         feedSubscriptions.clear()
+    }
+
+    override fun unsubscribeAdditionalFeedData() {
+        nostrService.unsubscribe(additionalFeedDataSubscriptions)
+        additionalFeedDataSubscriptions.clear()
     }
 }

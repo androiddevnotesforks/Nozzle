@@ -4,6 +4,7 @@ import androidx.room.*
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import com.kaiwolfram.nozzle.model.NameAndPicture
+import com.kaiwolfram.nozzle.model.NameAndPubkey
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -49,12 +50,12 @@ interface ProfileDao {
     suspend fun getNamesAndPicturesMap(pubkeys: List<String>): Map<String, NameAndPicture>
 
 
-    @MapInfo(keyColumn = "postId", valueColumn = "name")
+    @MapInfo(keyColumn = "postId")
     @Query(
-        "SELECT id AS postId, name " +
+        "SELECT id AS postId, name, profile.pubkey " +
                 "FROM profile " +
                 "JOIN post ON post.pubkey = profile.pubkey " +
                 "WHERE postId IN (:postIds) "
     )
-    suspend fun getAuthorNamesMap(postIds: List<String>): Map<String, String>
+    suspend fun getAuthorNamesAndPubkeysMap(postIds: List<String>): Map<String, NameAndPubkey>
 }

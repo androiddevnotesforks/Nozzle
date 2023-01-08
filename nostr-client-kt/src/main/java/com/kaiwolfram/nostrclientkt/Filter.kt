@@ -24,13 +24,22 @@ class Filter(
             )
         }
 
+        fun createProfileFilter(pubkeys: List<String>): Filter {
+            return Filter(
+                authors = pubkeys,
+                kinds = listOf(Event.Kind.METADATA)
+            )
+        }
+
         fun createPostFilter(
-            pubkeys: List<String>,
+            ids: List<String>? = null,
+            pubkeys: List<String>? = null,
             since: Long? = null,
             until: Long? = null,
             limit: Int? = null
         ): Filter {
             return Filter(
+                ids = ids,
                 authors = pubkeys,
                 kinds = listOf(Event.Kind.TEXT_NOTE),
                 since = since,
