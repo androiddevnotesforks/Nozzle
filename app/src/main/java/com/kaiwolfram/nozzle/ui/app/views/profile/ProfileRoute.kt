@@ -3,13 +3,14 @@ package com.kaiwolfram.nozzle.ui.app.views.profile
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 @Composable
 fun ProfileRoute(
     profileViewModel: ProfileViewModel,
     onPrepareReply: (PostWithMeta) -> Unit,
-    onNavigateToThread: (String) -> Unit,
+    onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
 ) {

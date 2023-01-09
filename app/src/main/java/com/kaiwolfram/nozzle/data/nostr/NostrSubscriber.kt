@@ -7,6 +7,7 @@ private const val TAG = "NostrSubscriber"
 
 class NostrSubscriber(private val nostrService: INostrService) : INostrSubscriber {
     private val feedSubscriptions = mutableListOf<String>()
+    private val threadSubscriptions = mutableListOf<String>()
     private val additionalFeedDataSubscriptions = mutableListOf<String>()
 
     override fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String> {
@@ -35,16 +36,12 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         return ids
     }
 
-    override fun subscribeToAdditionalFeedData(
+    override fun subscribeToAdditionalPostsData(
         postIds: List<String>,
         involvedPubkeys: List<String>,
         referencedPostIds: List<String>
     ): List<String> {
-        Log.i(
-            TAG,
-            "Subscribe to additional feed data of ${involvedPubkeys.size} pubkeys " +
-                    "and ${referencedPostIds.size} referenced posts"
-        )
+        Log.i(TAG, "Subscribe to additional posts data")
         if (involvedPubkeys.isEmpty() && referencedPostIds.isEmpty()) return listOf()
 
         val reactionFilter = Filter.createReactionFilter(e = postIds)
@@ -61,13 +58,40 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         return ids
     }
 
+    override fun subscribeToThread(
+        currentPostId: String,
+        replyToId: String?,
+        replyToRootId: String?
+    ): List<String> {
+        Log.i(TAG, "Subscribe to thread")
+
+        val replyFilter = Filter.createReplyFilter(e = listOf(currentPostId))
+
+        val filters = mutableListOf(replyFilter)
+        replyToId?.let { filters.add(Filter.createPostFilter(ids = listOf(it))) }
+        replyToRootId?.let { filters.add(Filter.createPostFilter(ids = listOf(it))) }
+
+        val ids = nostrService.subscribe(
+            filters = filters,
+            unsubOnEOSE = true
+        )
+        threadSubscriptions.addAll(ids)
+
+        return ids
+    }
+
     override fun unsubscribeFeeds() {
         nostrService.unsubscribe(feedSubscriptions)
         feedSubscriptions.clear()
     }
 
-    override fun unsubscribeAdditionalFeedData() {
+    override fun unsubscribeAdditionalPostsData() {
         nostrService.unsubscribe(additionalFeedDataSubscriptions)
         additionalFeedDataSubscriptions.clear()
+    }
+
+    override fun unsubscribeToThread() {
+        nostrService.unsubscribe(threadSubscriptions)
+        threadSubscriptions.clear()
     }
 }

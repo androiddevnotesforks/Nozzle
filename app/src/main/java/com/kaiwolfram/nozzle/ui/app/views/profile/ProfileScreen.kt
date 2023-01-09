@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.*
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
@@ -31,7 +32,7 @@ fun ProfileScreen(
     onUnfollow: (String) -> Unit,
     onRefreshProfileView: () -> Unit,
     onCopyNpubAndShowToast: (String) -> Unit,
-    onNavigateToThread: (String) -> Unit,
+    onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
 ) {

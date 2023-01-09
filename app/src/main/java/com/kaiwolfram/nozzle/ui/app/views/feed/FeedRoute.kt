@@ -3,6 +3,7 @@ package com.kaiwolfram.nozzle.ui.app.views.feed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 @Composable
@@ -12,7 +13,7 @@ fun FeedRoute(
     onPreparePost: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
-    onNavigateToThread: (String) -> Unit,
+    onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToPost: () -> Unit,
 ) {

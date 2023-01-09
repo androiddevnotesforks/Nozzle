@@ -4,20 +4,22 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IThreadProvider
-import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
-import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
+import com.kaiwolfram.nozzle.data.utils.*
+import com.kaiwolfram.nozzle.model.PostIds
+import com.kaiwolfram.nozzle.model.PostThread
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "ThreadViewModel"
 
@@ -28,13 +30,14 @@ data class ThreadViewModelState(
     val currentThreadPosition: ThreadPosition = ThreadPosition.SINGLE,
     val isRefreshing: Boolean = false,
 )
+
 class ThreadViewModel(
     private val threadProvider: IThreadProvider,
     private val postCardInteractor: IPostCardInteractor,
+    private val nostrSubscriber: INostrSubscriber,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ThreadViewModelState())
-    private var isSyncing = AtomicBoolean(false)
-    private var currentEventId = ""
+    private lateinit var currentPostIds: PostIds
 
     val uiState = viewModelState
         .stateIn(
@@ -47,29 +50,33 @@ class ThreadViewModel(
         Log.i(TAG, "Initialize ThreadViewModel")
     }
 
-    val onOpenThread: (String) -> Unit = { id ->
-        Log.i(TAG, "Open thread of post $id")
-        currentEventId = id
-        onRefreshThreadView()
+    val onOpenThread: (PostIds) -> Unit = { postIds ->
+        Log.i(TAG, "Open thread of post ${postIds.id}")
+        currentPostIds = postIds
+        setEmptyThread()
+        viewModelScope.launch(context = Dispatchers.IO) {
+            setThread(threadProvider.getThread(postIds.id))
+            renewThreadSubscription()
+            delay(1000)
+            val thread = threadProvider.getThread(postIds.id)
+            setThread(thread)
+            setThreadWithNewData(thread)
+            updateCurrentPostIds(thread)
+        }
     }
 
     val onRefreshThreadView: () -> Unit = {
-        execWhenSyncingNotBlocked {
-            viewModelScope.launch(context = Dispatchers.IO) {
-                Log.i(TAG, "Refresh thread view")
-                setRefresh(true)
-                val thread = threadProvider.getThread(currentEventId)
-                viewModelState.update {
-                    it.copy(
-                        previous = thread.previous,
-                        current = thread.current,
-                        replies = thread.replies,
-                        currentThreadPosition = getThreadPosition(thread.previous)
-                    )
-                }
-                setRefresh(false)
-                isSyncing.set(false)
-            }
+        viewModelScope.launch(context = Dispatchers.IO) {
+            Log.i(TAG, "Refresh thread view")
+            setRefresh(true)
+            renewThreadSubscription()
+            delay(1000)
+            val thread = threadProvider.getThread(currentPostIds.id)
+            renewAdditionalDataSubscription(thread)
+            updateCurrentPostIds(thread)
+            delay(1000)
+            setThread(threadProvider.getThread(currentPostIds.id))
+            setRefresh(false)
         }
     }
 
@@ -147,6 +154,63 @@ class ThreadViewModel(
         }
     }
 
+    private fun setThread(thread: PostThread) {
+        Log.i(TAG, "Set thread ${thread.current?.id}")
+        viewModelState.update {
+            it.copy(
+                previous = thread.previous,
+                current = thread.current,
+                replies = thread.replies,
+                currentThreadPosition = getThreadPosition(thread.previous)
+            )
+        }
+    }
+
+    private fun setEmptyThread() {
+        viewModelState.update {
+            it.copy(
+                previous = listOf(),
+                current = null,
+                replies = listOf(),
+                currentThreadPosition = ThreadPosition.SINGLE
+            )
+        }
+    }
+
+    private fun updateCurrentPostIds(thread: PostThread) {
+        thread.current?.let {
+            currentPostIds = PostIds(
+                id = it.id,
+                replyToId = it.replyToId,
+                replyToRootId = it.replyToRootId
+            )
+        }
+    }
+
+    private fun renewThreadSubscription() {
+        nostrSubscriber.unsubscribeToThread()
+        nostrSubscriber.subscribeToThread(
+            currentPostId = currentPostIds.id,
+            replyToId = currentPostIds.replyToId,
+            replyToRootId = currentPostIds.replyToRootId
+        )
+    }
+
+    private fun renewAdditionalDataSubscription(thread: PostThread) {
+        nostrSubscriber.unsubscribeAdditionalPostsData()
+        nostrSubscriber.subscribeToAdditionalPostsData(
+            postIds = listPostIds(thread),
+            referencedPostIds = listReferencedPostIds(thread),
+            involvedPubkeys = listInvolvedPubkeys(thread)
+        )
+    }
+
+    private suspend fun setThreadWithNewData(thread: PostThread) {
+        renewAdditionalDataSubscription(thread)
+        delay(1000)
+        thread.current?.let { setThread(threadProvider.getThread(it.id)) }
+    }
+
     private fun getThreadPosition(previous: List<PostWithMeta>): ThreadPosition {
         return if (previous.isEmpty())
             ThreadPosition.SINGLE
@@ -161,15 +225,6 @@ class ThreadViewModel(
         }
     }
 
-    private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
-        if (isSyncing.get()) {
-            Log.i(TAG, "Blocked by active sync process")
-        } else {
-            isSyncing.set(true)
-            exec()
-        }
-    }
-
     override fun onCleared() {
         viewModelScope.cancel()
         super.onCleared()
@@ -179,12 +234,14 @@ class ThreadViewModel(
         fun provideFactory(
             threadProvider: IThreadProvider,
             postCardInteractor: IPostCardInteractor,
+            nostrSubscriber: INostrSubscriber
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ThreadViewModel(
                     threadProvider = threadProvider,
                     postCardInteractor = postCardInteractor,
+                    nostrSubscriber = nostrSubscriber,
                 ) as T
             }
         }

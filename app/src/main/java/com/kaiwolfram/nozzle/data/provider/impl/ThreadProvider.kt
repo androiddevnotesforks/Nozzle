@@ -52,7 +52,8 @@ class ThreadProvider(
 
         return PostThread(
             current = mapped.first(),
-            previous = if (previous.isNotEmpty()) mapped.subList(1, previous.size) else listOf(),
+            previous = if (previous.isNotEmpty())
+                mapped.subList(1, previous.size + 1) else listOf(),
             replies = mapped.takeLast(replies.size)
         )
     }

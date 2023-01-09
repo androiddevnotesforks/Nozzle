@@ -86,6 +86,7 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = ThreadViewModel.provideFactory(
                         threadProvider = appContainer.threadProvider,
                         postCardInteractor = appContainer.postCardInteractor,
+                        nostrSubscriber = appContainer.nostrSubscriber,
                     )
                 ),
                 replyViewModel = viewModel(

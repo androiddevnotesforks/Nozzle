@@ -6,4 +6,8 @@ data class RepostPreview(
     val content: String,
     val name: String,
     val picture: String,
-)
+) {
+    fun toPostIds(): PostIds {
+        return PostIds(id = id, replyToId = null, replyToRootId = null)
+    }
+}

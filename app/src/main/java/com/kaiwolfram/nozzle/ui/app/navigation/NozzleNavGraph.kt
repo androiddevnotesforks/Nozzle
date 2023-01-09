@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.ui.app.VMContainer
 import com.kaiwolfram.nozzle.ui.app.views.editProfile.EditProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.feed.FeedRoute
@@ -38,9 +39,9 @@ fun NozzleNavGraph(
         }
     }
     val onNavigateToThread = remember {
-        { postId: String ->
+        { postIds: PostIds ->
             run {
-                vmContainer.threadViewModel.onOpenThread(postId)
+                vmContainer.threadViewModel.onOpenThread(postIds)
                 navActions.navigateToThread()
             }
         }

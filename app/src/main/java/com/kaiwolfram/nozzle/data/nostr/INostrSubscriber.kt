@@ -2,13 +2,24 @@ package com.kaiwolfram.nozzle.data.nostr
 
 interface INostrSubscriber {
     fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String>
+
     fun subscribeToFeed(contactPubkeys: List<String>, since: Long? = null): List<String>
-    fun subscribeToAdditionalFeedData(
+
+    fun subscribeToAdditionalPostsData(
         postIds: List<String>,
         involvedPubkeys: List<String>,
         referencedPostIds: List<String>
     ): List<String>
 
+    fun subscribeToThread(
+        currentPostId: String,
+        replyToId: String? = null,
+        replyToRootId: String? = null
+    ): List<String>
+
     fun unsubscribeFeeds()
-    fun unsubscribeAdditionalFeedData()
+
+    fun unsubscribeAdditionalPostsData()
+
+    fun unsubscribeToThread()
 }

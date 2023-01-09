@@ -17,4 +17,8 @@ data class PostWithMeta(
     val numOfReposts: Int,
     val numOfReplies: Int,
     val repost: RepostPreview?,
-)
+) {
+    fun toPostIds(): PostIds {
+        return PostIds(id = id, replyToId = replyToId, replyToRootId = replyToRootId)
+    }
+}

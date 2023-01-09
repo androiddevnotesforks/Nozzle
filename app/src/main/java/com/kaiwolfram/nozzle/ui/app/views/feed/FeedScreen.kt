@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.AddIcon
 import com.kaiwolfram.nozzle.ui.components.NoPostsHint
@@ -36,7 +37,7 @@ fun FeedScreen(
     onPrepareReply: (PostWithMeta) -> Unit,
     onPreparePost: () -> Unit,
     onOpenDrawer: () -> Unit,
-    onNavigateToThread: (String) -> Unit,
+    onNavigateToThread: (PostIds) -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToPost: () -> Unit,

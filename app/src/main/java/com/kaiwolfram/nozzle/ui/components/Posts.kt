@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.RepostPreview
 import com.kaiwolfram.nozzle.model.ThreadPosition
@@ -39,7 +40,7 @@ fun PostCardList(
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
-    onNavigateToThread: (String) -> Unit,
+    onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenProfile: ((String) -> Unit)? = null,
@@ -72,7 +73,7 @@ fun PostCard(
     onRepost: (String) -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
     modifier: Modifier = Modifier,
-    onNavigateToThread: (String) -> Unit,
+    onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     isCurrent: Boolean = false,
     threadPosition: ThreadPosition = ThreadPosition.SINGLE,
@@ -84,7 +85,7 @@ fun PostCard(
     val small = spacing.small
     Row(
         modifier
-            .clickable(enabled = !isCurrent) { onNavigateToThread(post.id) }
+            .clickable(enabled = !isCurrent) { onNavigateToThread(post.toPostIds()) }
             .fillMaxWidth()
             .drawBehind {
                 when (threadPosition) {
@@ -179,7 +180,7 @@ private fun PostCardProfileNameAndContent(
 private fun RepostCardContent(
     post: RepostPreview?,
     onOpenProfile: ((String) -> Unit)?,
-    onNavigateToThread: ((String) -> Unit)?,
+    onNavigateToThread: (PostIds) -> Unit,
 ) {
     post?.let {
         Column(
@@ -190,10 +191,8 @@ private fun RepostCardContent(
                     color = LightGray21,
                     shape = RoundedCornerShape(spacing.large)
                 )
-                .clickable(enabled = onNavigateToThread != null) {
-                    if (onNavigateToThread != null) {
-                        onNavigateToThread(it.id)
-                    }
+                .clickable {
+                    onNavigateToThread(it.toPostIds())
                 }
         ) {
             Column(modifier = Modifier.padding(spacing.large)) {

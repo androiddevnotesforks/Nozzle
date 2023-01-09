@@ -57,12 +57,14 @@ class FeedViewModel(
     init {
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelScope.launch(context = IO) {
+            setRefresh(true)
             renewSubscriptions()
             viewModelState.update {
                 it.copy(pubkey = personalProfileProvider.getPubkey())
             }
             delay(1000)
             setFeed()
+            setRefresh(false)
         }
     }
 
@@ -80,11 +82,6 @@ class FeedViewModel(
 
     val onResetProfileIconUiState: () -> Unit = {
         Log.i(TAG, "Reset profile icon")
-
-        viewModelScope.launch(context = IO) {
-            renewSubscriptions()
-            setFeed()
-        }
         metadataState = personalProfileProvider.getMetadata()
             .stateIn(
                 viewModelScope,
@@ -156,9 +153,9 @@ class FeedViewModel(
     private suspend fun subscribeToAdditionalFeedData() {
         Log.i(TAG, "Subscribe to additional feed data")
         val posts = feedProvider.getFeed()
-        nostrSubscriber.unsubscribeAdditionalFeedData()
+        nostrSubscriber.unsubscribeAdditionalPostsData()
 
-        nostrSubscriber.subscribeToAdditionalFeedData(
+        nostrSubscriber.subscribeToAdditionalPostsData(
             postIds = listPostIds(posts),
             involvedPubkeys = listInvolvedPubkeys(posts),
             referencedPostIds = listReferencedPostIds(posts)

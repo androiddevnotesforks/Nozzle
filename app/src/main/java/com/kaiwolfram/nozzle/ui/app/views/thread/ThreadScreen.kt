@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.components.PostCard
@@ -33,14 +34,14 @@ fun ThreadScreen(
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onRefreshThreadView: () -> Unit,
-    onOpenThread: (String) -> Unit,
+    onOpenThread: (PostIds) -> Unit,
     onGoBack: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToReply: () -> Unit,
 ) {
     Column {
         ReturnableTopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
-        Column {
+        Column(modifier = Modifier.fillMaxSize()) {
             uiState.current?.let {
                 ThreadedPosts(
                     previous = uiState.previous,
@@ -73,7 +74,7 @@ private fun ThreadedPosts(
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onNavigateToProfile: (String) -> Unit,
-    onOpenThread: (String) -> Unit,
+    onOpenThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
 ) {
     SwipeRefresh(
