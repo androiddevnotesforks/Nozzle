@@ -42,22 +42,20 @@ fun ThreadScreen(
     Column {
         ReturnableTopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
         Column(modifier = Modifier.fillMaxSize()) {
-            uiState.current?.let {
-                ThreadedPosts(
-                    previous = uiState.previous,
-                    current = it,
-                    replies = uiState.replies,
-                    currentThreadPosition = uiState.currentThreadPosition,
-                    isRefreshing = uiState.isRefreshing,
-                    onPrepareReply = onPrepareReply,
-                    onRefresh = onRefreshThreadView,
-                    onLike = onLike,
-                    onRepost = onRepost,
-                    onOpenThread = onOpenThread,
-                    onNavigateToProfile = onNavigateToProfile,
-                    onNavigateToReply = onNavigateToReply,
-                )
-            }
+            ThreadedPosts(
+                previous = uiState.previous,
+                current = uiState.current,
+                replies = uiState.replies,
+                currentThreadPosition = uiState.currentThreadPosition,
+                isRefreshing = uiState.isRefreshing,
+                onPrepareReply = onPrepareReply,
+                onRefresh = onRefreshThreadView,
+                onLike = onLike,
+                onRepost = onRepost,
+                onOpenThread = onOpenThread,
+                onNavigateToProfile = onNavigateToProfile,
+                onNavigateToReply = onNavigateToReply,
+            )
         }
     }
 }
@@ -65,7 +63,7 @@ fun ThreadScreen(
 @Composable
 private fun ThreadedPosts(
     previous: List<PostWithMeta>,
-    current: PostWithMeta,
+    current: PostWithMeta?,
     replies: List<PostWithMeta>,
     currentThreadPosition: ThreadPosition,
     isRefreshing: Boolean,
@@ -86,53 +84,55 @@ private fun ThreadedPosts(
             lazyListState.scrollToItem(previous.size)
         }
         LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
-            itemsIndexed(previous) { index, post ->
-                var threadPosition = ThreadPosition.MIDDLE
-                if (index == 0) {
-                    if (post.replyToId != null) {
-                        PostNotFound()
-                    } else {
-                        threadPosition = ThreadPosition.START
+            current?.let {
+                itemsIndexed(previous) { index, post ->
+                    var threadPosition = ThreadPosition.MIDDLE
+                    if (index == 0) {
+                        if (post.replyToId != null) {
+                            PostNotFound()
+                        } else {
+                            threadPosition = ThreadPosition.START
+                        }
                     }
+                    PostCard(
+                        post = post,
+                        onLike = onLike,
+                        onRepost = onRepost,
+                        onPrepareReply = onPrepareReply,
+                        threadPosition = threadPosition,
+                        onOpenProfile = onNavigateToProfile,
+                        onNavigateToThread = onOpenThread,
+                        onNavigateToReply = onNavigateToReply
+                    )
                 }
-                PostCard(
-                    post = post,
-                    onLike = onLike,
-                    onRepost = onRepost,
-                    onPrepareReply = onPrepareReply,
-                    threadPosition = threadPosition,
-                    onOpenProfile = onNavigateToProfile,
-                    onNavigateToThread = onOpenThread,
-                    onNavigateToReply = onNavigateToReply
-                )
-            }
-            item {
-                PostCard(
-                    post = current,
-                    isCurrent = true,
-                    onLike = onLike,
-                    onRepost = onRepost,
-                    onPrepareReply = onPrepareReply,
-                    modifier = Modifier.background(color = LightYellow),
-                    threadPosition = currentThreadPosition,
-                    onOpenProfile = onNavigateToProfile,
-                    onNavigateToReply = onNavigateToReply,
-                    onNavigateToThread = onOpenThread,
-                )
-                Divider()
-                Spacer(modifier = Modifier.height(spacing.tiny))
-                Divider()
-            }
-            items(replies) { post ->
-                PostCard(
-                    post = post,
-                    onLike = onLike,
-                    onRepost = onRepost,
-                    onPrepareReply = onPrepareReply,
-                    onOpenProfile = onNavigateToProfile,
-                    onNavigateToThread = onOpenThread,
-                    onNavigateToReply = onNavigateToReply
-                )
+                item {
+                    PostCard(
+                        post = it,
+                        isCurrent = true,
+                        onLike = onLike,
+                        onRepost = onRepost,
+                        onPrepareReply = onPrepareReply,
+                        modifier = Modifier.background(color = LightYellow),
+                        threadPosition = currentThreadPosition,
+                        onOpenProfile = onNavigateToProfile,
+                        onNavigateToReply = onNavigateToReply,
+                        onNavigateToThread = onOpenThread,
+                    )
+                    Divider()
+                    Spacer(modifier = Modifier.height(spacing.tiny))
+                    Divider()
+                }
+                items(replies) { post ->
+                    PostCard(
+                        post = post,
+                        onLike = onLike,
+                        onRepost = onRepost,
+                        onPrepareReply = onPrepareReply,
+                        onOpenProfile = onNavigateToProfile,
+                        onNavigateToThread = onOpenThread,
+                        onNavigateToReply = onNavigateToReply
+                    )
+                }
             }
         }
     }
