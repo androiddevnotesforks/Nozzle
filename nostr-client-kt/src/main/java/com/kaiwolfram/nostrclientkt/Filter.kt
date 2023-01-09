@@ -48,6 +48,28 @@ class Filter(
             )
         }
 
+        fun createReplyFilter(
+            e: List<String>,
+            pubkeys: List<String>? = null,
+        ): Filter {
+            return Filter(
+                authors = pubkeys,
+                kinds = listOf(Event.Kind.TEXT_NOTE),
+                e = e,
+            )
+        }
+
+        fun createReactionFilter(
+            e: List<String>,
+            pubkeys: List<String>? = null,
+        ): Filter {
+            return Filter(
+                authors = pubkeys,
+                kinds = listOf(Event.Kind.REACTION),
+                e = e,
+            )
+        }
+
         fun createContactListFilter(
             pubkey: String,
             since: Long? = null,

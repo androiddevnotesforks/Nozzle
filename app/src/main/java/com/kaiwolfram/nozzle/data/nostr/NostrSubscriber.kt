@@ -36,8 +36,9 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
     }
 
     override fun subscribeToAdditionalFeedData(
-        involvedPubkeys: Set<String>,
-        referencedPostIds: Set<String>
+        postIds: List<String>,
+        involvedPubkeys: List<String>,
+        referencedPostIds: List<String>
     ): List<String> {
         Log.i(
             TAG,
@@ -46,11 +47,13 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         )
         if (involvedPubkeys.isEmpty() && referencedPostIds.isEmpty()) return listOf()
 
-        val profileFilter = Filter.createProfileFilter(pubkeys = involvedPubkeys.toList())
-        val postFilter = Filter.createPostFilter(ids = referencedPostIds.toList())
+        val reactionFilter = Filter.createReactionFilter(e = postIds)
+        val replyFilter = Filter.createReplyFilter(e = postIds)
+        val profileFilter = Filter.createProfileFilter(pubkeys = involvedPubkeys)
+        val postFilter = Filter.createPostFilter(ids = referencedPostIds)
 
         val ids = nostrService.subscribe(
-            filters = listOf(profileFilter, postFilter),
+            filters = listOf(profileFilter, postFilter, reactionFilter, replyFilter),
             unsubOnEOSE = true
         )
         additionalFeedDataSubscriptions.addAll(ids)

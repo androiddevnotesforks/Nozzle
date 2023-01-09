@@ -9,10 +9,7 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
-import com.kaiwolfram.nozzle.data.utils.listInvolvedPubkeys
-import com.kaiwolfram.nozzle.data.utils.listReferencedPostIds
-import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
-import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
+import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
@@ -64,6 +61,7 @@ class FeedViewModel(
             viewModelState.update {
                 it.copy(pubkey = personalProfileProvider.getPubkey())
             }
+            delay(1000)
             setFeed()
         }
     }
@@ -73,8 +71,8 @@ class FeedViewModel(
             viewModelScope.launch(context = IO) {
                 Log.i(TAG, "Refresh feed view")
                 setRefresh(true)
-                renewSubscriptions()
                 setFeed()
+                renewSubscriptions()
                 setRefresh(false)
             }
         }
@@ -138,7 +136,6 @@ class FeedViewModel(
         subscribeToFeed()
         delay(1000)
         subscribeToAdditionalFeedData()
-        delay(1000)
     }
 
     private suspend fun subscribeToFeed() {
@@ -162,6 +159,7 @@ class FeedViewModel(
         nostrSubscriber.unsubscribeAdditionalFeedData()
 
         nostrSubscriber.subscribeToAdditionalFeedData(
+            postIds = listPostIds(posts),
             involvedPubkeys = listInvolvedPubkeys(posts),
             referencedPostIds = listReferencedPostIds(posts)
         )

@@ -184,6 +184,10 @@ class Event(
         return astralCompliant?.get(1)
     }
 
+    fun getReactedToId(): String? {
+        return tags.find { it.getOrNull(0) == "e" }?.getOrNull(1)
+    }
+
     fun isReaction() = this.kind == Kind.REACTION
     fun isPost() = this.kind == Kind.TEXT_NOTE
     fun isProfileMetadata() = this.kind == Kind.METADATA

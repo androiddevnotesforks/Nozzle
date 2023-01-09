@@ -4,8 +4,9 @@ interface INostrSubscriber {
     fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String>
     fun subscribeToFeed(contactPubkeys: List<String>, since: Long? = null): List<String>
     fun subscribeToAdditionalFeedData(
-        involvedPubkeys: Set<String>,
-        referencedPostIds: Set<String>
+        postIds: List<String>,
+        involvedPubkeys: List<String>,
+        referencedPostIds: List<String>
     ): List<String>
 
     fun unsubscribeFeeds()

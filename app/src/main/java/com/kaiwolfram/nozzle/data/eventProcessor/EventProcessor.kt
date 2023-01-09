@@ -27,7 +27,6 @@ class EventProcessor(
     private val scope = CoroutineScope(Dispatchers.IO)
     private val gson = Gson()
     override fun process(event: Event) {
-        Log.i(TAG, "Process kind ${event.kind} event ${event.id}")
         if (event.isPost()) {
             processPost(event)
             return
@@ -67,15 +66,16 @@ class EventProcessor(
     }
 
     private fun processReaction(event: Event) {
-        if (event.content != "+") {
-            Log.w(TAG, "Reaction event is not a like, content ${event.content}")
-            return
-        }
+        Log.i(TAG, "Process reaction")
+        if (event.content != "+") return
+
         if (!verify(event)) {
             return
         }
-        scope.launch {
-            reactionDao.like(eventId = event.id, pubkey = event.pubkey)
+        event.getReactedToId()?.let {
+            scope.launch {
+                reactionDao.like(eventId = it, pubkey = event.pubkey)
+            }
         }
     }
 
