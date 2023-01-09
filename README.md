@@ -18,6 +18,7 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 - [x] Repost and like posts
 - [ ] Open whole threads
 - [ ] Reply and post
+- [ ] Search bar
 - [ ] nip05 verification
 - [ ] Mentions
 - [ ] Hashtags
@@ -25,6 +26,7 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 - [ ] Lightning invoice widget
 - [ ] Notifications tab
 - [ ] Relay management
+- [ ] Multiple accounts
 - [ ] Mute users
 - [ ] Different feed settings
 - [ ] Encrypted direct messages
