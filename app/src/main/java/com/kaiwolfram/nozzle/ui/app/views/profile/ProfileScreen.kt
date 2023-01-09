@@ -64,6 +64,7 @@ fun ProfileScreen(
             onLike = onLike,
             onRepost = onRepost,
             onPrepareReply = onPrepareReply,
+            onLoadMore = {},
             onNavigateToThread = onNavigateToThread,
             onNavigateToReply = onNavigateToReply
         )

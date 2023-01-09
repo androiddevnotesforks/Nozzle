@@ -15,9 +15,13 @@ class FeedProvider(
     private val postDao: PostDao,
 ) : IFeedProvider {
 
-    override suspend fun getFeed(): List<PostWithMeta> {
+    override suspend fun getFeed(limit: Int, until: Long?): List<PostWithMeta> {
         Log.i(TAG, "Get feed")
-        val posts = postDao.getLatestFeed(pubkey = pubkeyProvider.getPubkey())
+        val posts = postDao.getLatestFeed(
+            pubkey = pubkeyProvider.getPubkey(),
+            limit = limit,
+            until = until
+        )
 
         return postMapper.mapToPostsWithMeta(posts)
     }

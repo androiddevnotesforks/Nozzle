@@ -15,10 +15,11 @@ interface PostDao {
         "SELECT * " +
                 "FROM post " +
                 "WHERE pubkey IN (SELECT contactPubkey FROM contact WHERE pubkey = :pubkey) " +
+                "AND (:until IS NULL OR createdAt < :until) " +
                 "ORDER BY createdAt DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getLatestFeed(pubkey: String, limit: Int = 250): List<PostEntity>
+    suspend fun getLatestFeed(pubkey: String, limit: Int, until: Long?): List<PostEntity>
 
     /**
      * Sorted from newest to oldest

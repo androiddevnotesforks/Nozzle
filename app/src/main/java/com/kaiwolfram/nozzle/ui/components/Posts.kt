@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.shapes
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +41,7 @@ fun PostCardList(
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
+    onLoadMore: () -> Unit,
     onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,6 +63,11 @@ fun PostCardList(
                     onNavigateToThread = onNavigateToThread,
                     onNavigateToReply = onNavigateToReply,
                 )
+            }
+            item {
+                LaunchedEffect(true) {
+                    onLoadMore()
+                }
             }
         }
     }

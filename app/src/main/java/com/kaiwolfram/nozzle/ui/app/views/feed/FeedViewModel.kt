@@ -39,6 +39,7 @@ class FeedViewModel(
     private val contactDao: ContactDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
+    private val batchSize = 50
 
     var metadataState = personalProfileProvider.getMetadata()
         .stateIn(
@@ -69,14 +70,19 @@ class FeedViewModel(
     }
 
     val onRefreshFeedView: () -> Unit = {
-        execWhenNoActiveRefresh {
-            viewModelScope.launch(context = IO) {
-                Log.i(TAG, "Refresh feed view")
-                setRefresh(true)
-                setFeed()
-                renewSubscriptions()
-                setRefresh(false)
-            }
+        viewModelScope.launch(context = IO) {
+            Log.i(TAG, "Refresh feed view")
+            setRefresh(true)
+            setFeed()
+            renewSubscriptions()
+            setRefresh(false)
+        }
+    }
+
+    val onLoadMore: () -> Unit = {
+        viewModelScope.launch(context = IO) {
+            Log.i(TAG, "Load more")
+            appendFeed()
         }
     }
 
@@ -132,29 +138,28 @@ class FeedViewModel(
     private suspend fun renewSubscriptions() {
         subscribeToFeed()
         delay(1000)
-        subscribeToAdditionalFeedData()
+        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = batchSize))
     }
 
-    private suspend fun subscribeToFeed() {
+    private suspend fun subscribeToFeed(until: Long? = null) {
         Log.i(TAG, "Subscribe to feed")
+        nostrSubscriber.unsubscribeFeeds()
         val pubkeys = mutableListOf(personalProfileProvider.getPubkey())
         pubkeys.addAll(
             contactDao.listContactPubkeys(
                 pubkey = personalProfileProvider.getPubkey()
             )
         )
-        nostrSubscriber.unsubscribeFeeds()
         nostrSubscriber.subscribeToFeed(
             contactPubkeys = pubkeys,
-            since = null
+            until = until,
+            limit = 100
         )
     }
 
-    private suspend fun subscribeToAdditionalFeedData() {
+    private fun subscribeToAdditionalFeedData(posts: List<PostWithMeta>) {
         Log.i(TAG, "Subscribe to additional feed data")
-        val posts = feedProvider.getFeed()
         nostrSubscriber.unsubscribeAdditionalPostsData()
-
         nostrSubscriber.subscribeToAdditionalPostsData(
             postIds = listPostIds(posts),
             involvedPubkeys = listInvolvedPubkeys(posts),
@@ -165,15 +170,30 @@ class FeedViewModel(
     private suspend fun setFeed() {
         Log.i(TAG, "Set feed")
         viewModelState.update {
-            it.copy(posts = feedProvider.getFeed())
+            it.copy(posts = feedProvider.getFeed(limit = batchSize))
         }
     }
 
-    private fun execWhenNoActiveRefresh(exec: () -> Unit) {
-        if (uiState.value.isRefreshing) {
-            Log.i(TAG, "Blocked by active refresh process")
-        } else {
-            exec()
+    private suspend fun appendFeed() {
+        Log.i(TAG, "Append feed")
+
+        viewModelState.value.let { state ->
+            state.posts.lastOrNull()?.let { last ->
+                subscribeToFeed(until = last.createdAt)
+                subscribeToAdditionalFeedData(
+                    feedProvider.getFeed(
+                        limit = batchSize,
+                        until = last.createdAt
+                    )
+                )
+                delay(1000)
+                val allPosts = mutableListOf<PostWithMeta>()
+                allPosts.addAll(state.posts)
+                allPosts.addAll(feedProvider.getFeed(limit = batchSize, until = last.createdAt))
+                viewModelState.update {
+                    it.copy(posts = allPosts)
+                }
+            }
         }
     }
 

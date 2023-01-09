@@ -21,12 +21,15 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         )
     }
 
-    override fun subscribeToFeed(contactPubkeys: List<String>, since: Long?): List<String> {
+    override fun subscribeToFeed(
+        contactPubkeys: List<String>,
+        until: Long?,
+        limit: Int
+    ): List<String> {
         Log.i(TAG, "Subscribe to feed of ${contactPubkeys.size} contacts")
-        val limit = if (since == null) 250 else null
         val postFilter = Filter.createPostFilter(
             pubkeys = contactPubkeys,
-            since = since,
+            until = until,
             limit = limit
         )
 
