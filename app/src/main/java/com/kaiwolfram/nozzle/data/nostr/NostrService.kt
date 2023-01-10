@@ -16,10 +16,12 @@ class NostrService(
     private val keys: Keys = keyManager.getKeys()
     private val client = Client()
     private val relays = listOf(
+        "wss://relay.damus.io",
+        "wss://nostr.oxtr.dev",
+        "wss://nostr-relay.wlvs.space",
+        "wss://nostr-2.zebedee.cloud",
         "wss://nostr.fmt.wiz.biz",
         "wss://nostr.einundzwanzig.space",
-        "wss://nostr-pub.wellorder.net",
-        "wss://relay.damus.io",
     )
     private val unsubOnEOSECache = mutableSetOf<String>()
     private val listener = object : NostrListener {

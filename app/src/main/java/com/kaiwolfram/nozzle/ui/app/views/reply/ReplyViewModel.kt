@@ -84,16 +84,18 @@ class ReplyViewModel(
                 Log.i(TAG, "Reply is not sendable")
                 Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
-                Log.i(TAG, "Send reply to ${state.recipientName} ${state.pubkey}")
-                val replyTo = ReplyTo(
-                    replyToRoot = postToReplyTo?.replyToRootId,
-                    replyTo = postToReplyTo?.replyToId.orEmpty(),
-                    relayUrl = "",
-                )
-                nostrService.sendReply(
-                    replyTo = replyTo,
-                    content = state.reply
-                )
+                postToReplyTo?.let {
+                    Log.i(TAG, "Send reply to ${state.recipientName} ${state.pubkey}")
+                    val replyTo = ReplyTo(
+                        replyToRoot = it.replyToRootId,
+                        replyTo = it.id,
+                        relayUrl = "",
+                    )
+                    nostrService.sendReply(
+                        replyTo = replyTo,
+                        content = state.reply
+                    )
+                }
                 reset()
             }
         }
