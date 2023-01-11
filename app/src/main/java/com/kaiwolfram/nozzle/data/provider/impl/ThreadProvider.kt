@@ -4,15 +4,20 @@ import com.kaiwolfram.nozzle.data.mapper.IPostMapper
 import com.kaiwolfram.nozzle.data.provider.IThreadProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
+import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostThread
 
 class ThreadProvider(
     private val postMapper: IPostMapper,
     private val postDao: PostDao,
 ) : IThreadProvider {
-    override suspend fun getThread(currentEventId: String): PostThread {
-        val wholeThread = postDao.getWholeThread(currentEventId)
-        val current = wholeThread.find { it.id == currentEventId }
+    override suspend fun getThread(ids: PostIds): PostThread {
+        val wholeThread = postDao.getWholeThread(
+            currentPostId = ids.id,
+            replyToRootId = ids.replyToRootId,
+            replyToId = ids.replyToId,
+        )
+        val current = wholeThread.find { it.id == ids.id }
             ?: return PostThread.createEmpty()
         val previous = getPrevious(wholeThread, current)
         val replies = wholeThread.filter { it.replyToId == current.id }

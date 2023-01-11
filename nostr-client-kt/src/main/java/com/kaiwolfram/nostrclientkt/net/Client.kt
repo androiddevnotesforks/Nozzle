@@ -99,7 +99,7 @@ class Client {
         urls.forEach { addRelay(it) }
     }
 
-    fun addRelay(url: String) {
+    private fun addRelay(url: String) {
         Log.i(TAG, "Add relay $url")
 
         if (sockets.containsKey(url)) {

@@ -55,10 +55,10 @@ class ThreadViewModel(
         currentPostIds = postIds
         setEmptyThread()
         viewModelScope.launch(context = Dispatchers.IO) {
-            setThread(threadProvider.getThread(postIds.id))
+            setThread(threadProvider.getThread(postIds))
             renewThreadSubscription()
             delay(1000)
-            val thread = threadProvider.getThread(postIds.id)
+            val thread = threadProvider.getThread(postIds)
             setThread(thread)
             setThreadWithNewData(thread)
             updateCurrentPostIds(thread)
@@ -71,11 +71,11 @@ class ThreadViewModel(
             setRefresh(true)
             renewThreadSubscription()
             delay(1000)
-            val thread = threadProvider.getThread(currentPostIds.id)
+            val thread = threadProvider.getThread(currentPostIds)
             renewAdditionalDataSubscription(thread)
             updateCurrentPostIds(thread)
             delay(1000)
-            setThread(threadProvider.getThread(currentPostIds.id))
+            setThread(threadProvider.getThread(currentPostIds))
             setRefresh(false)
         }
     }
@@ -208,7 +208,17 @@ class ThreadViewModel(
     private suspend fun setThreadWithNewData(thread: PostThread) {
         renewAdditionalDataSubscription(thread)
         delay(1000)
-        thread.current?.let { setThread(threadProvider.getThread(it.id)) }
+        thread.current?.let {
+            setThread(
+                threadProvider.getThread(
+                    PostIds(
+                        id = it.id,
+                        replyToRootId = it.replyToRootId,
+                        replyToId = it.replyToId
+                    )
+                )
+            )
+        }
     }
 
     private fun getThreadPosition(previous: List<PostWithMeta>): ThreadPosition {

@@ -49,10 +49,17 @@ interface PostDao {
     @Query(
         "SELECT * " +
                 "FROM post " +
-                "WHERE replyToRootId = (SELECT replyToRootId FROM post WHERE id = :currentPostId) " +
-                "AND replyToRootId IS NOT NULL"
+                "WHERE (:replyToRootId IS NOT NULL AND replyToRootId = :replyToRootId) " + // All
+                "OR id = :currentPostId " + // Current post
+                "OR (:replyToId IS NOT NULL AND id = :replyToId) " + // Direct parent
+                "OR replyToId = :currentPostId " + // All replies to current post
+                "OR (:replyToRootId IS NOT NULL AND id = :replyToRootId)" // Root post
     )
-    suspend fun getWholeThread(currentPostId: String): List<PostEntity>
+    suspend fun getWholeThread(
+        currentPostId: String,
+        replyToRootId: String?,
+        replyToId: String?
+    ): List<PostEntity>
 
     @MapInfo(keyColumn = "id")
     @Query(

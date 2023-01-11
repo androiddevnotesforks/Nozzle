@@ -74,7 +74,6 @@ class PostViewModel(
         uiState.value.let { state ->
             if (!state.isSendable) {
                 Log.i(TAG, "Post is not sendable")
-
                 Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
                 Log.i(TAG, "Send post")
