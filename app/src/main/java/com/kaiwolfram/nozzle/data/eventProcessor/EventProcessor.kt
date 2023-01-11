@@ -66,7 +66,6 @@ class EventProcessor(
     }
 
     private fun processReaction(event: Event) {
-        Log.i(TAG, "Process reaction")
         if (event.content != "+") return
 
         if (!verify(event)) {
@@ -122,7 +121,7 @@ class EventProcessor(
     private fun verify(event: Event): Boolean {
         val isValid = event.verify()
         if (!isValid) {
-            Log.w(TAG, "Invalid event ${event.id}")
+            Log.d(TAG, "Invalid event ${event.id} kind ${event.kind}")
         }
         return isValid
     }

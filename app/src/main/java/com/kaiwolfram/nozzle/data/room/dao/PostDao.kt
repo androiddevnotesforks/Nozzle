@@ -50,9 +50,9 @@ interface PostDao {
         "SELECT * " +
                 "FROM post " +
                 "WHERE (:replyToRootId IS NOT NULL AND replyToRootId = :replyToRootId) " + // All
+                "OR replyToId = :currentPostId " + // All replies to current post
                 "OR id = :currentPostId " + // Current post
                 "OR (:replyToId IS NOT NULL AND id = :replyToId) " + // Direct parent
-                "OR replyToId = :currentPostId " + // All replies to current post
                 "OR (:replyToRootId IS NOT NULL AND id = :replyToRootId)" // Root post
     )
     suspend fun getWholeThread(

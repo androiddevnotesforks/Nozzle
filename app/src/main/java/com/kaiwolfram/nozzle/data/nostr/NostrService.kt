@@ -19,27 +19,26 @@ class NostrService(
         "wss://relay.damus.io",
         "wss://nostr.oxtr.dev",
         "wss://nostr-relay.wlvs.space",
-        "wss://nostr-2.zebedee.cloud",
         "wss://nostr.fmt.wiz.biz",
         "wss://nostr.einundzwanzig.space",
     )
     private val unsubOnEOSECache = mutableSetOf<String>()
     private val listener = object : NostrListener {
         override fun onOpen(msg: String) {
-            Log.i(TAG, "Relay is ready: $msg")
+            Log.i(TAG, "OnOpen: $msg")
         }
 
         override fun onEvent(subscriptionId: String, event: Event) {
-            Log.i(TAG, "Received event ${event.id} in subscription $subscriptionId")
+            Log.d(TAG, "OnEvent: id ${event.id} in subscription $subscriptionId")
             eventProcessor.process(event)
         }
 
-        override fun onError(msg: String) {
-            Log.i(TAG, "Relay error: $msg")
+        override fun onError(msg: String, throwable: Throwable?) {
+            Log.w(TAG, "OnError: $msg", throwable)
         }
 
         override fun onEOSE(subscriptionId: String) {
-            Log.i(TAG, "EOSE on subscription $subscriptionId")
+            Log.i(TAG, "OnEOSE: $subscriptionId")
             if (unsubOnEOSECache.remove(subscriptionId)) {
                 Log.i(TAG, "Unsubscribe onEOSE $subscriptionId")
                 client.unsubscribe(subscriptionId)
@@ -47,11 +46,11 @@ class NostrService(
         }
 
         override fun onClose(reason: String) {
-            Log.i(TAG, "Closed relay connection: $reason")
+            Log.i(TAG, "OnClose: $reason")
         }
 
-        override fun onFailure(msg: String?) {
-            Log.i(TAG, "Relay failure error: $msg")
+        override fun onFailure(msg: String?, throwable: Throwable?) {
+            Log.w(TAG, "OnFailure: $msg", throwable)
         }
 
     }

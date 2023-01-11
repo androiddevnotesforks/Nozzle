@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme.colors
@@ -52,7 +53,8 @@ fun PostCardList(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        val state = rememberLazyListState()
+        LazyColumn(modifier = Modifier.fillMaxSize(), state = state) {
             items(posts) { post ->
                 PostCard(
                     post = post,
@@ -66,7 +68,9 @@ fun PostCardList(
             }
             item {
                 LaunchedEffect(true) {
-                    onLoadMore()
+                    if (state.firstVisibleItemIndex > 0 && state.isScrollInProgress) {
+                        onLoadMore()
+                    }
                 }
             }
         }

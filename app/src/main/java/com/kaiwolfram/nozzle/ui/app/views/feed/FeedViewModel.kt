@@ -153,7 +153,7 @@ class FeedViewModel(
         nostrSubscriber.subscribeToFeed(
             contactPubkeys = pubkeys,
             until = until,
-            limit = 100
+            limit = batchSize,
         )
     }
 

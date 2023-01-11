@@ -17,12 +17,10 @@ class Client {
     private var nostrListener: NostrListener? = null
     private val baseListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            Log.i(TAG, "onOpen: $response")
             nostrListener?.onOpen(response.message)
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            Log.i(TAG, "onMessage: $text")
             try {
                 val msg = gson.fromJson(text, JsonElement::class.java).asJsonArray
                 val type = msg[0].asString
@@ -41,19 +39,17 @@ class Client {
 
                 }
             } catch (t: Throwable) {
-                nostrListener?.onError("Problem with $text, $t")
-                nostrListener?.onError("Queue size ${webSocket.queueSize()}")
+                nostrListener?.onError("Problem with $text", t)
+                nostrListener?.onError("Queue size ${webSocket.queueSize()}", t)
             }
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            Log.i(TAG, "onClosing: $reason, $code")
             nostrListener?.onClose(reason)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            Log.i(TAG, "onFailure: $t, $response")
-            nostrListener?.onFailure(t.message)
+            nostrListener?.onFailure(response?.message, t)
         }
     }
 
@@ -67,7 +63,7 @@ class Client {
             ids.add(subscriptionId)
             subscriptions[subscriptionId] = it
             val request = createSubscriptionRequest(subscriptionId, filters)
-            Log.i(TAG, "Send $request")
+            Log.i(TAG, "Subscribe $request")
             it.send(request)
         }
 
@@ -83,7 +79,7 @@ class Client {
     fun unsubscribe(subscriptionId: String) {
         Log.i(TAG, "Unsubscribe from $subscriptionId")
 
-        val request = """["CLOSE",$subscriptionId]"""
+        val request = """["CLOSE","$subscriptionId"]"""
         subscriptions[subscriptionId]?.send(request)
         subscriptions.remove(subscriptionId)
     }
@@ -110,7 +106,7 @@ class Client {
         sockets[url] = socket
     }
 
-    fun removeRelay(url: String) {
+    private fun removeRelay(url: String) {
         Log.i(TAG, "Remove relay $url")
         sockets[url]?.close(1000, "Normal closure")
         sockets.remove(url)
