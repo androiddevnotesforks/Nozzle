@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -46,6 +47,7 @@ fun PostCardList(
     onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
     onOpenProfile: ((String) -> Unit)? = null,
 ) {
     SwipeRefresh(
@@ -53,8 +55,7 @@ fun PostCardList(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
-        val state = rememberLazyListState()
-        LazyColumn(modifier = Modifier.fillMaxSize(), state = state) {
+        LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
             items(posts) { post ->
                 PostCard(
                     post = post,
@@ -68,7 +69,7 @@ fun PostCardList(
             }
             item {
                 LaunchedEffect(true) {
-                    if (state.firstVisibleItemIndex > 0 && state.isScrollInProgress) {
+                    if (lazyListState.firstVisibleItemIndex > 0 && lazyListState.isScrollInProgress) {
                         onLoadMore()
                     }
                 }

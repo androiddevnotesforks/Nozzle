@@ -16,8 +16,8 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 - [x] Show profiles
 - [x] Show feed
 - [x] Repost and like posts
-- [ ] Open whole threads
-- [ ] Reply and post
+- [x] Reply and post
+- [x] Open whole threads
 - [ ] Search bar
 - [ ] nip05 verification
 - [ ] Mentions
@@ -32,8 +32,6 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 - [ ] Encrypted direct messages
 
 ## Preview
-
-I update this Readme infrequently, so these screenshots might be outdated
 
 <p float="left">
 <img src="screenshots/feed.jpeg" width="30%" height="30%" />

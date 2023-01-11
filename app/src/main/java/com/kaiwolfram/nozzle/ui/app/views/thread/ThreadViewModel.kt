@@ -12,14 +12,11 @@ import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostThread
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 private const val TAG = "ThreadViewModel"
 
@@ -50,11 +47,13 @@ class ThreadViewModel(
         Log.i(TAG, "Initialize ThreadViewModel")
     }
 
+    private var job: Job? = null
     val onOpenThread: (PostIds) -> Unit = { postIds ->
         Log.i(TAG, "Open thread of post ${postIds.id}")
         currentPostIds = postIds
         setEmptyThread()
-        viewModelScope.launch(context = Dispatchers.IO) {
+        job?.let { if (it.isActive) it.cancel() }
+        job = viewModelScope.launch(context = Dispatchers.IO) {
             setThread(threadProvider.getThread(postIds))
             renewThreadSubscription()
             delay(1000)

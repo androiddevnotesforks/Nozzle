@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.ui.app.views.feed
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme.colors
@@ -10,6 +11,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +28,7 @@ import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.theme.White21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
+import kotlinx.coroutines.launch
 
 @Composable
 fun FeedScreen(
@@ -43,12 +46,15 @@ fun FeedScreen(
     onNavigateToReply: () -> Unit,
     onNavigateToPost: () -> Unit,
 ) {
+    val lazyListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             FeedTopBar(
                 picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
                 onPictureClick = onOpenDrawer,
+                onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } }
             )
         },
         floatingActionButton = {
@@ -66,6 +72,7 @@ fun FeedScreen(
             PostCardList(
                 posts = uiState.posts,
                 isRefreshing = uiState.isRefreshing,
+                lazyListState = lazyListState,
                 onLike = onLike,
                 onRepost = onRepost,
                 onPrepareReply = onPrepareReply,
@@ -86,7 +93,8 @@ fun FeedScreen(
 private fun FeedTopBar(
     picture: String,
     pubkey: String,
-    onPictureClick: () -> Unit
+    onPictureClick: () -> Unit,
+    onScrollToTop: () -> Unit
 ) {
     TopAppBar {
         Row(
@@ -107,6 +115,7 @@ private fun FeedTopBar(
                 )
             }
             Text(
+                modifier = Modifier.clickable { onScrollToTop() },
                 text = stringResource(id = R.string.app_name),
                 style = typography.h6,
                 color = colors.background
