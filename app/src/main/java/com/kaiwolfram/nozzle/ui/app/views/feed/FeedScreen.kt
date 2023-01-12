@@ -130,7 +130,7 @@ private fun FeedTopBar(
 
 @Composable
 private fun FeedFab(onPrepareNewPost: () -> Unit) {
-    FloatingActionButton(onClick = { onPrepareNewPost() }) {
+    FloatingActionButton(onClick = { onPrepareNewPost() }, contentColor = colors.surface) {
         AddIcon()
     }
 }

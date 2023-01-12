@@ -12,9 +12,12 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 ## Preview
 
 <p float="left">
-<img src="screenshots/feed.jpeg" width="30%" height="30%" />
-<img src="screenshots/thread.jpeg" width="30%" height="30%" />
-<img src="screenshots/profile.jpeg" width="30%" height="30%" />
+<img src="screenshots/feed.png" width="24%" height="24%" />
+<img src="screenshots/thread.png" width="24%" height="24%" />
+<img src="screenshots/friend_profile.png" width="24%" height="24%" />
+<img src="screenshots/profile.png" width="24%" height="24%" />
+<img src="screenshots/keys.png" width="24%" height="24%" />
+<img src="screenshots/drawer.png" width="24%" height="24%" />
 </p>
 
 ## Features
