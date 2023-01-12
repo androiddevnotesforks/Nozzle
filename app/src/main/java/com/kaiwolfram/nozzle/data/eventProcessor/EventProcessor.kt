@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.data.eventProcessor
 
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.kaiwolfram.nostrclientkt.Event
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nostrclientkt.Tag
@@ -25,7 +26,7 @@ class EventProcessor(
     private val postDao: PostDao,
 ) : IEventProcessor {
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val gson = Gson()
+    private val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
     override fun process(event: Event) {
         if (event.isPost()) {
             processPost(event)
