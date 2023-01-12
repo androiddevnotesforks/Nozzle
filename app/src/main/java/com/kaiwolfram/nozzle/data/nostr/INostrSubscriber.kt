@@ -7,7 +7,7 @@ interface INostrSubscriber {
 
     fun subscribeToAdditionalPostsData(
         postIds: List<String>,
-        involvedPubkeys: List<String>,
+        referencedPubkeys: List<String>,
         referencedPostIds: List<String>
     ): List<String>
 
@@ -17,9 +17,13 @@ interface INostrSubscriber {
         replyToRootId: String? = null
     ): List<String>
 
+    fun subscribeToProfiles(pubkeys: List<String>): List<String>
+
     fun unsubscribeFeeds()
 
     fun unsubscribeAdditionalPostsData()
 
-    fun unsubscribeToThread()
+    fun unsubscribeThread()
+
+    fun unsubscribeProfiles()
 }

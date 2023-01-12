@@ -26,10 +26,6 @@ class FeedProvider(
         return postMapper.mapToPostsWithMeta(posts)
     }
 
-    override suspend fun getLatestTimestamp(): Long? {
-        return postDao.getLatestTimestampOfFeed(pubkey = pubkeyProvider.getPubkey())
-    }
-
     override suspend fun getFeedWithSingleAuthor(pubkey: String): List<PostWithMeta> {
         Log.i(TAG, "Get feed of author $pubkey")
         val posts = postDao.getLatestFeedOfCustomContacts(pubkey)

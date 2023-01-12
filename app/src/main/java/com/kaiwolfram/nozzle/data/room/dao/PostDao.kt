@@ -36,13 +36,6 @@ interface PostDao {
         limit: Int = 100
     ): List<PostEntity>
 
-    @Query(
-        "SELECT MAX(createdAt) " +
-                "FROM post " +
-                "WHERE pubkey IN (SELECT contactPubkey FROM contact WHERE pubkey = :pubkey) "
-    )
-    suspend fun getLatestTimestampOfFeed(pubkey: String): Long?
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIfNotPresent(vararg post: PostEntity)
 
@@ -61,6 +54,7 @@ interface PostDao {
         replyToId: String?
     ): List<PostEntity>
 
+    @RewriteQueriesToDropUnusedColumns
     @MapInfo(keyColumn = "id")
     @Query(
         "SELECT * " +
@@ -95,4 +89,11 @@ interface PostDao {
                 "AND repostedId IN (:postIds)"
     )
     suspend fun listRepostedByPubkey(pubkey: String, postIds: List<String>): List<String>
+
+    @Query(
+        "SELECT pubkey " +
+                "FROM post " +
+                "WHERE id IN (:postIds) "
+    )
+    suspend fun listAuthorPubkeys(postIds: List<String>): List<String>
 }

@@ -9,6 +9,7 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
+import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers.IO
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
 
@@ -36,10 +38,11 @@ class FeedViewModel(
     private val feedProvider: IFeedProvider,
     private val postCardInteractor: IPostCardInteractor,
     private val nostrSubscriber: INostrSubscriber,
+    private val postDao: PostDao,
     private val contactDao: ContactDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
-    private val batchSize = 50
+    private val batchSize = 25
 
     var metadataState = personalProfileProvider.getMetadata()
         .stateIn(
@@ -63,7 +66,6 @@ class FeedViewModel(
             viewModelState.update {
                 it.copy(pubkey = personalProfileProvider.getPubkey())
             }
-            delay(1000)
             setFeed()
             setRefresh(false)
         }
@@ -82,7 +84,7 @@ class FeedViewModel(
     val onLoadMore: () -> Unit = {
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Load more")
-            appendFeed()
+            fetchAndAppendFeed()
         }
     }
 
@@ -138,7 +140,9 @@ class FeedViewModel(
     private suspend fun renewSubscriptions() {
         subscribeToFeed()
         delay(1000)
-        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = batchSize))
+        val posts = feedProvider.getFeed(limit = batchSize)
+        subscribeToAdditionalFeedData(posts)
+        delay(2500)
     }
 
     private suspend fun subscribeToFeed(until: Long? = null) {
@@ -157,13 +161,17 @@ class FeedViewModel(
         )
     }
 
-    private fun subscribeToAdditionalFeedData(posts: List<PostWithMeta>) {
+    private suspend fun subscribeToAdditionalFeedData(posts: List<PostWithMeta>) {
         Log.i(TAG, "Subscribe to additional feed data")
+        val referencedPostIds = listReferencedPostIds(posts)
+        val referencedPubkeys = mutableListOf<String>()
+        referencedPubkeys.addAll(listReferencedPubkeys(posts))
+        referencedPubkeys.addAll(postDao.listAuthorPubkeys(referencedPostIds))
         nostrSubscriber.unsubscribeAdditionalPostsData()
         nostrSubscriber.subscribeToAdditionalPostsData(
             postIds = listPostIds(posts),
-            involvedPubkeys = listInvolvedPubkeys(posts),
-            referencedPostIds = listReferencedPostIds(posts)
+            referencedPubkeys = referencedPubkeys.distinct(),
+            referencedPostIds = referencedPostIds,
         )
     }
 
@@ -174,25 +182,38 @@ class FeedViewModel(
         }
     }
 
-    private suspend fun appendFeed() {
-        Log.i(TAG, "Append feed")
-
+    private suspend fun appendFeed(): List<PostWithMeta> {
         viewModelState.value.let { state ->
             state.posts.lastOrNull()?.let { last ->
-                subscribeToFeed(until = last.createdAt)
-                subscribeToAdditionalFeedData(
-                    feedProvider.getFeed(
-                        limit = batchSize,
-                        until = last.createdAt
-                    )
-                )
-                delay(1000)
                 val allPosts = mutableListOf<PostWithMeta>()
                 allPosts.addAll(state.posts)
-                allPosts.addAll(feedProvider.getFeed(limit = batchSize, until = last.createdAt))
+                val newPosts = feedProvider.getFeed(limit = batchSize, until = last.createdAt)
+                allPosts.addAll(newPosts)
                 viewModelState.update {
                     it.copy(posts = allPosts)
                 }
+                return newPosts
+            }
+        }
+        return listOf()
+    }
+
+    private val isAppending = AtomicBoolean(false)
+
+    private suspend fun fetchAndAppendFeed() {
+        if (isAppending.get()) return
+
+        Log.i(TAG, "Append feed")
+        viewModelState.value.let { state ->
+            state.posts.lastOrNull()?.let { last ->
+                isAppending.set(true)
+                subscribeToFeed(until = last.createdAt)
+                delay(1000)
+                val newPosts = appendFeed()
+                subscribeToAdditionalFeedData(newPosts)
+                delay(2500)
+                appendFeed()
+                isAppending.set(false)
             }
         }
     }
@@ -214,6 +235,7 @@ class FeedViewModel(
             feedProvider: IFeedProvider,
             postCardInteractor: IPostCardInteractor,
             nostrSubscriber: INostrSubscriber,
+            postDao: PostDao,
             contactDao: ContactDao,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -223,7 +245,8 @@ class FeedViewModel(
                     feedProvider = feedProvider,
                     postCardInteractor = postCardInteractor,
                     nostrSubscriber = nostrSubscriber,
-                    contactDao = contactDao
+                    postDao = postDao,
+                    contactDao = contactDao,
                 ) as T
             }
         }

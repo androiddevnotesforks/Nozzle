@@ -3,8 +3,8 @@ package com.kaiwolfram.nozzle.data.utils
 import com.kaiwolfram.nozzle.model.PostThread
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
-fun listInvolvedPubkeys(thread: PostThread): List<String> {
-    return listInvolvedPubkeys(posts = collectPosts(thread))
+fun listReferencedPubkeys(thread: PostThread): List<String> {
+    return listReferencedPubkeys(posts = collectPosts(thread))
 }
 
 fun listReferencedPostIds(thread: PostThread): List<String> {

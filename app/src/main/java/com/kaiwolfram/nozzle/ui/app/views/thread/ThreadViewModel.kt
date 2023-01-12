@@ -187,7 +187,7 @@ class ThreadViewModel(
     }
 
     private fun renewThreadSubscription() {
-        nostrSubscriber.unsubscribeToThread()
+        nostrSubscriber.unsubscribeThread()
         nostrSubscriber.subscribeToThread(
             currentPostId = currentPostIds.id,
             replyToId = currentPostIds.replyToId,
@@ -200,7 +200,7 @@ class ThreadViewModel(
         nostrSubscriber.subscribeToAdditionalPostsData(
             postIds = listPostIds(thread),
             referencedPostIds = listReferencedPostIds(thread),
-            involvedPubkeys = listInvolvedPubkeys(thread)
+            referencedPubkeys = listReferencedPubkeys(thread)
         )
     }
 

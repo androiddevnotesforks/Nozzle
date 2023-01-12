@@ -2,17 +2,17 @@ package com.kaiwolfram.nozzle.data.utils
 
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
-fun listInvolvedPubkeys(posts: List<PostWithMeta>): List<String> {
+fun listReferencedPubkeys(posts: List<PostWithMeta>): List<String> {
     if (posts.isEmpty()) return listOf()
 
-    val involvedPubKeys = mutableListOf<String>()
+    val referencedPubkeys = mutableListOf<String>()
     for (post in posts) {
-        involvedPubKeys.add(post.pubkey)
-        post.replyToPubkey?.let { involvedPubKeys.add(it) }
-        post.repost?.pubkey?.let { involvedPubKeys.add(it) }
+        referencedPubkeys.add(post.pubkey)
+        post.replyToPubkey?.let { referencedPubkeys.add(it) }
+        post.repost?.pubkey?.let { referencedPubkeys.add(it) }
     }
 
-    return involvedPubKeys.distinct()
+    return referencedPubkeys.distinct()
 }
 
 fun listReferencedPostIds(posts: List<PostWithMeta>): List<String> {

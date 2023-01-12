@@ -71,6 +71,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         feedProvider = appContainer.feedProvider,
                         postCardInteractor = appContainer.postCardInteractor,
                         nostrSubscriber = appContainer.nostrSubscriber,
+                        postDao = appContainer.roomDb.postDao(),
                         contactDao = appContainer.roomDb.contactDao()
                     )
                 ),

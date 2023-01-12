@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.RepostPreview
@@ -183,8 +184,18 @@ private fun PostCardProfileNameAndContent(
     onOpenProfile: ((String) -> Unit)?,
 ) {
     Column {
-        PostCardProfileName(name = post.name, pubkey = post.pubkey, onOpenProfile = onOpenProfile)
-        PostCardContentBase(replyToName = post.replyToName, content = post.content)
+        PostCardProfileName(
+            name = post.name.ifEmpty { hexToNpub(post.pubkey).take(16) },
+            pubkey = post.pubkey,
+            onOpenProfile = onOpenProfile
+        )
+        PostCardContentBase(
+            replyToName = if (post.replyToId != null) {
+                post.replyToName.orEmpty()
+                    .ifEmpty { post.replyToPubkey.orEmpty().ifEmpty { "???" } }
+            } else null,
+            content = post.content
+        )
     }
 }
 

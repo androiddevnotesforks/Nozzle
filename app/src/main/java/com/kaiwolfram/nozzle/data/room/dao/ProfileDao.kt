@@ -41,6 +41,7 @@ interface ProfileDao {
     )
     suspend fun deleteIfOutdated(pubkey: String, createdAt: Long)
 
+    @RewriteQueriesToDropUnusedColumns
     @MapInfo(keyColumn = "pubkey")
     @Query(
         "SELECT * " +
