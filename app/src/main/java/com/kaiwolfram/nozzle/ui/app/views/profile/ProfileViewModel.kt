@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "ProfileViewModel"
 
@@ -53,7 +52,6 @@ class ProfileViewModel(
     clip: ClipboardManager,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
-    private var isSyncing = AtomicBoolean(false)
 
     val uiState = viewModelState
         .stateIn(
@@ -83,14 +81,11 @@ class ProfileViewModel(
     }
 
     val onRefreshProfileView: () -> Unit = {
-        execWhenSyncingNotBlocked {
             viewModelScope.launch(context = Dispatchers.IO) {
                 Log.i(TAG, "Refresh profile view")
                 setRefresh(true)
                 useCachedValues(uiState.value.pubkey)
-                isSyncing.set(false)
             }
-        }
     }
 
     val onLike: (String) -> Unit = { id ->
@@ -189,15 +184,6 @@ class ProfileViewModel(
                 numOfFollowers = 0,
                 posts = listOf(),
             )
-        }
-    }
-
-    private fun execWhenSyncingNotBlocked(exec: () -> Unit) {
-        if (isSyncing.get()) {
-            Log.i(TAG, "Blocked by active sync process")
-        } else {
-            isSyncing.set(true)
-            exec()
         }
     }
 

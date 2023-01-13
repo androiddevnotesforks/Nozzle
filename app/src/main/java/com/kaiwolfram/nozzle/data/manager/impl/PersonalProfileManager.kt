@@ -1,10 +1,13 @@
 package com.kaiwolfram.nozzle.data.manager.impl
 
+import android.util.Log
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import kotlinx.coroutines.flow.Flow
+
+private const val TAG = "PersonalProfileManager"
 
 class PersonalProfileManager(
     private val pubkeyProvider: IPubkeyProvider,
@@ -23,6 +26,7 @@ class PersonalProfileManager(
     }
 
     override fun updateMetadata() {
+        Log.i(TAG, "Update metadata")
         metadataFlow = profileDao.getMetadata(pubkeyProvider.getPubkey())
     }
 

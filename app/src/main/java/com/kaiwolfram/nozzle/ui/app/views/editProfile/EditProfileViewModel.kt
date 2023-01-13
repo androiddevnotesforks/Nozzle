@@ -13,11 +13,8 @@ import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 private const val TAG = "EditProfileViewModel"
@@ -40,12 +37,7 @@ class EditProfileViewModel(
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(EditProfileViewModelState())
 
-    private var metadataState = personalProfileManager.getMetadata()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Lazily,
-            null
-        )
+    private var metadataState: Metadata? = null
 
     val uiState = viewModelState
         .stateIn(
@@ -57,9 +49,7 @@ class EditProfileViewModel(
     init {
         Log.i(TAG, "Initialize EditProfileViewModel")
         nostrSubscriber.subscribeToProfileMetadataAndContactList(personalProfileManager.getPubkey())
-        viewModelScope.launch(context = Dispatchers.IO) {
-            useCachedValues()
-        }
+        useCachedValues()
     }
 
     val onUpdateProfileAndShowToast: (String) -> Unit = { toast ->
@@ -144,12 +134,7 @@ class EditProfileViewModel(
     }
 
     val onResetUiState: () -> Unit = {
-        metadataState = personalProfileManager.getMetadata()
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Lazily,
-                null
-            )
+        Log.i(TAG, "Reset UI")
         useCachedValues()
     }
 
@@ -187,7 +172,7 @@ class EditProfileViewModel(
     private fun isValidUrl(url: String) = url.isEmpty() || URLUtil.isValidUrl(url)
 
     private fun setHasChanges() {
-        metadataState.value.let { metadata ->
+        metadataState.let { metadata ->
             uiState.value.let {
                 val hasChanges = it.nameInput != metadata?.name.orEmpty()
                         || it.aboutInput != metadata?.about.orEmpty()
@@ -204,25 +189,30 @@ class EditProfileViewModel(
 
     private fun useCachedValues() {
         Log.i(TAG, "Use cached values")
-        metadataState.value.let { metadata ->
-            viewModelState.update {
-                it.copy(
-                    nameInput = metadata?.name.orEmpty(),
-                    aboutInput = metadata?.about.orEmpty(),
-                    pictureInput = metadata?.picture.orEmpty(),
-                    nip05Input = metadata?.nip05.orEmpty(),
-                    hasChanges = false,
-                    isInvalidUsername = false,
-                    isInvalidPictureUrl = false
-                )
+        collectLatestMetadata().invokeOnCompletion {
+            metadataState.let { metadata ->
+                viewModelState.update {
+                    it.copy(
+                        nameInput = metadata?.name.orEmpty(),
+                        aboutInput = metadata?.about.orEmpty(),
+                        pictureInput = metadata?.picture.orEmpty(),
+                        nip05Input = metadata?.nip05.orEmpty(),
+                        hasChanges = false,
+                        isInvalidUsername = false,
+                        isInvalidPictureUrl = false
+                    )
+                }
             }
         }
     }
 
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
+    private fun collectLatestMetadata(): Job {
+        Log.i(TAG, "Collect latest metadata")
+        return viewModelScope.launch(Dispatchers.IO) {
+            metadataState = personalProfileManager.getMetadata().firstOrNull()
+        }
     }
+
 
     companion object {
         fun provideFactory(

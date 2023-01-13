@@ -49,7 +49,6 @@ class NozzleDrawerViewModel(
 
     val onResetUiState: () -> Unit = {
         Log.i(TAG, "Reset UI")
-
         metadataState = personalProfileProvider.getMetadata()
             .stateIn(
                 viewModelScope,
