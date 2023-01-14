@@ -93,7 +93,7 @@ class EventProcessor(
                     createdAt = event.createdAt
                 )
             }
-            contactDao.insertOrReplaceIfNewer(*contacts.toTypedArray())
+            contactDao.insertOrReplace(*contacts.toTypedArray())
         }
 
     }
@@ -105,7 +105,7 @@ class EventProcessor(
         deserializeMetadata(event.content)?.let {
             scope.launch {
                 profileDao.deleteIfOutdated(pubkey = event.pubkey, createdAt = event.createdAt)
-                profileDao.insertOrReplaceIfNewer(
+                profileDao.insertOrReplace(
                     ProfileEntity(
                         pubkey = event.pubkey,
                         name = it.name.orEmpty(),

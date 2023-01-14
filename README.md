@@ -37,6 +37,8 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 - [ ] Profile lists (likes, reposts, following, followers)
 - [ ] Mentions
 - [ ] Hashtags
+- [ ] Quote repost
+- [ ] Move to nip18 for reposts
 - [ ] Lightning tip button
 - [ ] Lightning invoice widget
 - [ ] Notifications tab
@@ -45,3 +47,5 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 - [ ] Relay management
 - [ ] Mute users
 - [ ] Encrypted direct messages
+- [ ] Republish saved events to new relays
+- [ ] Event signing with NFC card

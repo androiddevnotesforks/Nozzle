@@ -6,6 +6,7 @@ import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
+import java.util.*
 
 private const val TAG = "NostrService"
 
@@ -24,7 +25,7 @@ class NostrService(
         "wss://nostr-relay.wlvs.space",
         "wss://nostr.oxtr.dev",
     )
-    private val unsubOnEOSECache = mutableSetOf<String>()
+    private val unsubOnEOSECache = Collections.synchronizedSet(mutableSetOf<String>())
     private val listener = object : NostrListener {
         override fun onOpen(msg: String) {
             Log.i(TAG, "OnOpen: $msg")
