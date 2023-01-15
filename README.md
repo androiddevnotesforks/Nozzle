@@ -6,8 +6,10 @@ Nozzle is a Twitter-like nostr client for Android.
 
 This project is in early alpha stage.
 
-I will provide .apk files in the release section of this repository when the software is less buggy.
-Meanwhile you can clone this repo and run it in Android Studio if you want to test it.
+## Installation
+
+Go to the [release page](https://github.com/kaiwolfram/Nozzle/releases) and download the latest apk
+file or clone this repository and build it yourself
 
 ## Preview
 
@@ -15,9 +17,7 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 <img src="screenshots/feed.png" width="24%" height="24%" />
 <img src="screenshots/thread.png" width="24%" height="24%" />
 <img src="screenshots/friend_profile.png" width="24%" height="24%" />
-<img src="screenshots/profile.png" width="24%" height="24%" />
 <img src="screenshots/keys.png" width="24%" height="24%" />
-<img src="screenshots/drawer.png" width="24%" height="24%" />
 </p>
 
 ## Features
