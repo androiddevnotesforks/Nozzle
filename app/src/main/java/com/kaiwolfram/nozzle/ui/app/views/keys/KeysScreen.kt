@@ -30,7 +30,7 @@ fun KeysScreen(
             text = stringResource(id = R.string.keys),
             onGoBack = onGoBack,
             trailingIcon = {
-                CheckButton(
+                CheckTopBarButton(
                     hasChanges = uiState.hasChanges,
                     onCheck = { onUpdateKeyPairAndShowToast(focusManager, toast) },
                 )

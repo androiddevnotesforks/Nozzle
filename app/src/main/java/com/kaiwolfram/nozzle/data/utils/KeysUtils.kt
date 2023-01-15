@@ -1,5 +1,6 @@
 package com.kaiwolfram.nozzle.data.utils
 
+import fr.acinq.secp256k1.Hex
 import fr.acinq.secp256k1.Secp256k1
 import java.security.SecureRandom
 
@@ -25,6 +26,14 @@ fun derivePubkey(privkey: String): String {
 
 fun hexToNpub(pubkey: String): String {
     return Bech32.encode(NPUB, pubkey.decodeHex())
+}
+
+fun npubToHex(npub: String): Result<String> {
+    return try {
+        Result.success(Hex.encode(Bech32.decodeBytes(npub).second))
+    } catch (t: Throwable) {
+        Result.failure(t)
+    }
 }
 
 fun isValidPrivkey(privkey: String): Boolean {

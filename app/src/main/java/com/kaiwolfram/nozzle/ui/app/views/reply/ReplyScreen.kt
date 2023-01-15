@@ -11,7 +11,7 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ClosableTopBar
 import com.kaiwolfram.nozzle.ui.components.InputBox
 import com.kaiwolfram.nozzle.ui.components.ReplyingTo
-import com.kaiwolfram.nozzle.ui.components.SendButton
+import com.kaiwolfram.nozzle.ui.components.SendTopBarButton
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 
@@ -28,7 +28,7 @@ fun ReplyScreen(
         ClosableTopBar(
             onClose = onGoBack,
             trailingIcon = {
-                SendButton(
+                SendTopBarButton(
                     isSendable = uiState.isSendable,
                     onSend = { onSendOrShowErrorToast(errorToast) },
                     onGoBack = onGoBack,

@@ -31,4 +31,24 @@ internal class KeysUtilsKtTest {
 
         assert(result == expectedNpub)
     }
+
+    @Test
+    fun npubToHexConvertsNpubToHex() {
+        val npub = "npub1cx5v7vvvdgdq7f76fcszy9wvrnl0ulehkkudzyz4yzrm3yeg2a9quvjyrg"
+        val expectedHex = "c1a8cf318c6a1a0f27da4e202215cc1cfefe7f37b5b8d110552087b89328574a"
+
+        val result = npubToHex(npub)
+
+        assert(result.isSuccess)
+        assert(result.getOrNull() == expectedHex)
+    }
+
+    @Test
+    fun npubToHexFailsOnInvalidNpub() {
+        val npub = "npub1cx5v7vvvdgdq7f76fcszy9wvrnl0ulehkkudzy"
+
+        val result = npubToHex(npub)
+
+        assert(result.isFailure)
+    }
 }

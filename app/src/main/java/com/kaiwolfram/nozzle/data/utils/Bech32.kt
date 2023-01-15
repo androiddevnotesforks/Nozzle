@@ -1,7 +1,24 @@
 package com.kaiwolfram.nozzle.data.utils
 
+/**
+ * https://github.com/Giszmo/NostrPostr/blob/master/nostrpostrlib/src/main/java/nostr/postr/Bech32Util.kt
+ */
 object Bech32 {
-    private const val CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
+    const val CHARSET: String = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
+
+    enum class Encoding(val constant: Int) {
+        Bech32(1),
+        Bech32WithoutChecksum(0),
+    }
+
+    // char -> 5 bits value
+    private val map = Array<Byte>(255) { -1 }
+
+    init {
+        for (i in 0..CHARSET.lastIndex) {
+            map[CHARSET[i].code] = i.toByte()
+        }
+    }
 
     private fun polymod(values: ByteArray): Int {
         var c = 1
@@ -43,23 +60,6 @@ object Bech32 {
         return ret
     }
 
-    private fun convertTo5BitData(data: ByteArray): ByteArray {
-        val output = ArrayList<Byte>()
-        var buffer = 0L
-        var count = 0
-        data.forEach { b ->
-            buffer = (buffer shl 8) or (b.toLong() and 0xff)
-            count += 8
-            while (count >= 5) {
-                output.add(((buffer shr (count - 5)) and 31).toByte())
-                count -= 5
-            }
-        }
-        if (count > 0) output.add(((buffer shl (5 - count)) and 31).toByte())
-
-        return output.toByteArray()
-    }
-
     fun encode(humanReadablePart: String, data: ByteArray): String {
         var hrp = humanReadablePart
         val as5Bit = convertTo5BitData(data)
@@ -81,4 +81,71 @@ object Bech32 {
         }
         return sb.toString()
     }
+
+    private fun decode(
+        bech32: String,
+        noChecksum: Boolean = false
+    ): Triple<String, ByteArray, Encoding> {
+        require(bech32.lowercase() == bech32 || bech32.uppercase() == bech32) { "mixed case strings are not valid bech32" }
+        bech32.forEach { require(it.code in 33..126) { "invalid character " } }
+        val input = bech32.lowercase()
+        val pos = input.lastIndexOf('1')
+        val hrp = input.take(pos)
+        require(hrp.length in 1..83) { "hrp must contain 1 to 83 characters" }
+        val data = ByteArray(input.length - pos - 1) { 0 }
+        for (i in 0..data.lastIndex) data[i] = map[input[pos + 1 + i].code]
+        return if (noChecksum) {
+            Triple(hrp, data, Encoding.Bech32WithoutChecksum)
+        } else {
+            val encoding = when (polymod(expandHrp(hrp) + data)) {
+                Encoding.Bech32.constant -> Encoding.Bech32
+                else -> throw IllegalArgumentException("invalid checksum for $bech32")
+            }
+            Triple(hrp, data.dropLast(6).toByteArray(), encoding)
+        }
+    }
+
+    fun decodeBytes(
+        bech32: String,
+        noChecksum: Boolean = false
+    ): Triple<String, ByteArray, Encoding> {
+        val (hrp, int5s, encoding) = decode(bech32, noChecksum)
+        return Triple(hrp, convert5bitDataToBytes(int5s, 0), encoding)
+    }
+
+    private fun convertTo5BitData(data: ByteArray): ByteArray {
+        val output = ArrayList<Byte>()
+        var buffer = 0L
+        var count = 0
+        data.forEach { b ->
+            buffer = (buffer shl 8) or (b.toLong() and 0xff)
+            count += 8
+            while (count >= 5) {
+                output.add(((buffer shr (count - 5)) and 31).toByte())
+                count -= 5
+            }
+        }
+        if (count > 0) output.add(((buffer shl (5 - count)) and 31).toByte())
+
+        return output.toByteArray()
+    }
+
+    private fun convert5bitDataToBytes(input: ByteArray, offset: Int): ByteArray {
+        var buffer = 0L
+        val output = ArrayList<Byte>()
+        var count = 0
+        for (i in offset..input.lastIndex) {
+            val b = input[i]
+            buffer = (buffer shl 5) or (b.toLong() and 31)
+            count += 5
+            while (count >= 8) {
+                output.add(((buffer shr (count - 8)) and 0xff).toByte())
+                count -= 8
+            }
+        }
+        require(count <= 4) { "Zero-padding of more than 4 bits" }
+        require((buffer and ((1L shl count) - 1L)) == 0L) { "Non-zero padding in 8-to-5 conversion" }
+        return output.toByteArray()
+    }
+
 }

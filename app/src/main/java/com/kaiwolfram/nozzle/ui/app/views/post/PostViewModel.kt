@@ -8,8 +8,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.room.dao.PostDao
+import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -27,6 +28,7 @@ data class PostViewModelState(
 class PostViewModel(
     private val personalProfileProvider: IPersonalProfileProvider,
     private val nostrService: INostrService,
+    private val postDao: PostDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(PostViewModelState())
@@ -70,14 +72,17 @@ class PostViewModel(
         }
     }
 
-    val onSendOrShowErrorToast: (String) -> Unit = { errorToast ->
+    val onSend: (String) -> Unit = { toast ->
         uiState.value.let { state ->
             if (!state.isSendable) {
                 Log.i(TAG, "Post is not sendable")
-                Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
             } else {
                 Log.i(TAG, "Send post")
-                nostrService.sendPost(content = state.content)
+                val event = nostrService.sendPost(content = state.content)
+                viewModelScope.launch(context = Dispatchers.IO) {
+                    postDao.insertIfNotPresent(PostEntity.fromEvent(event))
+                }
+                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
                 reset()
             }
         }
@@ -89,15 +94,11 @@ class PostViewModel(
         }
     }
 
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
-    }
-
     companion object {
         fun provideFactory(
             personalProfileProvider: IPersonalProfileProvider,
             nostrService: INostrService,
+            postDao: PostDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -105,6 +106,7 @@ class PostViewModel(
                 return PostViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
+                    postDao = postDao,
                     context = context,
                 ) as T
             }

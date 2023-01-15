@@ -9,7 +9,7 @@ import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ClosableTopBar
 import com.kaiwolfram.nozzle.ui.components.InputBox
-import com.kaiwolfram.nozzle.ui.components.SendButton
+import com.kaiwolfram.nozzle.ui.components.SendTopBarButton
 
 
 @Composable
@@ -17,17 +17,17 @@ fun PostScreen(
     uiState: PostViewModelState,
     metadataState: Metadata?,
     onChangeContent: (String) -> Unit,
-    onSendOrShowErrorToast: (String) -> Unit,
+    onSend: (String) -> Unit,
     onGoBack: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        val errorToast = stringResource(id = R.string.your_post_is_empty)
+        val toast = stringResource(id = R.string.post_published)
         ClosableTopBar(
             onClose = onGoBack,
             trailingIcon = {
-                SendButton(
+                SendTopBarButton(
                     isSendable = uiState.isSendable,
-                    onSend = { onSendOrShowErrorToast(errorToast) },
+                    onSend = { onSend(toast) },
                     onGoBack = onGoBack,
                 )
             }

@@ -10,10 +10,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +43,7 @@ fun CloseButton(onGoBack: () -> Unit) {
 }
 
 @Composable
-fun SendButton(
+fun SendTopBarButton(
     isSendable: Boolean,
     onSend: () -> Unit,
     onGoBack: () -> Unit,
@@ -62,7 +59,7 @@ fun SendButton(
 }
 
 @Composable
-fun CheckButton(
+fun CheckTopBarButton(
     hasChanges: Boolean,
     onCheck: () -> Unit,
     onCanGoBack: (() -> Boolean)? = null,
@@ -73,6 +70,23 @@ fun CheckButton(
         hasChanges = hasChanges,
         description = stringResource(id = R.string.update),
         onClick = onCheck,
+        onCanGoBack = onCanGoBack,
+        onGoBack = onGoBack,
+    )
+}
+
+@Composable
+fun SearchTopBarButton(
+    hasChanges: Boolean,
+    onSearch: () -> Unit,
+    onCanGoBack: (() -> Boolean)? = null,
+    onGoBack: (() -> Unit)? = null,
+) {
+    TopBarButton(
+        imageVector = Icons.Default.Search,
+        hasChanges = hasChanges,
+        description = stringResource(id = R.string.search),
+        onClick = onSearch,
         onCanGoBack = onCanGoBack,
         onGoBack = onGoBack,
     )

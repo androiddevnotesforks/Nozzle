@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.room.dao.PostDao
+import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -30,6 +32,7 @@ data class ReplyViewModelState(
 class ReplyViewModel(
     private val nostrService: INostrService,
     private val personalProfileProvider: IPersonalProfileProvider,
+    private val postDao: PostDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
@@ -91,10 +94,13 @@ class ReplyViewModel(
                         replyTo = it.id,
                         relayUrl = "",
                     )
-                    nostrService.sendReply(
+                    val event = nostrService.sendReply(
                         replyTo = replyTo,
                         content = state.reply
                     )
+                    viewModelScope.launch(context = Dispatchers.IO) {
+                        postDao.insertIfNotPresent(PostEntity.fromEvent(event))
+                    }
                 }
                 reset()
             }
@@ -121,6 +127,7 @@ class ReplyViewModel(
         fun provideFactory(
             nostrService: INostrService,
             personalProfileProvider: IPersonalProfileProvider,
+            postDao: PostDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -128,6 +135,7 @@ class ReplyViewModel(
                 return ReplyViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
+                    postDao = postDao,
                     context = context,
                 ) as T
             }

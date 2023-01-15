@@ -17,6 +17,7 @@ import com.kaiwolfram.nozzle.ui.app.views.keys.KeysRoute
 import com.kaiwolfram.nozzle.ui.app.views.post.PostRoute
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileRoute
 import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyRoute
+import com.kaiwolfram.nozzle.ui.app.views.search.SearchRoute
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadRoute
 import kotlinx.coroutines.launch
 
@@ -70,6 +71,13 @@ fun NozzleNavGraph(
                 onNavigateToThread = onNavigateToThread,
                 onNavigateToReply = navActions.navigateToReply,
                 onNavigateToEditProfile = navActions.navigateToEditProfile,
+            )
+        }
+        composable(NozzleRoute.SEARCH) {
+            SearchRoute(
+                searchViewModel = vmContainer.searchViewModel,
+                onNavigateToProfile = onNavigateToProfile,
+                onGoBack = navActions.popStack,
             )
         }
         composable(NozzleRoute.KEYS) {

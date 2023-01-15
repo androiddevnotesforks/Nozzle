@@ -18,7 +18,7 @@ import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -67,7 +67,9 @@ class ProfileViewModel(
     val onSetPubkey: (String) -> Unit = { pubkey ->
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set UI data for $pubkey")
-            nostrSubscriber.subscribeToProfileMetadataAndContactList(pubkey)
+            useCachedValues(pubkey)
+            renewSubscriptions(pubkey = pubkey)
+            delay(1500)
             useCachedValues(pubkey)
         }
     }
@@ -81,11 +83,14 @@ class ProfileViewModel(
     }
 
     val onRefreshProfileView: () -> Unit = {
-            viewModelScope.launch(context = Dispatchers.IO) {
-                Log.i(TAG, "Refresh profile view")
-                setRefresh(true)
-                useCachedValues(uiState.value.pubkey)
-            }
+        viewModelScope.launch(context = Dispatchers.IO) {
+            Log.i(TAG, "Refresh profile view")
+            setRefresh(true)
+            renewSubscriptions(pubkey = uiState.value.pubkey)
+            delay(1500)
+            useCachedValues(uiState.value.pubkey)
+            setRefresh(false)
+        }
     }
 
     val onLike: (String) -> Unit = { id ->
@@ -144,29 +149,28 @@ class ProfileViewModel(
         }
     }
 
+    private fun renewSubscriptions(pubkey: String) {
+        nostrSubscriber.subscribeToProfileMetadataAndContactList(pubkey)
+        nostrSubscriber.subscribeToFeed(authorPubkeys = listOf(pubkey), limit = 25)
+    }
+
     private suspend fun useCachedValues(pubkey: String) {
         val cachedProfile = profileProvider.getProfile(pubkey)
-        if (cachedProfile != null) {
-            Log.i(TAG, "Use cached values")
-            viewModelState.update {
-                it.copy(
-                    pubkey = pubkey,
-                    npub = cachedProfile.npub,
-                    name = cachedProfile.metadata.name.orEmpty(),
-                    about = cachedProfile.metadata.about.orEmpty(),
-                    picture = cachedProfile.metadata.picture.orEmpty(),
-                    numOfFollowing = cachedProfile.numOfFollowing,
-                    numOfFollowers = cachedProfile.numOfFollowers,
-                    isOneself = cachedProfile.isOneself,
-                    isFollowed = cachedProfile.isFollowedByMe,
-                    posts = feedProvider.getFeedWithSingleAuthor(pubkey)
-                )
-            }
-        } else {
-            Log.i(TAG, "Reset UI state because cache is empty")
-            resetValues(pubkey)
+        Log.i(TAG, "Use cached values")
+        viewModelState.update {
+            it.copy(
+                pubkey = pubkey,
+                npub = cachedProfile.npub,
+                name = cachedProfile.metadata.name ?: cachedProfile.npub,
+                about = cachedProfile.metadata.about.orEmpty(),
+                picture = cachedProfile.metadata.picture.orEmpty(),
+                numOfFollowing = cachedProfile.numOfFollowing,
+                numOfFollowers = cachedProfile.numOfFollowers,
+                isOneself = cachedProfile.isOneself,
+                isFollowed = cachedProfile.isFollowedByMe,
+                posts = feedProvider.getFeedWithSingleAuthor(pubkey)
+            )
         }
-        setRefresh(false)
     }
 
     private fun resetValues(pubkey: String) {
@@ -191,11 +195,6 @@ class ProfileViewModel(
         viewModelState.update {
             it.copy(isRefreshing = value)
         }
-    }
-
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
     }
 
     companion object {

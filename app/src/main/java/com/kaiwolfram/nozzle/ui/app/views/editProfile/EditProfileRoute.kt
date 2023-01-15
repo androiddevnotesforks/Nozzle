@@ -21,8 +21,8 @@ fun EditProfileRoute(
             onResetFeedIconUiState()
         },
         onChangeName = editProfileViewModel.onChangeName,
-        onChangeBio = editProfileViewModel.onChangeBio,
-        onChangePictureUrl = editProfileViewModel.onChangePictureUrl,
+        onChangeAbout = editProfileViewModel.onChangeAbout,
+        onChangePicture = editProfileViewModel.onChangePicture,
         onChangeNip05 = editProfileViewModel.onChangeNip05,
         onResetUiState = editProfileViewModel.onResetUiState,
         onCanGoBack = editProfileViewModel.onCanGoBack,

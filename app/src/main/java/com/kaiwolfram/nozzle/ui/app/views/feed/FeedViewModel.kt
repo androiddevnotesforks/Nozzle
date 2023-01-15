@@ -155,11 +155,12 @@ class FeedViewModel(
             )
         )
         nostrSubscriber.subscribeToFeed(
-            contactPubkeys = pubkeys,
-            until = until,
+            authorPubkeys = pubkeys,
             limit = batchSize,
+            until = until
         )
     }
+
 
     private suspend fun subscribeToAdditionalFeedData(posts: List<PostWithMeta>) {
         Log.i(TAG, "Subscribe to additional feed data")

@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ChangeableTextField
-import com.kaiwolfram.nozzle.ui.components.CheckButton
+import com.kaiwolfram.nozzle.ui.components.CheckTopBarButton
 import com.kaiwolfram.nozzle.ui.components.ReturnableTopBar
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -22,8 +22,8 @@ fun EditProfileScreen(
     uiState: EditProfileViewModelState,
     onUpdateProfileAndShowToast: (String) -> Unit,
     onChangeName: (String) -> Unit,
-    onChangeBio: (String) -> Unit,
-    onChangePictureUrl: (String) -> Unit,
+    onChangeAbout: (String) -> Unit,
+    onChangePicture: (String) -> Unit,
     onChangeNip05: (String) -> Unit,
     onResetUiState: () -> Unit,
     onCanGoBack: () -> Boolean,
@@ -35,7 +35,7 @@ fun EditProfileScreen(
             text = stringResource(id = R.string.edit_profile),
             onGoBack = onGoBack,
             trailingIcon = {
-                CheckButton(
+                CheckTopBarButton(
                     hasChanges = uiState.hasChanges,
                     onCheck = { onUpdateProfileAndShowToast(toast) },
                     onCanGoBack = onCanGoBack,
@@ -58,13 +58,13 @@ fun EditProfileScreen(
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
 
-            Bio(bio = uiState.aboutInput, onChangeBio = onChangeBio)
+            About(about = uiState.aboutInput, onChangeAbout = onChangeAbout)
             Spacer(modifier = Modifier.height(spacing.xxl))
 
             ProfilePictureUrl(
                 pictureUrl = uiState.pictureInput,
                 isInvalid = uiState.isInvalidPictureUrl,
-                onChangePictureUrl = onChangePictureUrl
+                onChangePicture = onChangePicture
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
 
@@ -98,19 +98,19 @@ private fun Username(
 }
 
 @Composable
-private fun Bio(
-    bio: String,
-    onChangeBio: (String) -> Unit,
+private fun About(
+    about: String,
+    onChangeAbout: (String) -> Unit,
 ) {
     Text(text = stringResource(id = R.string.about_you), fontWeight = FontWeight.Bold)
     ChangeableTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = bio,
+        value = about,
         maxLines = 3,
         placeholder = stringResource(id = R.string.describe_yourself),
         errorLabel = stringResource(id = R.string.invalid_username),
         keyboardImeAction = ImeAction.Next,
-        onChangeValue = onChangeBio,
+        onChangeValue = onChangeAbout,
     )
 }
 
@@ -118,7 +118,7 @@ private fun Bio(
 private fun ProfilePictureUrl(
     pictureUrl: String,
     isInvalid: Boolean,
-    onChangePictureUrl: (String) -> Unit,
+    onChangePicture: (String) -> Unit,
 ) {
     Text(text = stringResource(id = R.string.profile_picture_url), fontWeight = FontWeight.Bold)
     ChangeableTextField(
@@ -130,7 +130,7 @@ private fun ProfilePictureUrl(
         errorLabel = stringResource(id = R.string.invalid_url),
         keyboardType = KeyboardType.Uri,
         keyboardImeAction = ImeAction.Next,
-        onChangeValue = onChangePictureUrl,
+        onChangeValue = onChangePicture,
     )
 }
 

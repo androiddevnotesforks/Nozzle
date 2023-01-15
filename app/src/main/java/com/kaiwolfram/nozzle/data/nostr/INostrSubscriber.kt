@@ -3,7 +3,11 @@ package com.kaiwolfram.nozzle.data.nostr
 interface INostrSubscriber {
     fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String>
 
-    fun subscribeToFeed(contactPubkeys: List<String>, until: Long?, limit: Int): List<String>
+    fun subscribeToFeed(
+        authorPubkeys: List<String>,
+        limit: Int,
+        until: Long? = null,
+    ): List<String>
 
     fun subscribeToAdditionalPostsData(
         postIds: List<String>,

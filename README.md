@@ -30,7 +30,7 @@ Meanwhile you can clone this repo and run it in Android Studio if you want to te
 - [x] Reply and post
 - [x] Open whole threads
 - [x] Edit profile
-- [ ] Search bar
+- [x] Search bar
 - [ ] Use Flows for smoother UX
 - [ ] nip05 verification
 - [ ] URL and media preview

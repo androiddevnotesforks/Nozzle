@@ -27,6 +27,7 @@ import com.kaiwolfram.nozzle.ui.app.views.keys.KeysViewModel
 import com.kaiwolfram.nozzle.ui.app.views.post.PostViewModel
 import com.kaiwolfram.nozzle.ui.app.views.profile.ProfileViewModel
 import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyViewModel
+import com.kaiwolfram.nozzle.ui.app.views.search.SearchViewModel
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadViewModel
 import com.kaiwolfram.nozzle.ui.theme.NozzleTheme
 import kotlinx.coroutines.launch
@@ -94,6 +95,7 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = ReplyViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
                         personalProfileProvider = appContainer.personalProfileManager,
+                        postDao = appContainer.roomDb.postDao(),
                         context = LocalContext.current,
                     )
                 ),
@@ -101,9 +103,13 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = PostViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
                         personalProfileProvider = appContainer.personalProfileManager,
+                        postDao = appContainer.roomDb.postDao(),
                         context = LocalContext.current,
                     )
-                )
+                ),
+                searchViewModel = viewModel(
+                    factory = SearchViewModel.provideFactory()
+                ),
             )
 
             val coroutineScope = rememberCoroutineScope()

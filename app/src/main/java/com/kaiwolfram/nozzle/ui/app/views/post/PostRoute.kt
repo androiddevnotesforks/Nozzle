@@ -16,7 +16,7 @@ fun PostRoute(
         uiState = uiState,
         metadataState = metadataState,
         onChangeContent = postViewModel.onChangeContent,
-        onSendOrShowErrorToast = postViewModel.onSendOrShowErrorToast,
+        onSend = postViewModel.onSend,
         onGoBack = onGoBack,
     )
 }

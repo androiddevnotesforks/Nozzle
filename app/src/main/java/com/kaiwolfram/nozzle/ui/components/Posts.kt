@@ -185,7 +185,7 @@ private fun PostCardProfileNameAndContent(
 ) {
     Column {
         PostCardProfileName(
-            name = post.name.ifEmpty { hexToNpub(post.pubkey).take(16) },
+            name = post.name.ifEmpty { hexToNpub(post.pubkey) },
             pubkey = post.pubkey,
             onOpenProfile = onOpenProfile
         )

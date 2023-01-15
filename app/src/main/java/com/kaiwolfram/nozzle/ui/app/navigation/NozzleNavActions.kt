@@ -17,6 +17,12 @@ class NozzleNavActions(private val navController: NavHostController) {
         }
     }
 
+    val navigateToSearch: () -> Unit = {
+        navController.navigate(NozzleRoute.SEARCH) {
+            setNavOptionsWithPop(optionsBuilder = this)
+        }
+    }
+
     val navigateToKeys: () -> Unit = {
         navController.navigate(NozzleRoute.KEYS) {
             setNavOptionsWithPop(optionsBuilder = this)

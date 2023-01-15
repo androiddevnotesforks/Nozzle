@@ -95,7 +95,7 @@ class EditProfileViewModel(
         }
     }
 
-    val onChangeBio: (String) -> Unit = { input ->
+    val onChangeAbout: (String) -> Unit = { input ->
         if (input != uiState.value.aboutInput) {
             viewModelState.update {
                 it.copy(aboutInput = input)
@@ -104,7 +104,7 @@ class EditProfileViewModel(
         }
     }
 
-    val onChangePictureUrl: (String) -> Unit = { input ->
+    val onChangePicture: (String) -> Unit = { input ->
         uiState.value.let { state ->
             viewModelState.update {
                 it.copy(pictureInput = input)
@@ -129,7 +129,6 @@ class EditProfileViewModel(
         val canGoBack = uiState.value.let { state ->
             !state.isInvalidUsername && !state.isInvalidPictureUrl
         }
-        Log.i(TAG, "can go back $canGoBack")
         canGoBack
     }
 

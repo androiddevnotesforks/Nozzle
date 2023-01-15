@@ -22,15 +22,17 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         )
     }
 
+    private fun getCurrentTimePlus5min() = System.currentTimeMillis() / 1000 + 300
+
     override fun subscribeToFeed(
-        contactPubkeys: List<String>,
+        authorPubkeys: List<String>,
+        limit: Int,
         until: Long?,
-        limit: Int
     ): List<String> {
-        Log.i(TAG, "Subscribe to feed of ${contactPubkeys.size} contacts")
+        Log.i(TAG, "Subscribe to feed of ${authorPubkeys.size} contacts")
         val postFilter = Filter.createPostFilter(
-            pubkeys = contactPubkeys,
-            until = until,
+            pubkeys = authorPubkeys,
+            until = until ?: getCurrentTimePlus5min(),
             limit = limit
         )
 

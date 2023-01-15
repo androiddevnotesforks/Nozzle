@@ -10,7 +10,6 @@
     <string name="nav_to_messages">Navigate to your messages</string>
     <string name="profile_picture">Profile picture</string>
     <string name="name">Name</string>
-    <string name="bio">Bio</string>
     <string name="private_key">Private key</string>
     <string name="profile_picture_url">Profile picture URL</string>
     <string name="confirm">Confirm</string>
@@ -63,7 +62,9 @@
     <string name="update">Update</string>
     <string name="nip05_identifier">nip-05 identifier</string>
     <string name="enter_nip05">e.g. username@nozzle.chat</string>
-    <string name="your_post_is_empty">Your post is empty</string>
     <string name="post_your_thoughts">Post your thoughts</string>
     <string name="add">Add</string>
+    <string name="invalid_npub">Invalid npub</string>
+    <string name="search_npub">Search npub</string>
+    <string name="post_published">Post published</string>
 </resources>
