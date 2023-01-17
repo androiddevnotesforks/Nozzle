@@ -75,4 +75,5 @@
     <string name="time_abbr_week">w</string>
     <string name="time_abbr_month">M</string>
     <string name="time_abbr_year">y</string>
+    <string name="note_id_copied">Note ID copied</string>
 </resources>

@@ -8,6 +8,7 @@ private val rnd = SecureRandom()
 private val secp256k1 = Secp256k1.get()
 private const val NPUB = "npub"
 private const val NSEC = "nsec"
+private const val NOTE = "note"
 
 fun generatePrivkey(): String {
     val bytes = ByteArray(32)
@@ -30,6 +31,10 @@ fun hexToNpub(pubkey: String): String {
 
 fun hexToNsec(privkey: String): String {
     return Bech32.encode(NSEC, privkey.decodeHex())
+}
+
+fun hexToNote(postId: String): String {
+    return Bech32.encode(NOTE, postId.decodeHex())
 }
 
 fun npubToHex(npub: String): Result<String> {

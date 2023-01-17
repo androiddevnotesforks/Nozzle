@@ -1,8 +1,7 @@
 package com.kaiwolfram.nozzle.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import android.widget.Toast
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -22,8 +21,10 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,6 +32,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.utils.getRelativeTimeSpanString
+import com.kaiwolfram.nozzle.data.utils.hexToNote
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -81,6 +83,7 @@ fun PostCardList(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PostCard(
     post: PostWithMeta,
@@ -98,9 +101,23 @@ fun PostCard(
     val yTop = spacing.screenEdge
     val yBottom = sizing.profilePicture + spacing.screenEdge
     val small = spacing.small
+    val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
     Row(
         modifier
-            .clickable(enabled = !isCurrent) { onNavigateToThread(post.toPostIds()) }
+            .combinedClickable(enabled = !isCurrent,
+                onClick = { onNavigateToThread(post.toPostIds()) },
+                onLongClick = {
+                    clipboard.setText(AnnotatedString(hexToNote(post.id)))
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.note_id_copied),
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
+
+                })
             .fillMaxWidth()
             .drawBehind {
                 when (threadPosition) {
