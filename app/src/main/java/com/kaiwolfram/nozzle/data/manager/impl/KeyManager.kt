@@ -7,9 +7,7 @@ import androidx.security.crypto.MasterKey
 import com.kaiwolfram.nostrclientkt.Keys
 import com.kaiwolfram.nozzle.data.PreferenceFileNames
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
-import com.kaiwolfram.nozzle.data.utils.derivePubkey
-import com.kaiwolfram.nozzle.data.utils.generatePrivkey
-import com.kaiwolfram.nozzle.data.utils.hexToNpub
+import com.kaiwolfram.nozzle.data.utils.*
 import fr.acinq.secp256k1.Hex
 
 
@@ -29,7 +27,9 @@ class KeyManager(context: Context) : IKeyManager {
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
-    private var pubkey: String
+    private var pubkey: String = ""
+    private var npub: String = ""
+    private var nsec: String = ""
 
     init {
         Log.i(TAG, "Initialize KeyPreferences")
@@ -39,7 +39,7 @@ class KeyManager(context: Context) : IKeyManager {
             Log.i(TAG, "Setting initial privkey $privkey")
             setPrivkey(privkey)
         }
-        pubkey = derivePubkey(privkey)
+        setPubkeyAndNpub(privkey)
     }
 
     override fun getPubkey() = pubkey
@@ -48,11 +48,15 @@ class KeyManager(context: Context) : IKeyManager {
 
     override fun getPrivkey() = preferences.getString(PRIVKEY, "") ?: ""
 
+    override fun getNsec() = hexToNsec(getPrivkey())
+
     override fun setPrivkey(privkey: String) {
-        pubkey = derivePubkey(privkey)
+        val hex = if (privkey.startsWith("nsec1"))
+            nsecToHex(privkey).getOrThrow() else privkey
+        setPubkeyAndNpub(hex)
         Log.i(TAG, "Setting privkey and derived pubkey $pubkey")
         preferences.edit()
-            .putString(PRIVKEY, privkey)
+            .putString(PRIVKEY, hex)
             .apply()
     }
 
@@ -61,6 +65,11 @@ class KeyManager(context: Context) : IKeyManager {
             privkey = Hex.decode(getPrivkey()),
             pubkey = Hex.decode(getPubkey())
         )
+    }
+
+    private fun setPubkeyAndNpub(privkey: String) {
+        pubkey = derivePubkey(privkey)
+        npub = hexToNpub(pubkey)
     }
 
 }

@@ -18,7 +18,7 @@ object TimeConstants {
     const val YEAR_IN_SECONDS: Long = 31_536_000
 }
 
-enum class TimeDimension {
+private enum class TimeDimension {
     NOW, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR;
 
     fun getAbbreviation(context: Context): String {
@@ -50,7 +50,7 @@ enum class TimeDimension {
 
 fun getCurrentTimeInSeconds(): Long = System.currentTimeMillis() / 1000
 
-fun getRelativeTimeDimension(differenceInSeconds: Long): TimeDimension {
+private fun getRelativeTimeDimension(differenceInSeconds: Long): TimeDimension {
     if (differenceInSeconds <= 0) return TimeDimension.NOW
     return when (differenceInSeconds) {
         in 1 until MINUTE_IN_SECONDS -> TimeDimension.SECOND

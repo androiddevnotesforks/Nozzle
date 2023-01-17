@@ -28,7 +28,12 @@ fun hexToNpub(pubkey: String): String {
     return Bech32.encode(NPUB, pubkey.decodeHex())
 }
 
+fun hexToNsec(privkey: String): String {
+    return Bech32.encode(NSEC, privkey.decodeHex())
+}
+
 fun npubToHex(npub: String): Result<String> {
+    if (!npub.startsWith("npub1")) return Result.failure(IllegalArgumentException())
     return try {
         Result.success(Hex.encode(Bech32.decodeBytes(npub).second))
     } catch (t: Throwable) {
@@ -36,8 +41,18 @@ fun npubToHex(npub: String): Result<String> {
     }
 }
 
+fun nsecToHex(nsec: String): Result<String> {
+    if (!nsec.startsWith("nsec1")) return Result.failure(IllegalArgumentException())
+
+    return try {
+        Result.success(Hex.encode(Bech32.decodeBytes(nsec).second))
+    } catch (t: Throwable) {
+        Result.failure(t)
+    }
+}
+
 fun isValidPrivkey(privkey: String): Boolean {
-    return privkey.length == 64 && privkey.isHex()
+    return nsecToHex(privkey).isSuccess || (privkey.length == 64 && privkey.isHex())
 }
 
 private fun ByteArray.toHex(): String {

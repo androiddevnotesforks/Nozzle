@@ -36,7 +36,7 @@ class KeysViewModel(
     clip: ClipboardManager,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(KeysViewModelState())
-    private var privkey = ""
+    private var nsec = ""
 
     val uiState = viewModelState
         .stateIn(
@@ -79,7 +79,7 @@ class KeysViewModel(
     }
 
     val onChangePrivkey: (String) -> Unit = { newValue ->
-        if (privkey == newValue) {
+        if (nsec == newValue) {
             viewModelState.update {
                 it.copy(
                     privkeyInput = newValue,
@@ -103,15 +103,15 @@ class KeysViewModel(
     }
 
     private fun useCachedValues() {
+        nsec = keyManager.getNsec()
         viewModelState.update {
             it.copy(
-                privkeyInput = keyManager.getPrivkey(),
+                privkeyInput = nsec,
                 npub = keyManager.getNpub(),
                 hasChanges = false,
                 isInvalid = false,
             )
         }
-        privkey = keyManager.getPrivkey()
     }
 
     override fun onCleared() {
