@@ -17,7 +17,7 @@ class ProfileFollower(
 
     override suspend fun follow(pubkeyToFollow: String, relayUrl: String) {
         Log.i(TAG, "Follow $pubkeyToFollow")
-        contactDao.insertOrReplace(
+        contactDao.insertOrIgnore(
             ContactEntity(
                 pubkey = pubkeyProvider.getPubkey(),
                 contactPubkey = pubkeyToFollow,

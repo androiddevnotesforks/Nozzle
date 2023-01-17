@@ -2,6 +2,8 @@ package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
 import com.kaiwolfram.nostrclientkt.Filter
+import com.kaiwolfram.nozzle.data.utils.TimeConstants
+import com.kaiwolfram.nozzle.data.utils.getCurrentTimeInSeconds
 
 private const val TAG = "NostrSubscriber"
 
@@ -22,7 +24,8 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         )
     }
 
-    private fun getCurrentTimePlus5min() = System.currentTimeMillis() / 1000 + 300
+    private fun getCurrentTimePlus5min() =
+        getCurrentTimeInSeconds() + (5 * TimeConstants.MINUTE_IN_SECONDS)
 
     override fun subscribeToFeed(
         authorPubkeys: List<String>,

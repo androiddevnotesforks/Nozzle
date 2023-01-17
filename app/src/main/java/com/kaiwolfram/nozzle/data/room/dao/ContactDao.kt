@@ -24,8 +24,8 @@ interface ContactDao {
     )
     suspend fun listContacts(pubkey: String): List<ContactEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrReplace(vararg contacts: ContactEntity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOrIgnore(vararg contacts: ContactEntity)
 
     @Query(
         "DELETE FROM contact " +

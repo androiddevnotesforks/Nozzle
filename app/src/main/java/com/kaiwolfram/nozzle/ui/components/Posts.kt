@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.data.utils.getRelativeTimeSpanString
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -153,7 +155,7 @@ fun PostCard(
         )
         Spacer(Modifier.width(spacing.large))
         Column {
-            PostCardProfileNameAndContent(
+            PostCardHeaderAndContent(
                 post = post,
                 onOpenProfile = onOpenProfile,
             )
@@ -179,14 +181,15 @@ fun PostCard(
 }
 
 @Composable
-private fun PostCardProfileNameAndContent(
+private fun PostCardHeaderAndContent(
     post: PostWithMeta,
     onOpenProfile: ((String) -> Unit)?,
 ) {
     Column {
-        PostCardProfileName(
+        PostCardHeader(
             name = post.name.ifEmpty { hexToNpub(post.pubkey) },
             pubkey = post.pubkey,
+            createdAt = post.createdAt,
             onOpenProfile = onOpenProfile
         )
         PostCardContentBase(
@@ -229,9 +232,10 @@ private fun RepostCardContent(
                         onOpenProfile = onOpenProfile
                     )
                     Spacer(modifier = Modifier.width(spacing.medium))
-                    PostCardProfileName(
+                    PostCardHeader(
                         name = it.name,
                         pubkey = it.pubkey,
+                        createdAt = post.createdAt,
                         onOpenProfile = onOpenProfile
                     )
                 }
@@ -275,22 +279,40 @@ private fun PostCardProfilePicture(
 }
 
 @Composable
-private fun PostCardProfileName(
+private fun PostCardHeader(
     name: String,
     pubkey: String,
+    createdAt: Long,
     onOpenProfile: ((String) -> Unit)?
 ) {
-    Text(
-        modifier = if (onOpenProfile != null) {
-            Modifier.clickable { onOpenProfile(pubkey) }
-        } else {
-            Modifier
-        },
-        text = name,
-        fontWeight = FontWeight.SemiBold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-    )
+    Row {
+        Text(
+            modifier = if (onOpenProfile != null) {
+                Modifier.clickable { onOpenProfile(pubkey) }
+            } else {
+                Modifier
+            },
+            text = name,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(modifier = Modifier.width(spacing.medium))
+        Text(
+            text = "\u2022",
+            color = LightGray21,
+        )
+        Spacer(modifier = Modifier.width(spacing.medium))
+        Text(
+            text = getRelativeTimeSpanString(
+                context = LocalContext.current,
+                from = createdAt
+            ),
+            color = LightGray21,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 @Composable

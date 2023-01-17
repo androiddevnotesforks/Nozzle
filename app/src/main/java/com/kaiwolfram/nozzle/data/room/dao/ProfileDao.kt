@@ -32,8 +32,8 @@ interface ProfileDao {
         nip05: String,
     )
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrReplace(vararg profile: ProfileEntity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOrIgnore(vararg profile: ProfileEntity)
 
     @Query(
         "DELETE FROM profile " +

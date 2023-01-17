@@ -67,4 +67,12 @@
     <string name="invalid_npub">Invalid npub</string>
     <string name="search_npub">Search npub</string>
     <string name="post_published">Post published</string>
+    <string name="time_abbr_now">Now</string>
+    <string name="time_abbr_second">s</string>
+    <string name="time_abbr_minute">m</string>
+    <string name="time_abbr_hour">h</string>
+    <string name="time_abbr_day">d</string>
+    <string name="time_abbr_week">w</string>
+    <string name="time_abbr_month">M</string>
+    <string name="time_abbr_year">y</string>
 </resources>
