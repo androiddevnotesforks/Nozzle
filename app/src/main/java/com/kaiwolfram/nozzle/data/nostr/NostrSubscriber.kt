@@ -54,7 +54,7 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         if (referencedPubkeys.isEmpty() && referencedPostIds.isEmpty()) return listOf()
 
         val reactionFilter = Filter.createReactionFilter(e = postIds)
-        val replyFilter = Filter.createReplyFilter(e = postIds)
+        val replyFilter = Filter.createPostFilter(e = postIds)
         val profileFilter = Filter.createProfileFilter(pubkeys = referencedPubkeys)
         val postFilter = Filter.createPostFilter(ids = referencedPostIds)
 
@@ -74,11 +74,13 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
     ): List<String> {
         Log.i(TAG, "Subscribe to thread")
 
-        val replyFilter = Filter.createReplyFilter(e = listOf(currentPostId))
+        val postIds = mutableListOf(currentPostId)
+        replyToId?.let { postIds.add(it) }
+        replyToRootId?.let { postIds.add(it) }
 
-        val filters = mutableListOf(replyFilter)
-        replyToId?.let { filters.add(Filter.createPostFilter(ids = listOf(it))) }
-        replyToRootId?.let { filters.add(Filter.createPostFilter(ids = listOf(it))) }
+        val filters = mutableListOf<Filter>()
+        filters.add(Filter.createPostFilter(e = postIds))
+        filters.add(Filter.createPostFilter(ids = postIds))
 
         val ids = nostrService.subscribe(
             filters = filters,

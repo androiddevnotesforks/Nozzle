@@ -34,6 +34,7 @@ class Filter(
         fun createPostFilter(
             ids: List<String>? = null,
             pubkeys: List<String>? = null,
+            e: List<String>? = null,
             since: Long? = null,
             until: Long? = null,
             limit: Int? = null
@@ -41,21 +42,11 @@ class Filter(
             return Filter(
                 ids = ids,
                 authors = pubkeys,
+                e = e,
                 kinds = listOf(Event.Kind.TEXT_NOTE),
                 since = since,
                 until = until,
                 limit = limit
-            )
-        }
-
-        fun createReplyFilter(
-            e: List<String>,
-            pubkeys: List<String>? = null,
-        ): Filter {
-            return Filter(
-                authors = pubkeys,
-                kinds = listOf(Event.Kind.TEXT_NOTE),
-                e = e,
             )
         }
 

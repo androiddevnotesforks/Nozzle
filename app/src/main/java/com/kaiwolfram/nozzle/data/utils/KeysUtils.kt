@@ -46,6 +46,15 @@ fun npubToHex(npub: String): Result<String> {
     }
 }
 
+fun noteIdToHex(noteId: String): Result<String> {
+    if (!noteId.startsWith("note1")) return Result.failure(IllegalArgumentException())
+    return try {
+        Result.success(Hex.encode(Bech32.decodeBytes(noteId).second))
+    } catch (t: Throwable) {
+        Result.failure(t)
+    }
+}
+
 fun nsecToHex(nsec: String): Result<String> {
     if (!nsec.startsWith("nsec1")) return Result.failure(IllegalArgumentException())
 

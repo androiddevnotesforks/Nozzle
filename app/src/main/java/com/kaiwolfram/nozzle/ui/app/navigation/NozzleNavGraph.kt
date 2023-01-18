@@ -77,6 +77,7 @@ fun NozzleNavGraph(
             SearchRoute(
                 searchViewModel = vmContainer.searchViewModel,
                 onNavigateToProfile = onNavigateToProfile,
+                onNavigateToThread = onNavigateToThread,
                 onGoBack = navActions.popStack,
             )
         }

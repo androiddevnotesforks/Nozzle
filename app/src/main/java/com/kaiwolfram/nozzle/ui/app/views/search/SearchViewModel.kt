@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.data.utils.noteIdToHex
 import com.kaiwolfram.nozzle.data.utils.npubToHex
+import com.kaiwolfram.nozzle.model.PostIds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -32,15 +34,23 @@ class SearchViewModel : ViewModel() {
         Log.i(TAG, "Initialize SearchViewModel")
     }
 
-    val onValidateAndNavigateToProfile: ((String) -> Unit) -> Unit = { onNavigateToProfile ->
-        uiState.value.input.let { input ->
-            val result = npubToHex(input)
-            result.onSuccess { onNavigateToProfile(it) }
-            result.onFailure {
-                viewModelState.update { state -> state.copy(isInvalid = true) }
+    val onValidateAndNavigateToDestination: ((String) -> Unit, (PostIds) -> Unit) -> Unit =
+        { onNavigateToProfile, onNavigateToThread ->
+            uiState.value.input.let { input ->
+                val trimmed = input.trim()
+                if (trimmed.startsWith("npub1")) {
+                    val npub = npubToHex(trimmed)
+                    npub.onSuccess { onNavigateToProfile(it) }
+                    npub.onFailure { setInvalid() }
+                } else if (trimmed.startsWith("note1")) {
+                    val noteId = noteIdToHex(trimmed)
+                    noteId.onSuccess { onNavigateToThread(PostIds.fromId(it)) }
+                    noteId.onFailure { setInvalid() }
+                } else {
+                    setInvalid()
+                }
             }
         }
-    }
 
     val onChangeInput: (String) -> Unit = { input ->
         uiState.value.let {
@@ -54,6 +64,10 @@ class SearchViewModel : ViewModel() {
         viewModelState.update {
             it.copy(input = "", isInvalid = false)
         }
+    }
+
+    private fun setInvalid() {
+        viewModelState.update { state -> state.copy(isInvalid = true) }
     }
 
     companion object {

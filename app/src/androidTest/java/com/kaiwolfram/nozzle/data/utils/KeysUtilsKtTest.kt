@@ -82,4 +82,24 @@ internal class KeysUtilsKtTest {
         assert(result.isFailure)
     }
 
+    @Test
+    fun noteIdToHexConvertsNoteIdToHex() {
+        val noteId = "note1xy9fv8ntag53ts5t7967tehc6edrvgpdutx93c9g9vrr4zpqm46slh9vlf"
+        val expectedHex = "310a961e6bea2915c28bf175e5e6f8d65a36202de2cc58e0a82b063a8820dd75"
+
+        val result = noteIdToHex(noteId)
+
+        assert(result.isSuccess)
+        assert(result.getOrNull() == expectedHex)
+    }
+
+    @Test
+    fun noteIdToHexFailsOnInvalidNoteId() {
+        val noteId = "note1cx5v7vvvdgdq7f76fcszy9wvrnl0ulehkkudzy"
+
+        val result = noteIdToHex(noteId)
+
+        assert(result.isFailure)
+    }
+
 }

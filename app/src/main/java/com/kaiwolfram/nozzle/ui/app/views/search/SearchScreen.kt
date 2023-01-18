@@ -17,7 +17,7 @@ import com.kaiwolfram.nozzle.ui.components.SearchTopBarButton
 fun SearchScreen(
     uiState: SearchViewModelState,
     onChangeInput: (String) -> Unit,
-    onValidateAndNavigateToProfile: () -> Unit,
+    onValidateAndNavigateToDestination: () -> Unit,
     onResetUI: () -> Unit,
     onGoBack: () -> Unit,
 ) {
@@ -28,7 +28,7 @@ fun SearchScreen(
             trailingIcon = {
                 SearchTopBarButton(
                     hasChanges = uiState.input.isNotBlank(),
-                    onSearch = onValidateAndNavigateToProfile,
+                    onSearch = onValidateAndNavigateToDestination,
                 )
             }
         )
@@ -36,7 +36,7 @@ fun SearchScreen(
             input = uiState.input,
             isInvalid = uiState.isInvalid,
             onChangeInput = onChangeInput,
-            onNavigateToProfile = onValidateAndNavigateToProfile,
+            onNavigateToProfile = onValidateAndNavigateToDestination,
         )
     }
     DisposableEffect(true) {
@@ -56,8 +56,8 @@ private fun SearchBar(
         value = input,
         isError = isInvalid,
         maxLines = 2,
-        placeholder = stringResource(id = R.string.search_npub),
-        errorLabel = stringResource(id = R.string.invalid_npub),
+        placeholder = stringResource(id = R.string.search_npub_or_note),
+        errorLabel = stringResource(id = R.string.invalid_npub_or_note),
         keyboardImeAction = ImeAction.Go,
         onGo = onNavigateToProfile,
         onChangeValue = onChangeInput,
