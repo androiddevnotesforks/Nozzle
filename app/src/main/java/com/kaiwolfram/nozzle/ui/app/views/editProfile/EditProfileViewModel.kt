@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.Metadata
 import com.kaiwolfram.nostrclientkt.utils.NostrUtils.isValidUsername
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
@@ -52,7 +53,7 @@ class EditProfileViewModel(
         useCachedValues()
     }
 
-    val onUpdateProfileAndShowToast: (String) -> Unit = { toast ->
+    val onUpdateProfile: () -> Unit = {
         uiState.value.let {
             if (!it.hasChanges) {
                 Log.i(TAG, "Profile editor has no changes")
@@ -68,7 +69,11 @@ class EditProfileViewModel(
                     updateMetadataOverNostr(it)
                     useCachedValues()
                 }
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.profile_updated),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 Log.i(TAG, "New values are invalid")
                 viewModelState.update { state ->

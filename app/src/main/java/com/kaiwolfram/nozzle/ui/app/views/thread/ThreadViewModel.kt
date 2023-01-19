@@ -160,7 +160,10 @@ class ThreadViewModel(
                 previous = thread.previous,
                 current = thread.current,
                 replies = thread.replies,
-                currentThreadPosition = getThreadPosition(thread.previous)
+                currentThreadPosition = getThreadPosition(
+                    current = thread.current,
+                    previous = thread.previous
+                )
             )
         }
     }
@@ -220,11 +223,14 @@ class ThreadViewModel(
         }
     }
 
-    private fun getThreadPosition(previous: List<PostWithMeta>): ThreadPosition {
-        return if (previous.isEmpty())
-            ThreadPosition.SINGLE
-        else {
+    private fun getThreadPosition(
+        current: PostWithMeta?,
+        previous: List<PostWithMeta>
+    ): ThreadPosition {
+        return if (previous.isNotEmpty() || current?.replyToId != null)
             ThreadPosition.END
+        else {
+            ThreadPosition.SINGLE
         }
     }
 

@@ -20,17 +20,16 @@ fun ReplyScreen(
     uiState: ReplyViewModelState,
     metadataState: Metadata?,
     onChangeReply: (String) -> Unit,
-    onSendOrShowErrorToast: (String) -> Unit,
+    onSend: () -> Unit,
     onGoBack: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        val errorToast = stringResource(id = R.string.your_reply_is_empty)
         ClosableTopBar(
             onClose = onGoBack,
             trailingIcon = {
                 SendTopBarButton(
                     isSendable = uiState.isSendable,
-                    onSend = { onSendOrShowErrorToast(errorToast) },
+                    onSend = { onSend() },
                     onGoBack = onGoBack,
                 )
             }

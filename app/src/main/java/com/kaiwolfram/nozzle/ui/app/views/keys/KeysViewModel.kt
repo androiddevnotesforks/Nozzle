@@ -9,6 +9,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
@@ -50,15 +51,16 @@ class KeysViewModel(
         useCachedValues()
     }
 
-    val onCopyNpubAndShowToast: (String) -> Unit = { toast ->
+    val onCopyNpub: () -> Unit = {
         uiState.value.npub.let {
-            Log.i(TAG, "Copy npub $it and show toast '$toast'")
+            Log.i(TAG, "Copy npub $it")
             clip.setText(AnnotatedString(it))
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.pubkey_copied), Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
-    val onUpdateKeyPairAndShowToast: (FocusManager, String) -> Unit = { focusManager, toast ->
+    val onUpdateKeyPair: (FocusManager) -> Unit = { focusManager ->
         uiState.value.let { state ->
             val isValid = isValidPrivkey(state.privkeyInput)
             if (!isValid) {
@@ -73,7 +75,11 @@ class KeysViewModel(
                 nostrSubscriber.subscribeToProfileMetadataAndContactList(keyManager.getPubkey())
                 useCachedValues()
                 focusManager.clearFocus()
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.key_pair_updated),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

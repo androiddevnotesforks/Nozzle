@@ -20,7 +20,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun EditProfileScreen(
     uiState: EditProfileViewModelState,
-    onUpdateProfileAndShowToast: (String) -> Unit,
+    onUpdateProfile: () -> Unit,
     onChangeName: (String) -> Unit,
     onChangeAbout: (String) -> Unit,
     onChangePicture: (String) -> Unit,
@@ -30,14 +30,13 @@ fun EditProfileScreen(
     onGoBack: () -> Unit,
 ) {
     Column {
-        val toast = stringResource(id = R.string.profile_updated)
         ReturnableTopBar(
             text = stringResource(id = R.string.edit_profile),
             onGoBack = onGoBack,
             trailingIcon = {
                 CheckTopBarButton(
                     hasChanges = uiState.hasChanges,
-                    onCheck = { onUpdateProfileAndShowToast(toast) },
+                    onCheck = { onUpdateProfile() },
                     onCanGoBack = onCanGoBack,
                     onGoBack = onGoBack,
                 )

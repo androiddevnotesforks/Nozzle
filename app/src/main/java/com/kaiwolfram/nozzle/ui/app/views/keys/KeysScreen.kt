@@ -17,14 +17,13 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 @Composable
 fun KeysScreen(
     uiState: KeysViewModelState,
-    onCopyNpubAndShowToast: (String) -> Unit,
-    onUpdateKeyPairAndShowToast: (FocusManager, String) -> Unit,
+    onCopyNpub: () -> Unit,
+    onUpdateKeyPair: (FocusManager) -> Unit,
     onChangePrivkey: (String) -> Unit,
     onResetUiState: () -> Unit,
     onGoBack: () -> Unit,
 ) {
     Column {
-        val toast = stringResource(id = R.string.key_pair_updated)
         val focusManager = LocalFocusManager.current
         ReturnableTopBar(
             text = stringResource(id = R.string.keys),
@@ -32,13 +31,13 @@ fun KeysScreen(
             trailingIcon = {
                 CheckTopBarButton(
                     hasChanges = uiState.hasChanges,
-                    onCheck = { onUpdateKeyPairAndShowToast(focusManager, toast) },
+                    onCheck = { onUpdateKeyPair(focusManager) },
                 )
             })
         Column(modifier = Modifier.padding(spacing.screenEdge)) {
             Npub(
                 npub = uiState.npub,
-                onCopyNpubAndShowToast = onCopyNpubAndShowToast
+                onCopyNpub = onCopyNpub
             )
             Spacer(modifier = Modifier.height(spacing.xxl))
             Privkey(
@@ -57,7 +56,7 @@ fun KeysScreen(
 @Composable
 private fun Npub(
     npub: String,
-    onCopyNpubAndShowToast: (String) -> Unit
+    onCopyNpub: () -> Unit
 ) {
     Text(
         text = stringResource(id = R.string.public_key),
@@ -69,12 +68,7 @@ private fun Npub(
         value = TextFieldValue(npub),
         enabled = false,
         onValueChange = { /* Always disabled*/ },
-        trailingIcon = {
-            CopyAndToastIcon(
-                toastText = stringResource(id = R.string.pubkey_copied),
-                onCopyAndShowToast = onCopyNpubAndShowToast
-            )
-        }
+        trailingIcon = { CopyIcon(onCopy = onCopyNpub) }
     )
 }
 

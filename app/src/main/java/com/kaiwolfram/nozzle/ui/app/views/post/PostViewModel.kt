@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
@@ -72,7 +73,7 @@ class PostViewModel(
         }
     }
 
-    val onSend: (String) -> Unit = { toast ->
+    val onSend: () -> Unit = {
         uiState.value.let { state ->
             if (!state.isSendable) {
                 Log.i(TAG, "Post is not sendable")
@@ -82,7 +83,11 @@ class PostViewModel(
                 viewModelScope.launch(context = Dispatchers.IO) {
                     postDao.insertIfNotPresent(PostEntity.fromEvent(event))
                 }
-                Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.post_published),
+                    Toast.LENGTH_SHORT
+                ).show()
                 reset()
             }
         }

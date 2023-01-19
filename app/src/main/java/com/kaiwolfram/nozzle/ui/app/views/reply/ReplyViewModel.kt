@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.ReplyTo
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
@@ -81,11 +82,15 @@ class ReplyViewModel(
         }
     }
 
-    val onSendOrShowErrorToast: (String) -> Unit = { errorToast ->
+    val onSend: () -> Unit = {
         uiState.value.let { state ->
             if (!state.isSendable) {
                 Log.i(TAG, "Reply is not sendable")
-                Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.your_reply_is_empty),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 postToReplyTo?.let {
                     Log.i(TAG, "Send reply to ${state.recipientName} ${state.pubkey}")

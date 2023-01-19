@@ -8,12 +8,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IProfileWithFollowerProvider
-import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
 import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -74,11 +74,12 @@ class ProfileViewModel(
         }
     }
 
-    val onCopyNpubAndShowToast: (String) -> Unit = { toast ->
+    val onCopyNpub: () -> Unit = {
         uiState.value.npub.let {
-            Log.i(TAG, "Copy npub $it and show toast '$toast'")
+            Log.i(TAG, "Copy npub $it")
             clip.setText(AnnotatedString(it))
-            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.pubkey_copied), Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -169,24 +170,6 @@ class ProfileViewModel(
                 isOneself = cachedProfile.isOneself,
                 isFollowed = cachedProfile.isFollowedByMe,
                 posts = feedProvider.getFeedWithSingleAuthor(pubkey)
-            )
-        }
-    }
-
-    private fun resetValues(pubkey: String) {
-        Log.i(TAG, "Reset values for to $pubkey")
-        viewModelState.update {
-            val npub = hexToNpub(pubkey)
-            it.copy(
-                pubkey = pubkey,
-                npub = npub,
-                name = npub,
-                about = "",
-                picture = "",
-                isFollowed = false,
-                numOfFollowing = 0,
-                numOfFollowers = 0,
-                posts = listOf(),
             )
         }
     }

@@ -15,8 +15,8 @@ fun EditProfileRoute(
 
     EditProfileScreen(
         uiState = uiState,
-        onUpdateProfileAndShowToast = { toast ->
-            editProfileViewModel.onUpdateProfileAndShowToast(toast)
+        onUpdateProfile = {
+            editProfileViewModel.onUpdateProfile()
             onResetDrawerUiState()
             onResetFeedIconUiState()
         },

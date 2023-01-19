@@ -31,7 +31,7 @@ fun ProfileScreen(
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
     onRefreshProfileView: () -> Unit,
-    onCopyNpubAndShowToast: (String) -> Unit,
+    onCopyNpub: () -> Unit,
     onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
@@ -47,7 +47,7 @@ fun ProfileScreen(
             isFollowed = uiState.isFollowed,
             onFollow = onFollow,
             onUnfollow = onUnfollow,
-            onCopyNpubAndShowToast = onCopyNpubAndShowToast,
+            onCopyNpub = onCopyNpub,
             onNavToEditProfile = onNavigateToEditProfile,
         )
         Spacer(Modifier.height(spacing.medium))
@@ -85,7 +85,7 @@ private fun ProfileData(
     isFollowed: Boolean,
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
-    onCopyNpubAndShowToast: (String) -> Unit,
+    onCopyNpub: () -> Unit,
     onNavToEditProfile: () -> Unit,
 ) {
     Column(
@@ -104,7 +104,7 @@ private fun ProfileData(
         NameAndNpub(
             name = name,
             npub = npub,
-            onCopyNpubAndShowToast = onCopyNpubAndShowToast,
+            onCopyNpub = onCopyNpub,
         )
         Spacer(Modifier.height(spacing.medium))
         if (about.isNotBlank()) {
@@ -205,7 +205,7 @@ private fun FollowerNumbers(
 private fun NameAndNpub(
     name: String,
     npub: String,
-    onCopyNpubAndShowToast: (String) -> Unit,
+    onCopyNpub: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -220,7 +220,7 @@ private fun NameAndNpub(
             )
             CopyableNpub(
                 npub = npub,
-                onCopyNpubAndShowToast = onCopyNpubAndShowToast
+                onCopyNpub = onCopyNpub
             )
         }
     }
@@ -229,11 +229,10 @@ private fun NameAndNpub(
 @Composable
 private fun CopyableNpub(
     npub: String,
-    onCopyNpubAndShowToast: (String) -> Unit,
+    onCopyNpub: () -> Unit,
 ) {
-    val toast = stringResource(id = R.string.pubkey_copied)
     Row(
-        Modifier.clickable { onCopyNpubAndShowToast(toast) },
+        Modifier.clickable { onCopyNpub() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         CopyIcon(

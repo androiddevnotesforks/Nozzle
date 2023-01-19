@@ -17,17 +17,16 @@ fun PostScreen(
     uiState: PostViewModelState,
     metadataState: Metadata?,
     onChangeContent: (String) -> Unit,
-    onSend: (String) -> Unit,
+    onSend: () -> Unit,
     onGoBack: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        val toast = stringResource(id = R.string.post_published)
         ClosableTopBar(
             onClose = onGoBack,
             trailingIcon = {
                 SendTopBarButton(
                     isSendable = uiState.isSendable,
-                    onSend = { onSend(toast) },
+                    onSend = { onSend() },
                     onGoBack = onGoBack,
                 )
             }

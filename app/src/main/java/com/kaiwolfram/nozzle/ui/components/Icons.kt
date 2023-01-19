@@ -18,14 +18,11 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.theme.sizing
 
 @Composable
-fun CopyAndToastIcon(
-    toastText: String,
-    onCopyAndShowToast: (String) -> Unit,
-) {
+fun CopyIcon(onCopy: () -> Unit) {
     CopyIcon(
         modifier = Modifier
             .size(sizing.smallIcon)
-            .clickable { onCopyAndShowToast(toastText) },
+            .clickable { onCopy() },
         description = stringResource(id = R.string.copy_content),
     )
 }
