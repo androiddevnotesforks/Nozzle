@@ -14,7 +14,6 @@ import com.kaiwolfram.nozzle.data.manager.IKeyManager
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.utils.isValidPrivkey
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -118,11 +117,6 @@ class KeysViewModel(
                 isInvalid = false,
             )
         }
-    }
-
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
     }
 
     companion object {

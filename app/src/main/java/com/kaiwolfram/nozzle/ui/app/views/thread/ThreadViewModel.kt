@@ -12,11 +12,14 @@ import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostThread
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 private const val TAG = "ThreadViewModel"
 
@@ -238,11 +241,6 @@ class ThreadViewModel(
         viewModelState.update {
             it.copy(isRefreshing = value)
         }
-    }
-
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
     }
 
     companion object {

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -66,11 +65,6 @@ class NozzleDrawerViewModel(
                 npub = personalProfileProvider.getNpub(),
             )
         }
-    }
-
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
     }
 
     companion object {

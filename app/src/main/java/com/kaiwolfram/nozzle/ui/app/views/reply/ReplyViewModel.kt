@@ -14,7 +14,6 @@ import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -121,11 +120,6 @@ class ReplyViewModel(
                 isSendable = false,
             )
         }
-    }
-
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
     }
 
     companion object {

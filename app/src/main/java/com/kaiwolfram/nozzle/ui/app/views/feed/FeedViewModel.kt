@@ -13,7 +13,6 @@ import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -223,11 +222,6 @@ class FeedViewModel(
         viewModelState.update {
             it.copy(isRefreshing = value)
         }
-    }
-
-    override fun onCleared() {
-        viewModelScope.cancel()
-        super.onCleared()
     }
 
     companion object {
