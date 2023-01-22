@@ -21,6 +21,13 @@ interface PostDao {
     )
     suspend fun getLatestFeed(pubkey: String, limit: Int, until: Long?): List<PostEntity>
 
+    @Query(
+        "SELECT * " +
+                "FROM post " +
+                "WHERE id = :id "
+    )
+    suspend fun getPost(id: String): PostEntity?
+
     /**
      * Sorted from newest to oldest
      */
@@ -42,17 +49,11 @@ interface PostDao {
     @Query(
         "SELECT * " +
                 "FROM post " +
-                "WHERE (:replyToRootId IS NOT NULL AND replyToRootId = :replyToRootId) " + // All
-                "OR replyToId = :currentPostId " + // All replies to current post
+                "WHERE replyToId = :currentPostId " + // All replies to current post
                 "OR id = :currentPostId " + // Current post
-                "OR (:replyToId IS NOT NULL AND id = :replyToId) " + // Direct parent
-                "OR (:replyToRootId IS NOT NULL AND id = :replyToRootId)" // Root post
+                "OR (:replyToId IS NOT NULL AND id = :replyToId) " // Direct parent
     )
-    suspend fun getWholeThread(
-        currentPostId: String,
-        replyToRootId: String?,
-        replyToId: String?
-    ): List<PostEntity>
+    suspend fun getThreadEnd(currentPostId: String, replyToId: String?): List<PostEntity>
 
     @RewriteQueriesToDropUnusedColumns
     @MapInfo(keyColumn = "id")

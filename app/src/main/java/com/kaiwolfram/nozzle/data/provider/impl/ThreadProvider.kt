@@ -4,43 +4,34 @@ import com.kaiwolfram.nozzle.data.mapper.IPostMapper
 import com.kaiwolfram.nozzle.data.provider.IThreadProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
-import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostThread
 
 class ThreadProvider(
     private val postMapper: IPostMapper,
     private val postDao: PostDao,
 ) : IThreadProvider {
-    override suspend fun getThread(ids: PostIds): PostThread {
-        val wholeThread = postDao.getWholeThread(
-            currentPostId = ids.id,
-            replyToRootId = ids.replyToRootId,
-            replyToId = ids.replyToId,
+    override suspend fun getThread(currentPostId: String, replyToId: String?): PostThread {
+        val threadEnd = postDao.getThreadEnd(
+            currentPostId = currentPostId,
+            replyToId = replyToId,
         )
-        val current = wholeThread.find { it.id == ids.id }
-            ?: return PostThread.createEmpty()
-        val previous = getPrevious(wholeThread, current)
-        val replies = wholeThread.filter { it.replyToId == current.id }
+        val current = threadEnd.find { it.id == currentPostId } ?: return PostThread.createEmpty()
+        val replies = threadEnd.filter { it.replyToId == current.id }
+        val previous = listPrevious(current)
 
         return getMappedThread(current, previous, replies)
     }
 
-    private fun getPrevious(wholeThread: List<PostEntity>, current: PostEntity): List<PostEntity> {
+    private suspend fun listPrevious(current: PostEntity): List<PostEntity> {
+        if (current.replyToId == null) return listOf()
+
         val previous = mutableListOf(current)
-        var isEarliest = false
-        while (!isEarliest) {
-            for (post in wholeThread) {
-                if (post.id == current.replyToRootId) isEarliest = true
-                if (post.id == previous.last().replyToId) {
-                    previous.add(post)
-                    if (post.replyToId == null) isEarliest = true
-                    break
-                }
-                if (post == wholeThread.last()) {
-                    isEarliest = true
-                }
-            }
+        while (previous.last().replyToId != null) {
+            val replyToId = previous.last().replyToId ?: break
+            val previousPost = postDao.getPost(replyToId) ?: break
+            previous.add(previousPost)
         }
+
         previous.reverse() // root first
         previous.removeLast() // Removing 'current'
 

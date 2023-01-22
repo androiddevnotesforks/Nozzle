@@ -53,14 +53,14 @@ class ThreadViewModel(
     private var job: Job? = null
     val onOpenThread: (PostIds) -> Unit = { postIds ->
         Log.i(TAG, "Open thread of post ${postIds.id}")
-        currentPostIds = postIds
         setEmptyThread()
+        currentPostIds = postIds
         job?.let { if (it.isActive) it.cancel() }
         job = viewModelScope.launch(context = Dispatchers.IO) {
-            setThread(threadProvider.getThread(postIds))
+            setThread(getThread())
             renewThreadSubscription()
             delay(1000)
-            val thread = threadProvider.getThread(postIds)
+            val thread = getThread()
             setThread(thread)
             setThreadWithNewData(thread)
             updateCurrentPostIds(thread)
@@ -73,11 +73,10 @@ class ThreadViewModel(
             setRefresh(true)
             renewThreadSubscription()
             delay(1000)
-            val thread = threadProvider.getThread(currentPostIds)
+            val thread = getThread()
             renewAdditionalDataSubscription(thread)
-            updateCurrentPostIds(thread)
             delay(1000)
-            setThread(threadProvider.getThread(currentPostIds))
+            setThread(getThread())
             setRefresh(false)
         }
     }
@@ -156,6 +155,13 @@ class ThreadViewModel(
         }
     }
 
+    private suspend fun getThread(): PostThread {
+        return threadProvider.getThread(
+            currentPostId = currentPostIds.id,
+            replyToId = currentPostIds.replyToId
+        )
+    }
+
     private fun setThread(thread: PostThread) {
         Log.i(TAG, "Set thread ${thread.current?.id}")
         viewModelState.update {
@@ -213,17 +219,7 @@ class ThreadViewModel(
     private suspend fun setThreadWithNewData(thread: PostThread) {
         renewAdditionalDataSubscription(thread)
         delay(1000)
-        thread.current?.let {
-            setThread(
-                threadProvider.getThread(
-                    PostIds(
-                        id = it.id,
-                        replyToRootId = it.replyToRootId,
-                        replyToId = it.replyToId
-                    )
-                )
-            )
-        }
+        setThread(getThread())
     }
 
     private fun getThreadPosition(

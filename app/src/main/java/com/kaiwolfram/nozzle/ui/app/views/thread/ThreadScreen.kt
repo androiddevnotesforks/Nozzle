@@ -106,6 +106,9 @@ private fun ThreadedPosts(
                     )
                 }
                 item {
+                    if (it.replyToId != null && previous.isEmpty()) {
+                        PostNotFound()
+                    }
                     PostCard(
                         post = it,
                         isCurrent = true,
