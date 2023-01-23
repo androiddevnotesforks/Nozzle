@@ -1,6 +1,6 @@
 package com.kaiwolfram.nozzle.data.provider.impl
 
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.data.provider.IProfileWithFollowerProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao

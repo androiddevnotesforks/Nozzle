@@ -1,7 +1,7 @@
 package com.kaiwolfram.nozzle.data.room.dao
 
 import androidx.room.*
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import com.kaiwolfram.nozzle.model.NameAndPicture
 import com.kaiwolfram.nozzle.model.NameAndPubkey

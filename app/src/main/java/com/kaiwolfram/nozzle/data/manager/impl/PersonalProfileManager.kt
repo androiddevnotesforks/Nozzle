@@ -1,7 +1,7 @@
 package com.kaiwolfram.nozzle.data.manager.impl
 
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao

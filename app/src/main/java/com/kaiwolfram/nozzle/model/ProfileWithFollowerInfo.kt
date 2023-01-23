@@ -1,6 +1,6 @@
 package com.kaiwolfram.nozzle.model
 
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.model.Metadata
 
 data class ProfileWithFollowerInfo(
     val pubkey: String,

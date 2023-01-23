@@ -1,6 +1,6 @@
 package com.kaiwolfram.nostrclientkt.net
 
-import com.kaiwolfram.nostrclientkt.Event
+import com.kaiwolfram.nostrclientkt.model.Event
 
 interface NostrListener {
     fun onOpen(msg: String)

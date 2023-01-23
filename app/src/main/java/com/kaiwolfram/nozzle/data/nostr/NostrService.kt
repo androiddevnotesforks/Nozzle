@@ -2,6 +2,9 @@ package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
 import com.kaiwolfram.nostrclientkt.*
+import com.kaiwolfram.nostrclientkt.model.Event
+import com.kaiwolfram.nostrclientkt.model.Filter
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor

@@ -1,6 +1,10 @@
 package com.kaiwolfram.nozzle.data.nostr
 
-import com.kaiwolfram.nostrclientkt.*
+import com.kaiwolfram.nostrclientkt.ContactListEntry
+import com.kaiwolfram.nostrclientkt.ReplyTo
+import com.kaiwolfram.nostrclientkt.model.Event
+import com.kaiwolfram.nostrclientkt.model.Filter
+import com.kaiwolfram.nostrclientkt.model.Metadata
 
 interface INostrService {
     fun publishProfile(metadata: Metadata): Event

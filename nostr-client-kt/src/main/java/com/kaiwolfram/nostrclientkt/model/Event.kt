@@ -1,7 +1,10 @@
-package com.kaiwolfram.nostrclientkt
+package com.kaiwolfram.nostrclientkt.model
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
+import com.kaiwolfram.nostrclientkt.ContactListEntry
+import com.kaiwolfram.nostrclientkt.Keys
+import com.kaiwolfram.nostrclientkt.Post
 import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 import com.kaiwolfram.nostrclientkt.utils.SchnorrUtils
 import com.kaiwolfram.nostrclientkt.utils.SchnorrUtils.secp256k1

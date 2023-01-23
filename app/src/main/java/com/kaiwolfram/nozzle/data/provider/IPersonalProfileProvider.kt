@@ -1,6 +1,6 @@
 package com.kaiwolfram.nozzle.data.provider
 
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import kotlinx.coroutines.flow.Flow
 
 interface IPersonalProfileProvider : IPubkeyProvider {

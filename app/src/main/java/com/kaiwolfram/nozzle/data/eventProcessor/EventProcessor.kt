@@ -3,9 +3,9 @@ package com.kaiwolfram.nozzle.data.eventProcessor
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.kaiwolfram.nostrclientkt.Event
-import com.kaiwolfram.nostrclientkt.Metadata
-import com.kaiwolfram.nostrclientkt.Tag
+import com.kaiwolfram.nostrclientkt.model.Event
+import com.kaiwolfram.nostrclientkt.model.Metadata
+import com.kaiwolfram.nostrclientkt.model.Tag
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao

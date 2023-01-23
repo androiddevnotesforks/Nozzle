@@ -1,7 +1,7 @@
 package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.Filter
+import com.kaiwolfram.nostrclientkt.model.Filter
 import com.kaiwolfram.nozzle.data.utils.TimeConstants
 import com.kaiwolfram.nozzle.data.utils.getCurrentTimeInSeconds
 

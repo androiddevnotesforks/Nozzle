@@ -2,8 +2,8 @@ package com.kaiwolfram.nostrclientkt.net
 
 import android.util.Log
 import com.google.gson.JsonElement
-import com.kaiwolfram.nostrclientkt.Event
-import com.kaiwolfram.nostrclientkt.Filter
+import com.kaiwolfram.nostrclientkt.model.Event
+import com.kaiwolfram.nostrclientkt.model.Filter
 import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 import okhttp3.*
 import java.util.*

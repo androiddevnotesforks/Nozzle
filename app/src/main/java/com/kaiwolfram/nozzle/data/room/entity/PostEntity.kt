@@ -2,7 +2,7 @@ package com.kaiwolfram.nozzle.data.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.kaiwolfram.nostrclientkt.Event
+import com.kaiwolfram.nostrclientkt.model.Event
 
 @Entity(tableName = "post")
 data class PostEntity(

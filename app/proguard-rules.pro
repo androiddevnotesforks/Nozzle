@@ -20,3 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep class fr.acinq.secp256k1.jni.** { *; }
+-keep class com.kaiwolfram.nostrclientkt.model.** { <fields>; }

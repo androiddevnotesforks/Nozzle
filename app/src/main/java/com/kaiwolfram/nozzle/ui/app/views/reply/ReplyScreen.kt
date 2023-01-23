@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ClosableTopBar
 import com.kaiwolfram.nozzle.ui.components.InputBox

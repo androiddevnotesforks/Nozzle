@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nostrclientkt.Metadata
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nostrclientkt.utils.NostrUtils.isValidUsername
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.manager.IPersonalProfileManager

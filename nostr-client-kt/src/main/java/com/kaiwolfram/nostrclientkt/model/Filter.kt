@@ -1,7 +1,7 @@
-package com.kaiwolfram.nostrclientkt
+package com.kaiwolfram.nostrclientkt.model
 
 import com.google.gson.annotations.SerializedName
-import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
+import com.kaiwolfram.nostrclientkt.utils.JsonUtils
 
 class Filter(
     val ids: List<String>? = null,
@@ -13,14 +13,14 @@ class Filter(
     val until: Long? = null,
     val limit: Int? = null
 ) {
-    fun toJson(): String = gson.toJson(this)
+    fun toJson(): String = JsonUtils.gson.toJson(this)
 
     companion object {
         fun createProfileFilter(pubkey: String): Filter {
             return Filter(
                 authors = listOf(pubkey),
                 kinds = listOf(Event.Kind.METADATA),
-                limit = 1
+                limit = 1,
             )
         }
 
@@ -65,14 +65,13 @@ class Filter(
             pubkey: String,
             since: Long? = null,
             until: Long? = null,
-            limit: Int? = null
         ): Filter {
             return Filter(
                 authors = listOf(pubkey),
                 kinds = listOf(Event.Kind.CONTACT_LIST),
                 since = since,
                 until = until,
-                limit = limit
+                limit = 1
             )
         }
     }
