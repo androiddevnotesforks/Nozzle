@@ -9,7 +9,6 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
-import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers.IO
@@ -37,7 +36,6 @@ class FeedViewModel(
     private val feedProvider: IFeedProvider,
     private val postCardInteractor: IPostCardInteractor,
     private val nostrSubscriber: INostrSubscriber,
-    private val postDao: PostDao,
     private val contactDao: ContactDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
@@ -160,19 +158,10 @@ class FeedViewModel(
         )
     }
 
-
     private suspend fun subscribeToAdditionalFeedData(posts: List<PostWithMeta>) {
         Log.i(TAG, "Subscribe to additional feed data")
-        val referencedPostIds = listReferencedPostIds(posts)
-        val referencedPubkeys = mutableListOf<String>()
-        referencedPubkeys.addAll(listReferencedPubkeys(posts))
-        referencedPubkeys.addAll(postDao.listAuthorPubkeys(referencedPostIds))
         nostrSubscriber.unsubscribeAdditionalPostsData()
-        nostrSubscriber.subscribeToAdditionalPostsData(
-            postIds = listPostIds(posts),
-            referencedPubkeys = referencedPubkeys.distinct(),
-            referencedPostIds = referencedPostIds,
-        )
+        nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
     }
 
     private suspend fun setFeed() {
@@ -180,22 +169,6 @@ class FeedViewModel(
         viewModelState.update {
             it.copy(posts = feedProvider.getFeed(limit = batchSize))
         }
-    }
-
-    private suspend fun appendFeed(): List<PostWithMeta> {
-        viewModelState.value.let { state ->
-            state.posts.lastOrNull()?.let { last ->
-                val allPosts = mutableListOf<PostWithMeta>()
-                allPosts.addAll(state.posts)
-                val newPosts = feedProvider.getFeed(limit = batchSize, until = last.createdAt)
-                allPosts.addAll(newPosts)
-                viewModelState.update {
-                    it.copy(posts = allPosts)
-                }
-                return newPosts
-            }
-        }
-        return listOf()
     }
 
     private val isAppending = AtomicBoolean(false)
@@ -209,12 +182,23 @@ class FeedViewModel(
                 isAppending.set(true)
                 subscribeToFeed(until = last.createdAt)
                 delay(1000)
-                val newPosts = appendFeed()
+                val newPosts = appendFeedAndGetNewPosts()
                 subscribeToAdditionalFeedData(newPosts)
-                delay(2500)
-                appendFeed()
                 isAppending.set(false)
             }
+        }
+    }
+
+    private suspend fun appendFeedAndGetNewPosts(): List<PostWithMeta> {
+        viewModelState.value.let { state ->
+            val newFeed = feedProvider.appendFeed(currentFeed = state.posts, limit = batchSize)
+            val countOfNewPosts = newFeed.size - state.posts.size
+            require(countOfNewPosts >= 0)
+            val appended = newFeed.takeLast(countOfNewPosts)
+            viewModelState.update {
+                it.copy(posts = newFeed)
+            }
+            return appended
         }
     }
 
@@ -230,7 +214,6 @@ class FeedViewModel(
             feedProvider: IFeedProvider,
             postCardInteractor: IPostCardInteractor,
             nostrSubscriber: INostrSubscriber,
-            postDao: PostDao,
             contactDao: ContactDao,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -240,7 +223,6 @@ class FeedViewModel(
                     feedProvider = feedProvider,
                     postCardInteractor = postCardInteractor,
                     nostrSubscriber = nostrSubscriber,
-                    postDao = postDao,
                     contactDao = contactDao,
                 ) as T
             }

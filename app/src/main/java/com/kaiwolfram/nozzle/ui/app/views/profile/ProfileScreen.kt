@@ -32,6 +32,7 @@ fun ProfileScreen(
     onUnfollow: (String) -> Unit,
     onRefreshProfileView: () -> Unit,
     onCopyNpub: () -> Unit,
+    onLoadMore: () -> Unit,
     onNavigateToThread: (PostIds) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
@@ -64,7 +65,7 @@ fun ProfileScreen(
             onLike = onLike,
             onRepost = onRepost,
             onPrepareReply = onPrepareReply,
-            onLoadMore = {},
+            onLoadMore = onLoadMore,
             onNavigateToThread = onNavigateToThread,
             onNavigateToReply = onNavigateToReply
         )

@@ -1,5 +1,6 @@
 package com.kaiwolfram.nostrclientkt
 
+import com.kaiwolfram.nostrclientkt.model.Event
 import org.junit.Test
 
 internal class EventTest {

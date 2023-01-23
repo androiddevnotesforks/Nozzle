@@ -207,13 +207,9 @@ class ThreadViewModel(
         )
     }
 
-    private fun renewAdditionalDataSubscription(thread: PostThread) {
+    private suspend fun renewAdditionalDataSubscription(thread: PostThread) {
         nostrSubscriber.unsubscribeAdditionalPostsData()
-        nostrSubscriber.subscribeToAdditionalPostsData(
-            postIds = listPostIds(thread),
-            referencedPostIds = listReferencedPostIds(thread),
-            referencedPubkeys = listReferencedPubkeys(thread)
-        )
+        nostrSubscriber.subscribeToAdditionalPostsData(thread.getList())
     }
 
     private suspend fun setThreadWithNewData(thread: PostThread) {

@@ -2,12 +2,19 @@ package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
 import com.kaiwolfram.nostrclientkt.model.Filter
+import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.utils.TimeConstants
 import com.kaiwolfram.nozzle.data.utils.getCurrentTimeInSeconds
+import com.kaiwolfram.nozzle.data.utils.listReferencedPostIds
+import com.kaiwolfram.nozzle.data.utils.listReferencedPubkeys
+import com.kaiwolfram.nozzle.model.PostWithMeta
 
 private const val TAG = "NostrSubscriber"
 
-class NostrSubscriber(private val nostrService: INostrService) : INostrSubscriber {
+class NostrSubscriber(
+    private val nostrService: INostrService,
+    private val postDao: PostDao
+) : INostrSubscriber {
     private val feedSubscriptions = mutableListOf<String>()
     private val threadSubscriptions = mutableListOf<String>()
     private val additionalFeedDataSubscriptions = mutableListOf<String>()
@@ -18,10 +25,13 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
         val profileFilter = Filter.createProfileFilter(pubkey = pubkey)
         val contactListFilter = Filter.createContactListFilter(pubkey = pubkey)
 
-        return nostrService.subscribe(
+        val ids = nostrService.subscribe(
             filters = listOf(profileFilter, contactListFilter),
             unsubOnEOSE = true
         )
+        profileSubscriptions.addAll(ids)
+
+        return ids
     }
 
     private fun getCurrentTimePlus5min() =
@@ -30,7 +40,7 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
     override fun subscribeToFeed(
         authorPubkeys: List<String>,
         limit: Int,
-        until: Long?,
+        until: Long?
     ): List<String> {
         Log.i(TAG, "Subscribe to feed of ${authorPubkeys.size} contacts")
         val postFilter = Filter.createPostFilter(
@@ -39,27 +49,39 @@ class NostrSubscriber(private val nostrService: INostrService) : INostrSubscribe
             limit = limit
         )
 
-        val ids = nostrService.subscribe(filters = listOf(postFilter))
+        val ids = nostrService.subscribe(
+            filters = listOf(postFilter),
+            unsubOnEOSE = until != null
+        )
         feedSubscriptions.addAll(ids)
 
         return ids
     }
 
-    override fun subscribeToAdditionalPostsData(
-        postIds: List<String>,
-        referencedPubkeys: List<String>,
-        referencedPostIds: List<String>
+    override suspend fun subscribeToAdditionalPostsData(
+        posts: List<PostWithMeta>
     ): List<String> {
         Log.i(TAG, "Subscribe to additional posts data")
-        if (referencedPubkeys.isEmpty() && referencedPostIds.isEmpty()) return listOf()
+        if (posts.isEmpty()) return listOf()
 
-        val reactionFilter = Filter.createReactionFilter(e = postIds)
-        val replyFilter = Filter.createPostFilter(e = postIds)
-        val profileFilter = Filter.createProfileFilter(pubkeys = referencedPubkeys)
-        val postFilter = Filter.createPostFilter(ids = referencedPostIds)
+        val postIds = posts.map { it.id }
+        val referencedPostIds = listReferencedPostIds(posts)
+        val referencedPubkeys = mutableSetOf<String>()
+        referencedPubkeys.addAll(listReferencedPubkeys(posts))
+        referencedPubkeys.addAll(postDao.listAuthorPubkeys(referencedPostIds))
+
+        val filters = mutableListOf<Filter>()
+        filters.add(Filter.createReactionFilter(e = postIds))
+        filters.add(Filter.createPostFilter(e = postIds))
+        if (referencedPostIds.isNotEmpty()) {
+            filters.add(Filter.createPostFilter(ids = referencedPostIds))
+        }
+        if (referencedPubkeys.isNotEmpty()) {
+            filters.add(Filter.createProfileFilter(pubkeys = referencedPubkeys.toList()))
+        }
 
         val ids = nostrService.subscribe(
-            filters = listOf(profileFilter, postFilter, reactionFilter, replyFilter),
+            filters = filters,
             unsubOnEOSE = true
         )
         additionalFeedDataSubscriptions.addAll(ids)

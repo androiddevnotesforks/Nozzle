@@ -54,6 +54,7 @@ class AppContainer(context: Context) {
 
     val nostrSubscriber: INostrSubscriber = NostrSubscriber(
         nostrService = nostrService,
+        postDao = roomDb.postDao()
     )
 
     val postCardInteractor: IPostCardInteractor = PostCardInteractor(

@@ -1,5 +1,7 @@
 package com.kaiwolfram.nozzle.data.nostr
 
+import com.kaiwolfram.nozzle.model.PostWithMeta
+
 interface INostrSubscriber {
     fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String>
 
@@ -9,11 +11,7 @@ interface INostrSubscriber {
         until: Long? = null,
     ): List<String>
 
-    fun subscribeToAdditionalPostsData(
-        postIds: List<String>,
-        referencedPubkeys: List<String>,
-        referencedPostIds: List<String>
-    ): List<String>
+    suspend fun subscribeToAdditionalPostsData(posts: List<PostWithMeta>): List<String>
 
     fun subscribeToThread(
         currentPostId: String,

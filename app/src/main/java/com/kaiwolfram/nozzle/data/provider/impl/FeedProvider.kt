@@ -26,10 +26,53 @@ class FeedProvider(
         return postMapper.mapToPostsWithMeta(posts)
     }
 
-    override suspend fun getFeedWithSingleAuthor(pubkey: String): List<PostWithMeta> {
+    override suspend fun getFeedWithSingleAuthor(
+        pubkey: String,
+        limit: Int,
+        until: Long?
+    ): List<PostWithMeta> {
         Log.i(TAG, "Get feed of author $pubkey")
-        val posts = postDao.getLatestFeedOfCustomContacts(pubkey)
+        val posts = postDao.getLatestFeedOfSingleAuthor(
+            pubkey = pubkey,
+            limit = limit,
+            until = until
+        )
 
         return postMapper.mapToPostsWithMeta(posts)
+    }
+
+    override suspend fun appendFeed(
+        currentFeed: List<PostWithMeta>,
+        limit: Int
+    ): List<PostWithMeta> {
+        currentFeed.lastOrNull()?.let { last ->
+            val allPosts = mutableListOf<PostWithMeta>()
+            allPosts.addAll(currentFeed)
+            allPosts.addAll(getFeed(limit = limit, until = last.createdAt))
+            return allPosts
+        }
+
+        return listOf()
+    }
+
+    override suspend fun appendFeedWithSingleAuthor(
+        pubkey: String,
+        currentFeed: List<PostWithMeta>,
+        limit: Int
+    ): List<PostWithMeta> {
+        currentFeed.lastOrNull()?.let { last ->
+            val allPosts = mutableListOf<PostWithMeta>()
+            allPosts.addAll(currentFeed)
+            allPosts.addAll(
+                getFeedWithSingleAuthor(
+                    pubkey = pubkey,
+                    limit = limit,
+                    until = last.createdAt
+                )
+            )
+            return allPosts
+        }
+
+        return listOf()
     }
 }

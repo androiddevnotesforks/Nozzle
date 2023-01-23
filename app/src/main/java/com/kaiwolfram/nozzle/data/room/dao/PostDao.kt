@@ -34,13 +34,15 @@ interface PostDao {
     @Query(
         "SELECT * " +
                 "FROM post " +
-                "WHERE pubkey IN (:contactPubkeys) " +
+                "WHERE pubkey = :pubkey " +
+                "AND (:until IS NULL OR createdAt < :until) " +
                 "ORDER BY createdAt DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getLatestFeedOfCustomContacts(
-        vararg contactPubkeys: String,
-        limit: Int = 100
+    suspend fun getLatestFeedOfSingleAuthor(
+        pubkey: String,
+        limit: Int,
+        until: Long?
     ): List<PostEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
