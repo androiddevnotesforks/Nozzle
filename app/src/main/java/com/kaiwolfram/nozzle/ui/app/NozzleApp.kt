@@ -70,9 +70,11 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = FeedViewModel.provideFactory(
                         personalProfileProvider = appContainer.personalProfileManager,
                         feedProvider = appContainer.feedProvider,
+                        relayProvider = appContainer.relayProvider,
                         postCardInteractor = appContainer.postCardInteractor,
                         nostrSubscriber = appContainer.nostrSubscriber,
-                        contactDao = appContainer.roomDb.contactDao()
+                        contactDao = appContainer.roomDb.contactDao(),
+                        context = LocalContext.current
                     )
                 ),
                 editProfileViewModel = viewModel(

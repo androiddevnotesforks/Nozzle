@@ -76,4 +76,7 @@
     <string name="time_abbr_month">M</string>
     <string name="time_abbr_year">y</string>
     <string name="note_id_copied">Note ID copied</string>
+    <string name="move_to_previous_feed">Move to previous feed</string>
+    <string name="move_to_next_feed">Move to next feed</string>
+    <string name="overview">Overview</string>
 </resources>

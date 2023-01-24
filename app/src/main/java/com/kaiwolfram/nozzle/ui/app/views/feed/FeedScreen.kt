@@ -5,12 +5,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostIds
@@ -42,6 +44,8 @@ fun FeedScreen(
     onPrepareReply: (PostWithMeta) -> Unit,
     onPreparePost: () -> Unit,
     onLoadMore: () -> Unit,
+    onPreviousHeadline: () -> Unit,
+    onNextHeadline: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (PostIds) -> Unit,
     onNavigateToProfile: (String) -> Unit,
@@ -52,12 +56,13 @@ fun FeedScreen(
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
-            FeedTopBar(
-                picture = metadataState?.picture.orEmpty(),
+            FeedTopBar(picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
+                headline = uiState.headline,
+                onPreviousHeadline = onPreviousHeadline,
+                onNextHeadline = onNextHeadline,
                 onPictureClick = onOpenDrawer,
-                onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } }
-            )
+                onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } })
         },
         floatingActionButton = {
             FeedFab(onPrepareNewPost = {
@@ -95,6 +100,9 @@ fun FeedScreen(
 private fun FeedTopBar(
     picture: String,
     pubkey: String,
+    headline: String,
+    onNextHeadline: () -> Unit,
+    onPreviousHeadline: () -> Unit,
     onPictureClick: () -> Unit,
     onScrollToTop: () -> Unit
 ) {
@@ -116,20 +124,58 @@ private fun FeedTopBar(
                         .clickable { onPictureClick() },
                 )
             }
-            Text(
-                modifier = Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onScrollToTop() },
-                text = stringResource(id = R.string.app_name),
-                style = typography.h6,
-                color = colors.background
+            Headline(
+                modifier = Modifier.fillMaxWidth(0.8f),
+                headline = headline,
+                onPreviousHeadline = onPreviousHeadline,
+                onNextHeadline = onNextHeadline,
+                onScrollToTop = onScrollToTop,
             )
             Row {
                 Spacer(modifier = Modifier.size(sizing.smallProfilePicture))
                 Spacer(modifier = Modifier.width(spacing.large))
             }
         }
+    }
+}
+
+@Composable
+private fun Headline(
+    headline: String,
+    onNextHeadline: () -> Unit,
+    onPreviousHeadline: () -> Unit,
+    onScrollToTop: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable { onPreviousHeadline() },
+            imageVector = Icons.Default.ArrowLeft,
+            contentDescription = stringResource(id = R.string.move_to_previous_feed),
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onScrollToTop() },
+            text = headline.removePrefix("wss://"),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = typography.h6,
+            color = colors.background
+        )
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable { onNextHeadline() },
+            imageVector = Icons.Default.ArrowRight,
+            contentDescription = stringResource(id = R.string.move_to_next_feed),
+        )
     }
 }
 

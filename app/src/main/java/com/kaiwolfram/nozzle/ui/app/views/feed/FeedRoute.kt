@@ -29,6 +29,8 @@ fun FeedRoute(
         onPreparePost = onPreparePost,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onLoadMore = feedViewModel.onLoadMore,
+        onPreviousHeadline = feedViewModel.onPreviousHeadline,
+        onNextHeadline = feedViewModel.onNextHeadline,
         onOpenDrawer = onOpenDrawer,
         onNavigateToProfile = onNavigateToProfile,
         onNavigateToThread = onNavigateToThread,
