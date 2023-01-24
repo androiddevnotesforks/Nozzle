@@ -33,6 +33,7 @@ class Client {
                             )
                         }
                     }
+                    "OK" -> nostrListener?.onOk(id = msg[1].asString.orEmpty())
                     "NOTICE" -> nostrListener?.onError(msg = msg[1].asString)
                     "EOSE" -> nostrListener?.onEOSE(subscriptionId = msg[1].asString)
                     else -> nostrListener?.onError(msg = "Unknown type $type. Msg was $text")
@@ -85,9 +86,8 @@ class Client {
     }
 
     fun publish(event: Event) {
-        Log.i(TAG, "Publish kind ${event.kind} event ${event.id}")
-
         val request = """["EVENT",${event.toJson()}]"""
+        Log.i(TAG, "Publish $request")
         sockets.values.forEach { it.send(request) }
     }
 

@@ -20,7 +20,6 @@ class Filter(
             return Filter(
                 authors = listOf(pubkey),
                 kinds = listOf(Event.Kind.METADATA),
-                limit = 1,
             )
         }
 
@@ -71,7 +70,6 @@ class Filter(
                 kinds = listOf(Event.Kind.CONTACT_LIST),
                 since = since,
                 until = until,
-                limit = 1
             )
         }
     }

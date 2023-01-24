@@ -68,7 +68,7 @@ class KeysViewModel(
                     state.copy(isInvalid = true)
                 }
             } else if (uiState.value.hasChanges) {
-                Log.i(TAG, "Saving new privkey $state.privkeyInput")
+                Log.i(TAG, "Saving new privkey")
                 keyManager.setPrivkey(state.privkeyInput)
                 personalProfileManager.updateMetadata()
                 nostrSubscriber.subscribeToProfileMetadataAndContactList(keyManager.getPubkey())

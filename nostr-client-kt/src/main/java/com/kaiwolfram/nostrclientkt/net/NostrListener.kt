@@ -9,4 +9,5 @@ interface NostrListener {
     fun onEOSE(subscriptionId: String)
     fun onClose(reason: String)
     fun onFailure(msg: String?, throwable: Throwable? = null)
+    fun onOk(id: String)
 }

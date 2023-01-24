@@ -20,13 +20,14 @@ class NostrService(
     private val keys: Keys = keyManager.getKeys()
     private val client = Client()
     private val relays = listOf(
+        "wss://nostr-pub.wellorder.net",
+        "wss://nostr.onsats.org",
+        "wss://nostr-relay.wlvs.space",
+        "wss://nostr.bitcoiner.social",
+        "wss://relay.damus.io",
         "wss://nostr.zebedee.cloud",
         "wss://nostr.fmt.wiz.biz",
-        "wss://nostr.einundzwanzig.space",
-        "wss://relay.damus.io",
-        "wss://nostr.bitcoiner.social",
-        "wss://nostr-relay.wlvs.space",
-        "wss://nostr.oxtr.dev",
+        "wss://nostr.walletofsatoshi.com",
     )
     private val unsubOnEOSECache = Collections.synchronizedSet(mutableSetOf<String>())
     private val listener = object : NostrListener {
@@ -35,7 +36,10 @@ class NostrService(
         }
 
         override fun onEvent(subscriptionId: String, event: Event) {
-            Log.d(TAG, "OnEvent: id ${event.id} in subscription $subscriptionId")
+            Log.d(
+                TAG,
+                "OnEvent: id ${event.id}, kind ${event.kind} in subscription $subscriptionId"
+            )
             eventProcessor.process(event)
         }
 
@@ -59,6 +63,10 @@ class NostrService(
             Log.w(TAG, "OnFailure: $msg", throwable)
         }
 
+        override fun onOk(id: String) {
+            Log.d(TAG, "OnOk: $id")
+        }
+
     }
 
     init {
@@ -72,6 +80,7 @@ class NostrService(
             metadata = metadata,
             keys = keys,
         )
+        Log.i(TAG, "new profile is valid ${event.verify()}")
         client.publish(event)
 
         return event

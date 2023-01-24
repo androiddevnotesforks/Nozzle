@@ -65,7 +65,6 @@ class EditProfileViewModel(
                 Log.i(TAG, "New values are valid. Update profile")
                 viewModelScope.launch(context = Dispatchers.IO) {
                     updateMetadataInDb(it)
-                    updateMetadataInProfileCache(it)
                     updateMetadataOverNostr(it)
                     useCachedValues()
                 }
@@ -149,16 +148,6 @@ class EditProfileViewModel(
             about = state.aboutInput,
             picture = state.pictureInput,
             nip05 = state.nip05Input,
-        )
-    }
-
-    private suspend fun updateMetadataInProfileCache(state: EditProfileViewModelState) {
-        Log.i(TAG, "Update profile in profile cache")
-        personalProfileManager.setMeta(
-            name = state.nameInput,
-            about = state.aboutInput,
-            picture = state.pictureInput,
-            nip05 = state.nip05Input
         )
     }
 

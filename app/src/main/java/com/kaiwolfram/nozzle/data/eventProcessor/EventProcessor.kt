@@ -41,6 +41,7 @@ class EventProcessor(
             return
         }
         if (event.isProfileMetadata()) {
+            Log.d(TAG, "Process profile event ${event}")
             processMetadata(event)
             return
         }
@@ -100,6 +101,7 @@ class EventProcessor(
 
     private fun processMetadata(event: Event) {
         if (!verify(event)) {
+            Log.d(TAG, "Metadata is invalid ${event.id}")
             return
         }
         deserializeMetadata(event.content)?.let {
