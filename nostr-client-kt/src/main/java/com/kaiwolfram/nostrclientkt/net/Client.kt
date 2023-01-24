@@ -29,7 +29,8 @@ class Client {
                         Event.fromJson(msg[2]).onSuccess { event ->
                             nostrListener?.onEvent(
                                 subscriptionId = msg[1].asString,
-                                event = event
+                                event = event,
+                                relayUrl = getRelayUrl(webSocket)
                             )
                         }
                     }
@@ -122,5 +123,9 @@ class Client {
         Log.i(TAG, "Close connections")
         sockets.keys.forEach { removeRelay(it) }
         httpClient.dispatcher.executorService.shutdown()
+    }
+
+    private fun getRelayUrl(webSocket: WebSocket): String? {
+        return sockets.entries.find { it.value == webSocket }?.key
     }
 }

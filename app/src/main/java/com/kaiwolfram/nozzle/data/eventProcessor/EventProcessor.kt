@@ -6,10 +6,7 @@ import com.google.gson.GsonBuilder
 import com.kaiwolfram.nostrclientkt.model.Event
 import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nostrclientkt.model.Tag
-import com.kaiwolfram.nozzle.data.room.dao.ContactDao
-import com.kaiwolfram.nozzle.data.room.dao.PostDao
-import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
-import com.kaiwolfram.nozzle.data.room.dao.ReactionDao
+import com.kaiwolfram.nozzle.data.room.dao.*
 import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
@@ -24,31 +21,32 @@ class EventProcessor(
     private val contactDao: ContactDao,
     private val profileDao: ProfileDao,
     private val postDao: PostDao,
+    private val eventRelayDao: EventRelayDao,
 ) : IEventProcessor {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
-    override fun process(event: Event) {
+    override fun process(event: Event, relayUrl: String?) {
         if (event.isPost()) {
-            processPost(event)
+            processPost(event = event, relayUrl = relayUrl)
             return
         }
         if (event.isReaction()) {
-            processReaction(event)
+            processReaction(event = event, relayUrl = relayUrl)
             return
         }
         if (event.isContactList()) {
-            processContactList(event)
+            processContactList(event = event)
             return
         }
         if (event.isProfileMetadata()) {
-            Log.d(TAG, "Process profile event ${event}")
-            processMetadata(event)
+            Log.d(TAG, "Process profile event $event")
+            processMetadata(event = event)
             return
         }
 
     }
 
-    private fun processPost(event: Event) {
+    private fun processPost(event: Event, relayUrl: String?) {
         if (!verify(event)) {
             return
         }
@@ -65,9 +63,10 @@ class EventProcessor(
                 )
             )
         }
+        insertEventRelay(eventId = event.id, relayUrl = relayUrl)
     }
 
-    private fun processReaction(event: Event) {
+    private fun processReaction(event: Event, relayUrl: String?) {
         if (event.content != "+") return
 
         if (!verify(event)) {
@@ -77,6 +76,7 @@ class EventProcessor(
             scope.launch {
                 reactionDao.like(eventId = it, pubkey = event.pubkey)
             }
+            insertEventRelay(eventId = event.id, relayUrl = relayUrl)
         }
     }
 
@@ -146,5 +146,15 @@ class EventProcessor(
             }
         }
         return result
+    }
+
+    private fun insertEventRelay(eventId: String, relayUrl: String?) {
+        if (relayUrl == null) {
+            return
+        } else {
+            scope.launch {
+                eventRelayDao.insertOrIgnore(eventId = eventId, relayUrl = relayUrl)
+            }
+        }
     }
 }

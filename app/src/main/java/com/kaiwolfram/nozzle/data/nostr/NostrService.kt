@@ -35,12 +35,12 @@ class NostrService(
             Log.i(TAG, "OnOpen: $msg")
         }
 
-        override fun onEvent(subscriptionId: String, event: Event) {
+        override fun onEvent(subscriptionId: String, event: Event, relayUrl: String?) {
             Log.d(
                 TAG,
-                "OnEvent: id ${event.id}, kind ${event.kind} in subscription $subscriptionId"
+                "OnEvent: id ${event.id}, kind ${event.kind}, relay $relayUrl in subscription $subscriptionId"
             )
-            eventProcessor.process(event)
+            eventProcessor.process(event = event, relayUrl = relayUrl)
         }
 
         override fun onError(msg: String, throwable: Throwable?) {
