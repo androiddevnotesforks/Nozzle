@@ -9,26 +9,18 @@ import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
+import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import java.util.*
 
 private const val TAG = "NostrService"
 
 class NostrService(
     keyManager: IKeyManager,
+    private val relayProvider: IRelayProvider,
     private val eventProcessor: IEventProcessor
 ) : INostrService {
     private val keys: Keys = keyManager.getKeys()
     private val client = Client()
-    private val relays = listOf(
-        "wss://nostr-pub.wellorder.net",
-        "wss://nostr.onsats.org",
-        "wss://nostr-relay.wlvs.space",
-        "wss://nostr.bitcoiner.social",
-        "wss://relay.damus.io",
-        "wss://nostr.zebedee.cloud",
-        "wss://nostr.fmt.wiz.biz",
-        "wss://nostr.walletofsatoshi.com",
-    )
     private val unsubOnEOSECache = Collections.synchronizedSet(mutableSetOf<String>())
     private val listener = object : NostrListener {
         override fun onOpen(msg: String) {
@@ -71,6 +63,8 @@ class NostrService(
 
     init {
         client.setListener(listener)
+        val relays = relayProvider.listRelays()
+        Log.i(TAG, "Add ${relays.size} relays")
         client.addRelays(relays)
     }
 
@@ -101,7 +95,10 @@ class NostrService(
         Log.i(TAG, "Send repost of $postId")
         val event = Event.createTextNoteEvent(
             post = Post(
-                repostId = RepostId(repostId = postId, relayUrl = relays.first()),
+                repostId = RepostId(
+                    repostId = postId,
+                    relayUrl = relayProvider.listRelays().firstOrNull().orEmpty()
+                ),
                 msg = quote
             ),
             keys = keys,
@@ -148,6 +145,19 @@ class NostrService(
 
     override fun subscribe(filters: List<Filter>, unsubOnEOSE: Boolean): List<String> {
         val subscriptionIds = client.subscribe(filters)
+        if (subscriptionIds.isNotEmpty() && unsubOnEOSE) {
+            unsubOnEOSECache.addAll(subscriptionIds)
+        }
+
+        return subscriptionIds
+    }
+
+    override fun subscribeByRelay(
+        relayUrl: String,
+        filters: List<Filter>,
+        unsubOnEOSE: Boolean
+    ): List<String> {
+        val subscriptionIds = client.subscribeByRelay(relayUrl = relayUrl, filters = filters)
         if (subscriptionIds.isNotEmpty() && unsubOnEOSE) {
             unsubOnEOSECache.addAll(subscriptionIds)
         }

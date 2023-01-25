@@ -58,9 +58,15 @@ fun FeedScreen(
         topBar = {
             FeedTopBar(picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
-                headline = uiState.headline,
-                onPreviousHeadline = onPreviousHeadline,
-                onNextHeadline = onNextHeadline,
+                currentRelay = uiState.currentRelay,
+                onPreviousHeadline = {
+                    scope.launch { lazyListState.scrollToItem(0) }
+                    onPreviousHeadline()
+                },
+                onNextHeadline = {
+                    scope.launch { lazyListState.scrollToItem(0) }
+                    onNextHeadline()
+                },
                 onPictureClick = onOpenDrawer,
                 onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } })
         },
@@ -100,7 +106,7 @@ fun FeedScreen(
 private fun FeedTopBar(
     picture: String,
     pubkey: String,
-    headline: String,
+    currentRelay: String,
     onNextHeadline: () -> Unit,
     onPreviousHeadline: () -> Unit,
     onPictureClick: () -> Unit,
@@ -112,7 +118,7 @@ private fun FeedTopBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row {
+            Row(modifier = Modifier.weight(0.1f)) {
                 Spacer(modifier = Modifier.width(spacing.large))
                 ProfilePicture(
                     pictureUrl = picture,
@@ -125,13 +131,13 @@ private fun FeedTopBar(
                 )
             }
             Headline(
-                modifier = Modifier.fillMaxWidth(0.8f),
-                headline = headline,
+                modifier = Modifier.weight(0.8f),
+                headline = currentRelay,
                 onPreviousHeadline = onPreviousHeadline,
                 onNextHeadline = onNextHeadline,
                 onScrollToTop = onScrollToTop,
             )
-            Row {
+            Row(modifier = Modifier.weight(0.1f)) {
                 Spacer(modifier = Modifier.size(sizing.smallProfilePicture))
                 Spacer(modifier = Modifier.width(spacing.large))
             }
@@ -148,13 +154,15 @@ private fun Headline(
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
-        Icon(
-            modifier = Modifier
-                .clip(CircleShape)
-                .clickable { onPreviousHeadline() },
-            imageVector = Icons.Default.ArrowLeft,
-            contentDescription = stringResource(id = R.string.move_to_previous_feed),
-        )
+        if (headline.isNotBlank()) {
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable { onPreviousHeadline() },
+                imageVector = Icons.Default.ArrowLeft,
+                contentDescription = stringResource(id = R.string.move_to_previous_feed),
+            )
+        }
         Text(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -169,13 +177,15 @@ private fun Headline(
             style = typography.h6,
             color = colors.background
         )
-        Icon(
-            modifier = Modifier
-                .clip(CircleShape)
-                .clickable { onNextHeadline() },
-            imageVector = Icons.Default.ArrowRight,
-            contentDescription = stringResource(id = R.string.move_to_next_feed),
-        )
+        if (headline.isNotBlank()) {
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable { onNextHeadline() },
+                imageVector = Icons.Default.ArrowRight,
+                contentDescription = stringResource(id = R.string.move_to_next_feed),
+            )
+        }
     }
 }
 

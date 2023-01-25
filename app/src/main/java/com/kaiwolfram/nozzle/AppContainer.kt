@@ -32,6 +32,10 @@ class AppContainer(context: Context) {
         ).build()
     }
 
+    val relayProvider: IRelayProvider = RelayProvider(
+        relayDao = roomDb.relayDao()
+    )
+
     val keyManager: IKeyManager = KeyManager(context = context)
 
     private val eventProcessor: IEventProcessor = EventProcessor(
@@ -44,6 +48,7 @@ class AppContainer(context: Context) {
 
     val nostrService: INostrService = NostrService(
         keyManager = keyManager,
+        relayProvider = relayProvider,
         eventProcessor = eventProcessor
     )
 
@@ -98,7 +103,5 @@ class AppContainer(context: Context) {
         postDao = roomDb.postDao()
     )
 
-    val relayProvider: IRelayProvider = RelayProvider(
-        relayDao = roomDb.relayDao()
-    )
+
 }

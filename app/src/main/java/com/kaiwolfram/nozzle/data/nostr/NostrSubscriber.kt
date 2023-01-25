@@ -58,6 +58,29 @@ class NostrSubscriber(
         return ids
     }
 
+    override fun subscribeToFeedByRelay(
+        relayUrl: String,
+        authorPubkeys: List<String>,
+        limit: Int,
+        until: Long?
+    ): List<String> {
+        Log.i(TAG, "Subscribe to feed of ${authorPubkeys.size} contacts in $relayUrl")
+        val postFilter = Filter.createPostFilter(
+            pubkeys = authorPubkeys,
+            until = until ?: getCurrentTimePlus5min(),
+            limit = limit
+        )
+
+        val ids = nostrService.subscribeByRelay(
+            relayUrl = relayUrl,
+            filters = listOf(postFilter),
+            unsubOnEOSE = until != null
+        )
+        feedSubscriptions.addAll(ids)
+
+        return ids
+    }
+
     override suspend fun subscribeToAdditionalPostsData(
         posts: List<PostWithMeta>
     ): List<String> {

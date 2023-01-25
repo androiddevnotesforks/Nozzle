@@ -11,6 +11,13 @@ interface INostrSubscriber {
         until: Long? = null,
     ): List<String>
 
+    fun subscribeToFeedByRelay(
+        relayUrl: String,
+        authorPubkeys: List<String>,
+        limit: Int,
+        until: Long?
+    ): List<String>
+
     suspend fun subscribeToAdditionalPostsData(posts: List<PostWithMeta>): List<String>
 
     fun subscribeToThread(

@@ -26,6 +26,22 @@ class FeedProvider(
         return postMapper.mapToPostsWithMeta(posts)
     }
 
+    override suspend fun getFeedByRelay(
+        relayUrl: String,
+        limit: Int,
+        until: Long?
+    ): List<PostWithMeta> {
+        Log.i(TAG, "Get feed by relay $relayUrl")
+        val posts = postDao.getLatestFeedByRelay(
+            pubkey = pubkeyProvider.getPubkey(),
+            relayUrl = relayUrl,
+            limit = limit,
+            until = until
+        )
+
+        return postMapper.mapToPostsWithMeta(posts)
+    }
+
     override suspend fun getFeedWithSingleAuthor(
         pubkey: String,
         limit: Int,
@@ -41,14 +57,22 @@ class FeedProvider(
         return postMapper.mapToPostsWithMeta(posts)
     }
 
-    override suspend fun appendFeed(
+    override suspend fun appendFeedByRelay(
+        relayUrl: String,
         currentFeed: List<PostWithMeta>,
         limit: Int
     ): List<PostWithMeta> {
+        Log.i(TAG, "Append feed from $relayUrl")
         currentFeed.lastOrNull()?.let { last ->
             val allPosts = mutableListOf<PostWithMeta>()
             allPosts.addAll(currentFeed)
-            allPosts.addAll(getFeed(limit = limit, until = last.createdAt))
+            allPosts.addAll(
+                getFeedByRelay(
+                    relayUrl = relayUrl,
+                    limit = limit,
+                    until = last.createdAt
+                )
+            )
             return allPosts
         }
 

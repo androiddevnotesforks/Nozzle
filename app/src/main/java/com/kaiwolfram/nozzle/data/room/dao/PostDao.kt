@@ -21,6 +21,28 @@ interface PostDao {
     )
     suspend fun getLatestFeed(pubkey: String, limit: Int, until: Long?): List<PostEntity>
 
+    /**
+     * Sorted from newest to oldest
+     */
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        "SELECT * " +
+                "FROM post " +
+                "JOIN eventRelay ON post.id = eventRelay.eventId " +
+                "WHERE eventRelay.relayUrl = :relayUrl " +
+                "AND post.pubkey IN (SELECT contactPubkey FROM contact WHERE pubkey = :pubkey) " +
+                "AND (:until IS NULL OR post.createdAt < :until) " +
+                "ORDER BY createdAt DESC " +
+                "LIMIT :limit"
+    )
+    suspend fun getLatestFeedByRelay(
+        pubkey: String,
+        relayUrl: String,
+        limit: Int,
+        until: Long?
+    ): List<PostEntity>
+
+
     @Query(
         "SELECT * " +
                 "FROM post " +

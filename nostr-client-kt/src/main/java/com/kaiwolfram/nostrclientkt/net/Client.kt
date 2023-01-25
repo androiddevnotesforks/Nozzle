@@ -69,7 +69,22 @@ class Client {
             it.send(request)
         }
 
-        Log.i(TAG, "Subscribe to $ids")
+        return ids
+    }
+
+    fun subscribeByRelay(relayUrl: String, filters: List<Filter>): List<String> {
+        if (filters.isEmpty() || !sockets.containsKey(relayUrl)) {
+            return listOf()
+        }
+        val ids = mutableListOf<String>()
+        sockets.entries.find { it.key == relayUrl }?.value?.let {
+            val subscriptionId = UUID.randomUUID().toString()
+            ids.add(subscriptionId)
+            subscriptions[subscriptionId] = it
+            val request = createSubscriptionRequest(subscriptionId, filters)
+            Log.i(TAG, "Subscribe $request")
+            it.send(request)
+        }
 
         return ids
     }
@@ -102,9 +117,13 @@ class Client {
         if (sockets.containsKey(url)) {
             return
         }
-        val request = Request.Builder().url(url).build()
-        val socket = httpClient.newWebSocket(request = request, listener = baseListener)
-        sockets[url] = socket
+        try {
+            val request = Request.Builder().url(url).build()
+            val socket = httpClient.newWebSocket(request = request, listener = baseListener)
+            sockets[url] = socket
+        } catch (t: Throwable) {
+            Log.e(TAG, "Failed to connect to $url", t)
+        }
     }
 
     private fun removeRelay(url: String) {
@@ -128,4 +147,5 @@ class Client {
     private fun getRelayUrl(webSocket: WebSocket): String? {
         return sockets.entries.find { it.value == webSocket }?.key
     }
+
 }
