@@ -271,7 +271,7 @@ private fun PostCardContentBase(
     Spacer(Modifier.height(spacing.medium))
     Text(
         text = content,
-        maxLines = 21,
+        maxLines = 64,
         overflow = TextOverflow.Ellipsis
     )
 }
