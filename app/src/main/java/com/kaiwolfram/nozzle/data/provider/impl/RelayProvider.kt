@@ -22,8 +22,10 @@ class RelayProvider(private val relayDao: RelayDao) : IRelayProvider {
             "wss://nostr.zebedee.cloud",
             "wss://nostr.fmt.wiz.biz",
             "wss://nostr.einundzwanzig.space",
-            "wss://relay.snort.social",
             "wss://nostr-pub.wellorder.net",
+            "wss://relay.snort.social",
+            "wss://relay.nostr.ch",
+            "wss://nos.lol",
         )
         scope.launch {
             relays.forEach {

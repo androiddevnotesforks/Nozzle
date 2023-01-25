@@ -39,7 +39,6 @@ class EventProcessor(
             return
         }
         if (event.isProfileMetadata()) {
-            Log.d(TAG, "Process profile event $event")
             processMetadata(event = event)
             return
         }
@@ -104,6 +103,7 @@ class EventProcessor(
             Log.d(TAG, "Metadata is invalid ${event.id}")
             return
         }
+        Log.d(TAG, "Process profile event ${event.content}")
         deserializeMetadata(event.content)?.let {
             scope.launch {
                 profileDao.deleteIfOutdated(pubkey = event.pubkey, createdAt = event.createdAt)
@@ -141,8 +141,8 @@ class EventProcessor(
     private fun getContactPubkeysAndRelayUrls(tags: List<Tag>): List<Pair<String, String>> {
         val result = mutableListOf<Pair<String, String>>()
         for (tag in tags) {
-            if (tag.size >= 3 && tag[0] == "p") {
-                result.add(Pair(tag[1], tag[2]))
+            if (tag.size >= 2 && tag[0] == "p") {
+                result.add(Pair(tag[1], tag.getOrNull(2).orEmpty()))
             }
         }
         return result

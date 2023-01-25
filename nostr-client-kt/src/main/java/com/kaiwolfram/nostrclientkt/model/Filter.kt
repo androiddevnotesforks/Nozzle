@@ -60,16 +60,10 @@ class Filter(
             )
         }
 
-        fun createContactListFilter(
-            pubkey: String,
-            since: Long? = null,
-            until: Long? = null,
-        ): Filter {
+        fun createContactListFilter(pubkey: String): Filter {
             return Filter(
                 authors = listOf(pubkey),
                 kinds = listOf(Event.Kind.CONTACT_LIST),
-                since = since,
-                until = until,
             )
         }
     }
