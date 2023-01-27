@@ -16,7 +16,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
-import com.kaiwolfram.nozzle.ui.components.*
+import com.kaiwolfram.nozzle.ui.components.CopyIcon
+import com.kaiwolfram.nozzle.ui.components.EditProfileButton
+import com.kaiwolfram.nozzle.ui.components.FollowButton
+import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
+import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing

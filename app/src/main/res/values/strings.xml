@@ -47,7 +47,7 @@
     <string name="update_profile">Update profile</string>
     <string name="invalid_url">Invalid URL</string>
     <string name="remove">Remove</string>
-    <string name="replying_to">Replying to</string>
+    <string name="replying_to">replying to</string>
     <string name="thread">Thread</string>
     <string name="post_not_found">Post not found</string>
     <string name="reply">Reply</string>
@@ -78,4 +78,10 @@
     <string name="note_id_copied">Note ID copied</string>
     <string name="move_to_previous_feed">Move to previous feed</string>
     <string name="move_to_next_feed">Move to next feed</string>
+    <string name="in_relay">in</string>
+    <string name="and">and</string>
+    <plurals name="other_relays">
+        <item quantity="one">other</item>
+        <item quantity="other">others</item>
+    </plurals>
 </resources>

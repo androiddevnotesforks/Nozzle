@@ -26,9 +26,9 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.AddIcon
-import com.kaiwolfram.nozzle.ui.components.NoPostsHint
-import com.kaiwolfram.nozzle.ui.components.PostCardList
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
+import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
 import com.kaiwolfram.nozzle.ui.theme.White21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing

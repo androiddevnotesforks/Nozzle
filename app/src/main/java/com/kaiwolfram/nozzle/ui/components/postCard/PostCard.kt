@@ -1,19 +1,14 @@
-package com.kaiwolfram.nozzle.ui.components
+package com.kaiwolfram.nozzle.ui.components.postCard
 
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.shapes
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,63 +20,18 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.data.utils.getRelativeTimeSpanString
 import com.kaiwolfram.nozzle.data.utils.hexToNote
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.RepostPreview
 import com.kaiwolfram.nozzle.model.ThreadPosition
+import com.kaiwolfram.nozzle.ui.components.*
+import com.kaiwolfram.nozzle.ui.components.text.*
 import com.kaiwolfram.nozzle.ui.theme.*
-
-@Composable
-fun PostCardList(
-    posts: List<PostWithMeta>,
-    isRefreshing: Boolean,
-    onRefresh: () -> Unit,
-    onLike: (String) -> Unit,
-    onRepost: (String) -> Unit,
-    onPrepareReply: (PostWithMeta) -> Unit,
-    onLoadMore: () -> Unit,
-    onNavigateToThread: (PostIds) -> Unit,
-    onNavigateToReply: () -> Unit,
-    modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
-    onOpenProfile: ((String) -> Unit)? = null,
-) {
-    SwipeRefresh(
-        modifier = modifier,
-        state = rememberSwipeRefreshState(isRefreshing),
-        onRefresh = onRefresh,
-    ) {
-        LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
-            items(posts) { post ->
-                PostCard(
-                    post = post,
-                    onLike = onLike,
-                    onRepost = onRepost,
-                    onOpenProfile = onOpenProfile,
-                    onPrepareReply = onPrepareReply,
-                    onNavigateToThread = onNavigateToThread,
-                    onNavigateToReply = onNavigateToReply,
-                )
-            }
-            item {
-                LaunchedEffect(true) {
-                    if (lazyListState.firstVisibleItemIndex > 0 && lazyListState.isScrollInProgress) {
-                        onLoadMore()
-                    }
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -105,8 +55,9 @@ fun PostCard(
     val context = LocalContext.current
     Row(
         modifier
-            .combinedClickable(enabled = !isCurrent,
-                onClick = { onNavigateToThread(post.toPostIds()) },
+            .combinedClickable(
+                enabled = !isCurrent,
+                onClick = { onNavigateToThread(post.getPostIds()) },
                 onLongClick = {
                     clipboard.setText(AnnotatedString(hexToNote(post.id)))
                     Toast
@@ -214,6 +165,7 @@ private fun PostCardHeaderAndContent(
                 post.replyToName.orEmpty()
                     .ifEmpty { post.replyToPubkey.orEmpty().ifEmpty { "???" } }
             } else null,
+            relays = post.relays,
             content = post.content
         )
     }
@@ -256,7 +208,7 @@ private fun RepostCardContent(
                         onOpenProfile = onOpenProfile
                     )
                 }
-                PostCardContentBase(replyToName = null, content = it.content)
+                PostCardContentBase(replyToName = null, relays = null, content = it.content)
             }
         }
     }
@@ -265,9 +217,12 @@ private fun RepostCardContent(
 @Composable
 private fun PostCardContentBase(
     replyToName: String?,
+    relays: List<String>?,
     content: String,
 ) {
     replyToName?.let { ReplyingTo(name = it) }
+    Spacer(Modifier.height(spacing.small))
+    relays?.let { InRelays(relays = it) }
     Spacer(Modifier.height(spacing.medium))
     Text(
         text = content,
@@ -303,32 +258,11 @@ private fun PostCardHeader(
     onOpenProfile: ((String) -> Unit)?
 ) {
     Row {
-        Text(
-            modifier = if (onOpenProfile != null) {
-                Modifier.clickable { onOpenProfile(pubkey) }
-            } else {
-                Modifier
-            },
-            text = name,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Username(username = name, pubkey = pubkey, onOpenProfile = onOpenProfile)
         Spacer(modifier = Modifier.width(spacing.medium))
-        Text(
-            text = "\u2022",
-            color = LightGray21,
-        )
+        Bullet()
         Spacer(modifier = Modifier.width(spacing.medium))
-        Text(
-            text = getRelativeTimeSpanString(
-                context = LocalContext.current,
-                from = createdAt
-            ),
-            color = LightGray21,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        RelativeTime(from = createdAt)
     }
 }
 

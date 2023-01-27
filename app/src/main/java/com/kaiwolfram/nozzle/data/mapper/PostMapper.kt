@@ -1,6 +1,7 @@
 package com.kaiwolfram.nozzle.data.mapper
 
 import com.kaiwolfram.nozzle.data.provider.IInteractionStatsProvider
+import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
@@ -10,6 +11,7 @@ class PostMapper(
     private val interactionStatsProvider: IInteractionStatsProvider,
     private val postDao: PostDao,
     private val profileDao: ProfileDao,
+    private val eventRelayDao: EventRelayDao,
 ) : IPostMapper {
 
     override suspend fun mapToPostsWithMeta(posts: List<PostEntity>): List<PostWithMeta> {
@@ -20,6 +22,7 @@ class PostMapper(
         val namesAndPictures = profileDao.getNamesAndPicturesMap(posts.map { it.pubkey })
         val replyRecipients =
             profileDao.getAuthorNamesAndPubkeysMap(posts.mapNotNull { it.replyToId })
+        val relays = eventRelayDao.getRelayMap(posts.map { it.id })
 
         return posts.map {
             PostWithMeta(
@@ -39,6 +42,7 @@ class PostMapper(
                 numOfLikes = stats.getNumOfLikes(it.id),
                 numOfReposts = stats.getNumOfReposts(it.id),
                 numOfReplies = stats.getNumOfReplies(it.id),
+                relays = relays[it.id].orEmpty(),
             )
         }
     }

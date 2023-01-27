@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.ui.components
+package com.kaiwolfram.nozzle.ui.components.text
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable

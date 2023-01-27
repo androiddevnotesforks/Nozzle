@@ -20,9 +20,9 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
-import com.kaiwolfram.nozzle.ui.components.PostCard
-import com.kaiwolfram.nozzle.ui.components.PostNotFound
 import com.kaiwolfram.nozzle.ui.components.ReturnableTopBar
+import com.kaiwolfram.nozzle.ui.components.postCard.PostCard
+import com.kaiwolfram.nozzle.ui.components.postCard.PostNotFound
 import com.kaiwolfram.nozzle.ui.theme.LightYellow
 import com.kaiwolfram.nozzle.ui.theme.spacing
 

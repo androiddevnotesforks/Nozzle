@@ -10,8 +10,8 @@ import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ClosableTopBar
 import com.kaiwolfram.nozzle.ui.components.InputBox
-import com.kaiwolfram.nozzle.ui.components.ReplyingTo
 import com.kaiwolfram.nozzle.ui.components.SendTopBarButton
+import com.kaiwolfram.nozzle.ui.components.text.ReplyingTo
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 
