@@ -88,12 +88,12 @@ class PostViewModel(
                     context.getString(R.string.post_published),
                     Toast.LENGTH_SHORT
                 ).show()
-                reset()
+                resetUI()
             }
         }
     }
 
-    private fun reset() {
+    private fun resetUI() {
         viewModelState.update {
             it.copy(content = "", isSendable = false)
         }

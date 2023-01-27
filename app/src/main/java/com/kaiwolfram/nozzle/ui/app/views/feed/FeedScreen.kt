@@ -77,13 +77,14 @@ fun FeedScreen(
             })
         },
     ) {
+        val posts = uiState.feedMap[uiState.currentRelay].orEmpty()
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
             PostCardList(
-                posts = uiState.posts,
+                posts = posts,
                 isRefreshing = uiState.isRefreshing,
                 lazyListState = lazyListState,
                 onLike = onLike,
@@ -96,7 +97,7 @@ fun FeedScreen(
                 onNavigateToReply = onNavigateToReply,
             )
         }
-        if (uiState.posts.isEmpty()) {
+        if (posts.isEmpty()) {
             NoPostsHint()
         }
     }

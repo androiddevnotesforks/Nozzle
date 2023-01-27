@@ -90,7 +90,7 @@ class EditProfileViewModel(
             viewModelState.update {
                 it.copy(nameInput = input)
             }
-            setHasChanges()
+            setUIHasChanges()
             if (state.isInvalidUsername && isValidUsername(input)) {
                 viewModelState.update {
                     it.copy(isInvalidUsername = false)
@@ -104,7 +104,7 @@ class EditProfileViewModel(
             viewModelState.update {
                 it.copy(aboutInput = input)
             }
-            setHasChanges()
+            setUIHasChanges()
         }
     }
 
@@ -113,7 +113,7 @@ class EditProfileViewModel(
             viewModelState.update {
                 it.copy(pictureInput = input)
             }
-            setHasChanges()
+            setUIHasChanges()
             if (state.isInvalidPictureUrl && isValidUrl(input)) {
                 viewModelState.update {
                     it.copy(isInvalidPictureUrl = false)
@@ -126,7 +126,7 @@ class EditProfileViewModel(
         viewModelState.update {
             it.copy(nip05Input = input)
         }
-        setHasChanges()
+        setUIHasChanges()
     }
 
     val onCanGoBack: () -> Boolean = {
@@ -164,7 +164,7 @@ class EditProfileViewModel(
 
     private fun isValidUrl(url: String) = url.isEmpty() || URLUtil.isValidUrl(url)
 
-    private fun setHasChanges() {
+    private fun setUIHasChanges() {
         metadataState.let { metadata ->
             uiState.value.let {
                 val hasChanges = it.nameInput != metadata?.name.orEmpty()

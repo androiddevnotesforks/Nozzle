@@ -95,11 +95,11 @@ class ProfileViewModel(
     val onRefreshProfileView: () -> Unit = {
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Refresh profile view")
-            setRefresh(true)
+            setUIRefresh(true)
             renewSubscriptions(pubkey = uiState.value.pubkey, subBatchSize = SUB_BATCH_SIZE)
             delay(1500)
             useCachedValues(pubkey = uiState.value.pubkey, dbBatchSize = DB_BATCH_SIZE)
-            setRefresh(false)
+            setUIRefresh(false)
         }
     }
 
@@ -198,7 +198,6 @@ class ProfileViewModel(
         }
     }
 
-
     private suspend fun renewSubscriptions(pubkey: String, subBatchSize: Int) {
         nostrSubscriber.unsubscribeProfiles()
         nostrSubscriber.subscribeToProfileMetadataAndContactList(pubkey)
@@ -243,7 +242,7 @@ class ProfileViewModel(
         }
     }
 
-    private fun setRefresh(value: Boolean) {
+    private fun setUIRefresh(value: Boolean) {
         viewModelState.update {
             it.copy(isRefreshing = value)
         }

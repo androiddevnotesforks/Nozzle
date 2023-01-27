@@ -41,22 +41,20 @@ class SearchViewModel : ViewModel() {
                 if (trimmed.startsWith("npub1")) {
                     val npub = npubToHex(trimmed)
                     npub.onSuccess { onNavigateToProfile(it) }
-                    npub.onFailure { setInvalid() }
+                    npub.onFailure { setUIInvalid() }
                 } else if (trimmed.startsWith("note1")) {
                     val noteId = noteIdToHex(trimmed)
                     noteId.onSuccess { onNavigateToThread(PostIds.fromId(it)) }
-                    noteId.onFailure { setInvalid() }
+                    noteId.onFailure { setUIInvalid() }
                 } else {
-                    setInvalid()
+                    setUIInvalid()
                 }
             }
         }
 
     val onChangeInput: (String) -> Unit = { input ->
         uiState.value.let {
-            viewModelState.update {
-                it.copy(input = input)
-            }
+            viewModelState.update { it.copy(input = input) }
         }
     }
 
@@ -66,8 +64,8 @@ class SearchViewModel : ViewModel() {
         }
     }
 
-    private fun setInvalid() {
-        viewModelState.update { state -> state.copy(isInvalid = true) }
+    private fun setUIInvalid() {
+        viewModelState.update { it.copy(isInvalid = true) }
     }
 
     companion object {

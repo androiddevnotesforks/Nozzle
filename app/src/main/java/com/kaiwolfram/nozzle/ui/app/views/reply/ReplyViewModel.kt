@@ -106,12 +106,12 @@ class ReplyViewModel(
                         postDao.insertIfNotPresent(PostEntity.fromEvent(event))
                     }
                 }
-                reset()
+                resetUI()
             }
         }
     }
 
-    private fun reset() {
+    private fun resetUI() {
         viewModelState.update {
             recipientPubkey = ""
             it.copy(

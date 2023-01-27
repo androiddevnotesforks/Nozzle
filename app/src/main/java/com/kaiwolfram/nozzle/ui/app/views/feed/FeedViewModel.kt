@@ -26,10 +26,10 @@ data class FeedViewModelState(
     /**
      * Current posts sorted from newest to oldest
      */
-    val posts: List<PostWithMeta> = mutableListOf(),
+    val currentRelay: String = "",
+    val feedMap: Map<String, List<PostWithMeta>> = mutableMapOf(),
     val isRefreshing: Boolean = false,
     val pubkey: String = "",
-    val currentRelay: String = ""
 )
 
 class FeedViewModel(
@@ -41,7 +41,6 @@ class FeedViewModel(
     private val contactDao: ContactDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
-    private val feedMap = mutableMapOf<String, List<PostWithMeta>>()
 
     var metadataState = personalProfileProvider.getMetadata().stateIn(
         viewModelScope, SharingStarted.Lazily, null
@@ -57,29 +56,33 @@ class FeedViewModel(
             it.copy(pubkey = personalProfileProvider.getPubkey())
         }
         viewModelScope.launch(context = IO) {
-            setRefresh(true)
+            setUIRefresh(true)
             renewAllSubscriptions(subBatchSize = SUB_BATCH_SIZE)
             val relays = relayProvider.listRelays()
             Log.i(TAG, "Listed ${relays.size} relays")
             viewModelState.update {
                 it.copy(currentRelay = relays.firstOrNull().orEmpty())
             }
-            setAllFeeds(relayUrls = relays, feedMap = feedMap, dbBatchSize = DB_BATCH_SIZE)
-            setRefresh(false)
+            setAllFeeds(
+                relayUrls = relays,
+                feedMap = uiState.value.feedMap,
+                dbBatchSize = DB_BATCH_SIZE
+            )
+            setUIRefresh(false)
         }
     }
 
     val onRefreshFeedView: () -> Unit = {
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Refresh feed view")
-            setRefresh(true)
+            setUIRefresh(true)
             renewAllSubscriptions(subBatchSize = SUB_BATCH_SIZE)
             setAllFeeds(
                 relayUrls = relayProvider.listRelays(),
-                feedMap = feedMap,
+                feedMap = uiState.value.feedMap,
                 dbBatchSize = DB_BATCH_SIZE
             )
-            setRefresh(false)
+            setUIRefresh(false)
         }
     }
 
@@ -88,7 +91,7 @@ class FeedViewModel(
             Log.i(TAG, "Load more")
             fetchAndAppendFeedByRelay(
                 relayUrl = uiState.value.currentRelay,
-                feedMap = feedMap,
+                feedMap = uiState.value.feedMap,
                 subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE,
             )
@@ -103,7 +106,7 @@ class FeedViewModel(
             else -> relayUrls.first()
         }
         Log.i(TAG, "Previous relay is $newRelayUrl")
-        setRelayAndPosts(relayUrl = newRelayUrl, posts = feedMap[newRelayUrl].orEmpty())
+        setUIRelay(relayUrl = newRelayUrl)
     }
 
     val onNextHeadline: () -> Unit = {
@@ -113,7 +116,7 @@ class FeedViewModel(
             else -> relayUrls.first()
         }
         Log.i(TAG, "Next relay is $newRelayUrl")
-        setRelayAndPosts(relayUrl = newRelayUrl, posts = feedMap[newRelayUrl].orEmpty())
+        setUIRelay(relayUrl = newRelayUrl)
     }
 
     val onResetProfileIconUiState: () -> Unit = {
@@ -122,24 +125,23 @@ class FeedViewModel(
             viewModelScope, SharingStarted.Lazily, null
         )
         viewModelState.update {
-            it.copy(
-                pubkey = personalProfileProvider.getPubkey(),
-            )
+            it.copy(pubkey = personalProfileProvider.getPubkey())
         }
     }
 
     val onLike: (String) -> Unit = { id ->
         uiState.value.let { state ->
-            state.posts.find { it.id == id }?.let {
+            state.feedMap[state.currentRelay]?.find { it.id == id }?.let {
                 viewModelScope.launch(context = IO) {
                     postCardInteractor.like(postId = id, postPubkey = it.pubkey)
                 }
                 viewModelState.update {
-                    it.copy(
-                        posts = state.posts.map { toMap ->
+                    val feedMap = state.feedMap.toMutableMap()
+                    feedMap[state.currentRelay] =
+                        feedMap[state.currentRelay].orEmpty().map { toMap ->
                             mapToLikedPost(toMap = toMap, id = id)
-                        },
-                    )
+                        }
+                    it.copy(feedMap = feedMap)
                 }
             }
         }
@@ -147,16 +149,17 @@ class FeedViewModel(
 
     val onRepost: (String) -> Unit = { id ->
         uiState.value.let { state ->
-            if (state.posts.any { post -> post.id == id }) {
+            if (state.feedMap[state.currentRelay].orEmpty().any { post -> post.id == id }) {
                 viewModelScope.launch(context = IO) {
                     postCardInteractor.repost(postId = id)
                 }
                 viewModelState.update {
-                    it.copy(
-                        posts = state.posts.map { toMap ->
+                    val feedMap = state.feedMap.toMutableMap()
+                    feedMap[state.currentRelay] =
+                        feedMap[state.currentRelay].orEmpty().map { toMap ->
                             mapToRepostedPost(toMap = toMap, id = id)
-                        },
-                    )
+                        }
+                    it.copy(feedMap = feedMap)
                 }
             }
         }
@@ -205,56 +208,51 @@ class FeedViewModel(
 
     private suspend fun setAllFeeds(
         relayUrls: List<String>,
-        feedMap: MutableMap<String, List<PostWithMeta>>,
+        feedMap: Map<String, List<PostWithMeta>>,
         dbBatchSize: Int,
     ) {
         Log.i(TAG, "Set all feeds")
+        val updatedMap = feedMap.toMutableMap()
         relayUrls.forEach { relayUrl ->
             val feedByRelay = feedProvider.getFeedByRelay(relayUrl = relayUrl, limit = dbBatchSize)
-            feedMap[relayUrl] = feedByRelay
-            if (relayUrl == uiState.value.currentRelay) {
-                viewModelState.update {
-                    it.copy(posts = feedByRelay)
-                }
-            }
+            updatedMap[relayUrl] = feedByRelay
             Log.i(TAG, "Feed for relay $relayUrl contains ${feedByRelay.size} posts")
         }
+        setUIFeedMap(feedMap = updatedMap)
     }
 
     private val isAppending = AtomicBoolean(false)
 
     private suspend fun fetchAndAppendFeedByRelay(
         relayUrl: String,
-        feedMap: MutableMap<String, List<PostWithMeta>>,
+        feedMap: Map<String, List<PostWithMeta>>,
         subBatchSize: Int,
         dbBatchSize: Int,
     ) {
         if (isAppending.get()) return
 
-        viewModelState.value.let { state ->
-            Log.i(TAG, "Append feed for relay $relayUrl")
-            state.posts.lastOrNull()?.let { last ->
-                isAppending.set(true)
-                subscribeToFeedByRelay(
-                    relayUrl = relayUrl,
-                    batchSize = subBatchSize,
-                    until = last.createdAt
-                )
-                delay(500)
-                val newPosts = appendFeedAndGetNewPosts(
-                    relayUrl = relayUrl,
-                    feedMap = feedMap,
-                    dbBatchSize = dbBatchSize
-                )
-                subscribeToAdditionalFeedData(newPosts)
-                isAppending.set(false)
-            }
+        Log.i(TAG, "Append feed for relay $relayUrl")
+        feedMap[relayUrl].orEmpty().lastOrNull()?.let { last ->
+            isAppending.set(true)
+            subscribeToFeedByRelay(
+                relayUrl = relayUrl,
+                batchSize = subBatchSize,
+                until = last.createdAt
+            )
+            delay(500)
+            val newPosts = appendFeedAndGetNewPosts(
+                relayUrl = relayUrl,
+                feedMap = feedMap,
+                dbBatchSize = dbBatchSize
+            )
+            subscribeToAdditionalFeedData(newPosts)
+            isAppending.set(false)
         }
     }
 
     private suspend fun appendFeedAndGetNewPosts(
         relayUrl: String,
-        feedMap: MutableMap<String, List<PostWithMeta>>,
+        feedMap: Map<String, List<PostWithMeta>>,
         dbBatchSize: Int,
     ): List<PostWithMeta> {
         val currentFeed = feedMap[relayUrl].orEmpty()
@@ -267,31 +265,26 @@ class FeedViewModel(
             currentFeed = currentFeed,
             limit = dbBatchSize
         )
-        feedMap[relayUrl] = newFeed
         val countOfNewPosts = newFeed.size - currentFeed.size
         require(countOfNewPosts >= 0)
-        val appended = newFeed.takeLast(countOfNewPosts)
-        viewModelState.value.let { state ->
-            if (state.currentRelay == relayUrl) {
-                viewModelState.update {
-                    it.copy(posts = newFeed)
-                }
-            }
-        }
-        return appended
+
+        val updatedMap = feedMap.toMutableMap()
+        updatedMap[relayUrl] = newFeed
+        setUIFeedMap(feedMap = updatedMap)
+
+        return newFeed.takeLast(countOfNewPosts)
     }
 
-    private fun setRefresh(value: Boolean) {
-        viewModelState.update {
-            it.copy(isRefreshing = value)
-        }
+    private fun setUIRefresh(value: Boolean) {
+        viewModelState.update { it.copy(isRefreshing = value) }
     }
 
-    private fun setRelayAndPosts(relayUrl: String, posts: List<PostWithMeta>) {
-        feedMap.putIfAbsent(relayUrl, listOf())
-        viewModelState.update {
-            it.copy(currentRelay = relayUrl, posts = posts)
-        }
+    private fun setUIRelay(relayUrl: String) {
+        viewModelState.update { it.copy(currentRelay = relayUrl) }
+    }
+
+    private fun setUIFeedMap(feedMap: Map<String, List<PostWithMeta>>) {
+        viewModelState.update { it.copy(feedMap = feedMap) }
     }
 
     private suspend fun listContactPubkeysAndYourself(): List<String> {
@@ -300,7 +293,6 @@ class FeedViewModel(
         ).toMutableList()
         Log.i(TAG, "Found ${pubkeys.size} contact pubkeys")
         pubkeys.add(personalProfileProvider.getPubkey())
-
 
         return pubkeys
     }

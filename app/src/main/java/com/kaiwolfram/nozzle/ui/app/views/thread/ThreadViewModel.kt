@@ -70,14 +70,14 @@ class ThreadViewModel(
     val onRefreshThreadView: () -> Unit = {
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Refresh thread view")
-            setRefresh(true)
+            setUIRefresh(true)
             renewThreadSubscription()
             delay(1000)
             val thread = getThread()
             renewAdditionalDataSubscription(thread)
             delay(1000)
             setThread(getThread())
-            setRefresh(false)
+            setUIRefresh(false)
         }
     }
 
@@ -224,15 +224,11 @@ class ThreadViewModel(
     ): ThreadPosition {
         return if (previous.isNotEmpty() || current?.replyToId != null)
             ThreadPosition.END
-        else {
-            ThreadPosition.SINGLE
-        }
+        else ThreadPosition.SINGLE
     }
 
-    private fun setRefresh(value: Boolean) {
-        viewModelState.update {
-            it.copy(isRefreshing = value)
-        }
+    private fun setUIRefresh(value: Boolean) {
+        viewModelState.update { it.copy(isRefreshing = value) }
     }
 
     companion object {
