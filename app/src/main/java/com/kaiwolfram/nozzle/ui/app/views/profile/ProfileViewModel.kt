@@ -27,6 +27,8 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "ProfileViewModel"
+private const val DB_BATCH_SIZE = 25
+private const val SUB_BATCH_SIZE = 50
 
 data class ProfileViewModelState(
     val pubkey: String = "",
@@ -42,7 +44,6 @@ data class ProfileViewModelState(
     val isRefreshing: Boolean = false,
 )
 
-
 class ProfileViewModel(
     private val nostrSubscriber: INostrSubscriber,
     private val feedProvider: IFeedProvider,
@@ -53,7 +54,6 @@ class ProfileViewModel(
     clip: ClipboardManager,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ProfileViewModelState())
-    private val batchSize = 25
 
     val uiState = viewModelState
         .stateIn(
@@ -69,17 +69,17 @@ class ProfileViewModel(
     val onSetPubkey: (String) -> Unit = { pubkey ->
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set UI data for $pubkey")
-            useCachedValues(pubkey)
-            renewSubscriptions(pubkey = pubkey)
+            useCachedValues(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
+            renewSubscriptions(pubkey = pubkey, subBatchSize = SUB_BATCH_SIZE)
             delay(1500)
-            useCachedValues(pubkey)
+            useCachedValues(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
         }
     }
 
     val onLoadMore: () -> Unit = {
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Load more")
-            fetchAndAppendFeed()
+            fetchAndAppendFeed(subBatchSize = SUB_BATCH_SIZE, dbBatchSize = DB_BATCH_SIZE)
         }
     }
 
@@ -96,9 +96,9 @@ class ProfileViewModel(
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Refresh profile view")
             setRefresh(true)
-            renewSubscriptions(pubkey = uiState.value.pubkey)
+            renewSubscriptions(pubkey = uiState.value.pubkey, subBatchSize = SUB_BATCH_SIZE)
             delay(1500)
-            useCachedValues(uiState.value.pubkey)
+            useCachedValues(pubkey = uiState.value.pubkey, dbBatchSize = DB_BATCH_SIZE)
             setRefresh(false)
         }
     }
@@ -161,28 +161,32 @@ class ProfileViewModel(
 
     private val isAppending = AtomicBoolean(false)
 
-    private suspend fun fetchAndAppendFeed() {
+    private suspend fun fetchAndAppendFeed(subBatchSize: Int, dbBatchSize: Int) {
         if (isAppending.get()) return
 
         Log.i(TAG, "Append feed")
         viewModelState.value.let { state ->
             state.posts.lastOrNull()?.let { last ->
                 isAppending.set(true)
-                subscribeToFeed(pubkey = state.pubkey, until = last.createdAt)
-                delay(1000)
-                val newPosts = appendFeedAndGetNewPosts()
+                subscribeToFeed(
+                    pubkey = state.pubkey,
+                    subBatchSize = subBatchSize,
+                    until = last.createdAt
+                )
+                delay(500)
+                val newPosts = appendFeedAndGetNewPosts(dbBatchSize = dbBatchSize)
                 subscribeToAdditionalFeedData(newPosts)
                 isAppending.set(false)
             }
         }
     }
 
-    private suspend fun appendFeedAndGetNewPosts(): List<PostWithMeta> {
+    private suspend fun appendFeedAndGetNewPosts(dbBatchSize: Int): List<PostWithMeta> {
         viewModelState.value.let { state ->
             val newFeed = feedProvider.appendFeedWithSingleAuthor(
                 pubkey = state.pubkey,
                 currentFeed = state.posts,
-                limit = batchSize
+                limit = dbBatchSize
             )
             val countOfNewPosts = newFeed.size - state.posts.size
             require(countOfNewPosts >= 0)
@@ -195,21 +199,21 @@ class ProfileViewModel(
     }
 
 
-    private suspend fun renewSubscriptions(pubkey: String) {
+    private suspend fun renewSubscriptions(pubkey: String, subBatchSize: Int) {
         nostrSubscriber.unsubscribeProfiles()
         nostrSubscriber.subscribeToProfileMetadataAndContactList(pubkey)
-        subscribeToFeed(pubkey)
+        subscribeToFeed(pubkey = pubkey, subBatchSize = subBatchSize)
         delay(1000)
-        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = batchSize))
-        delay(2500)
+        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = subBatchSize))
+        delay(1000)
     }
 
-    private fun subscribeToFeed(pubkey: String, until: Long? = null) {
+    private fun subscribeToFeed(pubkey: String, subBatchSize: Int, until: Long? = null) {
         Log.i(TAG, "Subscribe to feed")
         nostrSubscriber.unsubscribeFeeds()
         nostrSubscriber.subscribeToFeed(
             authorPubkeys = listOf(pubkey),
-            limit = batchSize,
+            limit = subBatchSize,
             until = until
         )
     }
@@ -220,7 +224,7 @@ class ProfileViewModel(
         nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
     }
 
-    private suspend fun useCachedValues(pubkey: String) {
+    private suspend fun useCachedValues(pubkey: String, dbBatchSize: Int) {
         val cachedProfile = profileProvider.getProfile(pubkey)
         Log.i(TAG, "Use cached values")
         viewModelState.update {
@@ -234,7 +238,7 @@ class ProfileViewModel(
                 numOfFollowers = cachedProfile.numOfFollowers,
                 isOneself = cachedProfile.isOneself,
                 isFollowed = cachedProfile.isFollowedByMe,
-                posts = feedProvider.getFeedWithSingleAuthor(pubkey = pubkey, limit = batchSize)
+                posts = feedProvider.getFeedWithSingleAuthor(pubkey = pubkey, limit = dbBatchSize)
             )
         }
     }

@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
-private const val BATCH_SIZE = 25
+private const val DB_BATCH_SIZE = 25
+private const val SUB_BATCH_SIZE = 50
 
 data class FeedViewModelState(
     /**
@@ -57,13 +58,13 @@ class FeedViewModel(
         }
         viewModelScope.launch(context = IO) {
             setRefresh(true)
-            renewAllSubscriptions()
+            renewAllSubscriptions(subBatchSize = SUB_BATCH_SIZE)
             val relays = relayProvider.listRelays()
             Log.i(TAG, "Listed ${relays.size} relays")
             viewModelState.update {
                 it.copy(currentRelay = relays.firstOrNull().orEmpty())
             }
-            setAllFeeds(relayUrls = relays, feedMap = feedMap)
+            setAllFeeds(relayUrls = relays, feedMap = feedMap, dbBatchSize = DB_BATCH_SIZE)
             setRefresh(false)
         }
     }
@@ -72,8 +73,12 @@ class FeedViewModel(
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Refresh feed view")
             setRefresh(true)
-            renewAllSubscriptions()
-            setAllFeeds(relayUrls = relayProvider.listRelays(), feedMap = feedMap)
+            renewAllSubscriptions(subBatchSize = SUB_BATCH_SIZE)
+            setAllFeeds(
+                relayUrls = relayProvider.listRelays(),
+                feedMap = feedMap,
+                dbBatchSize = DB_BATCH_SIZE
+            )
             setRefresh(false)
         }
     }
@@ -84,6 +89,8 @@ class FeedViewModel(
             fetchAndAppendFeedByRelay(
                 relayUrl = uiState.value.currentRelay,
                 feedMap = feedMap,
+                subBatchSize = SUB_BATCH_SIZE,
+                dbBatchSize = DB_BATCH_SIZE,
             )
         }
     }
@@ -155,33 +162,37 @@ class FeedViewModel(
         }
     }
 
-    private suspend fun renewAllSubscriptions() {
-        subscribeToAllFeeds()
+    private suspend fun renewAllSubscriptions(subBatchSize: Int) {
+        subscribeToAllFeeds(subBatchSize = subBatchSize)
         delay(1000)
-        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = 2 * BATCH_SIZE))
-        delay(2000)
+        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = subBatchSize))
+        delay(1000)
     }
 
-    private suspend fun subscribeToAllFeeds(until: Long? = null) {
+    private suspend fun subscribeToAllFeeds(subBatchSize: Int, until: Long? = null) {
         Log.i(TAG, "Subscribe to all feeds")
         nostrSubscriber.unsubscribeFeeds()
         val pubkeys = listContactPubkeysAndYourself()
         Log.i(TAG, "Found ${pubkeys.size} contact pubkeys")
         nostrSubscriber.subscribeToFeed(
             authorPubkeys = pubkeys,
-            limit = BATCH_SIZE,
+            limit = subBatchSize,
             until = until
         )
     }
 
-    private suspend fun subscribeToFeedByRelay(relayUrl: String, until: Long? = null) {
+    private suspend fun subscribeToFeedByRelay(
+        relayUrl: String,
+        batchSize: Int,
+        until: Long? = null
+    ) {
         Log.i(TAG, "Subscribe to feed of $relayUrl")
         nostrSubscriber.unsubscribeFeeds()
         val pubkeys = listContactPubkeysAndYourself()
         nostrSubscriber.subscribeToFeedByRelay(
             relayUrl = relayUrl,
             authorPubkeys = pubkeys,
-            limit = BATCH_SIZE,
+            limit = batchSize,
             until = until
         )
     }
@@ -194,11 +205,12 @@ class FeedViewModel(
 
     private suspend fun setAllFeeds(
         relayUrls: List<String>,
-        feedMap: MutableMap<String, List<PostWithMeta>>
+        feedMap: MutableMap<String, List<PostWithMeta>>,
+        dbBatchSize: Int,
     ) {
         Log.i(TAG, "Set all feeds")
         relayUrls.forEach { relayUrl ->
-            val feedByRelay = feedProvider.getFeedByRelay(relayUrl = relayUrl, limit = BATCH_SIZE)
+            val feedByRelay = feedProvider.getFeedByRelay(relayUrl = relayUrl, limit = dbBatchSize)
             feedMap[relayUrl] = feedByRelay
             if (relayUrl == uiState.value.currentRelay) {
                 viewModelState.update {
@@ -214,6 +226,8 @@ class FeedViewModel(
     private suspend fun fetchAndAppendFeedByRelay(
         relayUrl: String,
         feedMap: MutableMap<String, List<PostWithMeta>>,
+        subBatchSize: Int,
+        dbBatchSize: Int,
     ) {
         if (isAppending.get()) return
 
@@ -221,9 +235,17 @@ class FeedViewModel(
             Log.i(TAG, "Append feed for relay $relayUrl")
             state.posts.lastOrNull()?.let { last ->
                 isAppending.set(true)
-                subscribeToFeedByRelay(relayUrl = relayUrl, until = last.createdAt)
-                delay(1000)
-                val newPosts = appendFeedAndGetNewPosts(relayUrl = relayUrl, feedMap = feedMap)
+                subscribeToFeedByRelay(
+                    relayUrl = relayUrl,
+                    batchSize = subBatchSize,
+                    until = last.createdAt
+                )
+                delay(500)
+                val newPosts = appendFeedAndGetNewPosts(
+                    relayUrl = relayUrl,
+                    feedMap = feedMap,
+                    dbBatchSize = dbBatchSize
+                )
                 subscribeToAdditionalFeedData(newPosts)
                 isAppending.set(false)
             }
@@ -232,7 +254,8 @@ class FeedViewModel(
 
     private suspend fun appendFeedAndGetNewPosts(
         relayUrl: String,
-        feedMap: MutableMap<String, List<PostWithMeta>>
+        feedMap: MutableMap<String, List<PostWithMeta>>,
+        dbBatchSize: Int,
     ): List<PostWithMeta> {
         val currentFeed = feedMap[relayUrl].orEmpty()
         if (currentFeed.isEmpty()) {
@@ -242,7 +265,7 @@ class FeedViewModel(
         val newFeed = feedProvider.appendFeedByRelay(
             relayUrl = relayUrl,
             currentFeed = currentFeed,
-            limit = BATCH_SIZE
+            limit = dbBatchSize
         )
         feedMap[relayUrl] = newFeed
         val countOfNewPosts = newFeed.size - currentFeed.size
