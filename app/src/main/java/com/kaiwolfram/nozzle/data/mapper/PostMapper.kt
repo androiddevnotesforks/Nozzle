@@ -17,12 +17,14 @@ class PostMapper(
     override suspend fun mapToPostsWithMeta(posts: List<PostEntity>): List<PostWithMeta> {
         if (posts.isEmpty()) return listOf()
 
-        val stats = interactionStatsProvider.getStats(posts.map { it.id })
+        val postIds = posts.map { it.id }
+        val stats = interactionStatsProvider.getStats(postIds)
         val reposts = postDao.getRepostsPreviewMap(posts.mapNotNull { it.repostedId })
         val namesAndPictures = profileDao.getNamesAndPicturesMap(posts.map { it.pubkey })
-        val replyRecipients =
-            profileDao.getAuthorNamesAndPubkeysMap(posts.mapNotNull { it.replyToId })
-        val relays = eventRelayDao.getRelayMap(posts.map { it.id })
+        val replyRecipients = profileDao.getAuthorNamesAndPubkeysMap(
+            posts.mapNotNull { it.replyToId }
+        )
+        val relays = eventRelayDao.getRelayMap(postIds)
 
         return posts.map {
             PostWithMeta(

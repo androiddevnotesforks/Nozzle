@@ -224,11 +224,13 @@ private fun PostCardContentBase(
     Spacer(Modifier.height(spacing.small))
     relays?.let { InRelays(relays = it) }
     Spacer(Modifier.height(spacing.medium))
-    Text(
-        text = content,
-        maxLines = 64,
-        overflow = TextOverflow.Ellipsis
-    )
+    if (content.isNotBlank()) {
+        Text(
+            text = content.trim(),
+            maxLines = 64,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
 }
 
 @Composable

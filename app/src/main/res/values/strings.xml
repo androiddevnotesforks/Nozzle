@@ -80,6 +80,7 @@
     <string name="move_to_next_feed">Move to next feed</string>
     <string name="in_relay">in</string>
     <string name="and">and</string>
+    <string name="post_seen_in">Post seen in:</string>
     <plurals name="other_relays">
         <item quantity="one">other</item>
         <item quantity="other">others</item>

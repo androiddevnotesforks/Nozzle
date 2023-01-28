@@ -28,6 +28,10 @@ data class Sizing(
      * 60 dp
      */
     val largeProfilePicture: Dp = 60.dp,
+    /**
+     * 320 dp
+     */
+    val dialogHeight: Dp = 320.dp,
 )
 
 val LocalSizing = compositionLocalOf { Sizing() }
