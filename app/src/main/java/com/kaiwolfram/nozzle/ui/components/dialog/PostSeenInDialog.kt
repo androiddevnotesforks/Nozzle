@@ -7,39 +7,38 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.components.text.DialogHeadline
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun PostSeenInDialog(relays: List<String>, onCloseDialog: () -> Unit) {
     NozzleDialog(onCloseDialog = onCloseDialog) {
         Column {
-            DialogHeadline(
+            Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = spacing.dialogEdge)
                     .padding(top = spacing.large, bottom = spacing.medium),
-                headline = stringResource(id = R.string.post_seen_in)
+                text = stringResource(id = R.string.relays),
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            RelayList(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = spacing.dialogEdge)
-                    .padding(vertical = spacing.medium),
-                relays = relays
-            )
+            RelayList(relays = relays)
         }
     }
 }
 
 @Composable
-private fun RelayList(relays: List<String>, modifier: Modifier = Modifier) {
+private fun RelayList(relays: List<String>) {
     LazyColumn {
         items(relays) { relay ->
             Text(
-                modifier = modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = spacing.dialogEdge, vertical = spacing.medium),
                 text = relay,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

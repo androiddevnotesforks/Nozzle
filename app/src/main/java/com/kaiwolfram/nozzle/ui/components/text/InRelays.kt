@@ -57,7 +57,6 @@ private fun InRelay(relay: String, modifier: Modifier = Modifier, color: Color =
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = color)) {
                 append(relay.removePrefix("wss://"))
-                append(" ")
             }
         },
         maxLines = 1,
@@ -76,6 +75,7 @@ private fun AndOthers(
         modifier = modifier,
         text = buildAnnotatedString {
             withStyle(style = SpanStyle(color = color)) {
+                append(" ")
                 append(stringResource(id = R.string.and))
                 append(" ")
             }
