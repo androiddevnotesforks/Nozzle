@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.ui.theme.Green21
+import com.kaiwolfram.nozzle.ui.theme.Red21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 
 @Composable
@@ -71,30 +73,33 @@ fun ReplyIcon(
 
 @Composable
 fun RepostIcon(
+    isReposted: Boolean,
     modifier: Modifier = Modifier,
     description: String? = stringResource(id = R.string.repost),
-    tint: Color = colors.onBackground,
+    activeTint: Color = Green21,
+    inactiveTint: Color = colors.onBackground,
 ) {
     Icon(
         modifier = modifier,
         imageVector = Icons.Default.Repeat,
         contentDescription = description,
-        tint = tint
+        tint = if (isReposted) activeTint else inactiveTint,
     )
 }
 
 @Composable
 fun LikeIcon(
+    isLiked: Boolean,
     modifier: Modifier = Modifier,
-    isLiked: Boolean = false,
     description: String? = stringResource(id = R.string.like),
-    tint: Color = colors.onBackground,
+    activeTint: Color = Red21,
+    inactiveTint: Color = colors.onBackground,
 ) {
     Icon(
         modifier = modifier,
         imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
         contentDescription = description,
-        tint = tint
+        tint = if (isLiked) activeTint else inactiveTint,
     )
 }
 

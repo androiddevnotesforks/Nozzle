@@ -12,6 +12,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -133,16 +135,19 @@ fun EditProfileButton(onNavToEditProfile: () -> Unit) {
     }
 }
 
-
 @Composable
 fun FollowButton(
     isFollowed: Boolean,
     onFollow: () -> Unit,
     onUnfollow: () -> Unit
 ) {
-    if (isFollowed) {
+    val isFollowedLocally = remember { mutableStateOf(isFollowed) }
+    if (isFollowedLocally.value) {
         Button(
-            onClick = { onUnfollow() },
+            onClick = {
+                onUnfollow()
+                isFollowedLocally.value = false
+            },
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(1.dp, colors.onBackground),
             colors = ButtonDefaults.outlinedButtonColors(
@@ -154,7 +159,10 @@ fun FollowButton(
         }
     } else {
         Button(
-            onClick = { onFollow() },
+            onClick = {
+                onFollow()
+                isFollowedLocally.value = true
+            },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = colors.background,

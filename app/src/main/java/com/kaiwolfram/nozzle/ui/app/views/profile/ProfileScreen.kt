@@ -163,8 +163,8 @@ private fun FollowOrEditButton(
     } else {
         FollowButton(
             isFollowed = isFollowed,
-            onFollow = { onFollow() },
-            onUnfollow = { onUnfollow() }
+            onFollow = onFollow,
+            onUnfollow = onUnfollow,
         )
     }
 }

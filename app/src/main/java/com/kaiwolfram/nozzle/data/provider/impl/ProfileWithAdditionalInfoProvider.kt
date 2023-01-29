@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.flow
 
 private const val TAG = "ProfileWithAdditionalInfoProvider"
 private const val EMIT_INTERVAL_TIME = 1500L
-private const val EMIT_INTERVAL_NUM = 5L
+private const val EMIT_INTERVAL_NUM = 10L
 
 class ProfileWithAdditionalInfoProvider(
     private val pubkeyProvider: IPubkeyProvider,

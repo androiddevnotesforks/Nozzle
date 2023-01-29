@@ -5,10 +5,11 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.shapes
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -348,16 +349,25 @@ private fun RepostAction(
     isRepostedByMe: Boolean,
     onRepost: () -> Unit,
 ) {
+    val isClicked = remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         val modifier = Modifier
             .size(sizing.smallIcon)
             .clip(CircleShape)
         RepostIcon(
-            modifier = if (isRepostedByMe) modifier.clickable { } else modifier.clickable { onRepost() },
-            tint = if (isRepostedByMe) Green21 else colors.onBackground
+            modifier = if (isRepostedByMe) modifier.clickable { }
+            else modifier.clickable {
+                onRepost()
+                isClicked.value = true
+            },
+            isReposted = isRepostedByMe || isClicked.value
         )
         Spacer(Modifier.width(spacing.medium))
-        Text(text = numOfReposts.toString())
+        Text(
+            text = if (!isRepostedByMe && isClicked.value)
+                (numOfReposts + 1).toString()
+            else numOfReposts.toString()
+        )
     }
 }
 
@@ -367,17 +377,24 @@ private fun LikeAction(
     isLikedByMe: Boolean,
     onLike: () -> Unit,
 ) {
+    val isClicked = remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         val modifier = Modifier
             .size(sizing.smallIcon)
             .clip(CircleShape)
         LikeIcon(
-            modifier = if (isLikedByMe) modifier.clickable { } else modifier.clickable { onLike() },
-            isLiked = isLikedByMe,
-            tint = if (isLikedByMe) Red21 else colors.onBackground
+            modifier = if (isLikedByMe) modifier.clickable { }
+            else modifier.clickable {
+                onLike()
+                isClicked.value = true
+            },
+            isLiked = isLikedByMe || isClicked.value,
         )
         Spacer(Modifier.width(spacing.medium))
-        Text(text = numOfLikes.toString())
+        Text(
+            text = if (!isLikedByMe && isClicked.value) (numOfLikes + 1).toString()
+            else numOfLikes.toString()
+        )
     }
 }
 

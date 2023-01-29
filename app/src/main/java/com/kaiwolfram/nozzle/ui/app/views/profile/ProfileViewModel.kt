@@ -123,14 +123,11 @@ class ProfileViewModel(
     }
 
     val onRepost: (String) -> Unit = { id ->
-        if (postsState.value.any { post -> post.id == id }) {
-            viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.repost(postId = id)
-            }
+        viewModelScope.launch(context = Dispatchers.IO) {
+            postCardInteractor.repost(postId = id)
         }
     }
 
-    // TODO: Move like, repost and follow logic to UI
     val onFollow: (String) -> Unit = { pubkeyToFollow ->
         if (!profileState.value.isFollowedByMe) {
             viewModelScope.launch(context = Dispatchers.IO) {

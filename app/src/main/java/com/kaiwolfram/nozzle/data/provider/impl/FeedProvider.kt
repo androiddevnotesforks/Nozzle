@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flow
 
 private const val TAG = "FeedProvider"
 private const val EMIT_INTERVAL_TIME = 1500L
-private const val EMIT_INTERVAL_NUM = 5L
+private const val EMIT_INTERVAL_NUM = 10L
 
 class FeedProvider(
     private val pubkeyProvider: IPubkeyProvider,

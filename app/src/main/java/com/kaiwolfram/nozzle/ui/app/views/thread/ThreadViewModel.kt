@@ -80,79 +80,29 @@ class ThreadViewModel(
             setUIRefresh(false)
         }
     }
-    // TODO: Move like, repost and follow logic to UI
 
     val onLike: (String) -> Unit = { postId ->
-        var needsUpdate = false
-        uiState.value.let { state ->
-            if (state.current != null && state.current.id == postId) {
-                needsUpdate = true
-                viewModelState.update {
-                    it.copy(
-                        current = state.current.copy(isLikedByMe = true),
-                    )
-                }
+        val toLike = uiState.value.let { state ->
+            if (state.current?.id == postId) {
+                state.current
             } else if (state.previous.any { post -> post.id == postId }) {
-                needsUpdate = true
-//                viewModelState.update {
-//                    it.copy(
-//                        previous = state.previous.map { toMap ->
-//                            mapToLikedPost(toMap = toMap, id = postId)
-//                        },
-//                    )
-//                }
+                state.previous.find { post -> post.id == postId }
             } else if (state.replies.any { post -> post.id == postId }) {
-                needsUpdate = true
-//                viewModelState.update {
-//                    it.copy(
-//                        replies = state.replies.map { toMap ->
-//                            mapToLikedPost(toMap = toMap, id = postId)
-//                        },
-//                    )
-//                }
+                state.replies.find { post -> post.id == postId }
+            } else {
+                null
             }
         }
-        if (needsUpdate) {
+        toLike?.let {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.like(postId = postId, postPubkey = "FIXME")
+                postCardInteractor.like(postId = postId, postPubkey = it.pubkey)
             }
         }
     }
 
     val onRepost: (String) -> Unit = { postId ->
-        var needsUpdate = false
-        uiState.value.let { state ->
-            if (state.current != null && state.current.id == postId) {
-                needsUpdate = true
-                viewModelState.update {
-                    it.copy(
-                        current = state.current.copy(isRepostedByMe = true),
-                    )
-                }
-            } else if (state.previous.any { post -> post.id == postId }) {
-                needsUpdate = true
-//                viewModelState.update {
-//                    it.copy(
-//                        previous = state.previous.map { toMap ->
-//                            mapToRepostedPost(toMap = toMap, id = postId)
-//                        },
-//                    )
-//                }
-            } else if (state.replies.any { post -> post.id == postId }) {
-                needsUpdate = true
-//                viewModelState.update {
-//                    it.copy(
-//                        replies = state.replies.map { toMap ->
-//                            mapToRepostedPost(toMap = toMap, id = postId)
-//                        },
-//                    )
-//                }
-            }
-        }
-        if (needsUpdate) {
-            viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.repost(postId = postId)
-            }
+        viewModelScope.launch(context = Dispatchers.IO) {
+            postCardInteractor.repost(postId = postId)
         }
     }
 
