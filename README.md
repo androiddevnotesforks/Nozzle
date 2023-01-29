@@ -11,7 +11,7 @@ This project is in early alpha stage.
 Go to the [release page](https://github.com/kaiwolfram/Nozzle/releases) and download the latest apk
 file or clone this repository and build it yourself
 
-## Preview
+## Screenshots
 
 <p float="left">
 <img src="screenshots/feed.png" width="24%" height="24%" />
@@ -31,7 +31,10 @@ file or clone this repository and build it yourself
 - [x] Open whole threads
 - [x] Edit profile
 - [x] Search bar
+- [x] Show on which relays posts have been seen on
+- [x] Relay selection for sending posts and replies
 - [ ] Use Flows for smoother UX
+- [ ] Relay management
 - [ ] nip05 verification
 - [ ] URL and media preview
 - [ ] Profile lists (likes, reposts, following, followers)
@@ -44,8 +47,11 @@ file or clone this repository and build it yourself
 - [ ] Notifications tab
 - [ ] Different feed settings
 - [ ] Multiple accounts
-- [ ] Relay management
 - [ ] Mute users
 - [ ] Encrypted direct messages
 - [ ] Republish saved events to new relays
 - [ ] Event signing with NFC card
+
+## License
+
+[MIT licence](https://github.com/kaiwolfram/Nozzle/blob/master/LICENSE)
