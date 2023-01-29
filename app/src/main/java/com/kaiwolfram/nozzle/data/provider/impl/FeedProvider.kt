@@ -114,26 +114,27 @@ class FeedProvider(
         limit: Int,
     ): Flow<List<PostWithMeta>> {
         Log.i(TAG, "Append to feed of author $pubkey")
-        return flow {
-            if (currentFeed.isEmpty()) {
-                emit(currentFeed)
-            } else {
-                currentFeed.lastOrNull()?.let { last ->
-                    nostrSubscriber.unsubscribeFeeds()
-                    nostrSubscriber.unsubscribeAdditionalPostsData()
-                    nostrSubscriber.subscribeToFeed(
-                        authorPubkeys = listOf(pubkey),
-                        limit = 2 * limit,
-                        until = last.createdAt
-                    )
-                    delay(1000)
+        if (currentFeed.isEmpty()) return flow { emit(listOf()) }
 
-                    val toAppend = postDao.getLatestFeedOfSingleAuthor(
-                        pubkey = pubkey,
-                        limit = limit,
-                        until = last.createdAt
-                    )
+        return flow {
+            currentFeed.lastOrNull()?.let { last ->
+                nostrSubscriber.unsubscribeFeeds()
+                nostrSubscriber.unsubscribeAdditionalPostsData()
+                nostrSubscriber.subscribeToFeed(
+                    authorPubkeys = listOf(pubkey),
+                    limit = 2 * limit,
+                    until = last.createdAt
+                )
+                delay(1000)
+
+                val toAppend = postDao.getLatestFeedOfSingleAuthor(
+                    pubkey = pubkey,
+                    limit = limit,
+                    until = last.createdAt
+                )
+                if (toAppend.isNotEmpty()) {
                     postMapper.mapToPostsWithMeta(toAppend).let { mapped ->
+                        Log.d(TAG, "Emit ${currentFeed.size} + ${mapped.size}")
                         emit(currentFeed + mapped)
                         nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
                     }
@@ -141,6 +142,7 @@ class FeedProvider(
                         delay(EMIT_INTERVAL_TIME)
                         nostrSubscriber.unsubscribeAdditionalPostsData()
                         postMapper.mapToPostsWithMeta(toAppend).let { mapped ->
+                            Log.d(TAG, "Emit ${currentFeed.size} + ${mapped.size}")
                             emit(currentFeed + mapped)
                             nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
                         }

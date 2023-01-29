@@ -33,12 +33,21 @@ class ProfileViewModel(
     clip: ClipboardManager,
 ) : ViewModel() {
     private val isRefreshing = MutableStateFlow(false)
-
     val isRefreshingState = isRefreshing
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
             false
+        )
+
+
+    // TODO: Figure out how to do it without this hack
+    private val forceRecomposition = MutableStateFlow(0)
+    val forceRecompositionState = forceRecomposition
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            0
         )
 
     var profileState: StateFlow<ProfileWithAdditionalInfo> = MutableStateFlow(
@@ -89,9 +98,10 @@ class ProfileViewModel(
                 limit = DB_BATCH_SIZE,
             ).stateIn(
                 viewModelScope,
-                SharingStarted.Eagerly,
+                SharingStarted.WhileSubscribed(),
                 postsState.value,
             )
+            forceRecomposition.update { it + 1 }
         }
     }
 
@@ -141,16 +151,17 @@ class ProfileViewModel(
         Log.i(TAG, "Refresh profile and posts of $pubkey")
         profileState = profileProvider.getProfile(pubkey).stateIn(
             viewModelScope,
-            SharingStarted.Eagerly,
+            SharingStarted.WhileSubscribed(),
             profileState.value,
         )
         postsState = feedProvider.getFeedWithSingleAuthor(
             pubkey = pubkey, limit = dbBatchSize
         ).stateIn(
             viewModelScope,
-            SharingStarted.Eagerly,
+            SharingStarted.WhileSubscribed(),
             postsState.value,
         )
+        forceRecomposition.update { it + 1 }
     }
 
     private fun setUIRefresh(value: Boolean) {
