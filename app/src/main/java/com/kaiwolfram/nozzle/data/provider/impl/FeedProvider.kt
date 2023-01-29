@@ -2,16 +2,23 @@ package com.kaiwolfram.nozzle.data.provider.impl
 
 import android.util.Log
 import com.kaiwolfram.nozzle.data.mapper.IPostMapper
+import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 private const val TAG = "FeedProvider"
+private const val EMIT_INTERVAL_TIME = 1500L
+private const val EMIT_INTERVAL_NUM = 5L
 
 class FeedProvider(
     private val pubkeyProvider: IPubkeyProvider,
     private val postMapper: IPostMapper,
+    private val nostrSubscriber: INostrSubscriber,
     private val postDao: PostDao,
 ) : IFeedProvider {
 
@@ -42,19 +49,41 @@ class FeedProvider(
         return postMapper.mapToPostsWithMeta(posts)
     }
 
-    override suspend fun getFeedWithSingleAuthor(
+    override fun getFeedWithSingleAuthor(
         pubkey: String,
         limit: Int,
-        until: Long?
-    ): List<PostWithMeta> {
+        until: Long?,
+    ): Flow<List<PostWithMeta>> {
         Log.i(TAG, "Get feed of author $pubkey")
-        val posts = postDao.getLatestFeedOfSingleAuthor(
-            pubkey = pubkey,
-            limit = limit,
-            until = until
-        )
+        return flow {
+            nostrSubscriber.unsubscribeFeeds()
+            nostrSubscriber.unsubscribeAdditionalPostsData()
+            nostrSubscriber.subscribeToFeed(
+                authorPubkeys = listOf(pubkey),
+                limit = 2 * limit,
+                until = until
+            )
+            val posts = postDao.getLatestFeedOfSingleAuthor(
+                pubkey = pubkey,
+                limit = limit,
+                until = until
+            )
 
-        return postMapper.mapToPostsWithMeta(posts)
+            if (posts.isNotEmpty()) {
+                postMapper.mapToPostsWithMeta(posts).let { mapped ->
+                    emit(mapped)
+                    nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                }
+                for (num in 1..EMIT_INTERVAL_NUM) {
+                    delay(EMIT_INTERVAL_TIME)
+                    nostrSubscriber.unsubscribeAdditionalPostsData()
+                    postMapper.mapToPostsWithMeta(posts).let { mapped ->
+                        emit(mapped)
+                        nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun appendFeedByRelay(
@@ -79,24 +108,45 @@ class FeedProvider(
         return listOf()
     }
 
-    override suspend fun appendFeedWithSingleAuthor(
+    override fun appendFeedWithSingleAuthor(
         pubkey: String,
         currentFeed: List<PostWithMeta>,
-        limit: Int
-    ): List<PostWithMeta> {
-        currentFeed.lastOrNull()?.let { last ->
-            val allPosts = mutableListOf<PostWithMeta>()
-            allPosts.addAll(currentFeed)
-            allPosts.addAll(
-                getFeedWithSingleAuthor(
-                    pubkey = pubkey,
-                    limit = limit,
-                    until = last.createdAt
-                )
-            )
-            return allPosts
-        }
+        limit: Int,
+    ): Flow<List<PostWithMeta>> {
+        Log.i(TAG, "Append to feed of author $pubkey")
+        return flow {
+            if (currentFeed.isEmpty()) {
+                emit(currentFeed)
+            } else {
+                currentFeed.lastOrNull()?.let { last ->
+                    nostrSubscriber.unsubscribeFeeds()
+                    nostrSubscriber.unsubscribeAdditionalPostsData()
+                    nostrSubscriber.subscribeToFeed(
+                        authorPubkeys = listOf(pubkey),
+                        limit = 2 * limit,
+                        until = last.createdAt
+                    )
+                    delay(1000)
 
-        return listOf()
+                    val toAppend = postDao.getLatestFeedOfSingleAuthor(
+                        pubkey = pubkey,
+                        limit = limit,
+                        until = last.createdAt
+                    )
+                    postMapper.mapToPostsWithMeta(toAppend).let { mapped ->
+                        emit(currentFeed + mapped)
+                        nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                    }
+                    for (num in 1..EMIT_INTERVAL_NUM) {
+                        delay(EMIT_INTERVAL_TIME)
+                        nostrSubscriber.unsubscribeAdditionalPostsData()
+                        postMapper.mapToPostsWithMeta(toAppend).let { mapped ->
+                            emit(currentFeed + mapped)
+                            nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

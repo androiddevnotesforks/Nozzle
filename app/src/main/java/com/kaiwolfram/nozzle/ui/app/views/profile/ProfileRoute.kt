@@ -14,10 +14,14 @@ fun ProfileRoute(
     onNavigateToReply: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
 ) {
-    val uiState by profileViewModel.uiState.collectAsState()
+    val isRefreshing by profileViewModel.isRefreshingState.collectAsState()
+    val profile by profileViewModel.profileState.collectAsState()
+    val posts by profileViewModel.postsState.collectAsState()
 
     ProfileScreen(
-        uiState = uiState,
+        isRefreshing = isRefreshing,
+        profile = profile,
+        posts = posts,
         onPrepareReply = onPrepareReply,
         onLike = profileViewModel.onLike,
         onRepost = profileViewModel.onRepost,

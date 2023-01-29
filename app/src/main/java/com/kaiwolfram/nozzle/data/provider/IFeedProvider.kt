@@ -1,6 +1,7 @@
 package com.kaiwolfram.nozzle.data.provider
 
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import kotlinx.coroutines.flow.Flow
 
 interface IFeedProvider {
     suspend fun getFeed(limit: Int, until: Long? = null): List<PostWithMeta>
@@ -11,11 +12,11 @@ interface IFeedProvider {
         until: Long? = null
     ): List<PostWithMeta>
 
-    suspend fun getFeedWithSingleAuthor(
+    fun getFeedWithSingleAuthor(
         pubkey: String,
         limit: Int,
-        until: Long? = null
-    ): List<PostWithMeta>
+        until: Long? = null,
+    ): Flow<List<PostWithMeta>>
 
     suspend fun appendFeedByRelay(
         relayUrl: String,
@@ -23,9 +24,9 @@ interface IFeedProvider {
         limit: Int
     ): List<PostWithMeta>
 
-    suspend fun appendFeedWithSingleAuthor(
+    fun appendFeedWithSingleAuthor(
         pubkey: String,
         currentFeed: List<PostWithMeta>,
-        limit: Int
-    ): List<PostWithMeta>
+        limit: Int,
+    ): Flow<List<PostWithMeta>>
 }

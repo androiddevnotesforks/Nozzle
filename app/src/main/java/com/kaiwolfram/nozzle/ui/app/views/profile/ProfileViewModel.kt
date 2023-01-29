@@ -8,59 +8,53 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
-import com.kaiwolfram.nozzle.data.provider.IProfileWithFollowerProvider
-import com.kaiwolfram.nozzle.data.utils.mapToLikedPost
-import com.kaiwolfram.nozzle.data.utils.mapToRepostedPost
+import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "ProfileViewModel"
 private const val DB_BATCH_SIZE = 25
-private const val SUB_BATCH_SIZE = 50
-
-data class ProfileViewModelState(
-    val pubkey: String = "",
-    val npub: String = "",
-    val name: String = "",
-    val about: String = "",
-    val picture: String = "",
-    val numOfFollowing: Int = 0,
-    val numOfFollowers: Int = 0,
-    val isOneself: Boolean = true,
-    val isFollowed: Boolean = false,
-    val posts: List<PostWithMeta> = listOf(),
-    val isRefreshing: Boolean = false,
-)
 
 class ProfileViewModel(
-    private val nostrSubscriber: INostrSubscriber,
     private val feedProvider: IFeedProvider,
-    private val profileProvider: IProfileWithFollowerProvider,
+    private val profileProvider: IProfileWithAdditionalInfoProvider,
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
-    private val viewModelState = MutableStateFlow(ProfileViewModelState())
+    private val isRefreshing = MutableStateFlow(false)
 
-    val uiState = viewModelState
+    val isRefreshingState = isRefreshing
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value
+            false
         )
+
+    var profileState: StateFlow<ProfileWithAdditionalInfo> = MutableStateFlow(
+        ProfileWithAdditionalInfo(
+            pubkey = "",
+            npub = "",
+            metadata = Metadata(),
+            numOfFollowing = 0,
+            numOfFollowers = 0,
+            numOfRelays = 0,
+            isOneself = false,
+            isFollowedByMe = false,
+        )
+    )
+
+    var postsState: StateFlow<List<PostWithMeta>> = MutableStateFlow(listOf())
 
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
@@ -69,26 +63,7 @@ class ProfileViewModel(
     val onSetPubkey: (String) -> Unit = { pubkey ->
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set UI data for $pubkey")
-            useCachedValues(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
-            renewSubscriptions(pubkey = pubkey, subBatchSize = SUB_BATCH_SIZE)
-            delay(1500)
-            useCachedValues(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
-        }
-    }
-
-    val onLoadMore: () -> Unit = {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            Log.i(TAG, "Load more")
-            fetchAndAppendFeed(subBatchSize = SUB_BATCH_SIZE, dbBatchSize = DB_BATCH_SIZE)
-        }
-    }
-
-    val onCopyNpub: () -> Unit = {
-        uiState.value.npub.let {
-            Log.i(TAG, "Copy npub $it")
-            clip.setText(AnnotatedString(it))
-            Toast.makeText(context, context.getString(R.string.pubkey_copied), Toast.LENGTH_SHORT)
-                .show()
+            refreshProfileAndPostState(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
         }
     }
 
@@ -96,165 +71,98 @@ class ProfileViewModel(
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Refresh profile view")
             setUIRefresh(true)
-            renewSubscriptions(pubkey = uiState.value.pubkey, subBatchSize = SUB_BATCH_SIZE)
-            delay(1500)
-            useCachedValues(pubkey = uiState.value.pubkey, dbBatchSize = DB_BATCH_SIZE)
+            refreshProfileAndPostState(
+                pubkey = profileState.value.pubkey,
+                dbBatchSize = DB_BATCH_SIZE
+            )
+            delay(1000)
             setUIRefresh(false)
         }
     }
 
+    val onLoadMore: () -> Unit = {
+        viewModelScope.launch(context = Dispatchers.IO) {
+            Log.i(TAG, "Load more")
+            postsState = feedProvider.appendFeedWithSingleAuthor(
+                currentFeed = postsState.value,
+                pubkey = profileState.value.pubkey,
+                limit = DB_BATCH_SIZE,
+            ).stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                postsState.value,
+            )
+        }
+    }
+
+    val onCopyNpub: () -> Unit = {
+        profileState.value.npub.let {
+            Log.i(TAG, "Copy npub $it")
+            clip.setText(AnnotatedString(it))
+            Toast.makeText(context, context.getString(R.string.pubkey_copied), Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
     val onLike: (String) -> Unit = { id ->
-        uiState.value.let { state ->
-            state.posts.find { it.id == id }?.let {
-                viewModelScope.launch(context = Dispatchers.IO) {
-                    postCardInteractor.like(postId = id, postPubkey = it.pubkey)
-                }
-                viewModelState.update {
-                    it.copy(
-                        posts = state.posts.map { toMap ->
-                            mapToLikedPost(toMap = toMap, id = id)
-                        },
-                    )
-                }
+        postsState.value.find { it.id == id }?.let {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                postCardInteractor.like(postId = id, postPubkey = it.pubkey)
             }
         }
     }
 
     val onRepost: (String) -> Unit = { id ->
-        uiState.value.let { state ->
-            if (state.posts.any { post -> post.id == id }) {
-                viewModelScope.launch(context = Dispatchers.IO) {
-                    postCardInteractor.repost(postId = id)
-                }
-                viewModelState.update {
-                    it.copy(
-                        posts = state.posts.map { toMap ->
-                            mapToRepostedPost(toMap = toMap, id = id)
-                        },
-                    )
-                }
+        if (postsState.value.any { post -> post.id == id }) {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                postCardInteractor.repost(postId = id)
             }
         }
     }
 
+    // TODO: Move like, repost and follow logic to UI
     val onFollow: (String) -> Unit = { pubkeyToFollow ->
-        if (!uiState.value.isFollowed) {
+        if (!profileState.value.isFollowedByMe) {
             viewModelScope.launch(context = Dispatchers.IO) {
                 profileFollower.follow(pubkeyToFollow = pubkeyToFollow, relayUrl = "")
-            }
-            viewModelState.update {
-                it.copy(isFollowed = true)
             }
         }
     }
 
     val onUnfollow: (String) -> Unit = { pubkeyToUnfollow ->
-        if (uiState.value.isFollowed) {
+        if (profileState.value.isFollowedByMe) {
             viewModelScope.launch(context = Dispatchers.IO) {
                 profileFollower.unfollow(pubkeyToUnfollow = pubkeyToUnfollow)
             }
-            viewModelState.update {
-                it.copy(isFollowed = false)
-            }
         }
     }
 
-    private val isAppending = AtomicBoolean(false)
-
-    private suspend fun fetchAndAppendFeed(subBatchSize: Int, dbBatchSize: Int) {
-        if (isAppending.get()) return
-
-        Log.i(TAG, "Append feed")
-        viewModelState.value.let { state ->
-            state.posts.lastOrNull()?.let { last ->
-                isAppending.set(true)
-                subscribeToFeed(
-                    pubkey = state.pubkey,
-                    subBatchSize = subBatchSize,
-                    until = last.createdAt
-                )
-                delay(500)
-                val newPosts = appendFeedAndGetNewPosts(dbBatchSize = dbBatchSize)
-                subscribeToAdditionalFeedData(newPosts)
-                isAppending.set(false)
-            }
-        }
-    }
-
-    private suspend fun appendFeedAndGetNewPosts(dbBatchSize: Int): List<PostWithMeta> {
-        viewModelState.value.let { state ->
-            val newFeed = feedProvider.appendFeedWithSingleAuthor(
-                pubkey = state.pubkey,
-                currentFeed = state.posts,
-                limit = dbBatchSize
-            )
-            val countOfNewPosts = newFeed.size - state.posts.size
-            require(countOfNewPosts >= 0)
-            val appended = newFeed.takeLast(countOfNewPosts)
-            viewModelState.update {
-                it.copy(posts = newFeed)
-            }
-            return appended
-        }
-    }
-
-    private suspend fun renewSubscriptions(pubkey: String, subBatchSize: Int) {
-        nostrSubscriber.unsubscribeProfiles()
-        nostrSubscriber.subscribeToProfileMetadataAndContactList(pubkey)
-        subscribeToFeed(pubkey = pubkey, subBatchSize = subBatchSize)
-        delay(1000)
-        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = subBatchSize))
-        delay(1000)
-    }
-
-    private fun subscribeToFeed(pubkey: String, subBatchSize: Int, until: Long? = null) {
-        Log.i(TAG, "Subscribe to feed")
-        nostrSubscriber.unsubscribeFeeds()
-        nostrSubscriber.subscribeToFeed(
-            authorPubkeys = listOf(pubkey),
-            limit = subBatchSize,
-            until = until
+    private fun refreshProfileAndPostState(pubkey: String, dbBatchSize: Int) {
+        Log.i(TAG, "Refresh profile and posts of $pubkey")
+        profileState = profileProvider.getProfile(pubkey).stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            profileState.value,
+        )
+        postsState = feedProvider.getFeedWithSingleAuthor(
+            pubkey = pubkey, limit = dbBatchSize
+        ).stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            postsState.value,
         )
     }
 
-    private suspend fun subscribeToAdditionalFeedData(posts: List<PostWithMeta>) {
-        Log.i(TAG, "Subscribe to additional feed data")
-        nostrSubscriber.unsubscribeAdditionalPostsData()
-        nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
-    }
-
-    private suspend fun useCachedValues(pubkey: String, dbBatchSize: Int) {
-        val cachedProfile = profileProvider.getProfile(pubkey)
-        Log.i(TAG, "Use cached values")
-        viewModelState.update {
-            it.copy(
-                pubkey = pubkey,
-                npub = cachedProfile.npub,
-                name = cachedProfile.metadata.name ?: cachedProfile.npub,
-                about = cachedProfile.metadata.about.orEmpty(),
-                picture = cachedProfile.metadata.picture.orEmpty(),
-                numOfFollowing = cachedProfile.numOfFollowing,
-                numOfFollowers = cachedProfile.numOfFollowers,
-                isOneself = cachedProfile.isOneself,
-                isFollowed = cachedProfile.isFollowedByMe,
-                posts = feedProvider.getFeedWithSingleAuthor(pubkey = pubkey, limit = dbBatchSize)
-            )
-        }
-    }
-
     private fun setUIRefresh(value: Boolean) {
-        viewModelState.update {
-            it.copy(isRefreshing = value)
-        }
+        isRefreshing.update { value }
     }
 
     companion object {
         fun provideFactory(
-            nostrSubscriber: INostrSubscriber,
             profileFollower: IProfileFollower,
             postCardInteractor: IPostCardInteractor,
             feedProvider: IFeedProvider,
-            profileProvider: IProfileWithFollowerProvider,
+            profileProvider: IProfileWithAdditionalInfoProvider,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =
@@ -262,7 +170,6 @@ class ProfileViewModel(
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProfileViewModel(
-                        nostrSubscriber = nostrSubscriber,
                         profileFollower = profileFollower,
                         postCardInteractor = postCardInteractor,
                         feedProvider = feedProvider,

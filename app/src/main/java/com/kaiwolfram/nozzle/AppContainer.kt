@@ -85,14 +85,18 @@ class AppContainer(context: Context) {
     val feedProvider: IFeedProvider = FeedProvider(
         pubkeyProvider = keyManager,
         postMapper = postMapper,
+        nostrSubscriber = nostrSubscriber,
         postDao = roomDb.postDao(),
     )
 
-    val profileWithFollowerProvider: IProfileWithFollowerProvider = ProfileWithFollowerProvider(
-        pubkeyProvider = keyManager,
-        profileDao = roomDb.profileDao(),
-        contactDao = roomDb.contactDao()
-    )
+    val profileWithFollowerProvider: IProfileWithAdditionalInfoProvider =
+        ProfileWithAdditionalInfoProvider(
+            pubkeyProvider = keyManager,
+            nostrSubscriber = nostrSubscriber,
+            profileDao = roomDb.profileDao(),
+            contactDao = roomDb.contactDao(),
+            eventRelayDao = roomDb.eventRelayDao(),
+        )
 
     val personalProfileManager: IPersonalProfileManager = PersonalProfileManager(
         pubkeyProvider = keyManager,

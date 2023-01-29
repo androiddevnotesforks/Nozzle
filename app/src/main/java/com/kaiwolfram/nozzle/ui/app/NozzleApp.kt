@@ -48,7 +48,6 @@ fun NozzleApp(appContainer: AppContainer) {
                 ),
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
-                        nostrSubscriber = appContainer.nostrSubscriber,
                         postCardInteractor = appContainer.postCardInteractor,
                         feedProvider = appContainer.feedProvider,
                         profileProvider = appContainer.profileWithFollowerProvider,

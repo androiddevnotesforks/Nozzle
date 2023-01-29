@@ -11,17 +11,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
 import com.kaiwolfram.nozzle.ui.components.CopyIcon
 import com.kaiwolfram.nozzle.ui.components.EditProfileButton
 import com.kaiwolfram.nozzle.ui.components.FollowButton
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
+import com.kaiwolfram.nozzle.ui.components.text.NumberedCategory
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
@@ -29,7 +30,9 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun ProfileScreen(
-    uiState: ProfileViewModelState,
+    isRefreshing: Boolean,
+    profile: ProfileWithAdditionalInfo,
+    posts: List<PostWithMeta>,
     onPrepareReply: (PostWithMeta) -> Unit,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
@@ -44,28 +47,23 @@ fun ProfileScreen(
 ) {
     Column {
         ProfileData(
-            pubkey = uiState.pubkey,
-            npub = uiState.npub,
-            name = uiState.name,
-            about = uiState.about,
-            pictureUrl = uiState.picture,
-            isOneself = uiState.isOneself,
-            isFollowed = uiState.isFollowed,
+            profile = profile,
             onFollow = onFollow,
             onUnfollow = onUnfollow,
             onCopyNpub = onCopyNpub,
             onNavToEditProfile = onNavigateToEditProfile,
         )
         Spacer(Modifier.height(spacing.medium))
-        FollowerNumbers(
-            numOfFollowing = uiState.numOfFollowing,
-            numOfFollowers = uiState.numOfFollowers,
+        NumberedCategories(
+            numOfFollowing = profile.numOfFollowing,
+            numOfFollowers = profile.numOfFollowers,
+            numOfRelays = profile.numOfRelays,
         )
         Spacer(Modifier.height(spacing.xl))
         Divider()
         PostCardList(
-            posts = uiState.posts,
-            isRefreshing = uiState.isRefreshing,
+            posts = posts,
+            isRefreshing = isRefreshing,
             onRefresh = onRefreshProfileView,
             onLike = onLike,
             onRepost = onRepost,
@@ -75,20 +73,14 @@ fun ProfileScreen(
             onNavigateToReply = onNavigateToReply
         )
     }
-    if (uiState.posts.isEmpty()) {
+    if (posts.isEmpty()) {
         NoPostsHint()
     }
 }
 
 @Composable
 private fun ProfileData(
-    pubkey: String,
-    npub: String,
-    name: String,
-    about: String,
-    pictureUrl: String,
-    isOneself: Boolean,
-    isFollowed: Boolean,
+    profile: ProfileWithAdditionalInfo,
     onFollow: (String) -> Unit,
     onUnfollow: (String) -> Unit,
     onCopyNpub: () -> Unit,
@@ -99,23 +91,23 @@ private fun ProfileData(
         verticalArrangement = Arrangement.Center
     ) {
         ProfilePictureAndActions(
-            pictureUrl = pictureUrl,
-            pubkey = pubkey,
-            isOneself = isOneself,
-            isFollowed = isFollowed,
+            pictureUrl = profile.metadata.picture.orEmpty(),
+            pubkey = profile.pubkey,
+            isOneself = profile.isOneself,
+            isFollowed = profile.isFollowedByMe,
             onFollow = onFollow,
             onUnfollow = onUnfollow,
             onNavToEditProfile = onNavToEditProfile,
         )
         NameAndNpub(
-            name = name,
-            npub = npub,
+            name = profile.metadata.name.orEmpty(),
+            npub = profile.npub,
             onCopyNpub = onCopyNpub,
         )
         Spacer(Modifier.height(spacing.medium))
-        if (about.isNotBlank()) {
+        if (profile.metadata.about.orEmpty().isNotBlank()) {
             Text(
-                text = about,
+                text = profile.metadata.about.orEmpty(),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
@@ -178,9 +170,10 @@ private fun FollowOrEditButton(
 }
 
 @Composable
-private fun FollowerNumbers(
+private fun NumberedCategories(
     numOfFollowing: Int,
     numOfFollowers: Int,
+    numOfRelays: Int,
 ) {
     Row(
         Modifier
@@ -188,21 +181,20 @@ private fun FollowerNumbers(
             .padding(horizontal = spacing.xl),
     ) {
         Row {
-            Text(
-                text = numOfFollowing.toString(),
-                fontWeight = FontWeight.Bold
+            NumberedCategory(
+                number = numOfFollowing,
+                category = stringResource(id = R.string.following)
             )
-            Spacer(Modifier.width(spacing.medium))
-            Text(text = stringResource(id = R.string.following))
-        }
-        Spacer(Modifier.width(spacing.large))
-        Row {
-            Text(
-                text = numOfFollowers.toString(),
-                fontWeight = FontWeight.Bold
+            Spacer(Modifier.width(spacing.large))
+            NumberedCategory(
+                number = numOfFollowers,
+                category = stringResource(id = R.string.followers)
             )
-            Spacer(modifier = Modifier.width(spacing.medium))
-            Text(text = stringResource(id = R.string.followers))
+            Spacer(Modifier.width(spacing.large))
+            NumberedCategory(
+                number = numOfRelays,
+                category = stringResource(id = R.string.relays)
+            )
         }
     }
 }

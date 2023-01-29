@@ -128,6 +128,7 @@ class FeedViewModel(
             it.copy(pubkey = personalProfileProvider.getPubkey())
         }
     }
+    // TODO: Move like, repost and follow logic to UI
 
     val onLike: (String) -> Unit = { id ->
         uiState.value.let { state ->
@@ -135,14 +136,14 @@ class FeedViewModel(
                 viewModelScope.launch(context = IO) {
                     postCardInteractor.like(postId = id, postPubkey = it.pubkey)
                 }
-                viewModelState.update {
-                    val feedMap = state.feedMap.toMutableMap()
-                    feedMap[state.currentRelay] =
-                        feedMap[state.currentRelay].orEmpty().map { toMap ->
-                            mapToLikedPost(toMap = toMap, id = id)
-                        }
-                    it.copy(feedMap = feedMap)
-                }
+//                viewModelState.update {
+//                    val feedMap = state.feedMap.toMutableMap()
+//                    feedMap[state.currentRelay] =
+//                        feedMap[state.currentRelay].orEmpty().map { toMap ->
+//                            mapToLikedPost(toMap = toMap, id = id)
+//                        }
+//                    it.copy(feedMap = feedMap)
+//                }
             }
         }
     }
@@ -153,14 +154,14 @@ class FeedViewModel(
                 viewModelScope.launch(context = IO) {
                     postCardInteractor.repost(postId = id)
                 }
-                viewModelState.update {
-                    val feedMap = state.feedMap.toMutableMap()
-                    feedMap[state.currentRelay] =
-                        feedMap[state.currentRelay].orEmpty().map { toMap ->
-                            mapToRepostedPost(toMap = toMap, id = id)
-                        }
-                    it.copy(feedMap = feedMap)
-                }
+//                viewModelState.update {
+//                    val feedMap = state.feedMap.toMutableMap()
+//                    feedMap[state.currentRelay] =
+//                        feedMap[state.currentRelay].orEmpty().map { toMap ->
+//                            mapToRepostedPost(toMap = toMap, id = id)
+//                        }
+//                    it.copy(feedMap = feedMap)
+//                }
             }
         }
     }

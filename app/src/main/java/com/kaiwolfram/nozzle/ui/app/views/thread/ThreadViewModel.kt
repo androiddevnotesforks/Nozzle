@@ -80,6 +80,7 @@ class ThreadViewModel(
             setUIRefresh(false)
         }
     }
+    // TODO: Move like, repost and follow logic to UI
 
     val onLike: (String) -> Unit = { postId ->
         var needsUpdate = false
@@ -93,22 +94,22 @@ class ThreadViewModel(
                 }
             } else if (state.previous.any { post -> post.id == postId }) {
                 needsUpdate = true
-                viewModelState.update {
-                    it.copy(
-                        previous = state.previous.map { toMap ->
-                            mapToLikedPost(toMap = toMap, id = postId)
-                        },
-                    )
-                }
+//                viewModelState.update {
+//                    it.copy(
+//                        previous = state.previous.map { toMap ->
+//                            mapToLikedPost(toMap = toMap, id = postId)
+//                        },
+//                    )
+//                }
             } else if (state.replies.any { post -> post.id == postId }) {
                 needsUpdate = true
-                viewModelState.update {
-                    it.copy(
-                        replies = state.replies.map { toMap ->
-                            mapToLikedPost(toMap = toMap, id = postId)
-                        },
-                    )
-                }
+//                viewModelState.update {
+//                    it.copy(
+//                        replies = state.replies.map { toMap ->
+//                            mapToLikedPost(toMap = toMap, id = postId)
+//                        },
+//                    )
+//                }
             }
         }
         if (needsUpdate) {
@@ -130,22 +131,22 @@ class ThreadViewModel(
                 }
             } else if (state.previous.any { post -> post.id == postId }) {
                 needsUpdate = true
-                viewModelState.update {
-                    it.copy(
-                        previous = state.previous.map { toMap ->
-                            mapToRepostedPost(toMap = toMap, id = postId)
-                        },
-                    )
-                }
+//                viewModelState.update {
+//                    it.copy(
+//                        previous = state.previous.map { toMap ->
+//                            mapToRepostedPost(toMap = toMap, id = postId)
+//                        },
+//                    )
+//                }
             } else if (state.replies.any { post -> post.id == postId }) {
                 needsUpdate = true
-                viewModelState.update {
-                    it.copy(
-                        replies = state.replies.map { toMap ->
-                            mapToRepostedPost(toMap = toMap, id = postId)
-                        },
-                    )
-                }
+//                viewModelState.update {
+//                    it.copy(
+//                        replies = state.replies.map { toMap ->
+//                            mapToRepostedPost(toMap = toMap, id = postId)
+//                        },
+//                    )
+//                }
             }
         }
         if (needsUpdate) {

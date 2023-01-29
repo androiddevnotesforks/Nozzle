@@ -20,4 +20,12 @@ interface EventRelayDao {
                 "WHERE eventId IN (:eventIds) "
     )
     suspend fun getRelayMap(eventIds: List<String>): Map<String, List<String>>
+
+    @Query(
+        "SELECT COUNT(DISTINCT(relayUrl)) " +
+                "FROM eventRelay " +
+                "WHERE eventId IN " +
+                "(SELECT id FROM post WHERE pubkey = :pubkey) "
+    )
+    suspend fun getNumberOfUsedRelays(pubkey: String): Int
 }
