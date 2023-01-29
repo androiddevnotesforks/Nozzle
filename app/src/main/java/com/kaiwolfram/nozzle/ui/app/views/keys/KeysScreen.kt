@@ -89,7 +89,7 @@ private fun Privkey(
         modifier = Modifier.fillMaxWidth(),
         value = privkey,
         isError = isInvalid,
-        maxLines = 2,
+        maxLines = 4,
         placeholder = stringResource(id = R.string.enter_a_private_key),
         errorLabel = stringResource(id = R.string.invalid_private_key),
         isPassword = !isVisible,

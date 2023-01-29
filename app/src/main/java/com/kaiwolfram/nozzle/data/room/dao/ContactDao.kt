@@ -62,8 +62,15 @@ interface ContactDao {
     suspend fun isFollowed(pubkey: String, contactPubkey: String): Boolean
 
     @Query(
-        "DELETE FROM contact " +
-                "WHERE pubkey = :pubkey AND createdAt < :createdAt"
+        "SELECT MAX(createdAt) " +
+                "FROM contact " +
+                "WHERE pubkey = :pubkey"
     )
-    suspend fun deleteIfOutdated(pubkey: String, createdAt: Long)
+    suspend fun getLatestTimestamp(pubkey: String): Long?
+
+    @Query(
+        "DELETE FROM contact " +
+                "WHERE pubkey = :pubkey"
+    )
+    suspend fun deleteList(pubkey: String)
 }

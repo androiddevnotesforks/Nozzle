@@ -84,18 +84,20 @@ class EventProcessor(
             return
         }
         scope.launch {
-            contactDao.deleteIfOutdated(pubkey = event.pubkey, createdAt = event.createdAt)
-            val contacts = getContactPubkeysAndRelayUrls(event.tags).map {
-                ContactEntity(
-                    pubkey = event.pubkey,
-                    contactPubkey = it.first,
-                    relayUrl = it.second,
-                    createdAt = event.createdAt
-                )
+            val latestTimestamp = contactDao.getLatestTimestamp(event.pubkey) ?: 0
+            if (event.createdAt > latestTimestamp) {
+                contactDao.deleteList(pubkey = event.pubkey)
+                val contacts = getContactPubkeysAndRelayUrls(event.tags).map {
+                    ContactEntity(
+                        pubkey = event.pubkey,
+                        contactPubkey = it.first,
+                        relayUrl = it.second,
+                        createdAt = event.createdAt
+                    )
+                }
+                contactDao.insertOrIgnore(*contacts.toTypedArray())
             }
-            contactDao.insertOrIgnore(*contacts.toTypedArray())
         }
-
     }
 
     private fun processMetadata(event: Event) {
