@@ -10,7 +10,7 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 fun FeedRoute(
     feedViewModel: FeedViewModel,
     onPrepareReply: (PostWithMeta) -> Unit,
-    onPreparePost: () -> Unit,
+    onPreparePost: (List<String>) -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToThread: (PostIds) -> Unit,

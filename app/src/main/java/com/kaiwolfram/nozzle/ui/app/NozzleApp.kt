@@ -103,6 +103,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         nostrService = appContainer.nostrService,
                         personalProfileProvider = appContainer.personalProfileManager,
                         postDao = appContainer.roomDb.postDao(),
+                        eventRelayDao = appContainer.roomDb.eventRelayDao(),
                         context = LocalContext.current,
                     )
                 ),

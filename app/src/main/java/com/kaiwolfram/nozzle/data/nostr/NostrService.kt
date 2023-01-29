@@ -10,6 +10,9 @@ import com.kaiwolfram.nostrclientkt.net.NostrListener
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
+import com.kaiwolfram.nozzle.model.AllRelays
+import com.kaiwolfram.nozzle.model.MultipleRelays
+import com.kaiwolfram.nozzle.model.RelaySelection
 import java.util.*
 
 private const val TAG = "NostrService"
@@ -75,18 +78,24 @@ class NostrService(
             keys = keys,
         )
         Log.i(TAG, "new profile is valid ${event.verify()}")
-        client.publish(event)
+        client.publishToAllRelays(event)
 
         return event
     }
 
-    override fun sendPost(content: String): Event {
+    override fun sendPost(content: String, relaySelection: RelaySelection): Event {
         Log.i(TAG, "Send post '${content.take(50)}'")
         val event = Event.createTextNoteEvent(
             post = Post(msg = content),
             keys = keys,
         )
-        client.publish(event)
+        when (relaySelection) {
+            is AllRelays -> client.publishToAllRelays(event)
+            is MultipleRelays -> client.publishToRelays(
+                event = event,
+                relays = relaySelection.relays
+            )
+        }
 
         return event
     }
@@ -103,7 +112,7 @@ class NostrService(
             ),
             keys = keys,
         )
-        client.publish(event)
+        client.publishToAllRelays(event)
 
         return event
     }
@@ -116,7 +125,7 @@ class NostrService(
             isPositive = true,
             keys = keys,
         )
-        client.publish(event)
+        client.publishToAllRelays(event)
 
         return event
     }
@@ -127,7 +136,7 @@ class NostrService(
             post = Post(replyTo = replyTo, msg = content),
             keys = keys,
         )
-        client.publish(event)
+        client.publishToAllRelays(event)
 
         return event
     }
@@ -138,7 +147,7 @@ class NostrService(
             contacts = contacts,
             keys = keys,
         )
-        client.publish(event)
+        client.publishToAllRelays(event)
 
         return event
     }

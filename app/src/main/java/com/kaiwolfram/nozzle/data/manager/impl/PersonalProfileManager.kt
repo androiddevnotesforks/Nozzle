@@ -26,7 +26,7 @@ class PersonalProfileManager(
     }
 
     override fun updateMetadata() {
-        Log.i(TAG, "Update metadata")
+        Log.i(TAG, "Update metadata with new pubkey ${pubkeyProvider.getPubkey()}")
         metadataFlow = profileDao.getMetadata(pubkeyProvider.getPubkey())
     }
 

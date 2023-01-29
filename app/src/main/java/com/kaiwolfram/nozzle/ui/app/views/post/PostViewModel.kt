@@ -9,8 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
+import com.kaiwolfram.nozzle.model.MultipleRelays
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,17 +26,19 @@ data class PostViewModelState(
     val content: String = "",
     val isSendable: Boolean = false,
     val pubkey: String = "",
+    val targetRelays: List<String> = listOf(),
 )
 
 class PostViewModel(
     private val personalProfileProvider: IPersonalProfileProvider,
     private val nostrService: INostrService,
     private val postDao: PostDao,
+    private val eventRelayDao: EventRelayDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(PostViewModelState())
 
-    val metadataState = personalProfileProvider.getMetadata()
+    var metadataState = personalProfileProvider.getMetadata()
         .stateIn(
             viewModelScope,
             SharingStarted.Lazily,
@@ -52,7 +56,13 @@ class PostViewModel(
         Log.i(TAG, "Initialize PostViewModel")
     }
 
-    val onPreparePost: () -> Unit = {
+    val onPreparePost: (List<String>) -> Unit = { targetRelays ->
+        metadataState = personalProfileProvider.getMetadata()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Lazily,
+                null
+            )
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Prepare new post")
             viewModelState.update {
@@ -60,6 +70,7 @@ class PostViewModel(
                     pubkey = personalProfileProvider.getPubkey(),
                     content = "",
                     isSendable = false,
+                    targetRelays = targetRelays,
                 )
             }
         }
@@ -78,10 +89,16 @@ class PostViewModel(
             if (!state.isSendable) {
                 Log.i(TAG, "Post is not sendable")
             } else {
-                Log.i(TAG, "Send post")
-                val event = nostrService.sendPost(content = state.content)
+                Log.i(TAG, "Send post to ${state.targetRelays.size} relays")
+                val event = nostrService.sendPost(
+                    content = state.content,
+                    relaySelection = MultipleRelays(state.targetRelays)
+                )
                 viewModelScope.launch(context = Dispatchers.IO) {
                     postDao.insertIfNotPresent(PostEntity.fromEvent(event))
+                    for (relay in state.targetRelays) {
+                        eventRelayDao.insertOrIgnore(eventId = event.id, relayUrl = relay)
+                    }
                 }
                 Toast.makeText(
                     context,
@@ -104,6 +121,7 @@ class PostViewModel(
             personalProfileProvider: IPersonalProfileProvider,
             nostrService: INostrService,
             postDao: PostDao,
+            eventRelayDao: EventRelayDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -112,6 +130,7 @@ class PostViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
                     postDao = postDao,
+                    eventRelayDao = eventRelayDao,
                     context = context,
                 ) as T
             }

@@ -101,10 +101,20 @@ class Client {
         subscriptions.remove(subscriptionId)
     }
 
-    fun publish(event: Event) {
+    fun publishToAllRelays(event: Event) {
         val request = """["EVENT",${event.toJson()}]"""
         Log.i(TAG, "Publish $request")
         sockets.values.forEach { it.send(request) }
+    }
+
+    fun publishToRelays(event: Event, relays: List<String>) {
+        val request = """["EVENT",${event.toJson()}]"""
+        Log.i(TAG, "Publish $request to ${relays.size} relays")
+        for (relay in relays) {
+            val socket = sockets[relay]
+            if (socket == null) Log.w(TAG, "Relay $relay is not registered")
+            else socket.send(request)
+        }
     }
 
     fun addRelays(urls: List<String>) {

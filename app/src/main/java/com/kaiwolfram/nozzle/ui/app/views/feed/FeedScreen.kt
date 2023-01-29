@@ -42,7 +42,7 @@ fun FeedScreen(
     onRepost: (String) -> Unit,
     onRefreshFeedView: () -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
-    onPreparePost: () -> Unit,
+    onPreparePost: (List<String>) -> Unit,
     onLoadMore: () -> Unit,
     onPreviousHeadline: () -> Unit,
     onNextHeadline: () -> Unit,
@@ -72,7 +72,7 @@ fun FeedScreen(
         },
         floatingActionButton = {
             FeedFab(onPrepareNewPost = {
-                onPreparePost()
+                onPreparePost(listOf(uiState.currentRelay))
                 onNavigateToPost()
             })
         },
