@@ -18,14 +18,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.components.dialog.PostSeenInDialog
+import com.kaiwolfram.nozzle.ui.components.dialog.RelaysDialog
 import com.kaiwolfram.nozzle.ui.theme.*
 
 @Composable
 fun InRelays(relays: List<String>) {
     val openDialog = remember { mutableStateOf(false) }
     if (openDialog.value) {
-        PostSeenInDialog(relays = relays, onCloseDialog = { openDialog.value = false })
+        RelaysDialog(relays = relays, onCloseDialog = { openDialog.value = false })
     }
     if (relays.isNotEmpty()) {
         Row(modifier = Modifier

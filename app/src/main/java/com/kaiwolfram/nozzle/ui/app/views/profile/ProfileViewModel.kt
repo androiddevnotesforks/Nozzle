@@ -57,7 +57,7 @@ class ProfileViewModel(
             metadata = Metadata(),
             numOfFollowing = 0,
             numOfFollowers = 0,
-            numOfRelays = 0,
+            relays = listOf(),
             isOneself = false,
             isFollowedByMe = false,
         )

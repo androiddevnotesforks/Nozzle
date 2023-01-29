@@ -50,7 +50,7 @@ class ProfileWithAdditionalInfoProvider(
                 val metadata = profile?.getMetadata() ?: Metadata(name = npub)
                 val numOfFollowing = contactDao.getNumberOfFollowing(pubkey)
                 val numOfFollowers = contactDao.getNumberOfFollowers(pubkey)
-                val numOfRelays = eventRelayDao.getNumberOfUsedRelays(pubkey)
+                val relays = eventRelayDao.listUsedRelays(pubkey)
                 val isFollowedByMe = contactDao.isFollowed(
                     pubkey = pubkeyProvider.getPubkey(),
                     contactPubkey = pubkey
@@ -62,7 +62,7 @@ class ProfileWithAdditionalInfoProvider(
                         metadata = metadata,
                         numOfFollowing = numOfFollowing,
                         numOfFollowers = numOfFollowers,
-                        numOfRelays = numOfRelays,
+                        relays = relays,
                         isOneself = pubkey == pubkeyProvider.getPubkey(),
                         isFollowedByMe = isFollowedByMe,
                     )

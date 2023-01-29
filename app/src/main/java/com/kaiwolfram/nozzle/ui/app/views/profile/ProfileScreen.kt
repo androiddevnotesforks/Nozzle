@@ -7,6 +7,8 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +22,7 @@ import com.kaiwolfram.nozzle.ui.components.CopyIcon
 import com.kaiwolfram.nozzle.ui.components.EditProfileButton
 import com.kaiwolfram.nozzle.ui.components.FollowButton
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
+import com.kaiwolfram.nozzle.ui.components.dialog.RelaysDialog
 import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
 import com.kaiwolfram.nozzle.ui.components.text.NumberedCategory
@@ -57,7 +60,7 @@ fun ProfileScreen(
         NumberedCategories(
             numOfFollowing = profile.numOfFollowing,
             numOfFollowers = profile.numOfFollowers,
-            numOfRelays = profile.numOfRelays,
+            relays = profile.relays,
         )
         Spacer(Modifier.height(spacing.xl))
         Divider()
@@ -173,7 +176,7 @@ private fun FollowOrEditButton(
 private fun NumberedCategories(
     numOfFollowing: Int,
     numOfFollowers: Int,
-    numOfRelays: Int,
+    relays: List<String>,
 ) {
     Row(
         Modifier
@@ -191,8 +194,13 @@ private fun NumberedCategories(
                 category = stringResource(id = R.string.followers)
             )
             Spacer(Modifier.width(spacing.large))
+            val openRelayDialog = remember { mutableStateOf(false) }
+            if (openRelayDialog.value) {
+                RelaysDialog(relays = relays, onCloseDialog = { openRelayDialog.value = false })
+            }
             NumberedCategory(
-                number = numOfRelays,
+                modifier = Modifier.clickable { openRelayDialog.value = true },
+                number = relays.size,
                 category = stringResource(id = R.string.relays)
             )
         }

@@ -13,7 +13,7 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
-fun PostSeenInDialog(relays: List<String>, onCloseDialog: () -> Unit) {
+fun RelaysDialog(relays: List<String>, onCloseDialog: () -> Unit) {
     NozzleDialog(onCloseDialog = onCloseDialog) {
         Column {
             Text(

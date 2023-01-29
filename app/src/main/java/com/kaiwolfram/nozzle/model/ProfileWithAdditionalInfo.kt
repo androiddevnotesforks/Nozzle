@@ -8,7 +8,7 @@ data class ProfileWithAdditionalInfo(
     val metadata: Metadata,
     val numOfFollowing: Int,
     val numOfFollowers: Int,
-    val numOfRelays: Int,
+    val relays: List<String>,
     val isOneself: Boolean,
     val isFollowedByMe: Boolean,
 )
