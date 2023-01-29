@@ -13,7 +13,12 @@ interface INostrService {
     fun sendPost(content: String, relaySelection: RelaySelection = AllRelays): Event
     fun sendRepost(postId: String, quote: String): Event
     fun sendLike(postId: String, postPubkey: String): Event
-    fun sendReply(replyTo: ReplyTo, content: String): Event
+    fun sendReply(
+        replyTo: ReplyTo,
+        content: String,
+        relaySelection: RelaySelection = AllRelays
+    ): Event
+
     fun updateContactList(contacts: List<ContactListEntry>): Event
     fun subscribe(filters: List<Filter>, unsubOnEOSE: Boolean = false): List<String>
     fun subscribeByRelay(

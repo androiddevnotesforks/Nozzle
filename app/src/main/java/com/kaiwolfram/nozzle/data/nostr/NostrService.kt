@@ -130,13 +130,23 @@ class NostrService(
         return event
     }
 
-    override fun sendReply(replyTo: ReplyTo, content: String): Event {
+    override fun sendReply(
+        replyTo: ReplyTo,
+        content: String,
+        relaySelection: RelaySelection
+    ): Event {
         Log.i(TAG, "Send reply to ${replyTo.replyTo} of root ${replyTo.replyToRoot}")
         val event = Event.createTextNoteEvent(
             post = Post(replyTo = replyTo, msg = content),
             keys = keys,
         )
-        client.publishToAllRelays(event)
+        when (relaySelection) {
+            is AllRelays -> client.publishToAllRelays(event)
+            is MultipleRelays -> client.publishToRelays(
+                event = event,
+                relays = relaySelection.relays
+            )
+        }
 
         return event
     }

@@ -12,6 +12,7 @@ import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
+import com.kaiwolfram.nozzle.model.MultipleRelays
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,7 +101,8 @@ class ReplyViewModel(
                     )
                     val event = nostrService.sendReply(
                         replyTo = replyTo,
-                        content = state.reply
+                        content = state.reply,
+                        relaySelection = MultipleRelays(it.relays)
                     )
                     viewModelScope.launch(context = Dispatchers.IO) {
                         postDao.insertIfNotPresent(PostEntity.fromEvent(event))
