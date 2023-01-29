@@ -1,6 +1,7 @@
 package com.kaiwolfram.nozzle.data.provider.impl
 
 import android.util.Log
+import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
@@ -44,8 +45,9 @@ class ProfileWithAdditionalInfoProvider(
         pubkey: String,
     ) {
         with(flowCollector) {
-            profileDao.getProfile(pubkey)?.let { profile ->
-                val metadata = profile.getMetadata()
+            profileDao.getProfile(pubkey).let { profile ->
+                val npub = hexToNpub(pubkey)
+                val metadata = profile?.getMetadata() ?: Metadata(name = npub)
                 val numOfFollowing = contactDao.getNumberOfFollowing(pubkey)
                 val numOfFollowers = contactDao.getNumberOfFollowers(pubkey)
                 val numOfRelays = eventRelayDao.getNumberOfUsedRelays(pubkey)
@@ -56,7 +58,7 @@ class ProfileWithAdditionalInfoProvider(
                 emit(
                     ProfileWithAdditionalInfo(
                         pubkey = pubkey,
-                        npub = hexToNpub(pubkey),
+                        npub = npub,
                         metadata = metadata,
                         numOfFollowing = numOfFollowing,
                         numOfFollowers = numOfFollowers,
