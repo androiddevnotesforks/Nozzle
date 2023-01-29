@@ -81,6 +81,10 @@
     <string name="in_relay">in</string>
     <string name="and">and</string>
     <string name="relays">Relays</string>
+    <string name="choose_relays">Choose relays</string>
+    <string name="your_post_is_empty">Your post is empty</string>
+    <string name="pls_select_relays">Please select a relay to send your post to</string>
+    <string name="no_relays_available">No relays available</string>
     <plurals name="other_relays">
         <item quantity="one">other</item>
         <item quantity="other">others</item>

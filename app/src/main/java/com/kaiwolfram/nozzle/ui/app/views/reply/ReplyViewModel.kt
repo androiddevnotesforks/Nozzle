@@ -10,10 +10,15 @@ import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
+import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
+import com.kaiwolfram.nozzle.data.utils.getRelaySelection
+import com.kaiwolfram.nozzle.data.utils.toggleRelay
 import com.kaiwolfram.nozzle.model.MultipleRelays
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.RelayActive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,12 +33,15 @@ data class ReplyViewModelState(
     val reply: String = "",
     val isSendable: Boolean = false,
     val pubkey: String = "",
+    val relaySelection: List<RelayActive> = listOf(),
 )
 
 class ReplyViewModel(
     private val nostrService: INostrService,
     private val personalProfileProvider: IPersonalProfileProvider,
     private val postDao: PostDao,
+    private val eventRelayDao: EventRelayDao,
+    relayDao: RelayDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
@@ -43,7 +51,7 @@ class ReplyViewModel(
     var metadataState = personalProfileProvider.getMetadata()
         .stateIn(
             viewModelScope,
-            SharingStarted.Lazily,
+            SharingStarted.Eagerly,
             null
         )
 
@@ -54,11 +62,25 @@ class ReplyViewModel(
             viewModelState.value
         )
 
+    private val relayState = relayDao.listRelays()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            listOf()
+        )
+
     init {
         Log.i(TAG, "Initialize ReplyViewModel")
     }
 
     val onPrepareReply: (PostWithMeta) -> Unit = { post ->
+        metadataState = personalProfileProvider.getMetadata()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                null
+            )
+
         postToReplyTo = post
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Set reply to ${post.pubkey}")
@@ -69,6 +91,10 @@ class ReplyViewModel(
                     pubkey = personalProfileProvider.getPubkey(),
                     reply = "",
                     isSendable = false,
+                    relaySelection = getRelaySelection(
+                        allRelayUrls = relayState.value,
+                        activeRelays = post.relays,
+                    ),
                 )
             }
         }
@@ -82,34 +108,54 @@ class ReplyViewModel(
         }
     }
 
+    val onToggleRelaySelection: (Int) -> Unit = { index ->
+        val toggled = toggleRelay(relays = uiState.value.relaySelection, index = index)
+        if (toggled.any { it.isActive }) {
+            viewModelState.update {
+                it.copy(relaySelection = toggled)
+            }
+        }
+    }
+
     val onSend: () -> Unit = {
         uiState.value.let { state ->
-            if (!state.isSendable) {
-                Log.i(TAG, "Reply is not sendable")
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.your_reply_is_empty),
-                    Toast.LENGTH_SHORT
-                ).show()
+            val err = getErrorText(context = context, state = state)
+            if (err != null) {
+                Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
             } else {
-                postToReplyTo?.let {
+                postToReplyTo?.let { parentPost ->
                     Log.i(TAG, "Send reply to ${state.recipientName} ${state.pubkey}")
                     val replyTo = ReplyTo(
-                        replyToRoot = it.replyToRootId,
-                        replyTo = it.id,
-                        relayUrl = "",
+                        replyToRoot = parentPost.replyToRootId,
+                        replyTo = parentPost.id,
+                        relayUrl = parentPost.relays.firstOrNull().orEmpty(),
                     )
+                    val selectedRelays =
+                        state.relaySelection.filter { it.isActive }.map { it.relayUrl }
                     val event = nostrService.sendReply(
                         replyTo = replyTo,
                         content = state.reply,
-                        relaySelection = MultipleRelays(it.relays)
+                        relaySelection = MultipleRelays(selectedRelays)
                     )
                     viewModelScope.launch(context = Dispatchers.IO) {
                         postDao.insertIfNotPresent(PostEntity.fromEvent(event))
+                        for (relay in selectedRelays) {
+                            eventRelayDao.insertOrIgnore(eventId = event.id, relayUrl = relay)
+                        }
                     }
                 }
                 resetUI()
             }
+        }
+    }
+
+    private fun getErrorText(context: Context, state: ReplyViewModelState): String? {
+        return if (state.reply.isBlank()) {
+            context.getString(R.string.your_reply_is_empty)
+        } else if (state.relaySelection.all { !it.isActive }) {
+            context.getString(R.string.pls_select_relays)
+        } else {
+            null
         }
     }
 
@@ -129,6 +175,8 @@ class ReplyViewModel(
             nostrService: INostrService,
             personalProfileProvider: IPersonalProfileProvider,
             postDao: PostDao,
+            eventRelayDao: EventRelayDao,
+            relayDao: RelayDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -137,6 +185,8 @@ class ReplyViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
                     postDao = postDao,
+                    eventRelayDao = eventRelayDao,
+                    relayDao = relayDao,
                     context = context,
                 ) as T
             }

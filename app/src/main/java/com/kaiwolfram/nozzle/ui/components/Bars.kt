@@ -8,8 +8,35 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.kaiwolfram.nozzle.model.RelayActive
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
+@Composable
+fun ContentCreationTopBar(
+    relaySelection: List<RelayActive>,
+    isSendable: Boolean,
+    onToggleRelaySelection: (Int) -> Unit,
+    onSend: () -> Unit,
+    onClose: () -> Unit,
+) {
+    ClosableTopBar(
+        onClose = onClose,
+        trailingIcon = {
+            Row {
+                ChooseRelayButton(
+                    relays = relaySelection,
+                    onClickIndex = onToggleRelaySelection
+                )
+                Spacer(modifier = Modifier.width(spacing.large))
+                SendTopBarButton(
+                    isSendable = isSendable,
+                    onSend = onSend,
+                    onGoBack = onClose,
+                )
+            }
+        }
+    )
+}
 
 @Composable
 fun ReturnableTopBar(
@@ -25,7 +52,7 @@ fun ReturnableTopBar(
 }
 
 @Composable
-fun ClosableTopBar(onClose: () -> Unit, trailingIcon: @Composable (() -> Unit)? = null) {
+private fun ClosableTopBar(onClose: () -> Unit, trailingIcon: @Composable (() -> Unit)? = null) {
     BaseTopBar(
         leadingIcon = { CloseButton(onGoBack = onClose) },
         trailingIcon = trailingIcon

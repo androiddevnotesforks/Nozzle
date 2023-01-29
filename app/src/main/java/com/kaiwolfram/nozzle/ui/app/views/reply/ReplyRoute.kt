@@ -16,6 +16,7 @@ fun ReplyRoute(
         uiState = uiState,
         metadataState = metadataState,
         onChangeReply = replyViewModel.onChangeReply,
+        onToggleRelaySelection = replyViewModel.onToggleRelaySelection,
         onSend = replyViewModel.onSend,
         onGoBack = onGoBack,
     )

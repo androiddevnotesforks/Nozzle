@@ -7,9 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.R
-import com.kaiwolfram.nozzle.ui.components.ClosableTopBar
+import com.kaiwolfram.nozzle.ui.components.ContentCreationTopBar
 import com.kaiwolfram.nozzle.ui.components.InputBox
-import com.kaiwolfram.nozzle.ui.components.SendTopBarButton
 
 
 @Composable
@@ -17,19 +16,17 @@ fun PostScreen(
     uiState: PostViewModelState,
     metadataState: Metadata?,
     onChangeContent: (String) -> Unit,
+    onToggleRelaySelection: (Int) -> Unit,
     onSend: () -> Unit,
     onGoBack: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        ClosableTopBar(
-            onClose = onGoBack,
-            trailingIcon = {
-                SendTopBarButton(
-                    isSendable = uiState.isSendable,
-                    onSend = { onSend() },
-                    onGoBack = onGoBack,
-                )
-            }
+        ContentCreationTopBar(
+            relaySelection = uiState.relaySelection,
+            isSendable = uiState.isSendable,
+            onToggleRelaySelection = onToggleRelaySelection,
+            onSend = onSend,
+            onClose = onGoBack
         )
         InputBox(
             picture = metadataState?.picture.orEmpty(),

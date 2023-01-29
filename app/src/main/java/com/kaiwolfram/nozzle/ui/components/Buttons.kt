@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.RelayActive
+import com.kaiwolfram.nozzle.ui.components.dialog.RelayCheckboxMenu
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
 
 @Composable
@@ -57,6 +59,27 @@ fun SendTopBarButton(
         onClick = onSend,
         onCanGoBack = { true },
         onGoBack = onGoBack,
+    )
+}
+
+@Composable
+fun ChooseRelayButton(
+    relays: List<RelayActive>,
+    onClickIndex: (Int) -> Unit,
+) {
+    val showMenu = remember { mutableStateOf(false) }
+    RelayCheckboxMenu(
+        showMenu = showMenu.value,
+        menuItems = relays,
+        onClickIndex = onClickIndex,
+        onDismiss = { showMenu.value = false })
+    Icon(
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable { showMenu.value = true },
+        imageVector = Icons.Default.CellTower,
+        contentDescription = stringResource(id = R.string.choose_relays),
+        tint = colors.surface
     )
 }
 
