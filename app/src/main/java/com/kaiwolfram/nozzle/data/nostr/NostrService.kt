@@ -1,7 +1,10 @@
 package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.*
+import com.kaiwolfram.nostrclientkt.ContactListEntry
+import com.kaiwolfram.nostrclientkt.Post
+import com.kaiwolfram.nostrclientkt.ReplyTo
+import com.kaiwolfram.nostrclientkt.RepostId
 import com.kaiwolfram.nostrclientkt.model.Event
 import com.kaiwolfram.nostrclientkt.model.Filter
 import com.kaiwolfram.nostrclientkt.model.Metadata
@@ -18,11 +21,10 @@ import java.util.*
 private const val TAG = "NostrService"
 
 class NostrService(
-    keyManager: IKeyManager,
+    private val keyManager: IKeyManager,
     private val relayProvider: IRelayProvider,
     private val eventProcessor: IEventProcessor
 ) : INostrService {
-    private val keys: Keys = keyManager.getKeys()
     private val client = Client()
     private val unsubOnEOSECache = Collections.synchronizedSet(mutableSetOf<String>())
     private val listener = object : NostrListener {
@@ -75,7 +77,7 @@ class NostrService(
         Log.i(TAG, "Publish profile $metadata")
         val event = Event.createMetadataEvent(
             metadata = metadata,
-            keys = keys,
+            keys = keyManager.getKeys(),
         )
         Log.i(TAG, "new profile is valid ${event.verify()}")
         client.publishToAllRelays(event)
@@ -87,7 +89,7 @@ class NostrService(
         Log.i(TAG, "Send post '${content.take(50)}'")
         val event = Event.createTextNoteEvent(
             post = Post(msg = content),
-            keys = keys,
+            keys = keyManager.getKeys(),
         )
         when (relaySelection) {
             is AllRelays -> client.publishToAllRelays(event)
@@ -110,7 +112,7 @@ class NostrService(
                 ),
                 msg = quote
             ),
-            keys = keys,
+            keys = keyManager.getKeys(),
         )
         client.publishToAllRelays(event)
 
@@ -123,7 +125,7 @@ class NostrService(
             eventId = postId,
             eventPubkey = postPubkey,
             isPositive = true,
-            keys = keys,
+            keys = keyManager.getKeys(),
         )
         client.publishToAllRelays(event)
 
@@ -138,7 +140,7 @@ class NostrService(
         Log.i(TAG, "Send reply to ${replyTo.replyTo} of root ${replyTo.replyToRoot}")
         val event = Event.createTextNoteEvent(
             post = Post(replyTo = replyTo, msg = content),
-            keys = keys,
+            keys = keyManager.getKeys(),
         )
         when (relaySelection) {
             is AllRelays -> client.publishToAllRelays(event)
@@ -155,7 +157,7 @@ class NostrService(
         Log.i(TAG, "Update contact list with ${contacts.size} contacts")
         val event = Event.createContactListEvent(
             contacts = contacts,
-            keys = keys,
+            keys = keyManager.getKeys(),
         )
         client.publishToAllRelays(event)
 

@@ -79,6 +79,7 @@ class FeedProvider(
                 while (true) {
                     delay(EMIT_INTERVAL_TIME)
                     postMapper.mapToPostsWithMeta(posts).let { mapped ->
+                        Log.d(TAG, "Emit ${mapped.size}")
                         emit(mapped)
                         if (counter % RESUB_INTERVAL == 0) {
                             Log.d(TAG, "Resub after $counter iterations")

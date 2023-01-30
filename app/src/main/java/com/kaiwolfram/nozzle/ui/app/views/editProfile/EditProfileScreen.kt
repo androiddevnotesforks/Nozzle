@@ -9,7 +9,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.ui.components.ChangeableTextField
@@ -98,7 +97,6 @@ private fun Username(
         isError = isInvalid,
         placeholder = stringResource(id = R.string.enter_your_username),
         errorLabel = stringResource(id = R.string.invalid_username),
-        keyboardImeAction = ImeAction.Next,
         onChangeValue = onChangeName,
     )
 }
@@ -115,7 +113,6 @@ private fun About(
         maxLines = 3,
         placeholder = stringResource(id = R.string.describe_yourself),
         errorLabel = stringResource(id = R.string.invalid_username),
-        keyboardImeAction = ImeAction.Next,
         onChangeValue = onChangeAbout,
     )
 }
@@ -135,7 +132,6 @@ private fun ProfilePictureUrl(
         placeholder = stringResource(id = R.string.enter_a_picture_url),
         errorLabel = stringResource(id = R.string.invalid_url),
         keyboardType = KeyboardType.Uri,
-        keyboardImeAction = ImeAction.Next,
         onChangeValue = onChangePicture,
     )
 }
