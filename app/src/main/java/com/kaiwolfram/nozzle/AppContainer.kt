@@ -24,12 +24,13 @@ import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
 
+    // TODO: Add migrations instead of destructive migration
     val roomDb: AppDatabase by lazy {
         Room.databaseBuilder(
             context = context,
             klass = AppDatabase::class.java,
-            name = "nozzle_database"
-        ).build()
+            name = "nozzle_database",
+        ).fallbackToDestructiveMigration().build()
     }
 
     val relayProvider: IRelayProvider = RelayProvider(

@@ -15,13 +15,20 @@ class PersonalProfileManager(
 ) : IPersonalProfileManager {
     private var metadataFlow = profileDao.getMetadata(pubkeyProvider.getPubkey())
 
-    override suspend fun setMeta(name: String, about: String, picture: String, nip05: String) {
+    override suspend fun setMeta(
+        name: String,
+        about: String,
+        picture: String,
+        nip05: String,
+        lud16: String
+    ) {
         profileDao.updateMetadata(
             pubkey = getPubkey(),
             name = name,
             about = about,
             picture = picture,
             nip05 = nip05,
+            lud16 = lud16,
         )
     }
 

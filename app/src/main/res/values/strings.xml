@@ -61,7 +61,7 @@
     <string name="your_reply_is_empty">Your reply is empty</string>
     <string name="update">Update</string>
     <string name="nip05_identifier">nip-05 identifier</string>
-    <string name="enter_nip05">e.g. username@nozzle.chat</string>
+    <string name="enter_nip05">e.g. user@nozzle.chat</string>
     <string name="post_your_thoughts">Post your thoughts</string>
     <string name="add">Add</string>
     <string name="invalid_npub_or_note">Invalid npub or note ID</string>
@@ -85,6 +85,8 @@
     <string name="your_post_is_empty">Your post is empty</string>
     <string name="pls_select_relays">Please select a relay to send your post to</string>
     <string name="no_relays_available">No relays available</string>
+    <string name="lightning_address">Lightning address</string>
+    <string name="enter_lud16">e.g. user@domain.com</string>
     <plurals name="other_relays">
         <item quantity="one">other</item>
         <item quantity="other">others</item>

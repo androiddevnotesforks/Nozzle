@@ -16,6 +16,7 @@ fun EditProfileRoute(
     EditProfileScreen(
         uiState = uiState,
         onUpdateProfile = {
+            // TODO: Simplify with Flows
             editProfileViewModel.onUpdateProfile()
             onResetDrawerUiState()
             onResetFeedIconUiState()
@@ -24,6 +25,7 @@ fun EditProfileRoute(
         onChangeAbout = editProfileViewModel.onChangeAbout,
         onChangePicture = editProfileViewModel.onChangePicture,
         onChangeNip05 = editProfileViewModel.onChangeNip05,
+        onChangeLud16 = editProfileViewModel.onChangeLud16,
         onResetUiState = editProfileViewModel.onResetUiState,
         onCanGoBack = editProfileViewModel.onCanGoBack,
         onGoBack = onGoBack,

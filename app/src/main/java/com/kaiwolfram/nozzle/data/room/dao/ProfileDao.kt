@@ -21,7 +21,8 @@ interface ProfileDao {
                 "SET name = :name, " +
                 "about = :about, " +
                 "picture = :picture, " +
-                "nip05 = :nip05 " +
+                "nip05 = :nip05, " +
+                "lud16 = :lud16 " +
                 "WHERE pubkey = :pubkey"
     )
     suspend fun updateMetadata(
@@ -30,6 +31,7 @@ interface ProfileDao {
         about: String,
         picture: String,
         nip05: String,
+        lud16: String,
     )
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

@@ -47,6 +47,14 @@ fun NozzleNavGraph(
             }
         }
     }
+    val onNavigateToEditProfile = remember {
+        {
+            run {
+                vmContainer.editProfileViewModel.onResetUiState()
+                navActions.navigateToEditProfile()
+            }
+        }
+    }
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -70,7 +78,7 @@ fun NozzleNavGraph(
                 onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
                 onNavigateToThread = onNavigateToThread,
                 onNavigateToReply = navActions.navigateToReply,
-                onNavigateToEditProfile = navActions.navigateToEditProfile,
+                onNavigateToEditProfile = onNavigateToEditProfile,
             )
         }
         composable(NozzleRoute.SEARCH) {

@@ -116,6 +116,7 @@ class EventProcessor(
                         about = it.about.orEmpty(),
                         picture = it.picture.orEmpty(),
                         nip05 = it.nip05.orEmpty(),
+                        lud16 = it.lud16.orEmpty(),
                         createdAt = event.createdAt,
                     )
                 )

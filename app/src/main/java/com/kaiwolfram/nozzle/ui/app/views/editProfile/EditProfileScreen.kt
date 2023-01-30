@@ -25,6 +25,7 @@ fun EditProfileScreen(
     onChangeAbout: (String) -> Unit,
     onChangePicture: (String) -> Unit,
     onChangeNip05: (String) -> Unit,
+    onChangeLud16: (String) -> Unit,
     onResetUiState: () -> Unit,
     onCanGoBack: () -> Boolean,
     onGoBack: () -> Unit,
@@ -70,6 +71,12 @@ fun EditProfileScreen(
             Nip05(
                 nip05 = uiState.nip05Input,
                 onChangeNip05 = onChangeNip05
+            )
+            Spacer(modifier = Modifier.height(spacing.xxl))
+
+            Lud16(
+                lud16 = uiState.lud16Input,
+                onChangeLud16 = onChangeLud16
             )
         }
     }
@@ -146,5 +153,21 @@ private fun Nip05(
         placeholder = stringResource(id = R.string.enter_nip05),
         keyboardType = KeyboardType.Uri,
         onChangeValue = onChangeNip05,
+    )
+}
+
+@Composable
+private fun Lud16(
+    lud16: String,
+    onChangeLud16: (String) -> Unit,
+) {
+    Text(text = stringResource(id = R.string.lightning_address), fontWeight = FontWeight.Bold)
+    ChangeableTextField(
+        modifier = Modifier.fillMaxWidth(),
+        value = lud16,
+        maxLines = 3,
+        placeholder = stringResource(id = R.string.enter_lud16),
+        keyboardType = KeyboardType.Uri,
+        onChangeValue = onChangeLud16,
     )
 }

@@ -25,6 +25,7 @@ data class EditProfileViewModelState(
     val aboutInput: String = "",
     val pictureInput: String = "",
     val nip05Input: String = "",
+    val lud16Input: String = "",
     val hasChanges: Boolean = false,
     val isInvalidUsername: Boolean = false,
     val isInvalidPictureUrl: Boolean = false,
@@ -129,6 +130,13 @@ class EditProfileViewModel(
         setUIHasChanges()
     }
 
+    val onChangeLud16: (String) -> Unit = { input ->
+        viewModelState.update {
+            it.copy(lud16Input = input)
+        }
+        setUIHasChanges()
+    }
+
     val onCanGoBack: () -> Boolean = {
         val canGoBack = uiState.value.let { state ->
             !state.isInvalidUsername && !state.isInvalidPictureUrl
@@ -148,6 +156,7 @@ class EditProfileViewModel(
             about = state.aboutInput,
             picture = state.pictureInput,
             nip05 = state.nip05Input,
+            lud16 = state.lud16Input,
         )
     }
 
@@ -157,7 +166,8 @@ class EditProfileViewModel(
             name = state.nameInput,
             about = state.aboutInput,
             picture = state.pictureInput,
-            nip05 = state.nip05Input
+            nip05 = state.nip05Input,
+            lud16 = state.lud16Input,
         )
         nostrService.publishProfile(metadata = metadata)
     }
@@ -166,12 +176,13 @@ class EditProfileViewModel(
 
     private fun setUIHasChanges() {
         metadataState.let { metadata ->
-            uiState.value.let {
-                val hasChanges = it.nameInput != metadata?.name.orEmpty()
-                        || it.aboutInput != metadata?.about.orEmpty()
-                        || it.pictureInput != metadata?.picture.orEmpty()
-                        || it.nip05Input != metadata?.nip05.orEmpty()
-                if (hasChanges != it.hasChanges) {
+            uiState.value.let { oldState ->
+                val hasChanges = oldState.nameInput != metadata?.name.orEmpty()
+                        || oldState.aboutInput != metadata?.about.orEmpty()
+                        || oldState.pictureInput != metadata?.picture.orEmpty()
+                        || oldState.nip05Input != metadata?.nip05.orEmpty()
+                        || oldState.lud16Input != metadata?.lud16.orEmpty()
+                if (hasChanges != oldState.hasChanges) {
                     viewModelState.update { state ->
                         state.copy(hasChanges = hasChanges)
                     }
@@ -190,6 +201,7 @@ class EditProfileViewModel(
                         aboutInput = metadata?.about.orEmpty(),
                         pictureInput = metadata?.picture.orEmpty(),
                         nip05Input = metadata?.nip05.orEmpty(),
+                        lud16Input = metadata?.lud16.orEmpty(),
                         hasChanges = false,
                         isInvalidUsername = false,
                         isInvalidPictureUrl = false

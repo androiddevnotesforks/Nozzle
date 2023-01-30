@@ -11,9 +11,16 @@ data class ProfileEntity(
     val about: String,
     val picture: String,
     val nip05: String,
+    val lud16: String,
     val createdAt: Long,
 ) {
     fun getMetadata(): Metadata {
-        return Metadata(name, about, picture, nip05)
+        return Metadata(
+            name = name,
+            about = about,
+            picture = picture,
+            nip05 = nip05,
+            lud16 = lud16
+        )
     }
 }
