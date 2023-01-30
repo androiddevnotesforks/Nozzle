@@ -222,7 +222,6 @@ private fun PostCardContentBase(
     content: String,
 ) {
     replyToName?.let { ReplyingTo(name = it) }
-    Spacer(Modifier.height(spacing.small))
     relays?.let { InRelays(relays = it) }
     Spacer(Modifier.height(spacing.medium))
     if (content.isNotBlank()) {

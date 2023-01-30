@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 private const val TAG = "FeedProvider"
-private const val EMIT_INTERVAL_TIME = 1500L
-private const val EMIT_INTERVAL_NUM = 10L
+private const val EMIT_INTERVAL_TIME = 2100L
+private const val RESUB_INTERVAL = 5
 
 class FeedProvider(
     private val pubkeyProvider: IPubkeyProvider,
@@ -74,12 +74,18 @@ class FeedProvider(
                     emit(mapped)
                     nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
                 }
-                for (num in 1..EMIT_INTERVAL_NUM) {
+                // TODO: Use Flow
+                var counter = 0
+                while (true) {
                     delay(EMIT_INTERVAL_TIME)
-                    nostrSubscriber.unsubscribeAdditionalPostsData()
                     postMapper.mapToPostsWithMeta(posts).let { mapped ->
                         emit(mapped)
-                        nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                        if (counter % RESUB_INTERVAL == 0) {
+                            Log.d(TAG, "Resub after $counter iterations")
+                            nostrSubscriber.unsubscribeAdditionalPostsData()
+                            nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                        }
+                        counter++
                     }
                 }
             }
@@ -138,13 +144,19 @@ class FeedProvider(
                         emit(currentFeed + mapped)
                         nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
                     }
-                    for (num in 1..EMIT_INTERVAL_NUM) {
+                    // TODO: Use Flow
+                    var counter = 0
+                    while (true) {
                         delay(EMIT_INTERVAL_TIME)
-                        nostrSubscriber.unsubscribeAdditionalPostsData()
                         postMapper.mapToPostsWithMeta(toAppend).let { mapped ->
                             Log.d(TAG, "Emit ${currentFeed.size} + ${mapped.size}")
                             emit(currentFeed + mapped)
-                            nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                            if (counter % RESUB_INTERVAL == 0) {
+                                Log.d(TAG, "Resub after $counter iterations")
+                                nostrSubscriber.unsubscribeAdditionalPostsData()
+                                nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
+                            }
+                            counter++
                         }
                     }
                 }

@@ -40,7 +40,6 @@ class ProfileViewModel(
             false
         )
 
-
     // TODO: Figure out how to do it without this hack
     private val forceRecomposition = MutableStateFlow(0)
     val forceRecompositionState = forceRecomposition

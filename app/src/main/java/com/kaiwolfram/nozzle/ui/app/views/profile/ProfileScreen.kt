@@ -27,6 +27,7 @@ import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
 import com.kaiwolfram.nozzle.ui.components.text.NumberedCategory
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
+import com.kaiwolfram.nozzle.ui.theme.Shapes
 import com.kaiwolfram.nozzle.ui.theme.sizing
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
@@ -199,7 +200,9 @@ private fun NumberedCategories(
                 RelaysDialog(relays = relays, onCloseDialog = { openRelayDialog.value = false })
             }
             NumberedCategory(
-                modifier = Modifier.clickable { openRelayDialog.value = true },
+                modifier = Modifier
+                    .clip(Shapes.small)
+                    .clickable { openRelayDialog.value = true },
                 number = relays.size,
                 category = stringResource(id = R.string.relays)
             )
