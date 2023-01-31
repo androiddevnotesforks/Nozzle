@@ -13,3 +13,4 @@ val White21 = Color.White
 val DarkGray21 = Color.DarkGray
 val Red21 = Color.Red
 val Green21 = Color.Green
+val HyperlinkBlue = Color.Blue

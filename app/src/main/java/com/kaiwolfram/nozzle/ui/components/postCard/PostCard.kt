@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.utils.hexToNote
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
@@ -127,6 +126,11 @@ fun PostCard(
             PostCardHeaderAndContent(
                 post = post,
                 onOpenProfile = onOpenProfile,
+                onNavigateToThread = {
+                    if (!isCurrent) {
+                        onNavigateToThread(post.getPostIds())
+                    }
+                }
             )
             Spacer(Modifier.height(spacing.medium))
             RepostCardContent(
@@ -153,6 +157,7 @@ fun PostCard(
 private fun PostCardHeaderAndContent(
     post: PostWithMeta,
     onOpenProfile: ((String) -> Unit)?,
+    onNavigateToThread: () -> Unit,
 ) {
     Column {
         PostCardHeader(
@@ -167,7 +172,8 @@ private fun PostCardHeaderAndContent(
                     .ifEmpty { post.replyToPubkey.orEmpty().ifEmpty { "???" } }
             } else null,
             relays = post.relays,
-            content = post.content
+            content = post.content,
+            onNavigateToThread = onNavigateToThread,
         )
     }
 }
@@ -209,7 +215,14 @@ private fun RepostCardContent(
                         onOpenProfile = onOpenProfile
                     )
                 }
-                PostCardContentBase(replyToName = null, relays = null, content = it.content)
+                PostCardContentBase(
+                    replyToName = null,
+                    relays = null,
+                    content = it.content,
+                    onNavigateToThread = {
+                        onNavigateToThread(it.toPostIds())
+                    },
+                )
             }
         }
     }
@@ -220,17 +233,12 @@ private fun PostCardContentBase(
     replyToName: String?,
     relays: List<String>?,
     content: String,
+    onNavigateToThread: () -> Unit,
 ) {
     replyToName?.let { ReplyingTo(name = it) }
     relays?.let { InRelays(relays = it) }
     Spacer(Modifier.height(spacing.medium))
-    if (content.isNotBlank()) {
-        Text(
-            text = content.trim(),
-            maxLines = 64,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
+    HyperlinkedText(text = content, onClickNonLink = onNavigateToThread)
 }
 
 @Composable
