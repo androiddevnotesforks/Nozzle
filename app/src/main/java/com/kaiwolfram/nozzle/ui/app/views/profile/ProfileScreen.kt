@@ -25,6 +25,7 @@ import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.components.dialog.RelaysDialog
 import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
+import com.kaiwolfram.nozzle.ui.components.text.HyperlinkedText
 import com.kaiwolfram.nozzle.ui.components.text.NumberedCategory
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.Shapes
@@ -109,12 +110,10 @@ private fun ProfileData(
             onCopyNpub = onCopyNpub,
         )
         Spacer(Modifier.height(spacing.medium))
-        if (profile.metadata.about.orEmpty().isNotBlank()) {
-            Text(
-                text = profile.metadata.about.orEmpty(),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
+        profile.metadata.about?.let { about ->
+            if (about.isNotBlank()) {
+                HyperlinkedText(text = about, maxLines = 3, onClickNonLink = { /*Do nothing*/ })
+            }
         }
     }
 }

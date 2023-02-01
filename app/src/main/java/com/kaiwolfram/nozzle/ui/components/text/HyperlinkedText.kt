@@ -10,6 +10,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.data.utils.extractUrls
 import com.kaiwolfram.nozzle.data.utils.fixUrl
 import com.kaiwolfram.nozzle.ui.theme.HyperlinkBlue
+import com.kaiwolfram.nozzle.ui.theme.Typography
 
 private const val URL_TAG = "URL"
 
@@ -63,5 +64,10 @@ private fun buildAnnotatedString(text: String): AnnotatedString {
                 end = endIndex
             )
         }
+        addStyle(
+            style = Typography.body1.toSpanStyle(),
+            start = 0,
+            end = text.length
+        )
     }
 }
