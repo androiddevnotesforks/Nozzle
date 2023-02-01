@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 private const val TAG = "ProfileRoute"
@@ -13,7 +12,7 @@ private const val TAG = "ProfileRoute"
 fun ProfileRoute(
     profileViewModel: ProfileViewModel,
     onPrepareReply: (PostWithMeta) -> Unit,
-    onNavigateToThread: (PostIds) -> Unit,
+    onNavigateToThread: (String, String?, String?) -> Unit,
     onNavigateToReply: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
 ) {
@@ -35,7 +34,13 @@ fun ProfileRoute(
         onRefreshProfileView = profileViewModel.onRefreshProfileView,
         onCopyNpub = profileViewModel.onCopyNpub,
         onLoadMore = profileViewModel.onLoadMore,
-        onNavigateToThread = onNavigateToThread,
+        onNavigateToThread = { postIds ->
+            onNavigateToThread(
+                postIds.id,
+                postIds.replyToId,
+                postIds.replyToRootId
+            )
+        },
         onNavigateToReply = onNavigateToReply,
         onNavigateToEditProfile = onNavigateToEditProfile,
     )

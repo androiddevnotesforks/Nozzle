@@ -27,7 +27,6 @@ fun NozzleDrawerScreen(
     pubkeyState: DrawerViewModelState,
     metadataState: Metadata?,
     navActions: NozzleNavActions,
-    onSetPubkey: (String) -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -42,10 +41,7 @@ fun NozzleDrawerScreen(
             pubkey = pubkeyState.pubkey,
             npub = pubkeyState.npub,
             profileName = metadataState?.name.orEmpty(),
-            navigateToProfile = {
-                onSetPubkey(pubkeyState.pubkey)
-                navActions.navigateToProfile()
-            },
+            navigateToProfile = navActions.navigateToProfile,
             closeDrawer = closeDrawer
         )
         Spacer(
@@ -70,7 +66,7 @@ private fun ProfileRow(
     pubkey: String,
     npub: String,
     profileName: String,
-    navigateToProfile: () -> Unit,
+    navigateToProfile: (String) -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier,
 ) {
@@ -83,7 +79,7 @@ private fun ProfileRow(
     ) {
         TextButton(
             onClick = {
-                navigateToProfile()
+                navigateToProfile(pubkey)
                 closeDrawer()
             },
             modifier = Modifier.fillMaxWidth()

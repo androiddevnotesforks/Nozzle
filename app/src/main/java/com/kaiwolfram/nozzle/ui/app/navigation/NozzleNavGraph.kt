@@ -6,9 +6,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.ui.app.VMContainer
 import com.kaiwolfram.nozzle.ui.app.views.editProfile.EditProfileRoute
@@ -31,22 +33,6 @@ fun NozzleNavGraph(
     drawerState: DrawerState,
 ) {
     val scope = rememberCoroutineScope()
-    val onNavigateToProfile = remember {
-        { pubkey: String ->
-            run {
-                vmContainer.profileViewModel.onSetPubkey(pubkey)
-                navActions.navigateToProfile()
-            }
-        }
-    }
-    val onNavigateToThread = remember {
-        { postIds: PostIds ->
-            run {
-                vmContainer.threadViewModel.onOpenThread(postIds)
-                navActions.navigateToThread()
-            }
-        }
-    }
     val onNavigateToEditProfile = remember {
         {
             run {
@@ -66,17 +52,21 @@ fun NozzleNavGraph(
                 onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
                 onPreparePost = vmContainer.postViewModel.onPreparePost,
                 onOpenDrawer = { scope.launch { drawerState.open() } },
-                onNavigateToProfile = onNavigateToProfile,
-                onNavigateToThread = onNavigateToThread,
+                onNavigateToProfile = navActions.navigateToProfile,
+                onNavigateToThread = navActions.navigateToThread,
                 onNavigateToReply = navActions.navigateToReply,
                 onNavigateToPost = navActions.navigateToPost,
             )
         }
-        composable(NozzleRoute.PROFILE) {
+        composable(
+            route = NozzleRoute.PROFILE_FULL,
+            arguments = listOf(navArgument(Identifier.PUBKEY) { type = NavType.StringType })
+        ) { backStackEntry ->
+            vmContainer.profileViewModel.onSetPubkey(backStackEntry.arguments?.getString(Identifier.PUBKEY))
             ProfileRoute(
                 profileViewModel = vmContainer.profileViewModel,
                 onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
-                onNavigateToThread = onNavigateToThread,
+                onNavigateToThread = navActions.navigateToThread,
                 onNavigateToReply = navActions.navigateToReply,
                 onNavigateToEditProfile = onNavigateToEditProfile,
             )
@@ -84,8 +74,8 @@ fun NozzleNavGraph(
         composable(NozzleRoute.SEARCH) {
             SearchRoute(
                 searchViewModel = vmContainer.searchViewModel,
-                onNavigateToProfile = onNavigateToProfile,
-                onNavigateToThread = onNavigateToThread,
+                onNavigateToProfile = navActions.navigateToProfile,
+                onNavigateToThread = navActions.navigateToThread,
                 onGoBack = navActions.popStack,
             )
         }
@@ -106,11 +96,25 @@ fun NozzleNavGraph(
                 onGoBack = navActions.popStack,
             )
         }
-        composable(NozzleRoute.THREAD) {
+        composable(
+            route = NozzleRoute.THREAD_FULL,
+            arguments = listOf(
+                navArgument(Identifier.POST_ID) { type = NavType.StringType },
+                navArgument(Identifier.REPLY_TO_ID) { type = NavType.StringType },
+                navArgument(Identifier.REPLY_TO_ROOT_ID) { type = NavType.StringType },
+            )
+        ) { backStackEntry ->
+            vmContainer.threadViewModel.onOpenThread(
+                PostIds(
+                    id = backStackEntry.arguments?.getString(Identifier.POST_ID).orEmpty(),
+                    replyToId = backStackEntry.arguments?.getString(Identifier.REPLY_TO_ID),
+                    replyToRootId = backStackEntry.arguments?.getString(Identifier.REPLY_TO_ROOT_ID),
+                )
+            )
             ThreadRoute(
                 threadViewModel = vmContainer.threadViewModel,
                 onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
-                onNavigateToProfile = onNavigateToProfile,
+                onNavigateToProfile = navActions.navigateToProfile,
                 onNavigateToReply = navActions.navigateToReply,
                 onGoBack = navActions.popStack,
             )

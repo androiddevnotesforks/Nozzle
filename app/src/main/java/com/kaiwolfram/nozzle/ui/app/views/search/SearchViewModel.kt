@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.utils.noteIdToHex
 import com.kaiwolfram.nozzle.data.utils.npubToHex
-import com.kaiwolfram.nozzle.model.PostIds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -34,7 +33,7 @@ class SearchViewModel : ViewModel() {
         Log.i(TAG, "Initialize SearchViewModel")
     }
 
-    val onValidateAndNavigateToDestination: ((String) -> Unit, (PostIds) -> Unit) -> Unit =
+    val onValidateAndNavigateToDestination: ((String) -> Unit, (String, String?, String?) -> Unit) -> Unit =
         { onNavigateToProfile, onNavigateToThread ->
             uiState.value.input.let { input ->
                 val trimmed = input.trim()
@@ -44,7 +43,7 @@ class SearchViewModel : ViewModel() {
                     npub.onFailure { setUIInvalid() }
                 } else if (trimmed.startsWith("note1")) {
                     val noteId = noteIdToHex(trimmed)
-                    noteId.onSuccess { onNavigateToThread(PostIds.fromId(it)) }
+                    noteId.onSuccess { id -> onNavigateToThread(id, null, null) }
                     noteId.onFailure { setUIInvalid() }
                 } else {
                     setUIInvalid()

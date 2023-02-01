@@ -52,6 +52,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         feedProvider = appContainer.feedProvider,
                         profileProvider = appContainer.profileWithFollowerProvider,
                         profileFollower = appContainer.profileFollower,
+                        pubkeyProvider = appContainer.keyManager,
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
@@ -124,7 +125,6 @@ fun NozzleApp(appContainer: AppContainer) {
                     NozzleDrawerRoute(
                         nozzleDrawerViewModel = vmContainer.drawerViewModel,
                         navActions = navActions,
-                        onSetPubkey = vmContainer.profileViewModel.onSetPubkey,
                         closeDrawer = { coroutineScope.launch { drawerState.close() } },
                         modifier = Modifier
                             .statusBarsPadding()

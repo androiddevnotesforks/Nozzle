@@ -14,6 +14,7 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
+import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ class ProfileViewModel(
     private val profileProvider: IProfileWithAdditionalInfoProvider,
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
+    private val pubkeyProvider: IPubkeyProvider,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
@@ -68,9 +70,15 @@ class ProfileViewModel(
         Log.i(TAG, "Initialize ProfileViewModel")
     }
 
-    val onSetPubkey: (String) -> Unit = { pubkey ->
-        viewModelScope.launch(context = Dispatchers.IO) {
-            Log.i(TAG, "Set UI data for $pubkey")
+    val onSetPubkey: (String?) -> Unit = { pubkey ->
+        if (pubkey == null) {
+            Log.w(TAG, "Tried to set empty pubkey for UI")
+            refreshProfileAndPostState(
+                pubkey = pubkeyProvider.getPubkey(),
+                dbBatchSize = DB_BATCH_SIZE
+            )
+        } else {
+            Log.i(TAG, "Set UI for $pubkey")
             refreshProfileAndPostState(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
         }
     }
@@ -170,6 +178,7 @@ class ProfileViewModel(
             postCardInteractor: IPostCardInteractor,
             feedProvider: IFeedProvider,
             profileProvider: IProfileWithAdditionalInfoProvider,
+            pubkeyProvider: IPubkeyProvider,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =
@@ -181,6 +190,7 @@ class ProfileViewModel(
                         postCardInteractor = postCardInteractor,
                         feedProvider = feedProvider,
                         profileProvider = profileProvider,
+                        pubkeyProvider = pubkeyProvider,
                         context = context,
                         clip = clip,
                     ) as T
