@@ -1,5 +1,6 @@
 package com.kaiwolfram.nozzle.ui.app.navigation
 
+import android.util.Log
 import androidx.compose.material.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -11,6 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.kaiwolfram.nozzle.data.utils.noteIdToHex
+import com.kaiwolfram.nozzle.data.utils.npubToHex
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.ui.app.VMContainer
 import com.kaiwolfram.nozzle.ui.app.views.editProfile.EditProfileRoute
@@ -22,6 +26,9 @@ import com.kaiwolfram.nozzle.ui.app.views.reply.ReplyRoute
 import com.kaiwolfram.nozzle.ui.app.views.search.SearchRoute
 import com.kaiwolfram.nozzle.ui.app.views.thread.ThreadRoute
 import kotlinx.coroutines.launch
+
+private const val TAG = "NozzleNavGraph"
+private const val URI = "nostr:"
 
 @Composable
 fun NozzleNavGraph(
@@ -59,10 +66,10 @@ fun NozzleNavGraph(
             )
         }
         composable(
-            route = NozzleRoute.PROFILE_FULL,
-            arguments = listOf(navArgument(Identifier.PUBKEY) { type = NavType.StringType })
+            route = NozzleRoute.PROFILE + "/{pubkey}",
+            arguments = listOf(navArgument("pubkey") { type = NavType.StringType })
         ) { backStackEntry ->
-            vmContainer.profileViewModel.onSetPubkey(backStackEntry.arguments?.getString(Identifier.PUBKEY))
+            vmContainer.profileViewModel.onSetPubkey(backStackEntry.arguments?.getString("pubkey"))
             ProfileRoute(
                 profileViewModel = vmContainer.profileViewModel,
                 onPrepareReply = vmContainer.replyViewModel.onPrepareReply,
@@ -97,18 +104,21 @@ fun NozzleNavGraph(
             )
         }
         composable(
-            route = NozzleRoute.THREAD_FULL,
+            route = NozzleRoute.THREAD +
+                    "/{postId}" +
+                    "?replyToId={replyToId}" +
+                    "?replyToRootId={replyToRootId}",
             arguments = listOf(
-                navArgument(Identifier.POST_ID) { type = NavType.StringType },
-                navArgument(Identifier.REPLY_TO_ID) { type = NavType.StringType },
-                navArgument(Identifier.REPLY_TO_ROOT_ID) { type = NavType.StringType },
+                navArgument("postId") { type = NavType.StringType },
+                navArgument("replyToId") { type = NavType.StringType },
+                navArgument("replyToRootId") { type = NavType.StringType },
             )
         ) { backStackEntry ->
             vmContainer.threadViewModel.onOpenThread(
                 PostIds(
-                    id = backStackEntry.arguments?.getString(Identifier.POST_ID).orEmpty(),
-                    replyToId = backStackEntry.arguments?.getString(Identifier.REPLY_TO_ID),
-                    replyToRootId = backStackEntry.arguments?.getString(Identifier.REPLY_TO_ROOT_ID),
+                    id = backStackEntry.arguments?.getString("postId").orEmpty(),
+                    replyToId = backStackEntry.arguments?.getString("replyToId"),
+                    replyToRootId = backStackEntry.arguments?.getString("replyToRootId"),
                 )
             )
             ThreadRoute(
@@ -130,6 +140,32 @@ fun NozzleNavGraph(
                 postViewModel = vmContainer.postViewModel,
                 onGoBack = navActions.popStack,
             )
+        }
+        composable(
+            route = NozzleRoute.ROUTER,
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI{nip21}" })
+        ) { backStackEntry ->
+            val nip21 = backStackEntry.arguments?.getString("nip21")
+            if (nip21?.startsWith("npub1") == true) {
+                npubToHex(nip21)
+                    .onSuccess { hex ->
+                        navActions.navigateToProfile(hex)
+                    }
+                    .onFailure {
+                        Log.i(TAG, "npub $nip21 is invalid")
+                        navActions.navigateToFeed()
+                    }
+            } else if (nip21?.startsWith("note1") == true) {
+                noteIdToHex(nip21)
+                    .onSuccess { hex -> navActions.navigateToThread(hex, null, null) }
+                    .onFailure {
+                        Log.i(TAG, "note1 $nip21 is invalid")
+                        navActions.navigateToFeed()
+                    }
+            } else {
+                Log.i(TAG, "Nostr identifier $nip21 not recognized")
+                navActions.navigateToFeed()
+            }
         }
     }
 }
