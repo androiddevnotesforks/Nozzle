@@ -87,6 +87,10 @@
     <string name="no_relays_available">No relays available</string>
     <string name="lightning_address">Lightning address</string>
     <string name="enter_lud16">e.g. user@domain.com</string>
+    <string name="feed_settings">Feed settings</string>
+    <string name="contacts_only">Contacts only</string>
+    <string name="posts">Posts</string>
+    <string name="replies">Replies</string>
     <plurals name="other_relays">
         <item quantity="one">other</item>
         <item quantity="other">others</item>

@@ -30,6 +30,9 @@ data class FeedViewModelState(
     val feedMap: Map<String, List<PostWithMeta>> = mutableMapOf(),
     val isRefreshing: Boolean = false,
     val pubkey: String = "",
+    val isContactsOnly: Boolean = true,
+    val isPosts: Boolean = true,
+    val isReplies: Boolean = true,
 )
 
 class FeedViewModel(
@@ -95,6 +98,34 @@ class FeedViewModel(
                 subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE,
             )
+        }
+    }
+
+    val onToggleContactsOnly: () -> Unit = {
+        viewModelState.value.isContactsOnly.let { oldValue ->
+            viewModelState.update {
+                it.copy(isContactsOnly = !oldValue)
+            }
+        }
+    }
+
+    val onTogglePosts: () -> Unit = {
+        viewModelState.value.let { oldValues ->
+            if (oldValues.isReplies) {
+                viewModelState.update {
+                    it.copy(isPosts = !oldValues.isPosts)
+                }
+            }
+        }
+    }
+
+    val onToggleReplies: () -> Unit = {
+        viewModelState.value.let { oldValues ->
+            if (oldValues.isPosts) {
+                viewModelState.update {
+                    it.copy(isReplies = !oldValues.isReplies)
+                }
+            }
         }
     }
 

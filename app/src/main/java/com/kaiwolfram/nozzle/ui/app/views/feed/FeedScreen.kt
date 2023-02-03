@@ -26,6 +26,7 @@ import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.AddIcon
+import com.kaiwolfram.nozzle.ui.components.FeedSettingsButton
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
@@ -43,6 +44,9 @@ fun FeedScreen(
     onRefreshFeedView: () -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
     onPreparePost: (List<String>) -> Unit,
+    onToggleContactsOnly: () -> Unit,
+    onTogglePosts: () -> Unit,
+    onToggleReplies: () -> Unit,
     onLoadMore: () -> Unit,
     onPreviousHeadline: () -> Unit,
     onNextHeadline: () -> Unit,
@@ -56,9 +60,16 @@ fun FeedScreen(
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
-            FeedTopBar(picture = metadataState?.picture.orEmpty(),
+            FeedTopBar(
+                picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
                 currentRelay = uiState.currentRelay,
+                isContactsOnly = uiState.isContactsOnly,
+                isPosts = uiState.isPosts,
+                isReplies = uiState.isReplies,
+                onToggleContactsOnly = onToggleContactsOnly,
+                onTogglePosts = onTogglePosts,
+                onToggleReplies = onToggleReplies,
                 onPreviousHeadline = {
                     scope.launch { lazyListState.scrollToItem(0) }
                     onPreviousHeadline()
@@ -108,6 +119,12 @@ private fun FeedTopBar(
     picture: String,
     pubkey: String,
     currentRelay: String,
+    isContactsOnly: Boolean,
+    isPosts: Boolean,
+    isReplies: Boolean,
+    onToggleContactsOnly: () -> Unit,
+    onTogglePosts: () -> Unit,
+    onToggleReplies: () -> Unit,
     onNextHeadline: () -> Unit,
     onPreviousHeadline: () -> Unit,
     onPictureClick: () -> Unit,
@@ -138,9 +155,16 @@ private fun FeedTopBar(
                 onNextHeadline = onNextHeadline,
                 onScrollToTop = onScrollToTop,
             )
-            Row(modifier = Modifier.weight(0.1f)) {
-                Spacer(modifier = Modifier.size(sizing.smallProfilePicture))
-                Spacer(modifier = Modifier.width(spacing.large))
+            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.1f)) {
+                FeedSettingsButton(
+                    isContactsOnly = isContactsOnly,
+                    isPosts = isPosts,
+                    isReplies = isReplies,
+                    onToggleContactsOnly = onToggleContactsOnly,
+                    onTogglePosts = onTogglePosts,
+                    onToggleReplies = onToggleReplies,
+                )
+                Spacer(modifier = Modifier.width(spacing.medium))
             }
         }
     }

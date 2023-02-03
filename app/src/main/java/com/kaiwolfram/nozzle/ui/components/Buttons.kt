@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -21,8 +22,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.RelayActive
-import com.kaiwolfram.nozzle.ui.components.dialog.RelayCheckboxMenu
+import com.kaiwolfram.nozzle.ui.components.dropdown.FeedSettingsDropdownMenu
+import com.kaiwolfram.nozzle.ui.components.dropdown.RelaysDropdownMenu
 import com.kaiwolfram.nozzle.ui.theme.LightGray21
+import com.kaiwolfram.nozzle.ui.theme.sizing
 
 @Composable
 fun GoBackButton(onGoBack: () -> Unit) {
@@ -68,11 +71,12 @@ fun ChooseRelayButton(
     onClickIndex: (Int) -> Unit,
 ) {
     val showMenu = remember { mutableStateOf(false) }
-    RelayCheckboxMenu(
+    RelaysDropdownMenu(
         showMenu = showMenu.value,
         menuItems = relays,
         onClickIndex = onClickIndex,
-        onDismiss = { showMenu.value = false })
+        onDismiss = { showMenu.value = false }
+    )
     Icon(
         modifier = Modifier
             .clip(CircleShape)
@@ -80,6 +84,36 @@ fun ChooseRelayButton(
         imageVector = Icons.Default.CellTower,
         contentDescription = stringResource(id = R.string.choose_relays),
         tint = colors.surface
+    )
+}
+
+@Composable
+fun FeedSettingsButton(
+    isContactsOnly: Boolean,
+    isPosts: Boolean,
+    isReplies: Boolean,
+    onToggleContactsOnly: () -> Unit,
+    onTogglePosts: () -> Unit,
+    onToggleReplies: () -> Unit,
+) {
+    val showMenu = remember { mutableStateOf(false) }
+    FeedSettingsDropdownMenu(
+        showMenu = showMenu.value,
+        isContactsOnly = isContactsOnly,
+        isPosts = isPosts,
+        isReplies = isReplies,
+        onToggleContactsOnly = onToggleContactsOnly,
+        onTogglePosts = onTogglePosts,
+        onToggleReplies = onToggleReplies,
+        onDismiss = { showMenu.value = false }
+    )
+    Icon(
+        modifier = Modifier
+            .clip(CircleShape)
+            .size(sizing.mediumIcon)
+            .clickable { showMenu.value = true },
+        imageVector = Icons.Default.SettingsSuggest,
+        contentDescription = stringResource(id = R.string.feed_settings),
     )
 }
 

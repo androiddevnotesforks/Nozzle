@@ -8,6 +8,7 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 @Composable
 fun FeedRoute(
     feedViewModel: FeedViewModel,
+    // TODO: Nav with args, no need for onPrepare
     onPrepareReply: (PostWithMeta) -> Unit,
     onPreparePost: (List<String>) -> Unit,
     onOpenDrawer: () -> Unit,
@@ -26,6 +27,9 @@ fun FeedRoute(
         onRepost = feedViewModel.onRepost,
         onPrepareReply = onPrepareReply,
         onPreparePost = onPreparePost,
+        onToggleContactsOnly = feedViewModel.onToggleContactsOnly,
+        onTogglePosts = feedViewModel.onTogglePosts,
+        onToggleReplies = feedViewModel.onToggleReplies,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onLoadMore = feedViewModel.onLoadMore,
         onPreviousHeadline = feedViewModel.onPreviousHeadline,
