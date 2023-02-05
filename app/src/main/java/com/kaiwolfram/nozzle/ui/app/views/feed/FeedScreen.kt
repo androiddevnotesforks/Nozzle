@@ -5,12 +5,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,15 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nostrclientkt.model.Metadata
-import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.FeedScreenContent
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.AddIcon
-import com.kaiwolfram.nozzle.ui.components.FeedSettingsButton
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
@@ -63,7 +62,7 @@ fun FeedScreen(
             FeedTopBar(
                 picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
-                currentRelay = uiState.currentRelay,
+                screenContent = uiState.screenContent,
                 isContactsOnly = uiState.isContactsOnly,
                 isPosts = uiState.isPosts,
                 isReplies = uiState.isReplies,
@@ -83,19 +82,18 @@ fun FeedScreen(
         },
         floatingActionButton = {
             FeedFab(onPrepareNewPost = {
-                onPreparePost(listOf(uiState.currentRelay))
+                onPreparePost(uiState.relays)
                 onNavigateToPost()
             })
         },
     ) {
-        val posts = uiState.feedMap[uiState.currentRelay].orEmpty()
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
             PostCardList(
-                posts = posts,
+                posts = uiState.screenContent.feed,
                 isRefreshing = uiState.isRefreshing,
                 lazyListState = lazyListState,
                 onLike = onLike,
@@ -108,7 +106,7 @@ fun FeedScreen(
                 onNavigateToReply = onNavigateToReply,
             )
         }
-        if (posts.isEmpty()) {
+        if (uiState.screenContent.feed.isEmpty()) {
             NoPostsHint()
         }
     }
@@ -118,7 +116,7 @@ fun FeedScreen(
 private fun FeedTopBar(
     picture: String,
     pubkey: String,
-    currentRelay: String,
+    screenContent: FeedScreenContent,
     isContactsOnly: Boolean,
     isPosts: Boolean,
     isReplies: Boolean,
@@ -150,20 +148,21 @@ private fun FeedTopBar(
             }
             Headline(
                 modifier = Modifier.weight(0.8f),
-                headline = currentRelay,
+                headline = screenContent.getHeader(LocalContext.current),
                 onPreviousHeadline = onPreviousHeadline,
                 onNextHeadline = onNextHeadline,
                 onScrollToTop = onScrollToTop,
             )
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.1f)) {
-                FeedSettingsButton(
-                    isContactsOnly = isContactsOnly,
-                    isPosts = isPosts,
-                    isReplies = isReplies,
-                    onToggleContactsOnly = onToggleContactsOnly,
-                    onTogglePosts = onTogglePosts,
-                    onToggleReplies = onToggleReplies,
-                )
+                // TODO: Uncomment when after refactoring
+//                FeedSettingsButton(
+//                    isContactsOnly = isContactsOnly,
+//                    isPosts = isPosts,
+//                    isReplies = isReplies,
+//                    onToggleContactsOnly = onToggleContactsOnly,
+//                    onTogglePosts = onTogglePosts,
+//                    onToggleReplies = onToggleReplies,
+//                )
                 Spacer(modifier = Modifier.width(spacing.medium))
             }
         }
@@ -179,15 +178,16 @@ private fun Headline(
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
-        if (headline.isNotBlank()) {
-            Icon(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable { onPreviousHeadline() },
-                imageVector = Icons.Default.ArrowLeft,
-                contentDescription = stringResource(id = R.string.move_to_previous_feed),
-            )
-        }
+        // TODO: Uncomment after refactoring
+//        if (headline.isNotBlank()) {
+//            Icon(
+//                modifier = Modifier
+//                    .clip(CircleShape)
+//                    .clickable { onPreviousHeadline() },
+//                imageVector = Icons.Default.ArrowLeft,
+//                contentDescription = stringResource(id = R.string.move_to_previous_feed),
+//            )
+//        }
         Text(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -202,15 +202,16 @@ private fun Headline(
             style = typography.h6,
             color = colors.background
         )
-        if (headline.isNotBlank()) {
-            Icon(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable { onNextHeadline() },
-                imageVector = Icons.Default.ArrowRight,
-                contentDescription = stringResource(id = R.string.move_to_next_feed),
-            )
-        }
+        // TODO: Uncomment after refactoring
+//        if (headline.isNotBlank()) {
+//            Icon(
+//                modifier = Modifier
+//                    .clip(CircleShape)
+//                    .clickable { onNextHeadline() },
+//                imageVector = Icons.Default.ArrowRight,
+//                contentDescription = stringResource(id = R.string.move_to_next_feed),
+//            )
+//        }
     }
 }
 

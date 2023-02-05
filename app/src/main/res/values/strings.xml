@@ -91,6 +91,7 @@
     <string name="contacts_only">Contacts only</string>
     <string name="posts">Posts</string>
     <string name="replies">Replies</string>
+    <string name="home">Home</string>
     <plurals name="other_relays">
         <item quantity="one">other</item>
         <item quantity="other">others</item>
