@@ -68,6 +68,10 @@ class ProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
+        refreshProfileAndPostState(
+            pubkey = pubkeyProvider.getPubkey(),
+            dbBatchSize = DB_BATCH_SIZE
+        )
     }
 
     val onSetPubkey: (String?) -> Unit = { pubkey ->

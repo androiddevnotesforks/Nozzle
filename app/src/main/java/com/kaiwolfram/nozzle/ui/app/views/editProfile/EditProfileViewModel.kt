@@ -50,7 +50,9 @@ class EditProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize EditProfileViewModel")
-        nostrSubscriber.subscribeToProfileMetadataAndContactList(personalProfileManager.getPubkey())
+        nostrSubscriber.subscribeToProfileMetadataAndContactList(
+            listOf(personalProfileManager.getPubkey())
+        )
         useCachedValues()
     }
 

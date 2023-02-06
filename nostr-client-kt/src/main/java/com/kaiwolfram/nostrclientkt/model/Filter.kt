@@ -16,13 +16,6 @@ class Filter(
     fun toJson(): String = JsonUtils.gson.toJson(this)
 
     companion object {
-        fun createProfileFilter(pubkey: String): Filter {
-            return Filter(
-                authors = listOf(pubkey),
-                kinds = listOf(Event.Kind.METADATA),
-            )
-        }
-
         fun createProfileFilter(pubkeys: List<String>): Filter {
             return Filter(
                 authors = pubkeys,
@@ -60,9 +53,9 @@ class Filter(
             )
         }
 
-        fun createContactListFilter(pubkey: String): Filter {
+        fun createContactListFilter(pubkeys: List<String>): Filter {
             return Filter(
-                authors = listOf(pubkey),
+                authors = pubkeys,
                 kinds = listOf(Event.Kind.CONTACT_LIST),
             )
         }

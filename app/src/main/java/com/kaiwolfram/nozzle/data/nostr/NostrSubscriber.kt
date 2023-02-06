@@ -20,10 +20,10 @@ class NostrSubscriber(
     private val additionalFeedDataSubscriptions = mutableListOf<String>()
     private val profileSubscriptions = mutableListOf<String>()
 
-    override fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String> {
-        Log.i(TAG, "Subscribe metadata and contact list for $pubkey")
-        val profileFilter = Filter.createProfileFilter(pubkey = pubkey)
-        val contactListFilter = Filter.createContactListFilter(pubkey = pubkey)
+    override fun subscribeToProfileMetadataAndContactList(pubkeys: List<String>): List<String> {
+        Log.i(TAG, "Subscribe metadata and contact list for ${pubkeys.size} pubkeys")
+        val profileFilter = Filter.createProfileFilter(pubkeys = pubkeys)
+        val contactListFilter = Filter.createContactListFilter(pubkeys = pubkeys)
 
         val ids = nostrService.subscribe(
             filters = listOf(profileFilter, contactListFilter),

@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 
 private const val TAG = "ProfileWithAdditionalInfoProvider"
-private const val EMIT_INTERVAL_TIME = 1500L
+private const val EMIT_INTERVAL_TIME = 2000L
 private const val EMIT_INTERVAL_NUM = 10L
 
 class ProfileWithAdditionalInfoProvider(
@@ -31,7 +31,10 @@ class ProfileWithAdditionalInfoProvider(
         Log.i(TAG, "Get profile $pubkey")
         return flow {
             nostrSubscriber.unsubscribeProfiles()
-            nostrSubscriber.subscribeToProfileMetadataAndContactList(pubkey)
+            val contactPubkeys = listContactPubkeysIfIsOneself(pubkey = pubkey)
+            nostrSubscriber.subscribeToProfileMetadataAndContactList(
+                pubkeys = contactPubkeys
+            )
             getAndEmitProfile(flowCollector = this, pubkey = pubkey)
             for (num in 1..EMIT_INTERVAL_NUM) {
                 delay(EMIT_INTERVAL_TIME)
@@ -63,7 +66,7 @@ class ProfileWithAdditionalInfoProvider(
                         numOfFollowing = numOfFollowing,
                         numOfFollowers = numOfFollowers,
                         relays = relays,
-                        isOneself = pubkey == pubkeyProvider.getPubkey(),
+                        isOneself = isOneself(pubkey = pubkey),
                         isFollowedByMe = isFollowedByMe,
                     )
                 )
@@ -71,4 +74,11 @@ class ProfileWithAdditionalInfoProvider(
         }
     }
 
+    private fun isOneself(pubkey: String) = pubkey == pubkeyProvider.getPubkey()
+
+    private suspend fun listContactPubkeysIfIsOneself(pubkey: String): List<String> {
+        return if (isOneself(pubkey = pubkey)) {
+            contactDao.listContactPubkeys(pubkey) + pubkey
+        } else listOf(pubkey)
+    }
 }

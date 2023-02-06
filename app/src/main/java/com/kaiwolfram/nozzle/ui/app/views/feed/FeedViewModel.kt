@@ -142,7 +142,7 @@ class FeedViewModel(
     }
 
     val onLike: (String) -> Unit = { id ->
-        uiState.value.let { state ->
+        uiState.value.let { _ ->
             viewModelState.value.screenContent.feed.find { it.id == id }?.let {
                 viewModelScope.launch(context = IO) {
                     postCardInteractor.like(postId = id, postPubkey = it.pubkey)
@@ -159,7 +159,7 @@ class FeedViewModel(
 
     private suspend fun renewSubscription(subBatchSize: Int) {
         nostrSubscriber.subscribeToProfileMetadataAndContactList(
-            pubkey = personalProfileProvider.getPubkey()
+            pubkeys = listOf(personalProfileProvider.getPubkey())
         )
         subscribeToFeed(subBatchSize = subBatchSize)
         delay(1000)

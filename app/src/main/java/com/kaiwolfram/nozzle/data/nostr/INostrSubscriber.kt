@@ -3,7 +3,7 @@ package com.kaiwolfram.nozzle.data.nostr
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 interface INostrSubscriber {
-    fun subscribeToProfileMetadataAndContactList(pubkey: String): List<String>
+    fun subscribeToProfileMetadataAndContactList(pubkeys: List<String>): List<String>
 
     fun subscribeToFeed(
         authorPubkeys: List<String>,
