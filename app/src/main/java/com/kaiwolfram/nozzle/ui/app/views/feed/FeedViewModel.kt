@@ -63,7 +63,7 @@ class FeedViewModel(
         viewModelScope.launch(context = IO) {
             setUIRefresh(true)
             renewSubscription(subBatchSize = SUB_BATCH_SIZE)
-            setUIRelays(relayProvider.listRelays());
+            setUIRelays(relayProvider.listRelays())
             setScreenContent(
                 currentContent = viewModelState.value.screenContent,
                 dbBatchSize = DB_BATCH_SIZE
@@ -77,7 +77,7 @@ class FeedViewModel(
             Log.i(TAG, "Refresh feed view")
             setUIRefresh(true)
             renewSubscription(subBatchSize = SUB_BATCH_SIZE)
-            setUIRelays(relayProvider.listRelays());
+            setUIRelays(relayProvider.listRelays())
             setScreenContent(
                 currentContent = viewModelState.value.screenContent,
                 dbBatchSize = DB_BATCH_SIZE
@@ -158,6 +158,9 @@ class FeedViewModel(
     }
 
     private suspend fun renewSubscription(subBatchSize: Int) {
+        nostrSubscriber.subscribeToProfileMetadataAndContactList(
+            pubkey = personalProfileProvider.getPubkey()
+        )
         subscribeToFeed(subBatchSize = subBatchSize)
         delay(1000)
         subscribeToAdditionalFeedData(feedProvider.getFeed(limit = subBatchSize))

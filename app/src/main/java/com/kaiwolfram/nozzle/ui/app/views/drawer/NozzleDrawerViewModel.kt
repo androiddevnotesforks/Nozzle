@@ -28,7 +28,7 @@ class NozzleDrawerViewModel(
     var metadataState = personalProfileProvider.getMetadata()
         .stateIn(
             viewModelScope,
-            SharingStarted.Lazily,
+            SharingStarted.Eagerly,
             null
         )
 
