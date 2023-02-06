@@ -45,6 +45,7 @@ class AppContainer(context: Context) {
         contactDao = roomDb.contactDao(),
         postDao = roomDb.postDao(),
         eventRelayDao = roomDb.eventRelayDao(),
+        userRelayDao = roomDb.userRelayDao(),
     )
 
     val nostrService: INostrService = NostrService(

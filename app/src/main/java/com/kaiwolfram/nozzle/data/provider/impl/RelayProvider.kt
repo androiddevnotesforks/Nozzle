@@ -19,13 +19,10 @@ class RelayProvider(private val relayDao: RelayDao) : IRelayProvider {
 
     init {
         val relays = listOf(
-            "wss://relay.snort.social",
-            "wss://relay.nostr.ch",
-            "wss://nostr.zebedee.cloud",
-            "wss://nostr.fmt.wiz.biz",
             "wss://nostr.einundzwanzig.space",
             "wss://nostr-pub.wellorder.net",
             "wss://nos.lol",
+            "wss://nostr.d11n.net"
         )
         scope.launch {
             relays.forEach {

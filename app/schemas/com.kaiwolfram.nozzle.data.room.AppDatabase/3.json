@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "a2e8e951fd51878b791dd6ae1bef6d13",
+    "version": 3,
+    "identityHash": "db3058233baea96ea0553843d7e8cab6",
     "entities": [
       {
         "tableName": "contact",
@@ -231,7 +231,7 @@
       },
       {
         "tableName": "userRelay",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `relayUrl` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`pubkey`, `relayUrl`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `relayUrl` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `type` INTEGER NOT NULL, PRIMARY KEY(`pubkey`, `relayUrl`))",
         "fields": [
           {
             "fieldPath": "pubkey",
@@ -250,6 +250,12 @@
             "columnName": "createdAt",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -266,7 +272,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2e8e951fd51878b791dd6ae1bef6d13')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'db3058233baea96ea0553843d7e8cab6')"
     ]
   }
 }

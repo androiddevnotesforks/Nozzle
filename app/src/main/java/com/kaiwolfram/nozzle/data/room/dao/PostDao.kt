@@ -57,10 +57,9 @@ interface PostDao {
     )
     suspend fun getThreadEnd(currentPostId: String, replyToId: String?): List<PostEntity>
 
-    @RewriteQueriesToDropUnusedColumns
     @MapInfo(keyColumn = "id")
     @Query(
-        "SELECT * " +
+        "SELECT id, post.pubkey, content, name, picture, post.createdAt " +
                 "FROM post " +
                 "JOIN profile ON post.pubkey = profile.pubkey " +
                 "WHERE id IN (:postIds) "

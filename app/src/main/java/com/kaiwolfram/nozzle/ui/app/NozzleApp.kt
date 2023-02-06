@@ -46,6 +46,14 @@ fun NozzleApp(appContainer: AppContainer) {
                         personalProfileProvider = appContainer.personalProfileManager,
                     )
                 ),
+                editProfileViewModel = viewModel(
+                    factory = EditProfileViewModel.provideFactory(
+                        personalProfileManager = appContainer.personalProfileManager,
+                        nostrService = appContainer.nostrService,
+                        nostrSubscriber = appContainer.nostrSubscriber,
+                        context = LocalContext.current,
+                    )
+                ),
                 profileViewModel = viewModel(
                     factory = ProfileViewModel.provideFactory(
                         postCardInteractor = appContainer.postCardInteractor,
@@ -74,14 +82,6 @@ fun NozzleApp(appContainer: AppContainer) {
                         postCardInteractor = appContainer.postCardInteractor,
                         nostrSubscriber = appContainer.nostrSubscriber,
                         contactDao = appContainer.roomDb.contactDao(),
-                    )
-                ),
-                editProfileViewModel = viewModel(
-                    factory = EditProfileViewModel.provideFactory(
-                        personalProfileManager = appContainer.personalProfileManager,
-                        nostrService = appContainer.nostrService,
-                        nostrSubscriber = appContainer.nostrSubscriber,
-                        context = LocalContext.current,
                     )
                 ),
                 threadViewModel = viewModel(

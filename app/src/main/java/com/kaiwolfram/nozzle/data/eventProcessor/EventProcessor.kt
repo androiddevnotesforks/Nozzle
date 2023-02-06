@@ -22,6 +22,7 @@ class EventProcessor(
     private val profileDao: ProfileDao,
     private val postDao: PostDao,
     private val eventRelayDao: EventRelayDao,
+    private val userRelayDao: UserRelayDao,
 ) : IEventProcessor {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
