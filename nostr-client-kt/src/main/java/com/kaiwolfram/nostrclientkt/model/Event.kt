@@ -13,6 +13,8 @@ import fr.acinq.secp256k1.Hex
 
 typealias Tag = List<String>
 
+fun Tag.getNip10Marker() = this.getOrNull(3)
+
 class Event(
     val id: String,
     val pubkey: String,
@@ -149,14 +151,24 @@ class Event(
         val eventTags = tags.filter {
             it.size in 2..4
                     && it[0] == "e"
-                    && (it.getOrNull(3) == "reply" || it.getOrNull(3) == null)
+                    && (
+                    when (it.getNip10Marker()) {
+                        "reply" -> true
+                        "root" -> true
+                        null -> true
+                        else -> false
+                    }
+                    )
         }
         if (eventTags.isEmpty()) return null
 
-        val nip10Marked = eventTags.find { it.getOrNull(3) == "reply" }
-        if (nip10Marked != null) return nip10Marked[1]
+        val nip10Reply = eventTags.find { it.getNip10Marker() == "reply" }
+        if (nip10Reply != null) return nip10Reply[1]
 
-        // nip10 relational
+        val nip10Root = eventTags.find { it.getNip10Marker() == "root" }
+        if (nip10Root != null) return nip10Root[1]
+
+        // nip10 relational (deprecated)
         return when (eventTags.size) {
             1 -> eventTags[0][1]
             else -> eventTags[1][1]
@@ -167,14 +179,14 @@ class Event(
         val eventTags = tags.filter {
             it.size in 2..4
                     && it[0] == "e"
-                    && (it.getOrNull(3) == "root" || it.getOrNull(3) == null)
+                    && (it.getNip10Marker() == "root" || it.getNip10Marker() == null)
         }
         if (eventTags.isEmpty()) return null
 
-        val nip10Marked = eventTags.find { it.getOrNull(3) == "root" }
+        val nip10Marked = eventTags.find { it.getNip10Marker() == "root" }
         if (nip10Marked != null) return nip10Marked[1]
 
-        // nip10 relational
+        // nip10 relational (deprecated)
         return eventTags[0][1]
     }
 

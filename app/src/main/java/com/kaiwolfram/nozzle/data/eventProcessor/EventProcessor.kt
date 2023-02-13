@@ -27,23 +27,22 @@ class EventProcessor(
     private val scope = CoroutineScope(Dispatchers.IO)
     private val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
     override fun process(event: Event, relayUrl: String?) {
-        if (event.isPost()) {
-            processPost(event = event, relayUrl = relayUrl)
-            return
-        }
         if (event.isReaction()) {
             processReaction(event = event, relayUrl = relayUrl)
             return
         }
-        if (event.isContactList()) {
-            processContactList(event = event)
+        if (event.isPost()) {
+            processPost(event = event, relayUrl = relayUrl)
             return
         }
         if (event.isProfileMetadata()) {
             processMetadata(event = event)
             return
         }
-
+        if (event.isContactList()) {
+            processContactList(event = event)
+            return
+        }
     }
 
     private fun processPost(event: Event, relayUrl: String?) {

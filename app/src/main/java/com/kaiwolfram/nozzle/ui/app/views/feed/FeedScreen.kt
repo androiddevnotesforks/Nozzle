@@ -26,6 +26,7 @@ import com.kaiwolfram.nozzle.model.FeedScreenContent
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.AddIcon
+import com.kaiwolfram.nozzle.ui.components.FeedSettingsButton
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
 import com.kaiwolfram.nozzle.ui.components.postCard.PostCardList
@@ -154,15 +155,14 @@ private fun FeedTopBar(
                 onScrollToTop = onScrollToTop,
             )
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.1f)) {
-                // TODO: Uncomment when after refactoring
-//                FeedSettingsButton(
-//                    isContactsOnly = isContactsOnly,
-//                    isPosts = isPosts,
-//                    isReplies = isReplies,
-//                    onToggleContactsOnly = onToggleContactsOnly,
-//                    onTogglePosts = onTogglePosts,
-//                    onToggleReplies = onToggleReplies,
-//                )
+                FeedSettingsButton(
+                    isContactsOnly = isContactsOnly,
+                    isPosts = isPosts,
+                    isReplies = isReplies,
+                    onToggleContactsOnly = onToggleContactsOnly,
+                    onTogglePosts = onTogglePosts,
+                    onToggleReplies = onToggleReplies,
+                )
                 Spacer(modifier = Modifier.width(spacing.medium))
             }
         }

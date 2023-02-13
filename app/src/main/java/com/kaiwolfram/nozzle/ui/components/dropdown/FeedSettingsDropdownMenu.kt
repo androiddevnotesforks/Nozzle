@@ -24,7 +24,7 @@ fun FeedSettingsDropdownMenu(
 ) {
     DropdownMenu(
         expanded = showMenu,
-        onDismissRequest = { onDismiss() }
+        onDismissRequest = onDismiss
     ) {
         val padding = PaddingValues(start = spacing.medium, end = spacing.xl)
         CheckboxDropdownMenuItem(
@@ -33,9 +33,11 @@ fun FeedSettingsDropdownMenu(
             contentPadding = padding,
             onToggle = onToggleContactsOnly,
         )
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = spacing.medium))
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = spacing.medium)
+        )
         CheckboxDropdownMenuItem(
             isChecked = isPosts,
             text = stringResource(id = R.string.posts),
@@ -48,6 +50,5 @@ fun FeedSettingsDropdownMenu(
             contentPadding = padding,
             onToggle = onToggleReplies
         )
-
     }
 }
