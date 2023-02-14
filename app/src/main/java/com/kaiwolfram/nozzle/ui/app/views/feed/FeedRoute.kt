@@ -31,6 +31,7 @@ fun FeedRoute(
         onTogglePosts = feedViewModel.onTogglePosts,
         onToggleReplies = feedViewModel.onToggleReplies,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
+        onRefreshOnMenuDismiss = feedViewModel.onRefreshOnMenuDismiss,
         onLoadMore = feedViewModel.onLoadMore,
         onPreviousHeadline = feedViewModel.onPreviousHeadline,
         onNextHeadline = feedViewModel.onNextHeadline,

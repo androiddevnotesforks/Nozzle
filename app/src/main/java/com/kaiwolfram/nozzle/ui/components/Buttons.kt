@@ -92,6 +92,7 @@ fun FeedSettingsButton(
     isContactsOnly: Boolean,
     isPosts: Boolean,
     isReplies: Boolean,
+    onRefreshOnMenuDismiss: () -> Unit,
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
@@ -105,7 +106,10 @@ fun FeedSettingsButton(
         onToggleContactsOnly = onToggleContactsOnly,
         onTogglePosts = onTogglePosts,
         onToggleReplies = onToggleReplies,
-        onDismiss = { showMenu.value = false }
+        onDismiss = {
+            onRefreshOnMenuDismiss()
+            showMenu.value = false
+        }
     )
     Icon(
         modifier = Modifier
