@@ -84,7 +84,7 @@ fun FeedScreen(
         },
         floatingActionButton = {
             FeedFab(onPrepareNewPost = {
-                onPreparePost(uiState.relays)
+                onPreparePost(uiState.feedSettings.relays)
                 onNavigateToPost()
             })
         },

@@ -5,17 +5,12 @@ import com.kaiwolfram.nostrclientkt.ContactListEntry
 import com.kaiwolfram.nostrclientkt.Post
 import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nostrclientkt.RepostId
-import com.kaiwolfram.nostrclientkt.model.Event
-import com.kaiwolfram.nostrclientkt.model.Filter
-import com.kaiwolfram.nostrclientkt.model.Metadata
+import com.kaiwolfram.nostrclientkt.model.*
 import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener
 import com.kaiwolfram.nozzle.data.eventProcessor.IEventProcessor
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
-import com.kaiwolfram.nozzle.model.AllRelays
-import com.kaiwolfram.nozzle.model.MultipleRelays
-import com.kaiwolfram.nozzle.model.RelaySelection
 import java.util.*
 
 private const val TAG = "NostrService"
@@ -164,24 +159,13 @@ class NostrService(
         return event
     }
 
-    override fun subscribe(filters: List<Filter>, unsubOnEOSE: Boolean): List<String> {
-        val subscriptionIds = client.subscribe(filters)
-        if (subscriptionIds.isNotEmpty() && unsubOnEOSE) {
-            unsubOnEOSECache.addAll(subscriptionIds)
-        }
-
-        return subscriptionIds
-    }
-
-    override fun subscribeByRelay(
-        relayUrl: String,
+    override fun subscribe(
         filters: List<Filter>,
-        unsubOnEOSE: Boolean
+        unsubOnEOSE: Boolean,
+        relaySelection: RelaySelection
     ): List<String> {
-        val subscriptionIds = client.subscribeByRelay(relayUrl = relayUrl, filters = filters)
-        if (subscriptionIds.isNotEmpty() && unsubOnEOSE) {
-            unsubOnEOSECache.addAll(subscriptionIds)
-        }
+        val subscriptionIds = client.subscribe(filters = filters, relaySelection = relaySelection)
+        if (subscriptionIds.isNotEmpty() && unsubOnEOSE) unsubOnEOSECache.addAll(subscriptionIds)
 
         return subscriptionIds
     }

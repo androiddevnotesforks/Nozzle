@@ -19,7 +19,19 @@ interface PostDao {
                 "ORDER BY createdAt DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getLatestFeed(pubkey: String, limit: Int, until: Long?): List<PostEntity>
+    suspend fun getLatestContactFeed(pubkey: String, limit: Int, until: Long?): List<PostEntity>
+
+    /**
+     * Sorted from newest to oldest
+     */
+    @Query(
+        "SELECT * " +
+                "FROM post " +
+                "WHERE (:until IS NULL OR createdAt < :until) " +
+                "ORDER BY createdAt DESC " +
+                "LIMIT :limit"
+    )
+    suspend fun getLatestGlobalFeed(limit: Int, until: Long?): List<PostEntity>
 
     @Query(
         "SELECT * " +

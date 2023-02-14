@@ -2,8 +2,7 @@ package com.kaiwolfram.nostrclientkt.net
 
 import android.util.Log
 import com.google.gson.JsonElement
-import com.kaiwolfram.nostrclientkt.model.Event
-import com.kaiwolfram.nostrclientkt.model.Filter
+import com.kaiwolfram.nostrclientkt.model.*
 import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 import okhttp3.*
 import java.util.*
@@ -55,29 +54,22 @@ class Client {
         }
     }
 
-    fun subscribe(filters: List<Filter>): List<String> {
+    fun subscribe(filters: List<Filter>, relaySelection: RelaySelection = AllRelays): List<String> {
         if (filters.isEmpty()) {
             return listOf()
         }
         val ids = mutableListOf<String>()
-        sockets.values.forEach {
-            val subscriptionId = UUID.randomUUID().toString()
-            ids.add(subscriptionId)
-            subscriptions[subscriptionId] = it
-            val request = createSubscriptionRequest(subscriptionId, filters)
-            Log.i(TAG, "Subscribe $request")
-            it.send(request)
+        val filteredSockets = when (relaySelection) {
+            is AllRelays -> sockets.values
+            is MultipleRelays -> {
+                addRelays(relaySelection.relays)
+                sockets.entries
+                    .filter { relaySelection.relays.contains(it.key) }
+                    .map { it.value }
+            }
         }
 
-        return ids
-    }
-
-    fun subscribeByRelay(relayUrl: String, filters: List<Filter>): List<String> {
-        if (filters.isEmpty() || !sockets.containsKey(relayUrl)) {
-            return listOf()
-        }
-        val ids = mutableListOf<String>()
-        sockets.entries.find { it.key == relayUrl }?.value?.let {
+        filteredSockets.forEach {
             val subscriptionId = UUID.randomUUID().toString()
             ids.add(subscriptionId)
             subscriptions[subscriptionId] = it

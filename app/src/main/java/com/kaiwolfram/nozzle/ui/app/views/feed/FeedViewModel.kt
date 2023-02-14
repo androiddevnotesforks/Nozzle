@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
@@ -35,9 +36,9 @@ data class FeedViewModelState(
     val feedSettings: FeedSettings = FeedSettings(
         isContactsOnly = true,
         isPosts = true,
-        isReplies = true
+        isReplies = true,
+        relays = listOf(),
     ),
-    val relays: List<String> = listOf(),
 )
 
 class FeedViewModel(
@@ -65,10 +66,11 @@ class FeedViewModel(
         }
         viewModelScope.launch(context = IO) {
             setUIRefresh(true)
-            renewSubscription(subBatchSize = SUB_BATCH_SIZE)
-            setUIRelays(relayProvider.listRelays())
-            setScreenContent(
+            renewSubscriptionAndUI(
+                feedSettings = viewModelState.value.feedSettings,
                 currentContent = viewModelState.value.screenContent,
+                updatedRelays = relayProvider.listRelays(),
+                subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE
             )
             setUIRefresh(false)
@@ -79,10 +81,11 @@ class FeedViewModel(
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Refresh feed view")
             setUIRefresh(true)
-            renewSubscription(subBatchSize = SUB_BATCH_SIZE)
-            setUIRelays(relayProvider.listRelays())
-            setScreenContent(
+            renewSubscriptionAndUI(
+                feedSettings = viewModelState.value.feedSettings,
                 currentContent = viewModelState.value.screenContent,
+                updatedRelays = relayProvider.listRelays(),
+                subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE
             )
             setUIRefresh(false)
@@ -94,6 +97,7 @@ class FeedViewModel(
             Log.i(TAG, "Load more")
             fetchAndAppendFeed(
                 currentScreenContent = viewModelState.value.screenContent,
+                feedSettings = viewModelState.value.feedSettings,
                 subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE,
             )
@@ -178,25 +182,47 @@ class FeedViewModel(
         }
     }
 
-    private suspend fun renewSubscription(subBatchSize: Int) {
+    private suspend fun renewSubscriptionAndUI(
+        feedSettings: FeedSettings,
+        currentContent: FeedScreenContent,
+        updatedRelays: List<String>,
+        subBatchSize: Int,
+        dbBatchSize: Int
+    ) {
+        // TODO: Renewing subsriptions should happen in feedprovider
+        renewSubscription(feedSettings = feedSettings, subBatchSize = subBatchSize)
+        setUIRelays(updatedRelays)
+        getAndSetNewScreenContent(
+            feedSettings = feedSettings,
+            currentContent = currentContent,
+            dbBatchSize = dbBatchSize
+        )
+    }
+
+    private suspend fun renewSubscription(feedSettings: FeedSettings, subBatchSize: Int) {
+        nostrSubscriber.unsubscribeProfiles()
         nostrSubscriber.subscribeToProfileMetadataAndContactList(
             pubkeys = listOf(personalProfileProvider.getPubkey())
         )
-        subscribeToFeed(subBatchSize = subBatchSize)
+        subscribeToFeed(feedSettings = feedSettings, subBatchSize = subBatchSize)
         delay(1000)
-        subscribeToAdditionalFeedData(feedProvider.getFeed(limit = subBatchSize))
+        // TODO: Refactor using flows
+        subscribeToAdditionalFeedData(feedProvider.getFeed(, limit = subBatchSize))
         delay(1000)
     }
 
-    private suspend fun subscribeToFeed(subBatchSize: Int, until: Long? = null) {
+    private suspend fun subscribeToFeed(
+        feedSettings: FeedSettings,
+        subBatchSize: Int,
+        until: Long? = null
+    ) {
         Log.i(TAG, "Subscribe to feed")
         nostrSubscriber.unsubscribeFeeds()
-        val pubkeys = listContactPubkeysAndYourself()
-        Log.i(TAG, "Subscribe to feed of ${pubkeys.size} pubkeys")
         nostrSubscriber.subscribeToFeed(
-            authorPubkeys = pubkeys,
+            authorPubkeys = if (feedSettings.isContactsOnly) listContactPubkeysAndYourself() else listOf(),
             limit = subBatchSize,
-            until = until
+            until = until,
+            relaySelection = MultipleRelays(relays = feedSettings.relays)
         )
     }
 
@@ -206,12 +232,13 @@ class FeedViewModel(
         nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
     }
 
-    private suspend fun setScreenContent(
+    private suspend fun getAndSetNewScreenContent(
+        feedSettings: FeedSettings,
         currentContent: FeedScreenContent,
         dbBatchSize: Int,
     ) {
         Log.i(TAG, "Set feed")
-        val newFeed = feedProvider.getFeed(limit = dbBatchSize)
+        val newFeed = feedProvider.getFeed(, limit = dbBatchSize)
         val newScreenContent = currentContent.createWithNewFeed(newFeed = newFeed)
         setUIScreenContent(screenContent = newScreenContent)
     }
@@ -220,6 +247,7 @@ class FeedViewModel(
 
     private suspend fun fetchAndAppendFeed(
         currentScreenContent: FeedScreenContent,
+        feedSettings: FeedSettings,
         subBatchSize: Int,
         dbBatchSize: Int,
     ) {
@@ -228,9 +256,10 @@ class FeedViewModel(
         Log.i(TAG, "Append feed")
         currentScreenContent.feed.lastOrNull()?.let { last ->
             isAppending.set(true)
-            subscribeToFeed(subBatchSize = subBatchSize)
+            subscribeToFeed(feedSettings = feedSettings, subBatchSize = subBatchSize)
             delay(1000)
             val newPosts = feedProvider.getFeed(
+                ,
                 limit = dbBatchSize,
                 until = last.createdAt
             )
@@ -252,7 +281,7 @@ class FeedViewModel(
     }
 
     private fun setUIRelays(relayUrls: List<String>) {
-        viewModelState.update { it.copy(relays = relayUrls) }
+        viewModelState.update { it.copy(feedSettings = it.feedSettings.copy(relays = relayUrls)) }
     }
 
     private suspend fun listContactPubkeysAndYourself(): List<String> {

@@ -1,4 +1,4 @@
-package com.kaiwolfram.nozzle.model
+package com.kaiwolfram.nostrclientkt.model
 
 sealed class RelaySelection
 object AllRelays : RelaySelection()

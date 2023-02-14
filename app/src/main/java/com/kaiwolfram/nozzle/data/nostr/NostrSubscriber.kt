@@ -2,8 +2,8 @@ package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
 import com.kaiwolfram.nostrclientkt.model.Filter
+import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
-import com.kaiwolfram.nozzle.data.utils.TimeConstants
 import com.kaiwolfram.nozzle.data.utils.getCurrentTimeInSeconds
 import com.kaiwolfram.nozzle.data.utils.listReferencedPostIds
 import com.kaiwolfram.nozzle.data.utils.listReferencedPubkeys
@@ -34,47 +34,23 @@ class NostrSubscriber(
         return ids
     }
 
-    private fun getCurrentTimePlus5min() =
-        getCurrentTimeInSeconds() + (5 * TimeConstants.MINUTE_IN_SECONDS)
-
     override fun subscribeToFeed(
         authorPubkeys: List<String>,
         limit: Int,
-        until: Long?
+        until: Long?,
+        relaySelection: RelaySelection,
     ): List<String> {
-        Log.i(TAG, "Subscribe to feed of ${authorPubkeys.size} contacts")
+        Log.i(TAG, "Subscribe to feed with of ${authorPubkeys.size} authors")
         val postFilter = Filter.createPostFilter(
             pubkeys = authorPubkeys,
-            until = until ?: getCurrentTimePlus5min(),
+            until = until ?: getCurrentTimeInSeconds(),
             limit = limit
         )
 
         val ids = nostrService.subscribe(
             filters = listOf(postFilter),
-            unsubOnEOSE = until != null
-        )
-        feedSubscriptions.addAll(ids)
-
-        return ids
-    }
-
-    override fun subscribeToFeedByRelay(
-        relayUrl: String,
-        authorPubkeys: List<String>,
-        limit: Int,
-        until: Long?
-    ): List<String> {
-        Log.i(TAG, "Subscribe to feed of ${authorPubkeys.size} contacts in $relayUrl")
-        val postFilter = Filter.createPostFilter(
-            pubkeys = authorPubkeys,
-            until = until ?: getCurrentTimePlus5min(),
-            limit = limit
-        )
-
-        val ids = nostrService.subscribeByRelay(
-            relayUrl = relayUrl,
-            filters = listOf(postFilter),
-            unsubOnEOSE = until != null
+            unsubOnEOSE = until != null,
+            relaySelection = relaySelection,
         )
         feedSubscriptions.addAll(ids)
 

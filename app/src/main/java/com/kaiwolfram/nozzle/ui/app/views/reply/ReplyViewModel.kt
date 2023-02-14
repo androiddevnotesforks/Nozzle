@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.ReplyTo
+import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
@@ -16,7 +17,6 @@ import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.utils.getRelaySelection
 import com.kaiwolfram.nozzle.data.utils.toggleRelay
-import com.kaiwolfram.nozzle.model.MultipleRelays
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.RelayActive
 import kotlinx.coroutines.Dispatchers

@@ -6,6 +6,7 @@ import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
+import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -22,14 +23,21 @@ class FeedProvider(
     private val postDao: PostDao,
 ) : IFeedProvider {
 
-    override suspend fun getFeed(limit: Int, until: Long?): List<PostWithMeta> {
+    override suspend fun getFeed(
+        feedSettings: FeedSettings,
+        limit: Int,
+        until: Long?
+    ): List<PostWithMeta> {
         Log.i(TAG, "Get feed")
-        val posts = postDao.getLatestFeed(
+        // TODO: Posts from specific relays
+        // TODO: Global vs contact feed
+        val posts = postDao.getLatestContactFeed(
             pubkey = pubkeyProvider.getPubkey(),
             limit = limit,
             until = until
         )
 
+        // TODO: Map with SQL instead of manually
         return postMapper.mapToPostsWithMeta(posts)
     }
 
@@ -43,6 +51,7 @@ class FeedProvider(
             nostrSubscriber.unsubscribeFeeds()
             nostrSubscriber.unsubscribeAdditionalPostsData()
             nostrSubscriber.subscribeToFeed(
+                feedSettings = feedSettings,
                 authorPubkeys = listOf(pubkey),
                 limit = 2 * limit,
                 until = until
@@ -90,6 +99,7 @@ class FeedProvider(
                 nostrSubscriber.unsubscribeFeeds()
                 nostrSubscriber.unsubscribeAdditionalPostsData()
                 nostrSubscriber.subscribeToFeed(
+                    feedSettings = feedSettings,
                     authorPubkeys = listOf(pubkey),
                     limit = 2 * limit,
                     until = last.createdAt
