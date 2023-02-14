@@ -9,14 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun FeedSettingsDropdownMenu(
     showMenu: Boolean,
-    isContactsOnly: Boolean,
-    isPosts: Boolean,
-    isReplies: Boolean,
+    feedSettings: FeedSettings,
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
@@ -28,7 +27,7 @@ fun FeedSettingsDropdownMenu(
     ) {
         val padding = PaddingValues(start = spacing.medium, end = spacing.xl)
         CheckboxDropdownMenuItem(
-            isChecked = isContactsOnly,
+            isChecked = feedSettings.isContactsOnly,
             text = stringResource(id = R.string.contacts_only),
             contentPadding = padding,
             onToggle = onToggleContactsOnly,
@@ -39,13 +38,13 @@ fun FeedSettingsDropdownMenu(
                 .padding(vertical = spacing.medium)
         )
         CheckboxDropdownMenuItem(
-            isChecked = isPosts,
+            isChecked = feedSettings.isPosts,
             text = stringResource(id = R.string.posts),
             contentPadding = padding,
             onToggle = onTogglePosts
         )
         CheckboxDropdownMenuItem(
-            isChecked = isReplies,
+            isChecked = feedSettings.isReplies,
             text = stringResource(id = R.string.replies),
             contentPadding = padding,
             onToggle = onToggleReplies

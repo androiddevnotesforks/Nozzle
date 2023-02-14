@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.model.FeedScreenContent
+import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.ui.components.AddIcon
@@ -65,9 +66,7 @@ fun FeedScreen(
                 picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
                 screenContent = uiState.screenContent,
-                isContactsOnly = uiState.isContactsOnly,
-                isPosts = uiState.isPosts,
-                isReplies = uiState.isReplies,
+                feedSettings = uiState.feedSettings,
                 onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                 onToggleContactsOnly = onToggleContactsOnly,
                 onTogglePosts = onTogglePosts,
@@ -120,9 +119,7 @@ private fun FeedTopBar(
     picture: String,
     pubkey: String,
     screenContent: FeedScreenContent,
-    isContactsOnly: Boolean,
-    isPosts: Boolean,
-    isReplies: Boolean,
+    feedSettings: FeedSettings,
     onRefreshOnMenuDismiss: () -> Unit,
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
@@ -159,9 +156,7 @@ private fun FeedTopBar(
             )
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.1f)) {
                 FeedSettingsButton(
-                    isContactsOnly = isContactsOnly,
-                    isPosts = isPosts,
-                    isReplies = isReplies,
+                    feedSettings = feedSettings,
                     onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                     onToggleContactsOnly = onToggleContactsOnly,
                     onTogglePosts = onTogglePosts,

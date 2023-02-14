@@ -12,6 +12,7 @@ import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.FeedScreenContent
+import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.model.HomeScreen
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers.IO
@@ -31,9 +32,11 @@ data class FeedViewModelState(
     val screenContent: FeedScreenContent = HomeScreen(listOf()),
     val isRefreshing: Boolean = false,
     val pubkey: String = "",
-    val isContactsOnly: Boolean = true,
-    val isPosts: Boolean = true,
-    val isReplies: Boolean = true,
+    val feedSettings: FeedSettings = FeedSettings(
+        isContactsOnly = true,
+        isPosts = true,
+        isReplies = true
+    ),
     val relays: List<String> = listOf(),
 )
 
@@ -111,31 +114,33 @@ class FeedViewModel(
     }
 
     val onToggleContactsOnly: () -> Unit = {
-        viewModelState.value.isContactsOnly.let { oldValue ->
+        viewModelState.value.feedSettings.isContactsOnly.let { oldValue ->
             viewModelState.update {
                 this.toggledContacts = !this.toggledContacts
-                it.copy(isContactsOnly = !oldValue)
+                it.copy(feedSettings = it.feedSettings.copy(isContactsOnly = !oldValue))
             }
         }
     }
 
     val onTogglePosts: () -> Unit = {
-        viewModelState.value.let { oldValues ->
-            if (oldValues.isReplies) {
+        viewModelState.value.feedSettings.let { oldSettings ->
+            // Only changeable when isReplies is active
+            if (oldSettings.isReplies) {
                 viewModelState.update {
                     this.toggledPosts = !this.toggledPosts
-                    it.copy(isPosts = !oldValues.isPosts)
+                    it.copy(feedSettings = it.feedSettings.copy(isPosts = !oldSettings.isPosts))
                 }
             }
         }
     }
 
     val onToggleReplies: () -> Unit = {
-        viewModelState.value.let { oldValues ->
-            if (oldValues.isPosts) {
+        viewModelState.value.feedSettings.let { oldSettings ->
+            // Only changeable when isPosts is active
+            if (oldSettings.isPosts) {
                 viewModelState.update {
                     this.toggledReplies = !this.toggledReplies
-                    it.copy(isReplies = !oldValues.isReplies)
+                    it.copy(feedSettings = it.feedSettings.copy(isReplies = !oldSettings.isReplies))
                 }
             }
         }

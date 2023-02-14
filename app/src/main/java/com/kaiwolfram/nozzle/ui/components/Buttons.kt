@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kaiwolfram.nozzle.R
+import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.model.RelayActive
 import com.kaiwolfram.nozzle.ui.components.dropdown.FeedSettingsDropdownMenu
 import com.kaiwolfram.nozzle.ui.components.dropdown.RelaysDropdownMenu
@@ -89,9 +90,7 @@ fun ChooseRelayButton(
 
 @Composable
 fun FeedSettingsButton(
-    isContactsOnly: Boolean,
-    isPosts: Boolean,
-    isReplies: Boolean,
+    feedSettings: FeedSettings,
     onRefreshOnMenuDismiss: () -> Unit,
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
@@ -100,9 +99,7 @@ fun FeedSettingsButton(
     val showMenu = remember { mutableStateOf(false) }
     FeedSettingsDropdownMenu(
         showMenu = showMenu.value,
-        isContactsOnly = isContactsOnly,
-        isPosts = isPosts,
-        isReplies = isReplies,
+        feedSettings = feedSettings,
         onToggleContactsOnly = onToggleContactsOnly,
         onTogglePosts = onTogglePosts,
         onToggleReplies = onToggleReplies,
