@@ -97,26 +97,23 @@ class FeedViewModel(
         }
     }
 
-    private var countContactsToggle = 0
-    private var countPostsToggle = 0
-    private var countRepliesToggle = 0
+    private var toggledContacts = false
+    private var toggledPosts = false
+    private var toggledReplies = false
 
     val onRefreshOnMenuDismiss: () -> Unit = {
-        if (countContactsToggle % 2 == 1
-            || countPostsToggle % 2 == 1
-            || countRepliesToggle % 2 == 1
-        ) {
+        if (toggledContacts || toggledPosts || toggledReplies) {
             onRefreshFeedView()
         }
-        countContactsToggle = 0
-        countPostsToggle = 0
-        countRepliesToggle = 0
+        toggledContacts = false
+        toggledPosts = false
+        toggledReplies = false
     }
 
     val onToggleContactsOnly: () -> Unit = {
         viewModelState.value.isContactsOnly.let { oldValue ->
             viewModelState.update {
-                this.countContactsToggle += 1
+                this.toggledContacts = !this.toggledContacts
                 it.copy(isContactsOnly = !oldValue)
             }
         }
@@ -126,7 +123,7 @@ class FeedViewModel(
         viewModelState.value.let { oldValues ->
             if (oldValues.isReplies) {
                 viewModelState.update {
-                    this.countPostsToggle += 1
+                    this.toggledPosts = !this.toggledPosts
                     it.copy(isPosts = !oldValues.isPosts)
                 }
             }
@@ -137,7 +134,7 @@ class FeedViewModel(
         viewModelState.value.let { oldValues ->
             if (oldValues.isPosts) {
                 viewModelState.update {
-                    this.countRepliesToggle += 1
+                    this.toggledReplies = !this.toggledReplies
                     it.copy(isReplies = !oldValues.isReplies)
                 }
             }
