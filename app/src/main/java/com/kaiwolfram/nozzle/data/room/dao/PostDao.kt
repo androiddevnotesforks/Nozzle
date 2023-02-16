@@ -14,24 +14,22 @@ interface PostDao {
     @Query(
         "SELECT * " +
                 "FROM post " +
-                "WHERE pubkey IN (SELECT contactPubkey FROM contact WHERE pubkey = :pubkey) " +
-                "AND (:until IS NULL OR createdAt < :until) " +
+                "WHERE ((:isReplies AND replyToId IS NOT NULL) OR (:isPosts AND replyToId IS NULL))" +
+                "AND (:authorPubkeys IS NULL OR pubkey IN (:authorPubkeys)) " +
+                "AND (:relays IS NULL OR id IN (SELECT DISTINCT eventId FROM eventRelay WHERE relayUrl IN (:relays))) " +
+                "AND createdAt <= :until " +
                 "ORDER BY createdAt DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getLatestContactFeed(pubkey: String, limit: Int, until: Long?): List<PostEntity>
+    suspend fun getFeed(
+        isPosts: Boolean,
+        isReplies: Boolean,
+        authorPubkeys: List<String>?,
+        relays: List<String>?,
+        until: Long,
+        limit: Int,
+    ): List<PostEntity>
 
-    /**
-     * Sorted from newest to oldest
-     */
-    @Query(
-        "SELECT * " +
-                "FROM post " +
-                "WHERE (:until IS NULL OR createdAt < :until) " +
-                "ORDER BY createdAt DESC " +
-                "LIMIT :limit"
-    )
-    suspend fun getLatestGlobalFeed(limit: Int, until: Long?): List<PostEntity>
 
     @Query(
         "SELECT * " +
@@ -39,23 +37,6 @@ interface PostDao {
                 "WHERE id = :id "
     )
     suspend fun getPost(id: String): PostEntity?
-
-    /**
-     * Sorted from newest to oldest
-     */
-    @Query(
-        "SELECT * " +
-                "FROM post " +
-                "WHERE pubkey = :pubkey " +
-                "AND (:until IS NULL OR createdAt < :until) " +
-                "ORDER BY createdAt DESC " +
-                "LIMIT :limit"
-    )
-    suspend fun getLatestFeedOfSingleAuthor(
-        pubkey: String,
-        limit: Int,
-        until: Long?
-    ): List<PostEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIfNotPresent(vararg post: PostEntity)

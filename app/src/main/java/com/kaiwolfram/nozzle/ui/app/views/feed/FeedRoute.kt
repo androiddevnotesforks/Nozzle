@@ -3,6 +3,7 @@ package com.kaiwolfram.nozzle.ui.app.views.feed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 @Composable
@@ -10,7 +11,7 @@ fun FeedRoute(
     feedViewModel: FeedViewModel,
     // TODO: Nav with args, no need for onPrepare
     onPrepareReply: (PostWithMeta) -> Unit,
-    onPreparePost: (List<String>) -> Unit,
+    onPreparePost: (RelaySelection) -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToThread: (String, String?, String?) -> Unit,
@@ -19,9 +20,11 @@ fun FeedRoute(
 ) {
     val uiState by feedViewModel.uiState.collectAsState()
     val metadataState by feedViewModel.metadataState.collectAsState()
+    val feedState by feedViewModel.feedState.collectAsState()
 
     FeedScreen(
         uiState = uiState,
+        feedState = feedState,
         metadataState = metadataState,
         onLike = feedViewModel.onLike,
         onRepost = feedViewModel.onRepost,

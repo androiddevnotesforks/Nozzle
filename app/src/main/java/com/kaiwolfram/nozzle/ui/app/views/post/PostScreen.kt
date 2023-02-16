@@ -22,7 +22,7 @@ fun PostScreen(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         ContentCreationTopBar(
-            relaySelection = uiState.relaySelection,
+            relayStatuses = uiState.relayStatuses,
             isSendable = uiState.isSendable,
             onToggleRelaySelection = onToggleRelaySelection,
             onSend = onSend,

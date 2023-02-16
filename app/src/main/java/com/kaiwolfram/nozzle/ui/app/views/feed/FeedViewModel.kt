@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nostrclientkt.model.AllRelays
 import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
@@ -12,10 +13,7 @@ import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.utils.*
-import com.kaiwolfram.nozzle.model.FeedScreenContent
-import com.kaiwolfram.nozzle.model.FeedSettings
-import com.kaiwolfram.nozzle.model.HomeScreen
-import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -24,20 +22,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
 private const val DB_BATCH_SIZE = 25
-private const val SUB_BATCH_SIZE = 50
 
 data class FeedViewModelState(
-    /**
-     * Current posts sorted from newest to oldest
-     */
-    val screenContent: FeedScreenContent = HomeScreen(listOf()),
     val isRefreshing: Boolean = false,
     val pubkey: String = "",
     val feedSettings: FeedSettings = FeedSettings(
-        isContactsOnly = true,
         isPosts = true,
         isReplies = true,
-        relays = listOf(),
+        authorSelection = Contacts,
+        relaySelection = AllRelays,
     ),
 )
 
@@ -50,14 +43,16 @@ class FeedViewModel(
     private val contactDao: ContactDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
+    val uiState = viewModelState.stateIn(
+        viewModelScope, SharingStarted.Eagerly, viewModelState.value
+    )
 
     var metadataState = personalProfileProvider.getMetadata().stateIn(
         viewModelScope, SharingStarted.Lazily, null
     )
 
-    val uiState = viewModelState.stateIn(
-        viewModelScope, SharingStarted.Eagerly, viewModelState.value
-    )
+    var feedState: StateFlow<List<PostWithMeta>> = MutableStateFlow(listOf())
+
 
     init {
         Log.i(TAG, "Initialize FeedViewModel")
@@ -66,11 +61,10 @@ class FeedViewModel(
         }
         viewModelScope.launch(context = IO) {
             setUIRefresh(true)
-            renewSubscriptionAndUI(
+            subscribeToPersonalProfile()
+            updateScreen(
                 feedSettings = viewModelState.value.feedSettings,
-                currentContent = viewModelState.value.screenContent,
                 updatedRelays = relayProvider.listRelays(),
-                subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE
             )
             setUIRefresh(false)
@@ -81,11 +75,10 @@ class FeedViewModel(
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Refresh feed view")
             setUIRefresh(true)
-            renewSubscriptionAndUI(
+            subscribeToPersonalProfile()
+            updateScreen(
                 feedSettings = viewModelState.value.feedSettings,
-                currentContent = viewModelState.value.screenContent,
                 updatedRelays = relayProvider.listRelays(),
-                subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE
             )
             setUIRefresh(false)
@@ -95,12 +88,12 @@ class FeedViewModel(
     val onLoadMore: () -> Unit = {
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Load more")
-            fetchAndAppendFeed(
-                currentScreenContent = viewModelState.value.screenContent,
+            appendFeed(
+                currentFeed = feedState.value,
                 feedSettings = viewModelState.value.feedSettings,
-                subBatchSize = SUB_BATCH_SIZE,
                 dbBatchSize = DB_BATCH_SIZE,
             )
+            delay(1000)
         }
     }
 
@@ -118,10 +111,21 @@ class FeedViewModel(
     }
 
     val onToggleContactsOnly: () -> Unit = {
-        viewModelState.value.feedSettings.isContactsOnly.let { oldValue ->
+        viewModelState.value.feedSettings.authorSelection.let { oldValue ->
             viewModelState.update {
                 this.toggledContacts = !this.toggledContacts
-                it.copy(feedSettings = it.feedSettings.copy(isContactsOnly = !oldValue))
+                val newValue = when (oldValue) {
+                    is Everyone -> Contacts
+                    is Contacts -> Everyone
+                    is SingleAuthor -> {
+                        Log.w(
+                            TAG,
+                            "ContactsOnly is set to SingleAuthor, which shouldn't be possible"
+                        )
+                        Contacts
+                    }
+                }
+                it.copy(feedSettings = it.feedSettings.copy(authorSelection = newValue))
             }
         }
     }
@@ -168,7 +172,7 @@ class FeedViewModel(
 
     val onLike: (String) -> Unit = { id ->
         uiState.value.let { _ ->
-            viewModelState.value.screenContent.feed.find { it.id == id }?.let {
+            feedState.value.find { it.id == id }?.let {
                 viewModelScope.launch(context = IO) {
                     postCardInteractor.like(postId = id, postPubkey = it.pubkey)
                 }
@@ -182,116 +186,68 @@ class FeedViewModel(
         }
     }
 
-    private suspend fun renewSubscriptionAndUI(
+    private suspend fun updateScreen(
         feedSettings: FeedSettings,
-        currentContent: FeedScreenContent,
         updatedRelays: List<String>,
-        subBatchSize: Int,
         dbBatchSize: Int
     ) {
-        // TODO: Renewing subsriptions should happen in feedprovider
-        renewSubscription(feedSettings = feedSettings, subBatchSize = subBatchSize)
         setUIRelays(updatedRelays)
-        getAndSetNewScreenContent(
-            feedSettings = feedSettings,
-            currentContent = currentContent,
-            dbBatchSize = dbBatchSize
+        feedState = feedProvider.getFeed(feedSettings = feedSettings, limit = dbBatchSize).stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            feedState.value,
         )
-    }
-
-    private suspend fun renewSubscription(feedSettings: FeedSettings, subBatchSize: Int) {
-        nostrSubscriber.unsubscribeProfiles()
-        nostrSubscriber.subscribeToProfileMetadataAndContactList(
-            pubkeys = listOf(personalProfileProvider.getPubkey())
-        )
-        subscribeToFeed(feedSettings = feedSettings, subBatchSize = subBatchSize)
-        delay(1000)
-        // TODO: Refactor using flows
-        subscribeToAdditionalFeedData(feedProvider.getFeed(, limit = subBatchSize))
-        delay(1000)
-    }
-
-    private suspend fun subscribeToFeed(
-        feedSettings: FeedSettings,
-        subBatchSize: Int,
-        until: Long? = null
-    ) {
-        Log.i(TAG, "Subscribe to feed")
-        nostrSubscriber.unsubscribeFeeds()
-        nostrSubscriber.subscribeToFeed(
-            authorPubkeys = if (feedSettings.isContactsOnly) listContactPubkeysAndYourself() else listOf(),
-            limit = subBatchSize,
-            until = until,
-            relaySelection = MultipleRelays(relays = feedSettings.relays)
-        )
-    }
-
-    private suspend fun subscribeToAdditionalFeedData(posts: List<PostWithMeta>) {
-        Log.i(TAG, "Subscribe to additional feed data")
-        nostrSubscriber.unsubscribeAdditionalPostsData()
-        nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
-    }
-
-    private suspend fun getAndSetNewScreenContent(
-        feedSettings: FeedSettings,
-        currentContent: FeedScreenContent,
-        dbBatchSize: Int,
-    ) {
-        Log.i(TAG, "Set feed")
-        val newFeed = feedProvider.getFeed(, limit = dbBatchSize)
-        val newScreenContent = currentContent.createWithNewFeed(newFeed = newFeed)
-        setUIScreenContent(screenContent = newScreenContent)
     }
 
     private val isAppending = AtomicBoolean(false)
 
-    private suspend fun fetchAndAppendFeed(
-        currentScreenContent: FeedScreenContent,
+    private suspend fun appendFeed(
+        currentFeed: List<PostWithMeta>,
         feedSettings: FeedSettings,
-        subBatchSize: Int,
         dbBatchSize: Int,
     ) {
         if (isAppending.get()) return
 
         Log.i(TAG, "Append feed")
-        currentScreenContent.feed.lastOrNull()?.let { last ->
+        currentFeed.lastOrNull()?.let { last ->
             isAppending.set(true)
-            subscribeToFeed(feedSettings = feedSettings, subBatchSize = subBatchSize)
-            delay(1000)
-            val newPosts = feedProvider.getFeed(
-                ,
+            feedState = feedProvider.getFeed(
+                feedSettings = feedSettings,
                 limit = dbBatchSize,
                 until = last.createdAt
-            )
-            subscribeToAdditionalFeedData(newPosts)
-            val newScreenContent = currentScreenContent.createWithNewFeed(
-                currentScreenContent.feed + newPosts
-            )
-            setUIScreenContent(screenContent = newScreenContent)
+            ).map { toAppend -> currentFeed + toAppend }
+                .stateIn(
+                    viewModelScope,
+                    SharingStarted.WhileSubscribed(),
+                    currentFeed,
+                )
             isAppending.set(false)
         }
+    }
+
+    private fun subscribeToPersonalProfile() {
+        nostrSubscriber.unsubscribeProfiles()
+        nostrSubscriber.subscribeToProfileMetadataAndContactList(
+            pubkeys = listOf(
+                personalProfileProvider.getPubkey()
+            )
+        )
     }
 
     private fun setUIRefresh(value: Boolean) {
         viewModelState.update { it.copy(isRefreshing = value) }
     }
 
-    private fun setUIScreenContent(screenContent: FeedScreenContent) {
-        viewModelState.update { it.copy(screenContent = screenContent) }
-    }
-
     private fun setUIRelays(relayUrls: List<String>) {
-        viewModelState.update { it.copy(feedSettings = it.feedSettings.copy(relays = relayUrls)) }
-    }
-
-    private suspend fun listContactPubkeysAndYourself(): List<String> {
-        val pubkeys = contactDao.listContactPubkeys(
-            pubkey = personalProfileProvider.getPubkey()
-        ).toMutableList()
-        Log.i(TAG, "Found ${pubkeys.size} contact pubkeys")
-        pubkeys.add(personalProfileProvider.getPubkey())
-
-        return pubkeys
+        viewModelState.update {
+            it.copy(
+                feedSettings = it.feedSettings.copy(
+                    relaySelection = MultipleRelays(
+                        relays = relayUrls
+                    )
+                )
+            )
+        }
     }
 
     companion object {

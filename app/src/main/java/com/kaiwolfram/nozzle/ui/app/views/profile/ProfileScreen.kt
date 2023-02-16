@@ -37,7 +37,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 fun ProfileScreen(
     isRefreshing: Boolean,
     profile: ProfileWithAdditionalInfo,
-    posts: List<PostWithMeta>,
+    feed: List<PostWithMeta>,
     onPrepareReply: (PostWithMeta) -> Unit,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
@@ -67,7 +67,7 @@ fun ProfileScreen(
         Spacer(Modifier.height(spacing.xl))
         Divider()
         PostCardList(
-            posts = posts,
+            posts = feed,
             isRefreshing = isRefreshing,
             onRefresh = onRefreshProfileView,
             onLike = onLike,
@@ -78,7 +78,7 @@ fun ProfileScreen(
             onNavigateToReply = onNavigateToReply
         )
     }
-    if (posts.isEmpty()) {
+    if (feed.isEmpty()) {
         NoPostsHint()
     }
 }

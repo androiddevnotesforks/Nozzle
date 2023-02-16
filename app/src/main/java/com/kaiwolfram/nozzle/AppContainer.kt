@@ -89,6 +89,7 @@ class AppContainer(context: Context) {
         postMapper = postMapper,
         nostrSubscriber = nostrSubscriber,
         postDao = roomDb.postDao(),
+        contactDao = roomDb.contactDao(),
     )
 
     val profileWithFollowerProvider: IProfileWithAdditionalInfoProvider =

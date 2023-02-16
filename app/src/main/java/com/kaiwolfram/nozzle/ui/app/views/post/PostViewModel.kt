@@ -6,7 +6,9 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaiwolfram.nostrclientkt.model.AllRelays
 import com.kaiwolfram.nostrclientkt.model.MultipleRelays
+import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
@@ -14,7 +16,7 @@ import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
-import com.kaiwolfram.nozzle.data.utils.getRelaySelection
+import com.kaiwolfram.nozzle.data.utils.listRelayStatuses
 import com.kaiwolfram.nozzle.data.utils.toggleRelay
 import com.kaiwolfram.nozzle.model.RelayActive
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +31,7 @@ private const val TAG = "PostViewModel"
 data class PostViewModelState(
     val content: String = "",
     val pubkey: String = "",
-    val relaySelection: List<RelayActive> = listOf(),
+    val relayStatuses: List<RelayActive> = listOf(),
     val isSendable: Boolean = false,
 )
 
@@ -68,7 +70,7 @@ class PostViewModel(
         Log.i(TAG, "Initialize PostViewModel")
     }
 
-    val onPreparePost: (List<String>) -> Unit = { targetRelays ->
+    val onPreparePost: (RelaySelection) -> Unit = { relaySelection ->
         metadataState = personalProfileProvider.getMetadata()
             .stateIn(
                 viewModelScope,
@@ -83,9 +85,9 @@ class PostViewModel(
                     pubkey = personalProfileProvider.getPubkey(),
                     content = "",
                     isSendable = false,
-                    relaySelection = getRelaySelection(
+                    relayStatuses = listRelayStatuses(
                         allRelayUrls = relayState.value,
-                        activeRelays = targetRelays
+                        relaySelection = relaySelection
                     ),
                 )
             }
@@ -101,10 +103,10 @@ class PostViewModel(
     }
 
     val onToggleRelaySelection: (Int) -> Unit = { index ->
-        val toggled = toggleRelay(relays = uiState.value.relaySelection, index = index)
+        val toggled = toggleRelay(relays = uiState.value.relayStatuses, index = index)
         if (toggled.any { it.isActive }) {
             viewModelState.update {
-                it.copy(relaySelection = toggled)
+                it.copy(relayStatuses = toggled)
             }
         }
     }
@@ -115,7 +117,7 @@ class PostViewModel(
             if (err != null) {
                 Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
             } else {
-                val selectedRelays = state.relaySelection.filter { it.isActive }.map { it.relayUrl }
+                val selectedRelays = state.relayStatuses.filter { it.isActive }.map { it.relayUrl }
                 Log.i(TAG, "Send post to ${selectedRelays.size} relays")
                 val event = nostrService.sendPost(
                     content = state.content,
@@ -140,7 +142,7 @@ class PostViewModel(
     private fun getErrorText(context: Context, state: PostViewModelState): String? {
         return if (state.content.isBlank()) {
             context.getString(R.string.your_post_is_empty)
-        } else if (state.relaySelection.all { !it.isActive }) {
+        } else if (state.relayStatuses.all { !it.isActive }) {
             context.getString(R.string.pls_select_relays)
         } else {
             null
@@ -151,9 +153,9 @@ class PostViewModel(
         viewModelState.update {
             it.copy(
                 content = "",
-                relaySelection = getRelaySelection(
+                relayStatuses = listRelayStatuses(
                     allRelayUrls = relayState.value,
-                    activeRelays = listOf()
+                    relaySelection = AllRelays
                 ),
                 isSendable = false,
                 pubkey = personalProfileProvider.getPubkey()

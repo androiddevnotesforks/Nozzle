@@ -1,6 +1,5 @@
 package com.kaiwolfram.nozzle.data.nostr
 
-import com.kaiwolfram.nostrclientkt.model.AllRelays
 import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
@@ -10,8 +9,8 @@ interface INostrSubscriber {
     fun subscribeToFeed(
         authorPubkeys: List<String>,
         limit: Int,
-        until: Long? = null,
-        relaySelection: RelaySelection = AllRelays,
+        until: Long?,
+        relaySelection: RelaySelection,
     ): List<String>
 
     suspend fun subscribeToAdditionalPostsData(posts: List<PostWithMeta>): List<String>

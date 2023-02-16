@@ -1,8 +1,10 @@
 package com.kaiwolfram.nozzle.model
 
+import com.kaiwolfram.nostrclientkt.model.RelaySelection
+
 data class FeedSettings(
-    val isContactsOnly: Boolean,
     val isPosts: Boolean,
     val isReplies: Boolean,
-    val relays: List<String>,
+    val authorSelection: AuthorSelection,
+    val relaySelection: RelaySelection,
 )

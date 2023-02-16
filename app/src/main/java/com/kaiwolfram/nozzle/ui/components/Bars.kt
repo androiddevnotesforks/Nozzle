@@ -13,7 +13,7 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun ContentCreationTopBar(
-    relaySelection: List<RelayActive>,
+    relayStatuses: List<RelayActive>,
     isSendable: Boolean,
     onToggleRelaySelection: (Int) -> Unit,
     onSend: () -> Unit,
@@ -24,7 +24,7 @@ fun ContentCreationTopBar(
         trailingIcon = {
             Row {
                 ChooseRelayButton(
-                    relays = relaySelection,
+                    relays = relayStatuses,
                     onClickIndex = onToggleRelaySelection
                 )
                 Spacer(modifier = Modifier.width(spacing.large))

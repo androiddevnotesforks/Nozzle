@@ -1,5 +1,8 @@
 package com.kaiwolfram.nozzle.data.utils
 
+import com.kaiwolfram.nostrclientkt.model.AllRelays
+import com.kaiwolfram.nostrclientkt.model.MultipleRelays
+import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.RelayActive
 
 fun toggleRelay(relays: List<RelayActive>, index: Int): List<RelayActive> {
@@ -8,8 +11,15 @@ fun toggleRelay(relays: List<RelayActive>, index: Int): List<RelayActive> {
     }
 }
 
-fun getRelaySelection(allRelayUrls: List<String>, activeRelays: List<String>): List<RelayActive> {
+fun listRelayStatuses(
+    allRelayUrls: List<String>,
+    relaySelection: RelaySelection
+): List<RelayActive> {
     return allRelayUrls.map {
-        RelayActive(relayUrl = it, isActive = activeRelays.contains(it))
+        val isActive = when (relaySelection) {
+            is AllRelays -> true
+            is MultipleRelays -> relaySelection.relays.contains(it)
+        }
+        RelayActive(relayUrl = it, isActive = isActive)
     }
 }

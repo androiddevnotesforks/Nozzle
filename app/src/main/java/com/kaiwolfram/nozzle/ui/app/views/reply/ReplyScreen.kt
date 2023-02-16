@@ -25,7 +25,7 @@ fun ReplyScreen(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         ContentCreationTopBar(
-            relaySelection = uiState.relaySelection,
+            relayStatuses = uiState.relaySelection,
             isSendable = uiState.isSendable,
             onToggleRelaySelection = onToggleRelaySelection,
             onSend = onSend,

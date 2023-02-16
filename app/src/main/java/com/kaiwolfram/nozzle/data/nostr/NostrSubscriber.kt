@@ -46,7 +46,6 @@ class NostrSubscriber(
             until = until ?: getCurrentTimeInSeconds(),
             limit = limit
         )
-
         val ids = nostrService.subscribe(
             filters = listOf(postFilter),
             unsubOnEOSE = until != null,

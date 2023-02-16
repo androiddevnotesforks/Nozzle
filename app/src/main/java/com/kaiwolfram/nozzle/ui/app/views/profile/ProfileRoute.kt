@@ -18,14 +18,14 @@ fun ProfileRoute(
 ) {
     val isRefreshing by profileViewModel.isRefreshingState.collectAsState()
     val profile by profileViewModel.profileState.collectAsState()
-    val posts by profileViewModel.postsState.collectAsState()
+    val feed by profileViewModel.feedState.collectAsState()
     val forceRecomposition by profileViewModel.forceRecompositionState.collectAsState()
     Log.d(TAG, "Recompose $forceRecomposition")
 
     ProfileScreen(
         isRefreshing = isRefreshing,
         profile = profile,
-        posts = posts,
+        feed = feed,
         onPrepareReply = onPrepareReply,
         onLike = profileViewModel.onLike,
         onRepost = profileViewModel.onRepost,

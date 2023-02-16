@@ -18,11 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nostrclientkt.model.Metadata
-import com.kaiwolfram.nozzle.model.FeedScreenContent
+import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
@@ -39,13 +39,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun FeedScreen(
     uiState: FeedViewModelState,
+    feedState: List<PostWithMeta>,
     metadataState: Metadata?,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
     onRefreshFeedView: () -> Unit,
     onRefreshOnMenuDismiss: () -> Unit,
     onPrepareReply: (PostWithMeta) -> Unit,
-    onPreparePost: (List<String>) -> Unit,
+    onPreparePost: (RelaySelection) -> Unit,
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
@@ -65,7 +66,6 @@ fun FeedScreen(
             FeedTopBar(
                 picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
-                screenContent = uiState.screenContent,
                 feedSettings = uiState.feedSettings,
                 onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                 onToggleContactsOnly = onToggleContactsOnly,
@@ -84,7 +84,7 @@ fun FeedScreen(
         },
         floatingActionButton = {
             FeedFab(onPrepareNewPost = {
-                onPreparePost(uiState.feedSettings.relays)
+                onPreparePost(uiState.feedSettings.relaySelection)
                 onNavigateToPost()
             })
         },
@@ -95,7 +95,7 @@ fun FeedScreen(
                 .padding(it)
         ) {
             PostCardList(
-                posts = uiState.screenContent.feed,
+                posts = feedState,
                 isRefreshing = uiState.isRefreshing,
                 lazyListState = lazyListState,
                 onLike = onLike,
@@ -108,7 +108,7 @@ fun FeedScreen(
                 onNavigateToReply = onNavigateToReply,
             )
         }
-        if (uiState.screenContent.feed.isEmpty()) {
+        if (feedState.isEmpty()) {
             NoPostsHint()
         }
     }
@@ -118,7 +118,6 @@ fun FeedScreen(
 private fun FeedTopBar(
     picture: String,
     pubkey: String,
-    screenContent: FeedScreenContent,
     feedSettings: FeedSettings,
     onRefreshOnMenuDismiss: () -> Unit,
     onToggleContactsOnly: () -> Unit,
@@ -149,7 +148,7 @@ private fun FeedTopBar(
             }
             Headline(
                 modifier = Modifier.weight(0.8f),
-                headline = screenContent.getHeader(LocalContext.current),
+                headline = stringResource(id = com.kaiwolfram.nozzle.R.string.home),
                 onPreviousHeadline = onPreviousHeadline,
                 onNextHeadline = onNextHeadline,
                 onScrollToTop = onScrollToTop,

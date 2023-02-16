@@ -15,7 +15,7 @@ import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
-import com.kaiwolfram.nozzle.data.utils.getRelaySelection
+import com.kaiwolfram.nozzle.data.utils.listRelayStatuses
 import com.kaiwolfram.nozzle.data.utils.toggleRelay
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.RelayActive
@@ -91,9 +91,9 @@ class ReplyViewModel(
                     pubkey = personalProfileProvider.getPubkey(),
                     reply = "",
                     isSendable = false,
-                    relaySelection = getRelaySelection(
+                    relaySelection = listRelayStatuses(
                         allRelayUrls = relayState.value,
-                        activeRelays = post.relays,
+                        relaySelection = MultipleRelays(relays = post.relays),
                     ),
                 )
             }
