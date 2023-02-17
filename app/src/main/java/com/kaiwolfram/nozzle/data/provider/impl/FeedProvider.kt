@@ -41,7 +41,7 @@ class FeedProvider(
             val authorPubkeys = listPubkeys(authorSelection = feedSettings.authorSelection)
             val relays = listRelays(relaySelection = feedSettings.relaySelection)
             nostrSubscriber.subscribeToFeed(
-                authorPubkeys = authorPubkeys.orEmpty(),
+                authorPubkeys = authorPubkeys,
                 limit = 2 * limit,
                 until = until,
                 relaySelection = feedSettings.relaySelection
@@ -107,6 +107,7 @@ class FeedProvider(
         if (!isPosts && !isReplies) return listOf()
 
         return if (authorPubkeys == null && relays == null) {
+            Log.d(TAG, "Get global feed")
             postDao.getGlobalFeed(
                 isPosts = isPosts,
                 isReplies = isReplies,
@@ -114,6 +115,7 @@ class FeedProvider(
                 limit = limit,
             )
         } else if (authorPubkeys == null && relays != null) {
+            Log.d(TAG, "Get global feed by relays $relays")
             if (relays.isEmpty()) listOf()
             else postDao.getGlobalFeedByRelays(
                 isPosts = isPosts,
@@ -123,6 +125,7 @@ class FeedProvider(
                 limit = limit,
             )
         } else if (authorPubkeys != null && relays == null) {
+            Log.d(TAG, "Get authored feed")
             if (authorPubkeys.isEmpty()) listOf()
             else postDao.getAuthoredFeed(
                 isPosts = isPosts,
@@ -132,6 +135,7 @@ class FeedProvider(
                 limit = limit,
             )
         } else if (authorPubkeys != null && relays != null) {
+            Log.d(TAG, "Get authored feed by relays")
             if (authorPubkeys.isEmpty() || relays.isEmpty()) listOf()
             else postDao.getAuthoredFeedByRelays(
                 isPosts = isPosts,

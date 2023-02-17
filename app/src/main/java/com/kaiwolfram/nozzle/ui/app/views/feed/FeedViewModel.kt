@@ -200,12 +200,12 @@ class FeedViewModel(
     ) {
         setUIRelays(updatedRelays)
         val newFeedFlow = feedProvider.getFeed(feedSettings = feedSettings, limit = dbBatchSize)
-        delay(2000)
         feedState = newFeedFlow.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
             feedState.value,
         )
+        delay(2000)
     }
 
     private val isAppending = AtomicBoolean(false)

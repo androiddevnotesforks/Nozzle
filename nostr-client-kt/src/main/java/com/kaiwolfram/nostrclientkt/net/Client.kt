@@ -74,7 +74,7 @@ class Client {
             ids.add(subscriptionId)
             subscriptions[subscriptionId] = it
             val request = createSubscriptionRequest(subscriptionId, filters)
-            Log.i(TAG, "Subscribe $request")
+            Log.d(TAG, "Subscribe $request")
             it.send(request)
         }
 
@@ -86,7 +86,7 @@ class Client {
     }
 
     fun unsubscribe(subscriptionId: String) {
-        Log.i(TAG, "Unsubscribe from $subscriptionId")
+        Log.d(TAG, "Unsubscribe from $subscriptionId")
 
         val request = """["CLOSE","$subscriptionId"]"""
         subscriptions[subscriptionId]?.send(request)
@@ -114,11 +114,10 @@ class Client {
     }
 
     private fun addRelay(url: String) {
-        Log.i(TAG, "Add relay $url")
-
         if (sockets.containsKey(url)) {
             return
         }
+        Log.i(TAG, "Add relay $url")
         try {
             val request = Request.Builder().url(url).build()
             val socket = httpClient.newWebSocket(request = request, listener = baseListener)

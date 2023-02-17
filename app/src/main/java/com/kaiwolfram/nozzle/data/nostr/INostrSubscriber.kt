@@ -7,7 +7,7 @@ interface INostrSubscriber {
     fun subscribeToProfileMetadataAndContactList(pubkeys: List<String>): List<String>
 
     fun subscribeToFeed(
-        authorPubkeys: List<String>,
+        authorPubkeys: List<String>?,
         limit: Int,
         until: Long?,
         relaySelection: RelaySelection,

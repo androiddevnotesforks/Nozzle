@@ -35,12 +35,12 @@ class NostrSubscriber(
     }
 
     override fun subscribeToFeed(
-        authorPubkeys: List<String>,
+        authorPubkeys: List<String>?,
         limit: Int,
         until: Long?,
         relaySelection: RelaySelection,
     ): List<String> {
-        Log.i(TAG, "Subscribe to feed with of ${authorPubkeys.size} authors")
+        Log.i(TAG, "Subscribe to feed")
         val postFilter = Filter.createPostFilter(
             pubkeys = authorPubkeys,
             until = until ?: getCurrentTimeInSeconds(),

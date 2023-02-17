@@ -40,9 +40,9 @@ class NostrService(
         }
 
         override fun onEOSE(subscriptionId: String) {
-            Log.i(TAG, "OnEOSE: $subscriptionId")
+            Log.d(TAG, "OnEOSE: $subscriptionId")
             if (unsubOnEOSECache.remove(subscriptionId)) {
-                Log.i(TAG, "Unsubscribe onEOSE $subscriptionId")
+                Log.d(TAG, "Unsubscribe onEOSE $subscriptionId")
                 client.unsubscribe(subscriptionId)
             }
         }
