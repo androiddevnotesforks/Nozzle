@@ -46,6 +46,7 @@ class FeedProvider(
                 until = until,
                 relaySelection = feedSettings.relaySelection
             )
+            delay(1000)
             val posts = listPosts(
                 isPosts = feedSettings.isPosts,
                 isReplies = feedSettings.isReplies,
