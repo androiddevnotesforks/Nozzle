@@ -11,7 +11,6 @@ import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
-import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -40,7 +39,6 @@ class FeedViewModel(
     private val relayProvider: IRelayProvider,
     private val postCardInteractor: IPostCardInteractor,
     private val nostrSubscriber: INostrSubscriber,
-    private val contactDao: ContactDao,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     val uiState = viewModelState.stateIn(
@@ -53,6 +51,14 @@ class FeedViewModel(
 
     var feedState: StateFlow<List<PostWithMeta>> = MutableStateFlow(listOf())
 
+    // TODO: Figure out how to do it without this hack
+    private val forceRecomposition = MutableStateFlow(0)
+    val forceRecompositionState = forceRecomposition
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            0
+        )
 
     init {
         Log.i(TAG, "Initialize FeedViewModel")
@@ -94,6 +100,7 @@ class FeedViewModel(
                 dbBatchSize = DB_BATCH_SIZE,
             )
             delay(1000)
+            forceRecomposition.update { it + 1 }
         }
     }
 
@@ -192,7 +199,9 @@ class FeedViewModel(
         dbBatchSize: Int
     ) {
         setUIRelays(updatedRelays)
-        feedState = feedProvider.getFeed(feedSettings = feedSettings, limit = dbBatchSize).stateIn(
+        val newFeedFlow = feedProvider.getFeed(feedSettings = feedSettings, limit = dbBatchSize)
+        delay(2000)
+        feedState = newFeedFlow.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
             feedState.value,
@@ -201,15 +210,15 @@ class FeedViewModel(
 
     private val isAppending = AtomicBoolean(false)
 
-    private suspend fun appendFeed(
+    private fun appendFeed(
         currentFeed: List<PostWithMeta>,
         feedSettings: FeedSettings,
         dbBatchSize: Int,
     ) {
         if (isAppending.get()) return
 
-        Log.i(TAG, "Append feed")
         currentFeed.lastOrNull()?.let { last ->
+            Log.i(TAG, "Append feed")
             isAppending.set(true)
             feedState = feedProvider.getFeed(
                 feedSettings = feedSettings,
@@ -221,6 +230,7 @@ class FeedViewModel(
                     SharingStarted.WhileSubscribed(),
                     currentFeed,
                 )
+            Log.i(TAG, "New feed length ${feedState.value.size}")
             isAppending.set(false)
         }
     }
@@ -257,7 +267,6 @@ class FeedViewModel(
             relayProvider: IRelayProvider,
             postCardInteractor: IPostCardInteractor,
             nostrSubscriber: INostrSubscriber,
-            contactDao: ContactDao,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -267,7 +276,6 @@ class FeedViewModel(
                     relayProvider = relayProvider,
                     postCardInteractor = postCardInteractor,
                     nostrSubscriber = nostrSubscriber,
-                    contactDao = contactDao,
                 ) as T
             }
         }

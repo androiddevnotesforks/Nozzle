@@ -125,9 +125,6 @@ class PostViewModel(
                 )
                 viewModelScope.launch(context = Dispatchers.IO) {
                     postDao.insertIfNotPresent(PostEntity.fromEvent(event))
-                    for (relay in selectedRelays) {
-                        eventRelayDao.insertOrIgnore(eventId = event.id, relayUrl = relay)
-                    }
                 }
                 Toast.makeText(
                     context,

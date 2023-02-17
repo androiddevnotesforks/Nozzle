@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 private const val TAG = "FeedProvider"
-private const val EMIT_INTERVAL_TIME = 3333L
+private const val EMIT_INTERVAL_TIME = 2000L
 private const val RESUB_AFTER_INTERVAL = 3
 
 class FeedProvider(
@@ -35,8 +35,6 @@ class FeedProvider(
         until: Long?,
     ): Flow<List<PostWithMeta>> {
         Log.i(TAG, "Get feed")
-        // TODO: Posts from specific relays
-        // TODO: Global vs contact feed
         return flow {
             nostrSubscriber.unsubscribeFeeds()
             nostrSubscriber.unsubscribeAdditionalPostsData()
@@ -108,13 +106,44 @@ class FeedProvider(
     ): List<PostEntity> {
         if (!isPosts && !isReplies) return listOf()
 
-        return postDao.getFeed(
-            isPosts = isPosts,
-            isReplies = isReplies,
-            authorPubkeys = authorPubkeys,
-            relays = relays,
-            until = until,
-            limit = limit,
-        )
+        return if (authorPubkeys == null && relays == null) {
+            postDao.getGlobalFeed(
+                isPosts = isPosts,
+                isReplies = isReplies,
+                until = until,
+                limit = limit,
+            )
+        } else if (authorPubkeys == null && relays != null) {
+            if (relays.isEmpty()) listOf()
+            else postDao.getGlobalFeedByRelays(
+                isPosts = isPosts,
+                isReplies = isReplies,
+                relays = relays,
+                until = until,
+                limit = limit,
+            )
+        } else if (authorPubkeys != null && relays == null) {
+            if (authorPubkeys.isEmpty()) listOf()
+            else postDao.getAuthoredFeed(
+                isPosts = isPosts,
+                isReplies = isReplies,
+                authorPubkeys = authorPubkeys,
+                until = until,
+                limit = limit,
+            )
+        } else if (authorPubkeys != null && relays != null) {
+            if (authorPubkeys.isEmpty() || relays.isEmpty()) listOf()
+            else postDao.getAuthoredFeedByRelays(
+                isPosts = isPosts,
+                isReplies = isReplies,
+                authorPubkeys = authorPubkeys,
+                relays = relays,
+                until = until,
+                limit = limit,
+            )
+        } else {
+            Log.w(TAG, "Could not find correct db call. Default to empty list")
+            listOf()
+        }
     }
 }

@@ -81,7 +81,6 @@ fun NozzleApp(appContainer: AppContainer) {
                         relayProvider = appContainer.relayProvider,
                         postCardInteractor = appContainer.postCardInteractor,
                         nostrSubscriber = appContainer.nostrSubscriber,
-                        contactDao = appContainer.roomDb.contactDao(),
                     )
                 ),
                 threadViewModel = viewModel(

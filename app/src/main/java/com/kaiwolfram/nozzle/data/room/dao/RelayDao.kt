@@ -14,4 +14,7 @@ interface RelayDao {
 
     @Query("SELECT relayUrl FROM relay")
     fun listRelays(): Flow<List<String>>
+
+    @Query("DELETE FROM relay")
+    fun deleteAll()
 }

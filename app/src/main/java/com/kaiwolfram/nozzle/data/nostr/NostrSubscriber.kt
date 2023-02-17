@@ -48,7 +48,7 @@ class NostrSubscriber(
         )
         val ids = nostrService.subscribe(
             filters = listOf(postFilter),
-            unsubOnEOSE = until != null,
+            unsubOnEOSE = true,
             relaySelection = relaySelection,
         )
         feedSubscriptions.addAll(ids)

@@ -14,18 +14,76 @@ interface PostDao {
     @Query(
         "SELECT * " +
                 "FROM post " +
-                "WHERE ((:isReplies AND replyToId IS NOT NULL) OR (:isPosts AND replyToId IS NULL))" +
-                "AND (:authorPubkeys IS NULL OR pubkey IN (:authorPubkeys)) " +
-                "AND (:relays IS NULL OR id IN (SELECT DISTINCT eventId FROM eventRelay WHERE relayUrl IN (:relays))) " +
-                "AND createdAt <= :until " +
+                "WHERE ((:isReplies AND replyToId IS NOT NULL) OR (:isPosts AND replyToId IS NULL)) " +
+                "AND pubkey IN (:authorPubkeys) " +
+                "AND id IN (SELECT DISTINCT eventId FROM eventRelay WHERE relayUrl IN (:relays)) " +
+                "AND createdAt < :until " +
                 "ORDER BY createdAt DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getFeed(
+    suspend fun getAuthoredFeedByRelays(
         isPosts: Boolean,
         isReplies: Boolean,
-        authorPubkeys: List<String>?,
-        relays: List<String>?,
+        authorPubkeys: List<String>,
+        relays: List<String>,
+        until: Long,
+        limit: Int,
+    ): List<PostEntity>
+
+    /**
+     * Sorted from newest to oldest
+     */
+    @Query(
+        "SELECT * " +
+                "FROM post " +
+                "WHERE ((:isReplies AND replyToId IS NOT NULL) OR (:isPosts AND replyToId IS NULL)) " +
+                "AND pubkey IN (:authorPubkeys) " +
+                "AND createdAt < :until " +
+                "ORDER BY createdAt DESC " +
+                "LIMIT :limit"
+    )
+    suspend fun getAuthoredFeed(
+        isPosts: Boolean,
+        isReplies: Boolean,
+        authorPubkeys: List<String>,
+        until: Long,
+        limit: Int,
+    ): List<PostEntity>
+
+    /**
+     * Sorted from newest to oldest
+     */
+    @Query(
+        "SELECT * " +
+                "FROM post " +
+                "WHERE ((:isReplies AND replyToId IS NOT NULL) OR (:isPosts AND replyToId IS NULL)) " +
+                "AND id IN (SELECT DISTINCT eventId FROM eventRelay WHERE relayUrl IN (:relays)) " +
+                "AND createdAt < :until " +
+                "ORDER BY createdAt DESC " +
+                "LIMIT :limit"
+    )
+    suspend fun getGlobalFeedByRelays(
+        isPosts: Boolean,
+        isReplies: Boolean,
+        relays: List<String>,
+        until: Long,
+        limit: Int,
+    ): List<PostEntity>
+
+    /**
+     * Sorted from newest to oldest
+     */
+    @Query(
+        "SELECT * " +
+                "FROM post " +
+                "WHERE ((:isReplies AND replyToId IS NOT NULL) OR (:isPosts AND replyToId IS NULL)) " +
+                "AND createdAt < :until " +
+                "ORDER BY createdAt DESC " +
+                "LIMIT :limit"
+    )
+    suspend fun getGlobalFeed(
+        isPosts: Boolean,
+        isReplies: Boolean,
         until: Long,
         limit: Int,
     ): List<PostEntity>

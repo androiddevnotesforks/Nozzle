@@ -175,7 +175,7 @@ class ProfileViewModel(
 
     private val isAppending = AtomicBoolean(false)
 
-    private suspend fun appendFeed(
+    private fun appendFeed(
         currentFeed: List<PostWithMeta>,
         feedSettings: FeedSettings,
         dbBatchSize: Int,
