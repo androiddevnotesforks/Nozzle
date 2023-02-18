@@ -199,12 +199,15 @@ fun FollowButton(
     onFollow: () -> Unit,
     onUnfollow: () -> Unit
 ) {
-    val isFollowedLocally = remember { mutableStateOf(isFollowed) }
-    if (isFollowedLocally.value) {
+    val isFollowedUI = remember(isFollowed) { mutableStateOf(isFollowed) }
+    if (isFollowedUI.value) {
         Button(
             onClick = {
-                onUnfollow()
-                isFollowedLocally.value = false
+                // TODO: Remove this madness by improving the underlying flow
+                if (isFollowed) {
+                    onUnfollow()
+                    isFollowedUI.value = false
+                }
             },
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(1.dp, colors.onBackground),
@@ -218,8 +221,11 @@ fun FollowButton(
     } else {
         Button(
             onClick = {
-                onFollow()
-                isFollowedLocally.value = true
+                // TODO: Remove this madness by improving the underlying flow
+                if (!isFollowed) {
+                    onFollow()
+                    isFollowedUI.value = true
+                }
             },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.outlinedButtonColors(

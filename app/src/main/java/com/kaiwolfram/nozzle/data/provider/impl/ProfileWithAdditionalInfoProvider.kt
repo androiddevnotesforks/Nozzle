@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.flow
 
 private const val TAG = "ProfileWithAdditionalInfoProvider"
 private const val EMIT_INTERVAL_TIME = 2000L
-private const val EMIT_INTERVAL_NUM = 10L
 
 class ProfileWithAdditionalInfoProvider(
     private val pubkeyProvider: IPubkeyProvider,
@@ -35,10 +34,9 @@ class ProfileWithAdditionalInfoProvider(
             nostrSubscriber.subscribeToProfileMetadataAndContactList(
                 pubkeys = contactPubkeys
             )
-            getAndEmitProfile(flowCollector = this, pubkey = pubkey)
-            for (num in 1..EMIT_INTERVAL_NUM) {
-                delay(EMIT_INTERVAL_TIME)
+            while (true) {
                 getAndEmitProfile(flowCollector = this, pubkey = pubkey)
+                delay(EMIT_INTERVAL_TIME)
             }
         }
     }
@@ -47,9 +45,10 @@ class ProfileWithAdditionalInfoProvider(
         flowCollector: FlowCollector<ProfileWithAdditionalInfo>,
         pubkey: String,
     ) {
+        val npub = hexToNpub(pubkey)
         with(flowCollector) {
             profileDao.getProfile(pubkey).let { profile ->
-                val npub = hexToNpub(pubkey)
+                // TODO: One single god flow?
                 val metadata = profile?.getMetadata() ?: Metadata(name = npub)
                 val numOfFollowing = contactDao.getNumberOfFollowing(pubkey)
                 val numOfFollowers = contactDao.getNumberOfFollowers(pubkey)

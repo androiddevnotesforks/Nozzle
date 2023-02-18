@@ -139,19 +139,23 @@ class ProfileViewModel(
         }
     }
 
+    private var isInFollowProcess = AtomicBoolean(false)
+
     val onFollow: (String) -> Unit = { pubkeyToFollow ->
-        if (!profileState.value.isFollowedByMe) {
+        if (!profileState.value.isFollowedByMe && !isInFollowProcess.get()) {
+            isInFollowProcess.set(true)
             viewModelScope.launch(context = Dispatchers.IO) {
                 profileFollower.follow(pubkeyToFollow = pubkeyToFollow, relayUrl = "")
-            }
+            }.invokeOnCompletion { isInFollowProcess.set(false) }
         }
     }
 
     val onUnfollow: (String) -> Unit = { pubkeyToUnfollow ->
-        if (profileState.value.isFollowedByMe) {
+        if (profileState.value.isFollowedByMe && !isInFollowProcess.get()) {
+            isInFollowProcess.set(true)
             viewModelScope.launch(context = Dispatchers.IO) {
                 profileFollower.unfollow(pubkeyToUnfollow = pubkeyToUnfollow)
-            }
+            }.invokeOnCompletion { isInFollowProcess.set(false) }
         }
     }
 
