@@ -12,6 +12,9 @@ interface ProfileDao {
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
     suspend fun getProfile(pubkey: String): ProfileEntity?
 
+    @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
+    fun getProfileFlow(pubkey: String): Flow<ProfileEntity?>
+
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM profile WHERE pubkey = :pubkey")
     fun getMetadata(pubkey: String): Flow<Metadata?>

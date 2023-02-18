@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -50,9 +51,23 @@ interface ContactDao {
     @Query(
         "SELECT COUNT(*) " +
                 "FROM contact " +
+                "WHERE pubkey = :pubkey"
+    )
+    fun getNumberOfFollowingFlow(pubkey: String): Flow<Int>
+
+    @Query(
+        "SELECT COUNT(*) " +
+                "FROM contact " +
                 "WHERE contactPubkey = :pubkey"
     )
     suspend fun getNumberOfFollowers(pubkey: String): Int
+
+    @Query(
+        "SELECT COUNT(*) " +
+                "FROM contact " +
+                "WHERE contactPubkey = :pubkey"
+    )
+    fun getNumberOfFollowersFlow(pubkey: String): Flow<Int>
 
     @Query(
         "SELECT EXISTS(SELECT * " +
@@ -60,6 +75,13 @@ interface ContactDao {
                 "WHERE pubkey = :pubkey AND contactPubkey = :contactPubkey)"
     )
     suspend fun isFollowed(pubkey: String, contactPubkey: String): Boolean
+
+    @Query(
+        "SELECT EXISTS(SELECT * " +
+                "FROM contact " +
+                "WHERE pubkey = :pubkey AND contactPubkey = :contactPubkey)"
+    )
+    fun isFollowedFlow(pubkey: String, contactPubkey: String): Flow<Boolean>
 
     @Query(
         "SELECT MAX(createdAt) " +

@@ -10,13 +10,9 @@ import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 private const val TAG = "ProfileWithAdditionalInfoProvider"
-private const val EMIT_INTERVAL_TIME = 2000L
 
 class ProfileWithAdditionalInfoProvider(
     private val pubkeyProvider: IPubkeyProvider,
@@ -28,50 +24,51 @@ class ProfileWithAdditionalInfoProvider(
 
     override fun getProfile(pubkey: String): Flow<ProfileWithAdditionalInfo> {
         Log.i(TAG, "Get profile $pubkey")
-        return flow {
-            nostrSubscriber.unsubscribeProfiles()
-            val contactPubkeys = listContactPubkeysIfIsOneself(pubkey = pubkey)
-            nostrSubscriber.subscribeToProfileMetadataAndContactList(
-                pubkeys = contactPubkeys
+        val npub = hexToNpub(pubkey)
+        val profileFlow = profileDao.getProfileFlow(pubkey).distinctUntilChanged()
+        val relaysFlow = eventRelayDao.listUsedRelaysFlow(pubkey).distinctUntilChanged()
+        val numOfFollowingFlow = contactDao.getNumberOfFollowingFlow(pubkey).distinctUntilChanged()
+        val numOfFollowersFlow = contactDao.getNumberOfFollowersFlow(pubkey).distinctUntilChanged()
+        val isFollowedByMeFlow = contactDao.isFollowedFlow(
+            pubkey = pubkeyProvider.getPubkey(),
+            contactPubkey = pubkey
+        ).distinctUntilChanged()
+        val mainFlow = flow {
+            emit(
+                ProfileWithAdditionalInfo(
+                    pubkey = pubkey,
+                    npub = npub,
+                    metadata = Metadata(name = npub),
+                    numOfFollowing = 0,
+                    numOfFollowers = 0,
+                    relays = listOf(),
+                    isOneself = isOneself(pubkey = pubkey),
+                    isFollowedByMe = false,
+                )
             )
-            while (true) {
-                getAndEmitProfile(flowCollector = this, pubkey = pubkey)
-                delay(EMIT_INTERVAL_TIME)
-            }
+            nostrSubscriber.unsubscribeProfiles()
+            nostrSubscriber.subscribeToProfileMetadataAndContactList(
+                pubkeys = listContactPubkeysIfIsOneself(pubkey = pubkey)
+            )
         }
+        return mainFlow
+            .combine(profileFlow) { main, profile ->
+                profile?.let { main.copy(metadata = profile.getMetadata()) } ?: main
+            }
+            .combine(relaysFlow) { main, relays ->
+                main.copy(relays = relays)
+            }
+            .combine(numOfFollowingFlow) { main, numOfFollowing ->
+                main.copy(numOfFollowing = numOfFollowing)
+            }
+            .combine(numOfFollowersFlow) { main, numOfFollowers ->
+                main.copy(numOfFollowers = numOfFollowers)
+            }
+            .combine(isFollowedByMeFlow) { main, isFollowedByMe ->
+                main.copy(isFollowedByMe = isFollowedByMe)
+            }
     }
 
-    private suspend fun getAndEmitProfile(
-        flowCollector: FlowCollector<ProfileWithAdditionalInfo>,
-        pubkey: String,
-    ) {
-        val npub = hexToNpub(pubkey)
-        with(flowCollector) {
-            profileDao.getProfile(pubkey).let { profile ->
-                // TODO: One single god flow?
-                val metadata = profile?.getMetadata() ?: Metadata(name = npub)
-                val numOfFollowing = contactDao.getNumberOfFollowing(pubkey)
-                val numOfFollowers = contactDao.getNumberOfFollowers(pubkey)
-                val relays = eventRelayDao.listUsedRelays(pubkey)
-                val isFollowedByMe = contactDao.isFollowed(
-                    pubkey = pubkeyProvider.getPubkey(),
-                    contactPubkey = pubkey
-                )
-                emit(
-                    ProfileWithAdditionalInfo(
-                        pubkey = pubkey,
-                        npub = npub,
-                        metadata = metadata,
-                        numOfFollowing = numOfFollowing,
-                        numOfFollowers = numOfFollowers,
-                        relays = relays,
-                        isOneself = isOneself(pubkey = pubkey),
-                        isFollowedByMe = isFollowedByMe,
-                    )
-                )
-            }
-        }
-    }
 
     private fun isOneself(pubkey: String) = pubkey == pubkeyProvider.getPubkey()
 

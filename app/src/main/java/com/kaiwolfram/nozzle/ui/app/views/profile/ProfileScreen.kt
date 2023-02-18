@@ -112,7 +112,10 @@ private fun ProfileData(
         Spacer(Modifier.height(spacing.medium))
         profile.metadata.about?.let { about ->
             if (about.isNotBlank()) {
-                HyperlinkedText(text = about, maxLines = 3, onClickNonLink = { /*Do nothing*/ })
+                HyperlinkedText(
+                    text = about.trim(),
+                    maxLines = 3,
+                    onClickNonLink = { /*Do nothing*/ })
             }
         }
     }

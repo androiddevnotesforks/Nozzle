@@ -3,6 +3,7 @@ package com.kaiwolfram.nozzle.data.room.dao
 import androidx.room.Dao
 import androidx.room.MapInfo
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventRelayDao {
@@ -28,4 +29,12 @@ interface EventRelayDao {
                 "(SELECT id FROM post WHERE pubkey = :pubkey) "
     )
     suspend fun listUsedRelays(pubkey: String): List<String>
+
+    @Query(
+        "SELECT DISTINCT(relayUrl) " +
+                "FROM eventRelay " +
+                "WHERE eventId IN " +
+                "(SELECT id FROM post WHERE pubkey = :pubkey) "
+    )
+    fun listUsedRelaysFlow(pubkey: String): Flow<List<String>>
 }

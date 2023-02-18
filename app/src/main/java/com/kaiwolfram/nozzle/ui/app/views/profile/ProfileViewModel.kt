@@ -161,18 +161,18 @@ class ProfileViewModel(
 
     private fun refreshProfileAndPostState(pubkey: String, dbBatchSize: Int) {
         Log.i(TAG, "Refresh profile and posts of $pubkey")
-        profileState = profileProvider.getProfile(pubkey).stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            profileState.value,
-        )
         feedState = feedProvider.getFeed(
             feedSettings = getCurrentFeedSettings(),
             limit = dbBatchSize
         ).stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
-            feedState.value,
+            if (pubkey == profileState.value.pubkey) feedState.value else listOf(),
+        )
+        profileState = profileProvider.getProfile(pubkey).stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            profileState.value,
         )
         forceRecomposition.update { it + 1 }
     }
