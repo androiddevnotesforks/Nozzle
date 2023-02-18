@@ -33,6 +33,7 @@ class FeedProvider(
         feedSettings: FeedSettings,
         limit: Int,
         until: Long?,
+        waitForSubscription: Boolean,
     ): Flow<List<PostWithMeta>> {
         Log.i(TAG, "Get feed")
         return flow {
@@ -46,7 +47,9 @@ class FeedProvider(
                 until = until,
                 relaySelection = feedSettings.relaySelection
             )
-            delay(1000)
+
+            if (waitForSubscription) delay(1000)
+
             val posts = listPosts(
                 isPosts = feedSettings.isPosts,
                 isReplies = feedSettings.isReplies,

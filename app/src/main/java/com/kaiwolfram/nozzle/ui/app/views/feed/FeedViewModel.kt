@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
-private const val DB_BATCH_SIZE = 25
+private const val DB_BATCH_SIZE = 30
 
 data class FeedViewModelState(
     val isRefreshing: Boolean = false,
@@ -99,7 +99,6 @@ class FeedViewModel(
                 feedSettings = viewModelState.value.feedSettings,
                 dbBatchSize = DB_BATCH_SIZE,
             )
-            delay(1000)
             forceRecomposition.update { it + 1 }
         }
     }
@@ -161,12 +160,6 @@ class FeedViewModel(
         }
     }
 
-    val onPreviousHeadline: () -> Unit = {
-    }
-
-    val onNextHeadline: () -> Unit = {
-    }
-
     val onResetProfileIconUiState: () -> Unit = {
         Log.i(TAG, "Reset profile icon")
         metadataState = personalProfileProvider.getMetadata().stateIn(
@@ -199,8 +192,11 @@ class FeedViewModel(
         dbBatchSize: Int
     ) {
         setUIRelays(updatedRelays)
-        val newFeedFlow = feedProvider.getFeed(feedSettings = feedSettings, limit = dbBatchSize)
-        feedState = newFeedFlow.stateIn(
+        feedState = feedProvider.getFeed(
+            feedSettings = feedSettings,
+            limit = dbBatchSize,
+            waitForSubscription = false
+        ).stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
             feedState.value,

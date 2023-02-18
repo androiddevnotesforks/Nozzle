@@ -41,8 +41,6 @@ fun FeedRoute(
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onRefreshOnMenuDismiss = feedViewModel.onRefreshOnMenuDismiss,
         onLoadMore = feedViewModel.onLoadMore,
-        onPreviousHeadline = feedViewModel.onPreviousHeadline,
-        onNextHeadline = feedViewModel.onNextHeadline,
         onOpenDrawer = onOpenDrawer,
         onNavigateToProfile = onNavigateToProfile,
         onNavigateToThread = { postIds ->

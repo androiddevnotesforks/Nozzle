@@ -51,8 +51,6 @@ fun FeedScreen(
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
     onLoadMore: () -> Unit,
-    onPreviousHeadline: () -> Unit,
-    onNextHeadline: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (PostIds) -> Unit,
     onNavigateToProfile: (String) -> Unit,
@@ -71,14 +69,6 @@ fun FeedScreen(
                 onToggleContactsOnly = onToggleContactsOnly,
                 onTogglePosts = onTogglePosts,
                 onToggleReplies = onToggleReplies,
-                onPreviousHeadline = {
-                    scope.launch { lazyListState.scrollToItem(0) }
-                    onPreviousHeadline()
-                },
-                onNextHeadline = {
-                    scope.launch { lazyListState.scrollToItem(0) }
-                    onNextHeadline()
-                },
                 onPictureClick = onOpenDrawer,
                 onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } })
         },
@@ -123,8 +113,6 @@ private fun FeedTopBar(
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
-    onNextHeadline: () -> Unit,
-    onPreviousHeadline: () -> Unit,
     onPictureClick: () -> Unit,
     onScrollToTop: () -> Unit
 ) {
@@ -149,8 +137,6 @@ private fun FeedTopBar(
             Headline(
                 modifier = Modifier.weight(0.8f),
                 headline = stringResource(id = com.kaiwolfram.nozzle.R.string.home),
-                onPreviousHeadline = onPreviousHeadline,
-                onNextHeadline = onNextHeadline,
                 onScrollToTop = onScrollToTop,
             )
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.1f)) {
@@ -170,22 +156,10 @@ private fun FeedTopBar(
 @Composable
 private fun Headline(
     headline: String,
-    onNextHeadline: () -> Unit,
-    onPreviousHeadline: () -> Unit,
     onScrollToTop: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
-        // TODO: Uncomment after refactoring
-//        if (headline.isNotBlank()) {
-//            Icon(
-//                modifier = Modifier
-//                    .clip(CircleShape)
-//                    .clickable { onPreviousHeadline() },
-//                imageVector = Icons.Default.ArrowLeft,
-//                contentDescription = stringResource(id = R.string.move_to_previous_feed),
-//            )
-//        }
         Text(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -200,16 +174,6 @@ private fun Headline(
             style = typography.h6,
             color = colors.background
         )
-        // TODO: Uncomment after refactoring
-//        if (headline.isNotBlank()) {
-//            Icon(
-//                modifier = Modifier
-//                    .clip(CircleShape)
-//                    .clickable { onNextHeadline() },
-//                imageVector = Icons.Default.ArrowRight,
-//                contentDescription = stringResource(id = R.string.move_to_next_feed),
-//            )
-//        }
     }
 }
 

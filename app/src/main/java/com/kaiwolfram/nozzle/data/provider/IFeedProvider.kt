@@ -9,5 +9,6 @@ interface IFeedProvider {
         feedSettings: FeedSettings,
         limit: Int,
         until: Long? = null,
+        waitForSubscription: Boolean = true
     ): Flow<List<PostWithMeta>>
 }

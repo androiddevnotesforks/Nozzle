@@ -3,7 +3,7 @@ package com.kaiwolfram.nozzle.ui.components.postCard
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,7 +34,7 @@ fun PostCardList(
         onRefresh = onRefresh,
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
-            items(posts) { post ->
+            itemsIndexed(posts) { index, post ->
                 PostCard(
                     post = post,
                     onLike = onLike,
@@ -44,10 +44,9 @@ fun PostCardList(
                     onNavigateToThread = onNavigateToThread,
                     onNavigateToReply = onNavigateToReply,
                 )
-            }
-            item {
-                LaunchedEffect(true) {
-                    if (lazyListState.firstVisibleItemIndex > 0 && lazyListState.isScrollInProgress) {
+                // Append the next batch when only 9 more posts are left to be shown
+                if (index > 0 && index == posts.size - 10) {
+                    LaunchedEffect(key1 = index) {
                         onLoadMore()
                     }
                 }
