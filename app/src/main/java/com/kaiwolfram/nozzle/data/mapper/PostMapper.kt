@@ -14,6 +14,7 @@ class PostMapper(
     private val eventRelayDao: EventRelayDao,
 ) : IPostMapper {
 
+    // TODO: Return Flow
     override suspend fun mapToPostsWithMeta(posts: List<PostEntity>): List<PostWithMeta> {
         if (posts.isEmpty()) return listOf()
 

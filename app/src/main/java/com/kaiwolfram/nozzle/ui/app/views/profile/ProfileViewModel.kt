@@ -95,7 +95,7 @@ class ProfileViewModel(
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Refresh profile view")
             setUIRefresh(true)
-            refreshProfileAndPostState(
+            refreshPostState(
                 pubkey = profileState.value.pubkey,
                 dbBatchSize = DB_BATCH_SIZE
             )
@@ -112,7 +112,6 @@ class ProfileViewModel(
                 feedSettings = getCurrentFeedSettings(),
                 dbBatchSize = DB_BATCH_SIZE,
             )
-            forceRecomposition.update { it + 1 }
         }
     }
 
@@ -161,6 +160,16 @@ class ProfileViewModel(
 
     private fun refreshProfileAndPostState(pubkey: String, dbBatchSize: Int) {
         Log.i(TAG, "Refresh profile and posts of $pubkey")
+        profileState = profileProvider.getProfile(pubkey).stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            profileState.value,
+        )
+        refreshPostState(pubkey = pubkey, dbBatchSize = dbBatchSize)
+    }
+
+    private fun refreshPostState(pubkey: String, dbBatchSize: Int) {
+        Log.i(TAG, "Refresh posts of $pubkey")
         feedState = feedProvider.getFeed(
             feedSettings = getCurrentFeedSettings(),
             limit = dbBatchSize
@@ -168,11 +177,6 @@ class ProfileViewModel(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
             if (pubkey == profileState.value.pubkey) feedState.value else listOf(),
-        )
-        profileState = profileProvider.getProfile(pubkey).stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            profileState.value,
         )
         forceRecomposition.update { it + 1 }
     }
@@ -200,6 +204,7 @@ class ProfileViewModel(
                     currentFeed,
                 )
             isAppending.set(false)
+            forceRecomposition.update { it + 1 }
         }
     }
 
