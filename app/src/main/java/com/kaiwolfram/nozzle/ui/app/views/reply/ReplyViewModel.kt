@@ -11,7 +11,6 @@ import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
-import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
@@ -40,7 +39,6 @@ class ReplyViewModel(
     private val nostrService: INostrService,
     private val personalProfileProvider: IPersonalProfileProvider,
     private val postDao: PostDao,
-    private val eventRelayDao: EventRelayDao,
     relayDao: RelayDao,
     context: Context,
 ) : ViewModel() {
@@ -172,7 +170,6 @@ class ReplyViewModel(
             nostrService: INostrService,
             personalProfileProvider: IPersonalProfileProvider,
             postDao: PostDao,
-            eventRelayDao: EventRelayDao,
             relayDao: RelayDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -182,7 +179,6 @@ class ReplyViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
                     postDao = postDao,
-                    eventRelayDao = eventRelayDao,
                     relayDao = relayDao,
                     context = context,
                 ) as T

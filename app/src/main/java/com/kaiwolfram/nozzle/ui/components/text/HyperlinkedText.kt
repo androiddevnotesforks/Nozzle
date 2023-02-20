@@ -4,7 +4,9 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import com.kaiwolfram.nozzle.data.utils.extractUrls
@@ -14,7 +16,6 @@ import com.kaiwolfram.nozzle.ui.theme.Typography
 
 private const val URL_TAG = "URL"
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun HyperlinkedText(
     text: String,

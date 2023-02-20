@@ -12,7 +12,6 @@ import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
-import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
@@ -39,7 +38,6 @@ class PostViewModel(
     private val personalProfileProvider: IPersonalProfileProvider,
     private val nostrService: INostrService,
     private val postDao: PostDao,
-    private val eventRelayDao: EventRelayDao,
     relayDao: RelayDao,
     context: Context,
 ) : ViewModel() {
@@ -165,7 +163,6 @@ class PostViewModel(
             personalProfileProvider: IPersonalProfileProvider,
             nostrService: INostrService,
             postDao: PostDao,
-            eventRelayDao: EventRelayDao,
             relayDao: RelayDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -175,7 +172,6 @@ class PostViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
                     postDao = postDao,
-                    eventRelayDao = eventRelayDao,
                     relayDao = relayDao,
                     context = context,
                 ) as T

@@ -29,7 +29,6 @@ class KeyManager(context: Context) : IKeyManager {
     )
     private var pubkey: String = ""
     private var npub: String = ""
-    private var nsec: String = ""
 
     init {
         Log.i(TAG, "Initialize KeyPreferences")

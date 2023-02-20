@@ -95,7 +95,6 @@ fun NozzleApp(appContainer: AppContainer) {
                         nostrService = appContainer.nostrService,
                         personalProfileProvider = appContainer.personalProfileManager,
                         postDao = appContainer.roomDb.postDao(),
-                        eventRelayDao = appContainer.roomDb.eventRelayDao(),
                         relayDao = appContainer.roomDb.relayDao(),
                         context = LocalContext.current,
                     )
@@ -105,7 +104,6 @@ fun NozzleApp(appContainer: AppContainer) {
                         nostrService = appContainer.nostrService,
                         personalProfileProvider = appContainer.personalProfileManager,
                         postDao = appContainer.roomDb.postDao(),
-                        eventRelayDao = appContainer.roomDb.eventRelayDao(),
                         relayDao = appContainer.roomDb.relayDao(),
                         context = LocalContext.current,
                     )
