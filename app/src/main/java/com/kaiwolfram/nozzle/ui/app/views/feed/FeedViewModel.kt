@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
 private const val DB_BATCH_SIZE = 30
+private const val WAIT_TIME = 2100L
 
 data class FeedViewModelState(
     val isRefreshing: Boolean = false,
@@ -66,28 +67,14 @@ class FeedViewModel(
             it.copy(pubkey = personalProfileProvider.getPubkey())
         }
         viewModelScope.launch(context = IO) {
-            setUIRefresh(true)
-            subscribeToPersonalProfile()
-            updateScreen(
-                feedSettings = viewModelState.value.feedSettings,
-                updatedRelays = relayProvider.listRelays(),
-                dbBatchSize = DB_BATCH_SIZE
-            )
-            setUIRefresh(false)
+            handleRefresh()
         }
     }
 
     val onRefreshFeedView: () -> Unit = {
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Refresh feed view")
-            setUIRefresh(true)
-            subscribeToPersonalProfile()
-            updateScreen(
-                feedSettings = viewModelState.value.feedSettings,
-                updatedRelays = relayProvider.listRelays(),
-                dbBatchSize = DB_BATCH_SIZE
-            )
-            setUIRefresh(false)
+            handleRefresh()
         }
     }
 
@@ -186,27 +173,41 @@ class FeedViewModel(
         }
     }
 
+    private suspend fun handleRefresh() {
+        setUIRefresh(true)
+        subscribeToPersonalProfile()
+        updateScreen(
+            feedSettings = viewModelState.value.feedSettings,
+            updatedRelays = relayProvider.listRelays(),
+            dbBatchSize = DB_BATCH_SIZE,
+            waitForSubscription = WAIT_TIME,
+        )
+        setUIRefresh(false)
+        delay(WAIT_TIME)
+        renewAdditionalDataSubscription(feedState.value)
+    }
+
     private suspend fun updateScreen(
         feedSettings: FeedSettings,
         updatedRelays: List<String>,
-        dbBatchSize: Int
+        dbBatchSize: Int,
+        waitForSubscription: Long? = null,
     ) {
         setUIRelays(updatedRelays)
-        feedState = feedProvider.getFeed(
+        feedState = feedProvider.getFeedFlow(
             feedSettings = feedSettings,
             limit = dbBatchSize,
-            waitForSubscription = false
+            waitForSubscription = waitForSubscription,
         ).stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
             feedState.value,
         )
-        delay(2000)
     }
 
     private val isAppending = AtomicBoolean(false)
 
-    private fun appendFeed(
+    private suspend fun appendFeed(
         currentFeed: List<PostWithMeta>,
         feedSettings: FeedSettings,
         dbBatchSize: Int,
@@ -216,10 +217,10 @@ class FeedViewModel(
         currentFeed.lastOrNull()?.let { last ->
             Log.i(TAG, "Append feed")
             isAppending.set(true)
-            feedState = feedProvider.getFeed(
+            feedState = feedProvider.getFeedFlow(
                 feedSettings = feedSettings,
                 limit = dbBatchSize,
-                until = last.createdAt
+                until = last.createdAt,
             ).map { toAppend -> currentFeed + toAppend }
                 .stateIn(
                     viewModelScope,
@@ -238,6 +239,11 @@ class FeedViewModel(
                 personalProfileProvider.getPubkey()
             )
         )
+    }
+
+    private suspend fun renewAdditionalDataSubscription(posts: List<PostWithMeta>) {
+        nostrSubscriber.unsubscribeAdditionalPostsData()
+        nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
     }
 
     private fun setUIRefresh(value: Boolean) {

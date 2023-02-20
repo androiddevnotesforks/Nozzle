@@ -10,41 +10,31 @@ import com.kaiwolfram.nozzle.data.provider.IThreadProvider
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostThread
-import com.kaiwolfram.nozzle.model.PostWithMeta
-import com.kaiwolfram.nozzle.model.ThreadPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 private const val TAG = "ThreadViewModel"
-
-data class ThreadViewModelState(
-    val previous: List<PostWithMeta> = listOf(),
-    val current: PostWithMeta? = null,
-    val replies: List<PostWithMeta> = listOf(),
-    val currentThreadPosition: ThreadPosition = ThreadPosition.SINGLE,
-    val isRefreshing: Boolean = false,
-)
+private const val WAIT_TIME = 2100L
 
 class ThreadViewModel(
     private val threadProvider: IThreadProvider,
     private val postCardInteractor: IPostCardInteractor,
     private val nostrSubscriber: INostrSubscriber,
 ) : ViewModel() {
-    private val viewModelState = MutableStateFlow(ThreadViewModelState())
     private lateinit var currentPostIds: PostIds
 
-    val uiState = viewModelState
+    private val isRefreshing = MutableStateFlow(false)
+    val isRefreshingState = isRefreshing
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value
+            isRefreshing.value
         )
+
+    var threadState: StateFlow<PostThread> = MutableStateFlow(PostThread.createEmpty())
 
     init {
         Log.i(TAG, "Initialize ThreadViewModel")
@@ -57,13 +47,12 @@ class ThreadViewModel(
         currentPostIds = postIds
         job?.let { if (it.isActive) it.cancel() }
         job = viewModelScope.launch(context = Dispatchers.IO) {
-            setThread(getThread(currentPostIds))
-            renewThreadSubscription()
-            delay(1000)
-            val thread = getThread(currentPostIds)
-            setThread(thread)
-            setThreadWithNewData(thread)
-            updateCurrentPostIds(thread)
+            setUIRefresh(true)
+            updateScreen(postIds = currentPostIds)
+            setUIRefresh(false)
+            delay(WAIT_TIME)
+            renewAdditionalDataSubscription(threadState.value)
+            updateCurrentPostIds(threadState.value)
         }
     }
 
@@ -71,18 +60,20 @@ class ThreadViewModel(
         viewModelScope.launch(context = Dispatchers.IO) {
             Log.i(TAG, "Refresh thread view")
             setUIRefresh(true)
-            renewThreadSubscription()
-            delay(1000)
-            val thread = getThread(currentPostIds)
-            renewAdditionalDataSubscription(thread)
-            delay(1000)
-            setThread(getThread(currentPostIds))
+            updateScreen(
+                postIds = currentPostIds,
+                waitForSubscription = WAIT_TIME,
+                initValue = threadState.value
+            )
             setUIRefresh(false)
+            delay(WAIT_TIME)
+            renewAdditionalDataSubscription(threadState.value)
+            updateCurrentPostIds(threadState.value)
         }
     }
 
     val onLike: (String) -> Unit = { postId ->
-        val toLike = uiState.value.let { state ->
+        val toLike = threadState.value.let { state ->
             if (state.current?.id == postId) {
                 state.current
             } else if (state.previous.any { post -> post.id == postId }) {
@@ -106,37 +97,21 @@ class ThreadViewModel(
         }
     }
 
-    private suspend fun getThread(postIds: PostIds): PostThread {
-        return threadProvider.getThread(
+    private suspend fun updateScreen(
+        postIds: PostIds,
+        waitForSubscription: Long? = null,
+        initValue: PostThread = PostThread.createEmpty()
+    ) {
+        threadState = threadProvider.getThreadFlow(
             currentPostId = postIds.id,
-            replyToId = postIds.replyToId
+            replyToId = postIds.replyToId,
+            waitForSubscription = waitForSubscription,
         )
-    }
-
-    private fun setThread(thread: PostThread) {
-        Log.i(TAG, "Set thread ${thread.current?.id}")
-        viewModelState.update {
-            it.copy(
-                previous = thread.previous,
-                current = thread.current,
-                replies = thread.replies,
-                currentThreadPosition = getThreadPosition(
-                    current = thread.current,
-                    previous = thread.previous
-                )
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(),
+                initValue,
             )
-        }
-    }
-
-    private fun setEmptyThread() {
-        viewModelState.update {
-            it.copy(
-                previous = listOf(),
-                current = null,
-                replies = listOf(),
-                currentThreadPosition = ThreadPosition.SINGLE
-            )
-        }
     }
 
     private fun updateCurrentPostIds(thread: PostThread) {
@@ -149,37 +124,17 @@ class ThreadViewModel(
         }
     }
 
-    private fun renewThreadSubscription() {
-        nostrSubscriber.unsubscribeThread()
-        nostrSubscriber.subscribeToThread(
-            currentPostId = currentPostIds.id,
-            replyToId = currentPostIds.replyToId,
-            replyToRootId = currentPostIds.replyToRootId
-        )
-    }
-
     private suspend fun renewAdditionalDataSubscription(thread: PostThread) {
         nostrSubscriber.unsubscribeAdditionalPostsData()
         nostrSubscriber.subscribeToAdditionalPostsData(thread.getList())
     }
 
-    private suspend fun setThreadWithNewData(thread: PostThread) {
-        renewAdditionalDataSubscription(thread)
-        delay(1000)
-        setThread(getThread(currentPostIds))
-    }
-
-    private fun getThreadPosition(
-        current: PostWithMeta?,
-        previous: List<PostWithMeta>
-    ): ThreadPosition {
-        return if (previous.isNotEmpty() || current?.replyToId != null)
-            ThreadPosition.END
-        else ThreadPosition.SINGLE
+    private fun setEmptyThread() {
+        threadState = MutableStateFlow(PostThread.createEmpty())
     }
 
     private fun setUIRefresh(value: Boolean) {
-        viewModelState.update { it.copy(isRefreshing = value) }
+        isRefreshing.update { value }
     }
 
     companion object {

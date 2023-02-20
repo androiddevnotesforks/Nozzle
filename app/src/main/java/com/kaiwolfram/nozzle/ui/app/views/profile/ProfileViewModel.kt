@@ -72,22 +72,26 @@ class ProfileViewModel(
 
     init {
         Log.i(TAG, "Initialize ProfileViewModel")
-        refreshProfileAndPostState(
-            pubkey = pubkeyProvider.getPubkey(),
-            dbBatchSize = DB_BATCH_SIZE
-        )
-    }
-
-    val onSetPubkey: (String?) -> Unit = { pubkey ->
-        if (pubkey == null) {
-            Log.w(TAG, "Tried to set empty pubkey for UI")
+        viewModelScope.launch(context = Dispatchers.IO) {
             refreshProfileAndPostState(
                 pubkey = pubkeyProvider.getPubkey(),
                 dbBatchSize = DB_BATCH_SIZE
             )
-        } else {
-            Log.i(TAG, "Set UI for $pubkey")
-            refreshProfileAndPostState(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
+        }
+    }
+
+    val onSetPubkey: (String?) -> Unit = { pubkey ->
+        viewModelScope.launch(context = Dispatchers.IO) {
+            if (pubkey == null) {
+                Log.w(TAG, "Tried to set empty pubkey for UI")
+                refreshProfileAndPostState(
+                    pubkey = pubkeyProvider.getPubkey(),
+                    dbBatchSize = DB_BATCH_SIZE
+                )
+            } else {
+                Log.i(TAG, "Set UI for $pubkey")
+                refreshProfileAndPostState(pubkey = pubkey, dbBatchSize = DB_BATCH_SIZE)
+            }
         }
     }
 
@@ -158,19 +162,20 @@ class ProfileViewModel(
         }
     }
 
-    private fun refreshProfileAndPostState(pubkey: String, dbBatchSize: Int) {
+    private suspend fun refreshProfileAndPostState(pubkey: String, dbBatchSize: Int) {
         Log.i(TAG, "Refresh profile and posts of $pubkey")
-        profileState = profileProvider.getProfile(pubkey).stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            profileState.value,
-        )
+        profileState = profileProvider.getProfileFlow(pubkey)
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(),
+                profileState.value,
+            )
         refreshPostState(pubkey = pubkey, dbBatchSize = dbBatchSize)
     }
 
-    private fun refreshPostState(pubkey: String, dbBatchSize: Int) {
+    private suspend fun refreshPostState(pubkey: String, dbBatchSize: Int) {
         Log.i(TAG, "Refresh posts of $pubkey")
-        feedState = feedProvider.getFeed(
+        feedState = feedProvider.getFeedFlow(
             feedSettings = getCurrentFeedSettings(),
             limit = dbBatchSize
         ).stateIn(
@@ -183,7 +188,7 @@ class ProfileViewModel(
 
     private val isAppending = AtomicBoolean(false)
 
-    private fun appendFeed(
+    private suspend fun appendFeed(
         currentFeed: List<PostWithMeta>,
         feedSettings: FeedSettings,
         dbBatchSize: Int,
@@ -193,7 +198,7 @@ class ProfileViewModel(
         Log.i(TAG, "Append feed")
         currentFeed.lastOrNull()?.let { last ->
             isAppending.set(true)
-            feedState = feedProvider.getFeed(
+            feedState = feedProvider.getFeedFlow(
                 feedSettings = feedSettings,
                 limit = dbBatchSize,
                 until = last.createdAt

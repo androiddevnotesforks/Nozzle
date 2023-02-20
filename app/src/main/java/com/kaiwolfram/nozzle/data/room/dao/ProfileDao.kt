@@ -53,8 +53,7 @@ interface ProfileDao {
                 "FROM profile " +
                 "WHERE pubkey IN (:pubkeys) "
     )
-    suspend fun getNamesAndPicturesMap(pubkeys: List<String>): Map<String, NameAndPicture>
-
+    fun getNamesAndPicturesMapFlow(pubkeys: List<String>): Flow<Map<String, NameAndPicture>>
 
     @MapInfo(keyColumn = "postId")
     @Query(
@@ -63,5 +62,5 @@ interface ProfileDao {
                 "JOIN post ON post.pubkey = profile.pubkey " +
                 "WHERE postId IN (:postIds) "
     )
-    suspend fun getAuthorNamesAndPubkeysMap(postIds: List<String>): Map<String, NameAndPubkey>
+    fun getAuthorNamesAndPubkeysMapFlow(postIds: List<String>): Flow<Map<String, NameAndPubkey>>
 }

@@ -1,7 +1,8 @@
 package com.kaiwolfram.nozzle.data.provider
 
 import com.kaiwolfram.nozzle.model.InteractionStats
+import kotlinx.coroutines.flow.Flow
 
 interface IInteractionStatsProvider {
-    suspend fun getStats(postIds: List<String>): InteractionStats
+    fun getStatsFlow(postIds: List<String>): Flow<InteractionStats>
 }

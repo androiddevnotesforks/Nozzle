@@ -5,25 +5,52 @@ import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.dao.ReactionDao
 import com.kaiwolfram.nozzle.model.InteractionStats
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 
 class InteractionStatsProvider(
     private val pubkeyProvider: IPubkeyProvider,
     private val reactionDao: ReactionDao,
     private val postDao: PostDao,
 ) : IInteractionStatsProvider {
-    override suspend fun getStats(postIds: List<String>): InteractionStats {
-        val numOfLikesPerPost = reactionDao.getNumOfLikesPerPost(postIds)
-        val numOfRepostsPerPost = postDao.getNumOfRepostsPerPost(postIds)
-        val numOfRepliesPerPost = postDao.getNumOfRepliesPerPost(postIds)
-        val likedByMe = reactionDao.listLikedBy(pubkeyProvider.getPubkey(), postIds)
-        val repostedByMe = postDao.listRepostedByPubkey(pubkeyProvider.getPubkey(), postIds)
+    override fun getStatsFlow(postIds: List<String>): Flow<InteractionStats> {
+        val numOfLikesFlow = reactionDao.getNumOfLikesPerPostFlow(postIds).distinctUntilChanged()
+        val numOfRepostsFlow = postDao.getNumOfRepostsPerPostFlow(postIds).distinctUntilChanged()
+        val numOfRepliesFlow = postDao.getNumOfRepliesPerPostFlow(postIds).distinctUntilChanged()
+        val likedByMeFlow = reactionDao.listLikedByFlow(pubkeyProvider.getPubkey(), postIds)
+            .distinctUntilChanged()
+        val repostedByMeFlow = postDao.listRepostedByPubkeyFlow(pubkeyProvider.getPubkey(), postIds)
+            .distinctUntilChanged()
 
-        return InteractionStats(
-            numOfLikesPerPost = numOfLikesPerPost,
-            numOfRepostsPerPost = numOfRepostsPerPost,
-            numOfRepliesPerPost = numOfRepliesPerPost,
-            likedByMe = likedByMe,
-            repostedByMe = repostedByMe,
-        )
+        val mainFlow = flow {
+            emit(
+                InteractionStats(
+                    numOfLikesPerPost = mapOf(),
+                    numOfRepostsPerPost = mapOf(),
+                    numOfRepliesPerPost = mapOf(),
+                    likedByMe = listOf(),
+                    repostedByMe = listOf(),
+                )
+            )
+        }
+
+        return mainFlow
+            .combine(numOfLikesFlow) { main, likes ->
+                main.copy(numOfLikesPerPost = likes)
+            }
+            .combine(numOfRepostsFlow) { main, reposts ->
+                main.copy(numOfRepostsPerPost = reposts)
+            }
+            .combine(numOfRepliesFlow) { main, replies ->
+                main.copy(numOfRepliesPerPost = replies)
+            }
+            .combine(likedByMeFlow) { main, liked ->
+                main.copy(likedByMe = liked)
+            }
+            .combine(repostedByMeFlow) { main, reposted ->
+                main.copy(repostedByMe = reposted)
+            }
     }
 }

@@ -18,6 +18,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.PostIds
+import com.kaiwolfram.nozzle.model.PostThread
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.ThreadPosition
 import com.kaiwolfram.nozzle.ui.components.ReturnableTopBar
@@ -29,7 +30,8 @@ import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
 fun ThreadScreen(
-    uiState: ThreadViewModelState,
+    thread: PostThread,
+    isRefreshing: Boolean,
     onPrepareReply: (PostWithMeta) -> Unit,
     onLike: (String) -> Unit,
     onRepost: (String) -> Unit,
@@ -43,11 +45,8 @@ fun ThreadScreen(
         ReturnableTopBar(text = stringResource(id = R.string.thread), onGoBack = onGoBack)
         Column(modifier = Modifier.fillMaxSize()) {
             ThreadedPosts(
-                previous = uiState.previous,
-                current = uiState.current,
-                replies = uiState.replies,
-                currentThreadPosition = uiState.currentThreadPosition,
-                isRefreshing = uiState.isRefreshing,
+                thread = thread,
+                isRefreshing = isRefreshing,
                 onPrepareReply = onPrepareReply,
                 onRefresh = onRefreshThreadView,
                 onLike = onLike,
@@ -62,10 +61,7 @@ fun ThreadScreen(
 
 @Composable
 private fun ThreadedPosts(
-    previous: List<PostWithMeta>,
-    current: PostWithMeta?,
-    replies: List<PostWithMeta>,
-    currentThreadPosition: ThreadPosition,
+    thread: PostThread,
     isRefreshing: Boolean,
     onPrepareReply: (PostWithMeta) -> Unit,
     onRefresh: () -> Unit,
@@ -79,13 +75,14 @@ private fun ThreadedPosts(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
-        val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = previous.size)
-        LaunchedEffect(key1 = previous.size) {
-            lazyListState.scrollToItem(previous.size)
+        val lazyListState =
+            rememberLazyListState(initialFirstVisibleItemIndex = thread.previous.size)
+        LaunchedEffect(key1 = thread.previous.size) {
+            lazyListState.scrollToItem(thread.previous.size)
         }
         LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
-            current?.let {
-                itemsIndexed(previous) { index, post ->
+            thread.current?.let {
+                itemsIndexed(thread.previous) { index, post ->
                     var threadPosition = ThreadPosition.MIDDLE
                     if (index == 0) {
                         if (post.replyToId != null) {
@@ -106,7 +103,7 @@ private fun ThreadedPosts(
                     )
                 }
                 item {
-                    if (it.replyToId != null && previous.isEmpty()) {
+                    if (it.replyToId != null && thread.previous.isEmpty()) {
                         PostNotFound()
                     }
                     PostCard(
@@ -116,7 +113,7 @@ private fun ThreadedPosts(
                         onRepost = onRepost,
                         onPrepareReply = onPrepareReply,
                         modifier = Modifier.background(color = LightYellow),
-                        threadPosition = currentThreadPosition,
+                        threadPosition = thread.getCurrentThreadPosition(),
                         onOpenProfile = onNavigateToProfile,
                         onNavigateToReply = onNavigateToReply,
                         onNavigateToThread = onOpenThread,
@@ -125,7 +122,7 @@ private fun ThreadedPosts(
                     Spacer(modifier = Modifier.height(spacing.tiny))
                     Divider()
                 }
-                items(replies) { post ->
+                items(thread.replies) { post ->
                     PostCard(
                         post = post,
                         onLike = onLike,

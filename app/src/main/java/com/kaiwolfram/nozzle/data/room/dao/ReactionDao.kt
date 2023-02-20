@@ -3,6 +3,7 @@ package com.kaiwolfram.nozzle.data.room.dao
 import androidx.room.Dao
 import androidx.room.MapInfo
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReactionDao {
@@ -19,7 +20,7 @@ interface ReactionDao {
                 "WHERE eventId IN (:postIds) " +
                 "GROUP BY eventId"
     )
-    suspend fun getNumOfLikesPerPost(postIds: List<String>): Map<String, Int>
+    fun getNumOfLikesPerPostFlow(postIds: List<String>): Flow<Map<String, Int>>
 
     @Query(
         "SELECT eventId " +
@@ -27,5 +28,5 @@ interface ReactionDao {
                 "WHERE pubkey = :pubkey " +
                 "AND eventId IN (:postIds)"
     )
-    suspend fun listLikedBy(pubkey: String, postIds: List<String>): List<String>
+    fun listLikedByFlow(pubkey: String, postIds: List<String>): Flow<List<String>>
 }

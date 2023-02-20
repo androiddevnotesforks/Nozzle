@@ -13,10 +13,12 @@ fun ThreadRoute(
     onNavigateToReply: () -> Unit,
     onGoBack: () -> Unit,
 ) {
-    val uiState by threadViewModel.uiState.collectAsState()
+    val thread by threadViewModel.threadState.collectAsState()
+    val isRefreshing by threadViewModel.isRefreshingState.collectAsState()
 
     ThreadScreen(
-        uiState = uiState,
+        thread = thread,
+        isRefreshing = isRefreshing,
         onPrepareReply = onPrepareReply,
         onRefreshThreadView = threadViewModel.onRefreshThreadView,
         onLike = threadViewModel.onLike,

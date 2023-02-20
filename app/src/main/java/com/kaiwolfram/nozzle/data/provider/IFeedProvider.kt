@@ -5,10 +5,10 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.flow.Flow
 
 interface IFeedProvider {
-    fun getFeed(
+    suspend fun getFeedFlow(
         feedSettings: FeedSettings,
         limit: Int,
         until: Long? = null,
-        waitForSubscription: Boolean = true
+        waitForSubscription: Long? = null
     ): Flow<List<PostWithMeta>>
 }

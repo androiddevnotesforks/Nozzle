@@ -4,5 +4,5 @@ import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
 import kotlinx.coroutines.flow.Flow
 
 interface IProfileWithAdditionalInfoProvider {
-    fun getProfile(pubkey: String): Flow<ProfileWithAdditionalInfo>
+    fun getProfileFlow(pubkey: String): Flow<ProfileWithAdditionalInfo>
 }

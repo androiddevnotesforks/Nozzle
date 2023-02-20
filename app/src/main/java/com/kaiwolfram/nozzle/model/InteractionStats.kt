@@ -1,6 +1,6 @@
 package com.kaiwolfram.nozzle.model
 
-class InteractionStats(
+data class InteractionStats(
     private val numOfLikesPerPost: Map<String, Int>,
     private val numOfRepostsPerPost: Map<String, Int>,
     private val numOfRepliesPerPost: Map<String, Int>,
@@ -8,7 +8,7 @@ class InteractionStats(
     private val repostedByMe: List<String>,
 ) {
     fun getNumOfLikes(postId: String): Int {
-       return numOfLikesPerPost[postId] ?: 0
+        return numOfLikesPerPost[postId] ?: 0
     }
 
     fun getNumOfReposts(postId: String): Int {

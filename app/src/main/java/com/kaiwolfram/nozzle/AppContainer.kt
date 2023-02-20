@@ -108,6 +108,7 @@ class AppContainer(context: Context) {
 
     val threadProvider: IThreadProvider = ThreadProvider(
         postMapper = postMapper,
+        nostrSubscriber = nostrSubscriber,
         postDao = roomDb.postDao()
     )
 

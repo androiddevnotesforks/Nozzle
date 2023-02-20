@@ -22,7 +22,7 @@ class ProfileWithAdditionalInfoProvider(
     private val eventRelayDao: EventRelayDao,
 ) : IProfileWithAdditionalInfoProvider {
 
-    override fun getProfile(pubkey: String): Flow<ProfileWithAdditionalInfo> {
+    override fun getProfileFlow(pubkey: String): Flow<ProfileWithAdditionalInfo> {
         Log.i(TAG, "Get profile $pubkey")
         val npub = hexToNpub(pubkey)
         val profileFlow = profileDao.getProfileFlow(pubkey).distinctUntilChanged()

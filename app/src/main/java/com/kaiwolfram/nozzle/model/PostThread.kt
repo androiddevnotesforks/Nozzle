@@ -14,6 +14,11 @@ data class PostThread(
         return result
     }
 
+    fun getCurrentThreadPosition(): ThreadPosition {
+        return if (previous.isNotEmpty() || current?.replyToId != null) ThreadPosition.END
+        else ThreadPosition.SINGLE
+    }
+
     companion object {
         fun createEmpty(): PostThread {
             return PostThread(current = null, previous = listOf(), replies = listOf())

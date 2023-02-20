@@ -4,12 +4,12 @@ Nozzle is a Twitter-like nostr client for Android.
 
 ## State
 
-This project is in early alpha stage.
+This project is in alpha stage.
 
 ## Installation
 
 Go to the [release page](https://github.com/kaiwolfram/Nozzle/releases) and download the latest apk
-file or clone this repository and build it yourself
+file or clone this repository and build it yourself.
 
 ## Screenshots
 
@@ -33,23 +33,20 @@ file or clone this repository and build it yourself
 - [x] Search bar
 - [x] Show on which relays posts have been seen on
 - [x] Relay selection for sending posts and replies
-- [ ] Use Flows for smoother UX
+- [x] Different feed settings
 - [ ] Relay management
 - [ ] nip05 verification
-- [ ] URL and media preview
-- [ ] Profile lists (likes, reposts, following, followers)
 - [ ] Mentions
 - [ ] Hashtags
 - [ ] Quote repost
-- [ ] Move to nip18 for reposts
-- [ ] Lightning tip button
-- [ ] Lightning invoice widget
 - [ ] Notifications tab
-- [ ] Different feed settings
+- [ ] Profile lists (likes, reposts, following, followers)
+- [ ] Lightning tip button, invoice widget, zaps
 - [ ] Multiple accounts
+- [ ] URL and media preview
 - [ ] Mute users
 - [ ] Encrypted direct messages
-- [ ] Republish saved events to new relays
+- [ ] Export/Import events
 - [ ] Event signing with NFC card
 
 ## License

@@ -3,6 +3,7 @@ package com.kaiwolfram.nozzle.data.room.dao
 import androidx.room.*
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.model.RepostPreview
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -115,7 +116,7 @@ interface PostDao {
                 "JOIN profile ON post.pubkey = profile.pubkey " +
                 "WHERE id IN (:postIds) "
     )
-    suspend fun getRepostsPreviewMap(postIds: List<String>): Map<String, RepostPreview>
+    fun getRepostsPreviewMapFlow(postIds: List<String>): Flow<Map<String, RepostPreview>>
 
     @MapInfo(keyColumn = "repostedId", valueColumn = "repostCount")
     @Query(
@@ -124,7 +125,7 @@ interface PostDao {
                 "WHERE repostedId IN (:postIds) " +
                 "GROUP BY repostedId"
     )
-    suspend fun getNumOfRepostsPerPost(postIds: List<String>): Map<String, Int>
+    fun getNumOfRepostsPerPostFlow(postIds: List<String>): Flow<Map<String, Int>>
 
     @MapInfo(keyColumn = "replyToId", valueColumn = "replyCount")
     @Query(
@@ -133,7 +134,7 @@ interface PostDao {
                 "WHERE replyToId IN (:postIds) " +
                 "GROUP BY replyToId"
     )
-    suspend fun getNumOfRepliesPerPost(postIds: List<String>): Map<String, Int>
+    fun getNumOfRepliesPerPostFlow(postIds: List<String>): Flow<Map<String, Int>>
 
     @Query(
         "SELECT repostedId " +
@@ -141,7 +142,7 @@ interface PostDao {
                 "WHERE pubkey = :pubkey " +
                 "AND repostedId IN (:postIds)"
     )
-    suspend fun listRepostedByPubkey(pubkey: String, postIds: List<String>): List<String>
+    fun listRepostedByPubkeyFlow(pubkey: String, postIds: List<String>): Flow<List<String>>
 
     @Query(
         "SELECT pubkey " +

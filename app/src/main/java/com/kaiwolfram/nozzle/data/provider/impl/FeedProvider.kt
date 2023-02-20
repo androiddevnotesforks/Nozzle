@@ -18,8 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 private const val TAG = "FeedProvider"
-private const val EMIT_INTERVAL_TIME = 2000L
-private const val RESUB_AFTER_INTERVAL = 3
 
 class FeedProvider(
     private val pubkeyProvider: IPubkeyProvider,
@@ -29,60 +27,37 @@ class FeedProvider(
     private val contactDao: ContactDao,
 ) : IFeedProvider {
 
-    override fun getFeed(
+    override suspend fun getFeedFlow(
         feedSettings: FeedSettings,
         limit: Int,
         until: Long?,
-        waitForSubscription: Boolean,
+        waitForSubscription: Long?,
     ): Flow<List<PostWithMeta>> {
         Log.i(TAG, "Get feed")
-        return flow {
-            nostrSubscriber.unsubscribeFeeds()
-            nostrSubscriber.unsubscribeAdditionalPostsData()
-            val authorPubkeys = listPubkeys(authorSelection = feedSettings.authorSelection)
-            val relays = listRelays(relaySelection = feedSettings.relaySelection)
-            nostrSubscriber.subscribeToFeed(
-                authorPubkeys = authorPubkeys,
-                limit = 2 * limit,
-                until = until,
-                relaySelection = feedSettings.relaySelection
-            )
+        nostrSubscriber.unsubscribeFeeds()
+        nostrSubscriber.unsubscribeAdditionalPostsData()
+        val authorPubkeys = listPubkeys(authorSelection = feedSettings.authorSelection)
+        nostrSubscriber.subscribeToFeed(
+            authorPubkeys = authorPubkeys,
+            limit = 2 * limit,
+            until = until,
+            relaySelection = feedSettings.relaySelection
+        )
+        val relays = listRelays(relaySelection = feedSettings.relaySelection)
 
-            if (waitForSubscription) delay(1000)
+        waitForSubscription?.let { delay(it) }
 
-            val posts = listPosts(
-                isPosts = feedSettings.isPosts,
-                isReplies = feedSettings.isReplies,
-                authorPubkeys = authorPubkeys,
-                relays = relays,
-                until = until ?: getCurrentTimeInSeconds(),
-                limit = limit,
-            )
+        val posts = listPosts(
+            isPosts = feedSettings.isPosts,
+            isReplies = feedSettings.isReplies,
+            authorPubkeys = authorPubkeys,
+            relays = relays,
+            until = until ?: getCurrentTimeInSeconds(),
+            limit = limit,
+        )
 
-            if (posts.isNotEmpty()) {
-                postMapper.mapToPostsWithMeta(posts).let { mapped ->
-                    emit(mapped)
-                    nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
-                }
-                // TODO: Use Flow
-                var counter = 0
-                while (true) {
-                    delay(EMIT_INTERVAL_TIME)
-                    postMapper.mapToPostsWithMeta(posts).let { mapped ->
-                        Log.d(TAG, "Emit ${mapped.size}")
-                        emit(mapped)
-                        if (counter == RESUB_AFTER_INTERVAL) {
-                            Log.d(TAG, "Resub after $counter iterations")
-                            nostrSubscriber.unsubscribeAdditionalPostsData()
-                            nostrSubscriber.subscribeToAdditionalPostsData(posts = mapped)
-                        }
-                        counter++
-                    }
-                }
-            } else {
-                emit(listOf())
-            }
-        }
+        return if (posts.isEmpty()) flow { emit(listOf()) }
+        else postMapper.mapToPostsWithMetaFlow(posts)
     }
 
     private suspend fun listPubkeys(authorSelection: AuthorSelection): List<String>? {
