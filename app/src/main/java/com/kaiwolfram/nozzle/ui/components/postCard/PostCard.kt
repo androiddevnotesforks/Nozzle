@@ -125,6 +125,7 @@ fun PostCard(
         Column {
             PostCardHeaderAndContent(
                 post = post,
+                isCurrent = isCurrent,
                 onOpenProfile = onOpenProfile,
                 onNavigateToThread = {
                     if (!isCurrent) {
@@ -156,6 +157,7 @@ fun PostCard(
 @Composable
 private fun PostCardHeaderAndContent(
     post: PostWithMeta,
+    isCurrent: Boolean,
     onOpenProfile: ((String) -> Unit)?,
     onNavigateToThread: () -> Unit,
 ) {
@@ -173,6 +175,7 @@ private fun PostCardHeaderAndContent(
             } else null,
             relays = post.relays,
             content = post.content,
+            isCurrent = isCurrent,
             onNavigateToThread = onNavigateToThread,
         )
     }
@@ -219,10 +222,10 @@ private fun RepostCardContent(
                     replyToName = null,
                     relays = null,
                     content = it.content,
-                    onNavigateToThread = {
-                        onNavigateToThread(it.toPostIds())
-                    },
-                )
+                    isCurrent = false,
+                ) {
+                    onNavigateToThread(it.toPostIds())
+                }
             }
         }
     }
@@ -233,12 +236,17 @@ private fun PostCardContentBase(
     replyToName: String?,
     relays: List<String>?,
     content: String,
+    isCurrent: Boolean,
     onNavigateToThread: () -> Unit,
 ) {
     replyToName?.let { ReplyingTo(name = it) }
     relays?.let { InRelays(relays = it) }
     Spacer(Modifier.height(spacing.medium))
-    HyperlinkedText(text = content, onClickNonLink = onNavigateToThread)
+    HyperlinkedText(
+        text = content,
+        maxLines = if (isCurrent) null else 12,
+        onClickNonLink = onNavigateToThread
+    )
 }
 
 @Composable

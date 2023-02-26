@@ -20,7 +20,7 @@ private const val URL_TAG = "URL"
 fun HyperlinkedText(
     text: String,
     onClickNonLink: () -> Unit,
-    maxLines: Int = 64,
+    maxLines: Int? = null,
     overflow: TextOverflow = TextOverflow.Ellipsis
 ) {
     if (text.isNotBlank()) {
@@ -28,7 +28,7 @@ fun HyperlinkedText(
         val uriHandler = LocalUriHandler.current
         ClickableText(
             text = annotatedString,
-            maxLines = maxLines,
+            maxLines = maxLines ?: 1024,
             overflow = overflow,
             onClick = {
                 val url = annotatedString
