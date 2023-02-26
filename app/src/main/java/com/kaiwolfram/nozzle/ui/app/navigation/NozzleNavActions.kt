@@ -1,31 +1,30 @@
 package com.kaiwolfram.nozzle.ui.app.navigation
 
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 
 class NozzleNavActions(private val navController: NavHostController) {
     val navigateToProfile: (String) -> Unit = { pubkey ->
         navController.navigate(NozzleRoute.PROFILE + "/$pubkey") {
-            setNavOptionsWithPop(optionsBuilder = this)
+            setSimpleNavOptions(optionsBuilder = this)
         }
     }
 
     val navigateToFeed: () -> Unit = {
         navController.navigate(NozzleRoute.FEED) {
-            setNavOptionsWithPop(optionsBuilder = this)
+            setSimpleNavOptions(optionsBuilder = this)
         }
     }
 
     val navigateToSearch: () -> Unit = {
         navController.navigate(NozzleRoute.SEARCH) {
-            setNavOptionsWithPop(optionsBuilder = this)
+            setSimpleNavOptions(optionsBuilder = this)
         }
     }
 
     val navigateToKeys: () -> Unit = {
         navController.navigate(NozzleRoute.KEYS) {
-            setNavOptionsWithPop(optionsBuilder = this)
+            setSimpleNavOptions(optionsBuilder = this)
         }
     }
 
@@ -41,7 +40,7 @@ class NozzleNavActions(private val navController: NavHostController) {
                     "?replyToId=$replyToId" +
                     "?replyToRootId=$replyToRootId"
         ) {
-            setNavOptionsWithPop(optionsBuilder = this)
+            setSimpleNavOptions(optionsBuilder = this)
         }
     }
 
@@ -59,18 +58,6 @@ class NozzleNavActions(private val navController: NavHostController) {
 
     val popStack: () -> Unit = {
         navController.popBackStack()
-    }
-
-    private fun setNavOptionsWithPop(optionsBuilder: NavOptionsBuilder) {
-        optionsBuilder.apply {
-            // Pop up to the start destination of the graph to
-            // avoid building up a large stack of destinations
-            // on the back stack as users select items
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
-            }
-            setSimpleNavOptions(this)
-        }
     }
 
     private fun setSimpleNavOptions(optionsBuilder: NavOptionsBuilder) {
