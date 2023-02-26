@@ -200,7 +200,7 @@ class FeedViewModel(
             waitForSubscription = waitForSubscription,
         ).stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(),
+            SharingStarted.Eagerly,
             feedState.value,
         )
     }
@@ -224,7 +224,7 @@ class FeedViewModel(
             ).map { toAppend -> currentFeed + toAppend }
                 .stateIn(
                     viewModelScope,
-                    SharingStarted.WhileSubscribed(),
+                    SharingStarted.Eagerly,
                     currentFeed,
                 )
             Log.i(TAG, "New feed length ${feedState.value.size}")
