@@ -8,6 +8,7 @@ import com.kaiwolfram.nostrclientkt.model.AllRelays
 import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
+import com.kaiwolfram.nozzle.data.preferences.IFeedSettingsPreferences
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
@@ -40,6 +41,7 @@ class FeedViewModel(
     private val relayProvider: IRelayProvider,
     private val postCardInteractor: IPostCardInteractor,
     private val nostrSubscriber: INostrSubscriber,
+    private val feedSettingsPreferences: IFeedSettingsPreferences,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(FeedViewModelState())
     val uiState = viewModelState.stateIn(
@@ -64,7 +66,10 @@ class FeedViewModel(
     init {
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelState.update {
-            it.copy(pubkey = personalProfileProvider.getPubkey())
+            it.copy(
+                pubkey = personalProfileProvider.getPubkey(),
+                feedSettings = feedSettingsPreferences.getFeedSettings()
+            )
         }
         viewModelScope.launch(context = IO) {
             handleRefresh()
@@ -97,6 +102,7 @@ class FeedViewModel(
     val onRefreshOnMenuDismiss: () -> Unit = {
         if (toggledContacts || toggledPosts || toggledReplies) {
             onRefreshFeedView()
+            feedSettingsPreferences.setFeedSettings(viewModelState.value.feedSettings)
         }
         toggledContacts = false
         toggledPosts = false
@@ -269,6 +275,7 @@ class FeedViewModel(
             relayProvider: IRelayProvider,
             postCardInteractor: IPostCardInteractor,
             nostrSubscriber: INostrSubscriber,
+            feedSettingsPreferences: IFeedSettingsPreferences,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -278,6 +285,7 @@ class FeedViewModel(
                     relayProvider = relayProvider,
                     postCardInteractor = postCardInteractor,
                     nostrSubscriber = nostrSubscriber,
+                    feedSettingsPreferences = feedSettingsPreferences,
                 ) as T
             }
         }

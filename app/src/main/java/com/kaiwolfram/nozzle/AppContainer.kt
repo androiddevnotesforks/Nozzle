@@ -16,6 +16,8 @@ import com.kaiwolfram.nozzle.data.nostr.NostrService
 import com.kaiwolfram.nozzle.data.nostr.NostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.postCardInteractor.PostCardInteractor
+import com.kaiwolfram.nozzle.data.preferences.IFeedSettingsPreferences
+import com.kaiwolfram.nozzle.data.preferences.NozzlePreferences
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.profileFollower.ProfileFollower
 import com.kaiwolfram.nozzle.data.provider.*
@@ -38,6 +40,10 @@ class AppContainer(context: Context) {
     )
 
     val keyManager: IKeyManager = KeyManager(context = context)
+
+    private val nozzlePreferences = NozzlePreferences(context = context)
+
+    val feedSettingsPreferences: IFeedSettingsPreferences = nozzlePreferences
 
     private val eventProcessor: IEventProcessor = EventProcessor(
         reactionDao = roomDb.reactionDao(),
@@ -111,6 +117,4 @@ class AppContainer(context: Context) {
         nostrSubscriber = nostrSubscriber,
         postDao = roomDb.postDao()
     )
-
-
 }
