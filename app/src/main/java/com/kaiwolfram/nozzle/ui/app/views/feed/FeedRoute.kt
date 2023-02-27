@@ -38,6 +38,7 @@ fun FeedRoute(
         onToggleContactsOnly = feedViewModel.onToggleContactsOnly,
         onTogglePosts = feedViewModel.onTogglePosts,
         onToggleReplies = feedViewModel.onToggleReplies,
+        onToggleRelayIndex = feedViewModel.onToggleRelayIndex,
         onRefreshFeedView = feedViewModel.onRefreshFeedView,
         onRefreshOnMenuDismiss = feedViewModel.onRefreshOnMenuDismiss,
         onLoadMore = feedViewModel.onLoadMore,

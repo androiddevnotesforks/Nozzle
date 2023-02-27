@@ -33,6 +33,7 @@ data class FeedViewModelState(
         authorSelection = Contacts,
         relaySelection = AllRelays,
     ),
+    val relayStatuses: List<RelayActive> = listOf(),
 )
 
 class FeedViewModel(
@@ -68,7 +69,12 @@ class FeedViewModel(
         viewModelState.update {
             it.copy(
                 pubkey = personalProfileProvider.getPubkey(),
-                feedSettings = feedSettingsPreferences.getFeedSettings()
+                feedSettings = feedSettingsPreferences.getFeedSettings(),
+                // TODO: remember selected relays
+                relayStatuses = listRelayStatuses(
+                    allRelayUrls = relayProvider.listRelays(),
+                    relaySelection = AllRelays
+                )
             )
         }
         viewModelScope.launch(context = IO) {
@@ -86,11 +92,7 @@ class FeedViewModel(
     val onLoadMore: () -> Unit = {
         viewModelScope.launch(context = IO) {
             Log.i(TAG, "Load more")
-            appendFeed(
-                currentFeed = feedState.value,
-                feedSettings = viewModelState.value.feedSettings,
-                dbBatchSize = DB_BATCH_SIZE,
-            )
+            appendFeed(currentFeed = feedState.value)
             forceRecomposition.update { it + 1 }
         }
     }
@@ -153,6 +155,14 @@ class FeedViewModel(
         }
     }
 
+    // TODO: Refresh on dismiss
+    val onToggleRelayIndex: (Int) -> Unit = { index ->
+        val toggled = toggleRelay(relays = viewModelState.value.relayStatuses, index = index)
+        if (toggled.any { it.isActive }) {
+            updateRelaySelection(newRelayStatuses = toggled)
+        }
+    }
+
     val onResetProfileIconUiState: () -> Unit = {
         Log.i(TAG, "Reset profile icon")
         metadataState = personalProfileProvider.getMetadata().stateIn(
@@ -182,28 +192,18 @@ class FeedViewModel(
     private suspend fun handleRefresh() {
         setUIRefresh(true)
         subscribeToPersonalProfile()
-        updateScreen(
-            feedSettings = viewModelState.value.feedSettings,
-            updatedRelays = relayProvider.listRelays(),
-            dbBatchSize = DB_BATCH_SIZE,
-            waitForSubscription = WAIT_TIME,
-        )
+        updateScreen()
         setUIRefresh(false)
         delay(WAIT_TIME)
         renewAdditionalDataSubscription(feedState.value)
     }
 
-    private suspend fun updateScreen(
-        feedSettings: FeedSettings,
-        updatedRelays: List<String>,
-        dbBatchSize: Int,
-        waitForSubscription: Long? = null,
-    ) {
-        setUIRelays(updatedRelays)
+    private suspend fun updateScreen() {
+        updateRelaySelection()
         feedState = feedProvider.getFeedFlow(
-            feedSettings = feedSettings,
-            limit = dbBatchSize,
-            waitForSubscription = waitForSubscription,
+            feedSettings = viewModelState.value.feedSettings,
+            limit = DB_BATCH_SIZE,
+            waitForSubscription = WAIT_TIME,
         ).stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
@@ -213,19 +213,15 @@ class FeedViewModel(
 
     private val isAppending = AtomicBoolean(false)
 
-    private suspend fun appendFeed(
-        currentFeed: List<PostWithMeta>,
-        feedSettings: FeedSettings,
-        dbBatchSize: Int,
-    ) {
+    private suspend fun appendFeed(currentFeed: List<PostWithMeta>) {
         if (isAppending.get()) return
 
         currentFeed.lastOrNull()?.let { last ->
             Log.i(TAG, "Append feed")
             isAppending.set(true)
             feedState = feedProvider.getFeedFlow(
-                feedSettings = feedSettings,
-                limit = dbBatchSize,
+                feedSettings = viewModelState.value.feedSettings,
+                limit = DB_BATCH_SIZE,
                 until = last.createdAt,
             ).map { toAppend -> currentFeed + toAppend }
                 .stateIn(
@@ -238,6 +234,7 @@ class FeedViewModel(
         }
     }
 
+    // TODO: Consider relaySelection
     private fun subscribeToPersonalProfile() {
         nostrSubscriber.unsubscribeProfiles()
         nostrSubscriber.subscribeToProfileMetadataAndContactList(
@@ -247,6 +244,7 @@ class FeedViewModel(
         )
     }
 
+    // TODO: Consider relaySelection
     private suspend fun renewAdditionalDataSubscription(posts: List<PostWithMeta>) {
         nostrSubscriber.unsubscribeAdditionalPostsData()
         nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
@@ -256,14 +254,20 @@ class FeedViewModel(
         viewModelState.update { it.copy(isRefreshing = value) }
     }
 
-    private fun setUIRelays(relayUrls: List<String>) {
+    private fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
+        val selectedRelays = newRelayStatuses?.filter { it.isActive }?.map { it.relayUrl }
+            ?: viewModelState.value.relayStatuses
+                .filter { it.isActive }
+                .map { it.relayUrl }
+        val relaySelection = MultipleRelays(selectedRelays)
+        val newStatuses = newRelayStatuses ?: listRelayStatuses(
+            allRelayUrls = relayProvider.listRelays(),
+            relaySelection = relaySelection
+        )
         viewModelState.update {
             it.copy(
-                feedSettings = it.feedSettings.copy(
-                    relaySelection = MultipleRelays(
-                        relays = relayUrls
-                    )
-                )
+                relayStatuses = newStatuses,
+                feedSettings = it.feedSettings.copy(relaySelection = relaySelection)
             )
         }
     }

@@ -22,7 +22,6 @@ class RelayProvider(private val relayDao: RelayDao) : IRelayProvider {
             "wss://nos.lol",
             "wss://nostr-pub.wellorder.net",
             "wss://nostr.einundzwanzig.space",
-            "wss://nostr.bitcoiner.social",
             "wss://nostr.sandwich.farm",
         )
         scope.launch {

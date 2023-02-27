@@ -84,7 +84,6 @@ fun ChooseRelayButton(
             .clickable { showMenu.value = true },
         imageVector = Icons.Default.CellTower,
         contentDescription = stringResource(id = R.string.choose_relays),
-        tint = colors.surface
     )
 }
 

@@ -26,7 +26,9 @@ import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.RelayActive
 import com.kaiwolfram.nozzle.ui.components.AddIcon
+import com.kaiwolfram.nozzle.ui.components.ChooseRelayButton
 import com.kaiwolfram.nozzle.ui.components.FeedSettingsButton
 import com.kaiwolfram.nozzle.ui.components.ProfilePicture
 import com.kaiwolfram.nozzle.ui.components.postCard.NoPostsHint
@@ -50,6 +52,7 @@ fun FeedScreen(
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
+    onToggleRelayIndex: (Int) -> Unit,
     onLoadMore: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (PostIds) -> Unit,
@@ -65,11 +68,13 @@ fun FeedScreen(
                 picture = metadataState?.picture.orEmpty(),
                 pubkey = uiState.pubkey,
                 feedSettings = uiState.feedSettings,
+                relayStatuses = uiState.relayStatuses,
                 onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                 onToggleContactsOnly = onToggleContactsOnly,
                 onTogglePosts = onTogglePosts,
                 onToggleReplies = onToggleReplies,
                 onPictureClick = onOpenDrawer,
+                onToggleRelayIndex = onToggleRelayIndex,
                 onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } })
         },
         floatingActionButton = {
@@ -109,11 +114,13 @@ private fun FeedTopBar(
     picture: String,
     pubkey: String,
     feedSettings: FeedSettings,
+    relayStatuses: List<RelayActive>,
     onRefreshOnMenuDismiss: () -> Unit,
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
     onPictureClick: () -> Unit,
+    onToggleRelayIndex: (Int) -> Unit,
     onScrollToTop: () -> Unit
 ) {
     TopAppBar {
@@ -122,7 +129,7 @@ private fun FeedTopBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(modifier = Modifier.weight(0.1f)) {
+            Row(modifier = Modifier.weight(0.15f)) {
                 Spacer(modifier = Modifier.width(spacing.large))
                 ProfilePicture(
                     pictureUrl = picture,
@@ -135,11 +142,13 @@ private fun FeedTopBar(
                 )
             }
             Headline(
-                modifier = Modifier.weight(0.8f),
+                modifier = Modifier.weight(0.7f),
                 headline = stringResource(id = com.kaiwolfram.nozzle.R.string.home),
                 onScrollToTop = onScrollToTop,
             )
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.1f)) {
+            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.15f)) {
+                ChooseRelayButton(relays = relayStatuses, onClickIndex = onToggleRelayIndex)
+                Spacer(modifier = Modifier.width(spacing.large))
                 FeedSettingsButton(
                     feedSettings = feedSettings,
                     onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,

@@ -5,6 +5,12 @@ plugins {
     id 'kotlin-kapt'
 }
 
+// When preparing a new release:
+// - update versionName here
+// - update version name in strings.xml
+// - increase versionCode here
+// - Build -> Generate signed APK
+
 android {
     compileSdk 33
 

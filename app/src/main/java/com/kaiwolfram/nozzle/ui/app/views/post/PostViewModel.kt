@@ -50,6 +50,7 @@ class PostViewModel(
             null
         )
 
+    // TODO: Use relayProvider
     private val relayState = relayDao.listRelays()
         .stateIn(
             viewModelScope,
@@ -68,6 +69,7 @@ class PostViewModel(
         Log.i(TAG, "Initialize PostViewModel")
     }
 
+    // TODO: Preselect your nip65 write relays? + selected feed relays?
     val onPreparePost: (RelaySelection) -> Unit = { relaySelection ->
         metadataState = personalProfileProvider.getMetadata()
             .stateIn(

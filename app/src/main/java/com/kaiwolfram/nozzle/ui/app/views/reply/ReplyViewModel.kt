@@ -60,6 +60,7 @@ class ReplyViewModel(
             viewModelState.value
         )
 
+    // TODO: Use relay provider
     private val relayState = relayDao.listRelays()
         .stateIn(
             viewModelScope,
@@ -89,6 +90,7 @@ class ReplyViewModel(
                     pubkey = personalProfileProvider.getPubkey(),
                     reply = "",
                     isSendable = false,
+                    // TODO: Preselect your nip65 write relays? + post.relays?
                     relaySelection = listRelayStatuses(
                         allRelayUrls = relayState.value,
                         relaySelection = MultipleRelays(relays = post.relays),
