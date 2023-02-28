@@ -95,8 +95,8 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = ReplyViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
                         personalProfileProvider = appContainer.personalProfileManager,
+                        relayProvider = appContainer.relayProvider,
                         postDao = appContainer.roomDb.postDao(),
-                        relayDao = appContainer.roomDb.relayDao(),
                         context = LocalContext.current,
                     )
                 ),
@@ -104,8 +104,8 @@ fun NozzleApp(appContainer: AppContainer) {
                     factory = PostViewModel.provideFactory(
                         nostrService = appContainer.nostrService,
                         personalProfileProvider = appContainer.personalProfileManager,
+                        relayProvider = appContainer.relayProvider,
                         postDao = appContainer.roomDb.postDao(),
-                        relayDao = appContainer.roomDb.relayDao(),
                         context = LocalContext.current,
                     )
                 ),

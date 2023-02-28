@@ -11,8 +11,8 @@ import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
-import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.utils.listRelayStatuses
 import com.kaiwolfram.nozzle.data.utils.toggleRelay
@@ -38,8 +38,8 @@ data class ReplyViewModelState(
 class ReplyViewModel(
     private val nostrService: INostrService,
     private val personalProfileProvider: IPersonalProfileProvider,
+    relayProvider: IRelayProvider,
     private val postDao: PostDao,
-    relayDao: RelayDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ReplyViewModelState())
@@ -58,14 +58,6 @@ class ReplyViewModel(
             viewModelScope,
             SharingStarted.Eagerly,
             viewModelState.value
-        )
-
-    // TODO: Use relay provider
-    private val relayState = relayDao.listRelays()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            listOf()
         )
 
     init {
@@ -92,7 +84,7 @@ class ReplyViewModel(
                     isSendable = false,
                     // TODO: Preselect your nip65 write relays? + post.relays?
                     relaySelection = listRelayStatuses(
-                        allRelayUrls = relayState.value,
+                        allRelayUrls = relayProvider.listRelays(),
                         relaySelection = MultipleRelays(relays = post.relays),
                     ),
                 )
@@ -171,8 +163,8 @@ class ReplyViewModel(
         fun provideFactory(
             nostrService: INostrService,
             personalProfileProvider: IPersonalProfileProvider,
+            relayProvider: IRelayProvider,
             postDao: PostDao,
-            relayDao: RelayDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -180,8 +172,8 @@ class ReplyViewModel(
                 return ReplyViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
+                    relayProvider = relayProvider,
                     postDao = postDao,
-                    relayDao = relayDao,
                     context = context,
                 ) as T
             }

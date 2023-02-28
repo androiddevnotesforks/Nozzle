@@ -26,7 +26,6 @@ import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
 
-    // TODO: Add migrations instead of destructive migration
     val roomDb: AppDatabase by lazy {
         Room.databaseBuilder(
             context = context,

@@ -198,11 +198,12 @@ fun FollowButton(
     onFollow: () -> Unit,
     onUnfollow: () -> Unit
 ) {
+    // We can't rely on isFollowed bc the real follow/unfollow process
+    // might get delayed when multiple processes are running.
     val isFollowedUI = remember(isFollowed) { mutableStateOf(isFollowed) }
     if (isFollowedUI.value) {
         Button(
             onClick = {
-                // TODO: Remove this madness by improving the underlying flow
                 if (isFollowed) {
                     onUnfollow()
                     isFollowedUI.value = false
@@ -220,7 +221,6 @@ fun FollowButton(
     } else {
         Button(
             onClick = {
-                // TODO: Remove this madness by improving the underlying flow
                 if (!isFollowed) {
                     onFollow()
                     isFollowedUI.value = true

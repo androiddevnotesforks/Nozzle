@@ -43,7 +43,6 @@ file or clone this repository and build it yourself.
 - [ ] Profile lists (likes, reposts, following, followers)
 - [ ] Lightning tip button, invoice widget, zaps
 - [ ] Multiple accounts
-- [ ] URL and media preview
 - [ ] Mute users
 - [ ] Encrypted direct messages
 - [ ] Export/Import events

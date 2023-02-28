@@ -12,8 +12,8 @@ import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
+import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
-import com.kaiwolfram.nozzle.data.room.dao.RelayDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.utils.listRelayStatuses
 import com.kaiwolfram.nozzle.data.utils.toggleRelay
@@ -37,8 +37,8 @@ data class PostViewModelState(
 class PostViewModel(
     private val personalProfileProvider: IPersonalProfileProvider,
     private val nostrService: INostrService,
+    private val relayProvider: IRelayProvider,
     private val postDao: PostDao,
-    relayDao: RelayDao,
     context: Context,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(PostViewModelState())
@@ -48,14 +48,6 @@ class PostViewModel(
             viewModelScope,
             SharingStarted.Eagerly,
             null
-        )
-
-    // TODO: Use relayProvider
-    private val relayState = relayDao.listRelays()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            listOf()
         )
 
     val uiState = viewModelState
@@ -86,7 +78,7 @@ class PostViewModel(
                     content = "",
                     isSendable = false,
                     relayStatuses = listRelayStatuses(
-                        allRelayUrls = relayState.value,
+                        allRelayUrls = relayProvider.listRelays(),
                         relaySelection = relaySelection
                     ),
                 )
@@ -151,7 +143,7 @@ class PostViewModel(
             it.copy(
                 content = "",
                 relayStatuses = listRelayStatuses(
-                    allRelayUrls = relayState.value,
+                    allRelayUrls = relayProvider.listRelays(),
                     relaySelection = AllRelays
                 ),
                 isSendable = false,
@@ -164,8 +156,8 @@ class PostViewModel(
         fun provideFactory(
             personalProfileProvider: IPersonalProfileProvider,
             nostrService: INostrService,
+            relayProvider: IRelayProvider,
             postDao: PostDao,
-            relayDao: RelayDao,
             context: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -174,7 +166,7 @@ class PostViewModel(
                     nostrService = nostrService,
                     personalProfileProvider = personalProfileProvider,
                     postDao = postDao,
-                    relayDao = relayDao,
+                    relayProvider = relayProvider,
                     context = context,
                 ) as T
             }
