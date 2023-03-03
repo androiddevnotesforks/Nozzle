@@ -13,6 +13,7 @@ import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "EventProcessor"
 
@@ -22,11 +23,14 @@ class EventProcessor(
     private val profileDao: ProfileDao,
     private val postDao: PostDao,
     private val eventRelayDao: EventRelayDao,
-    private val userRelayDao: UserRelayDao,
 ) : IEventProcessor {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
+    private val idCache = Collections.synchronizedSet(mutableSetOf<String>())
+
     override fun process(event: Event, relayUrl: String?) {
+        if (idCache.contains(event.id)) return
+
         if (event.isReaction()) {
             processReaction(event = event, relayUrl = relayUrl)
             return
@@ -128,6 +132,8 @@ class EventProcessor(
         val isValid = event.verify()
         if (!isValid) {
             Log.d(TAG, "Invalid event ${event.id} kind ${event.kind}")
+        } else {
+            idCache.add(event.id)
         }
         return isValid
     }

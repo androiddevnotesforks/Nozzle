@@ -13,9 +13,8 @@ import com.kaiwolfram.nozzle.data.room.entity.*
         ProfileEntity::class,
         ReactionEntity::class,
         RelayEntity::class,
-        UserRelayEntity::class,
     ],
-    version = 3
+    version = 4
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun contactDao(): ContactDao
@@ -24,5 +23,4 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun postDao(): PostDao
     abstract fun reactionDao(): ReactionDao
     abstract fun relayDao(): RelayDao
-    abstract fun userRelayDao(): UserRelayDao
 }
