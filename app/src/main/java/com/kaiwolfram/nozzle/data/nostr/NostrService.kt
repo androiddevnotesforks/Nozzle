@@ -88,6 +88,8 @@ class NostrService(
         )
         when (relaySelection) {
             is AllRelays -> client.publishToAllRelays(event)
+            is Autopilot -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
+            is PersonalNip65 -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
             is MultipleRelays -> client.publishToRelays(
                 event = event,
                 relays = relaySelection.relays
@@ -139,6 +141,8 @@ class NostrService(
         )
         when (relaySelection) {
             is AllRelays -> client.publishToAllRelays(event)
+            is PersonalNip65 -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
+            is Autopilot -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
             is MultipleRelays -> client.publishToRelays(
                 event = event,
                 relays = relaySelection.relays

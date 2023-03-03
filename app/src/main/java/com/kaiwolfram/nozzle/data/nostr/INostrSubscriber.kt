@@ -23,6 +23,8 @@ interface INostrSubscriber {
 
     fun subscribeToProfiles(pubkeys: List<String>): List<String>
 
+    fun subscribeToNip65(pubkeys: List<String>): List<String>
+
     fun unsubscribeFeeds()
 
     fun unsubscribeAdditionalPostsData()
@@ -30,4 +32,6 @@ interface INostrSubscriber {
     fun unsubscribeThread()
 
     fun unsubscribeProfiles()
+
+    fun unsubscribeToNip65()
 }

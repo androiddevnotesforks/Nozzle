@@ -1,8 +1,6 @@
 package com.kaiwolfram.nozzle.data.utils
 
-import com.kaiwolfram.nostrclientkt.model.AllRelays
-import com.kaiwolfram.nostrclientkt.model.MultipleRelays
-import com.kaiwolfram.nostrclientkt.model.RelaySelection
+import com.kaiwolfram.nostrclientkt.model.*
 import com.kaiwolfram.nozzle.model.RelayActive
 
 fun toggleRelay(relays: List<RelayActive>, index: Int): List<RelayActive> {
@@ -18,6 +16,8 @@ fun listRelayStatuses(
     return allRelayUrls.map {
         val isActive = when (relaySelection) {
             is AllRelays -> true
+            is Autopilot -> true // TODO: Use AutopilotProvider
+            is PersonalNip65 -> true // TODO: Use your relays
             is MultipleRelays -> relaySelection.relays.contains(it)
         }
         RelayActive(relayUrl = it, isActive = isActive)

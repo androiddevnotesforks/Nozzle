@@ -59,5 +59,12 @@ class Filter(
                 kinds = listOf(Event.Kind.CONTACT_LIST),
             )
         }
+
+        fun createNip65Filter(pubkeys: List<String>): Filter {
+            return Filter(
+                authors = pubkeys,
+                kinds = listOf(Event.Kind.Nip65),
+            )
+        }
     }
 }

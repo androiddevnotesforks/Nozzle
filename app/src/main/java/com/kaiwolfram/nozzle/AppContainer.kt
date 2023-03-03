@@ -25,7 +25,6 @@ import com.kaiwolfram.nozzle.data.provider.impl.*
 import com.kaiwolfram.nozzle.data.room.AppDatabase
 
 class AppContainer(context: Context) {
-
     val roomDb: AppDatabase by lazy {
         Room.databaseBuilder(
             context = context,
@@ -39,6 +38,11 @@ class AppContainer(context: Context) {
     )
 
     val keyManager: IKeyManager = KeyManager(context = context)
+
+    val contactListProvider: IContactListProvider = ContactListProvider(
+        pubkeyProvider = keyManager,
+        contactDao = roomDb.contactDao()
+    )
 
     private val nozzlePreferences = NozzlePreferences(context = context)
 
@@ -90,11 +94,10 @@ class AppContainer(context: Context) {
     )
 
     val feedProvider: IFeedProvider = FeedProvider(
-        pubkeyProvider = keyManager,
         postMapper = postMapper,
         nostrSubscriber = nostrSubscriber,
         postDao = roomDb.postDao(),
-        contactDao = roomDb.contactDao(),
+        contactListProvider = contactListProvider,
     )
 
     val profileWithFollowerProvider: IProfileWithAdditionalInfoProvider =

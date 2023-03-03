@@ -11,6 +11,7 @@ import com.kaiwolfram.nozzle.model.PostWithMeta
 
 private const val TAG = "NostrSubscriber"
 
+// TODO: Check if separation of sub and unsub is needed or should be combined for less code
 class NostrSubscriber(
     private val nostrService: INostrService,
     private val postDao: PostDao
@@ -19,7 +20,9 @@ class NostrSubscriber(
     private val threadSubscriptions = mutableListOf<String>()
     private val additionalFeedDataSubscriptions = mutableListOf<String>()
     private val profileSubscriptions = mutableListOf<String>()
+    private val nip65Subscriptions = mutableListOf<String>()
 
+    // TODO: RelaySelection
     override fun subscribeToProfileMetadataAndContactList(pubkeys: List<String>): List<String> {
         Log.i(TAG, "Subscribe metadata and contact list for ${pubkeys.size} pubkeys")
         val profileFilter = Filter.createProfileFilter(pubkeys = pubkeys)
@@ -56,6 +59,7 @@ class NostrSubscriber(
         return ids
     }
 
+    // TODO: RelaySelection
     override suspend fun subscribeToAdditionalPostsData(
         posts: List<PostWithMeta>
     ): List<String> {
@@ -87,6 +91,7 @@ class NostrSubscriber(
         return ids
     }
 
+    // TODO: RelaySelection
     override fun subscribeToThread(
         currentPostId: String,
         replyToId: String?,
@@ -111,6 +116,7 @@ class NostrSubscriber(
         return ids
     }
 
+    // TODO: RelaySelection
     override fun subscribeToProfiles(pubkeys: List<String>): List<String> {
         Log.i(TAG, "Subscribe to ${pubkeys.size} profiles")
 
@@ -123,6 +129,23 @@ class NostrSubscriber(
             unsubOnEOSE = true
         )
         profileSubscriptions.addAll(ids)
+
+        return ids
+    }
+
+    // No relaySelection needed because nip65 could be anywhere
+    override fun subscribeToNip65(pubkeys: List<String>): List<String> {
+        Log.i(TAG, "Subscribe to ${pubkeys.size} nip65s")
+
+        if (pubkeys.isEmpty()) return listOf()
+
+        val nip65Filter = Filter.createNip65Filter(pubkeys = pubkeys)
+
+        val ids = nostrService.subscribe(
+            filters = listOf(nip65Filter),
+            unsubOnEOSE = true
+        )
+        nip65Subscriptions.addAll(ids)
 
         return ids
     }
@@ -145,5 +168,10 @@ class NostrSubscriber(
     override fun unsubscribeProfiles() {
         nostrService.unsubscribe(profileSubscriptions)
         profileSubscriptions.clear()
+    }
+
+    override fun unsubscribeToNip65() {
+        nostrService.unsubscribe(nip65Subscriptions)
+        nip65Subscriptions.clear()
     }
 }

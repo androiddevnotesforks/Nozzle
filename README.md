@@ -40,6 +40,7 @@ file or clone this repository and build it yourself.
 - [ ] Hashtags
 - [ ] Quote repost
 - [ ] Notifications tab
+- [ ] Bookmarks
 - [ ] Profile lists (likes, reposts, following, followers)
 - [ ] Lightning tip button, invoice widget, zaps
 - [ ] Multiple accounts

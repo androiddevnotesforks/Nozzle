@@ -19,6 +19,13 @@ interface ContactDao {
     suspend fun listContactPubkeys(pubkey: String): List<String>
 
     @Query(
+        "SELECT contactPubkey " +
+                "FROM contact " +
+                "WHERE pubkey = :pubkey"
+    )
+    fun listContactPubkeysFlow(pubkey: String): Flow<List<String>>
+
+    @Query(
         "SELECT * " +
                 "FROM contact " +
                 "WHERE pubkey = :pubkey"

@@ -222,7 +222,7 @@ class ProfileViewModel(
             isPosts = true,
             isReplies = true,
             authorSelection = SingleAuthor(profileState.value.pubkey),
-            relaySelection = AllRelays
+            relaySelection = AllRelays // TODO: Autopilot
         )
     }
 

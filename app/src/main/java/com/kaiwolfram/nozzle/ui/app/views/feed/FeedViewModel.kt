@@ -9,6 +9,7 @@ import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.IFeedSettingsPreferences
+import com.kaiwolfram.nozzle.data.provider.IContactListProvider
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
@@ -40,6 +41,7 @@ class FeedViewModel(
     private val personalProfileProvider: IPersonalProfileProvider,
     private val feedProvider: IFeedProvider,
     private val relayProvider: IRelayProvider,
+    private val contactListProvider: IContactListProvider,
     private val postCardInteractor: IPostCardInteractor,
     private val nostrSubscriber: INostrSubscriber,
     private val feedSettingsPreferences: IFeedSettingsPreferences,
@@ -191,7 +193,9 @@ class FeedViewModel(
 
     private suspend fun handleRefresh() {
         setUIRefresh(true)
+        // TODO: nip65
         subscribeToPersonalProfile()
+        subscribeToNip65()
         updateScreen()
         setUIRefresh(false)
         delay(WAIT_TIME)
@@ -200,6 +204,7 @@ class FeedViewModel(
 
     private suspend fun updateScreen() {
         updateRelaySelection()
+        // TODO: combine flow instead of new stateIn??
         feedState = feedProvider.getFeedFlow(
             feedSettings = viewModelState.value.feedSettings,
             limit = DB_BATCH_SIZE,
@@ -234,13 +239,20 @@ class FeedViewModel(
         }
     }
 
-    // TODO: Consider relaySelection
+    // TODO: Consider relaySelection / nip65
     private fun subscribeToPersonalProfile() {
         nostrSubscriber.unsubscribeProfiles()
         nostrSubscriber.subscribeToProfileMetadataAndContactList(
             pubkeys = listOf(
                 personalProfileProvider.getPubkey()
             )
+        )
+    }
+
+    private fun subscribeToNip65() {
+        nostrSubscriber.unsubscribeToNip65()
+        nostrSubscriber.subscribeToNip65(
+            pubkeys = contactListProvider.listPersonalContactPubkeys()
         )
     }
 
@@ -277,6 +289,7 @@ class FeedViewModel(
             personalProfileProvider: IPersonalProfileProvider,
             feedProvider: IFeedProvider,
             relayProvider: IRelayProvider,
+            contactListProvider: IContactListProvider,
             postCardInteractor: IPostCardInteractor,
             nostrSubscriber: INostrSubscriber,
             feedSettingsPreferences: IFeedSettingsPreferences,
@@ -287,6 +300,7 @@ class FeedViewModel(
                     personalProfileProvider = personalProfileProvider,
                     feedProvider = feedProvider,
                     relayProvider = relayProvider,
+                    contactListProvider = contactListProvider,
                     postCardInteractor = postCardInteractor,
                     nostrSubscriber = nostrSubscriber,
                     feedSettingsPreferences = feedSettingsPreferences,

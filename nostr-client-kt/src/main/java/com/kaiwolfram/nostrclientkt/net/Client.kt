@@ -61,6 +61,8 @@ class Client {
         val ids = mutableListOf<String>()
         val filteredSockets = when (relaySelection) {
             is AllRelays -> sockets.values
+            is Autopilot -> sockets.values // TODO: Use AutopilotProvider
+            is PersonalNip65 -> sockets.values // TODO: Use your relays
             is MultipleRelays -> {
                 addRelays(relaySelection.relays)
                 sockets.entries
@@ -86,11 +88,11 @@ class Client {
     }
 
     fun unsubscribe(subscriptionId: String) {
-        Log.d(TAG, "Unsubscribe from $subscriptionId")
-
-        val request = """["CLOSE","$subscriptionId"]"""
-        subscriptions[subscriptionId]?.send(request)
-        subscriptions.remove(subscriptionId)
+        subscriptions[subscriptionId]?.let { socket ->
+            Log.d(TAG, "Unsubscribe from $subscriptionId")
+            socket.send("""["CLOSE","$subscriptionId"]""")
+            subscriptions.remove(subscriptionId)
+        }
     }
 
     fun publishToAllRelays(event: Event) {

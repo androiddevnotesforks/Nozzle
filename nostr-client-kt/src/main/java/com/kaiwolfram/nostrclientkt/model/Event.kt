@@ -29,6 +29,7 @@ class Event(
         const val TEXT_NOTE = 1
         const val CONTACT_LIST = 3
         const val REACTION = 7
+        const val Nip65 = 10002
     }
 
     companion object {

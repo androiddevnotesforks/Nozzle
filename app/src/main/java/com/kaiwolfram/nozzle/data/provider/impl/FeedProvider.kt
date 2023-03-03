@@ -1,14 +1,11 @@
 package com.kaiwolfram.nozzle.data.provider.impl
 
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.model.AllRelays
-import com.kaiwolfram.nostrclientkt.model.MultipleRelays
-import com.kaiwolfram.nostrclientkt.model.RelaySelection
+import com.kaiwolfram.nostrclientkt.model.*
 import com.kaiwolfram.nozzle.data.mapper.IPostMapper
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
+import com.kaiwolfram.nozzle.data.provider.IContactListProvider
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
-import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
-import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.utils.getCurrentTimeInSeconds
@@ -20,11 +17,10 @@ import kotlinx.coroutines.flow.flow
 private const val TAG = "FeedProvider"
 
 class FeedProvider(
-    private val pubkeyProvider: IPubkeyProvider,
     private val postMapper: IPostMapper,
     private val nostrSubscriber: INostrSubscriber,
     private val postDao: PostDao,
-    private val contactDao: ContactDao,
+    private val contactListProvider: IContactListProvider,
 ) : IFeedProvider {
 
     override suspend fun getFeedFlow(
@@ -34,6 +30,7 @@ class FeedProvider(
         waitForSubscription: Long?,
     ): Flow<List<PostWithMeta>> {
         Log.i(TAG, "Get feed")
+
         nostrSubscriber.unsubscribeFeeds()
         nostrSubscriber.unsubscribeAdditionalPostsData()
         val authorPubkeys = listPubkeys(authorSelection = feedSettings.authorSelection)
@@ -60,10 +57,10 @@ class FeedProvider(
         else postMapper.mapToPostsWithMetaFlow(posts)
     }
 
-    private suspend fun listPubkeys(authorSelection: AuthorSelection): List<String>? {
+    private fun listPubkeys(authorSelection: AuthorSelection): List<String>? {
         return when (authorSelection) {
             is Everyone -> null
-            is Contacts -> contactDao.listContactPubkeys(pubkeyProvider.getPubkey())
+            is Contacts -> contactListProvider.listPersonalContactPubkeys() // TODO: Use contactListProvider
             is SingleAuthor -> listOf(authorSelection.pubkey)
         }
     }
@@ -71,6 +68,8 @@ class FeedProvider(
     private fun listRelays(relaySelection: RelaySelection): List<String>? {
         return when (relaySelection) {
             is AllRelays -> null
+            is Autopilot -> null // TODO: Use autopilot provider
+            is PersonalNip65 -> null // TODO: Use your relays
             is MultipleRelays -> relaySelection.relays
         }
     }
