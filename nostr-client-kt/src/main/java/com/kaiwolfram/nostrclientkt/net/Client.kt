@@ -54,6 +54,7 @@ class Client {
         }
     }
 
+    // TODO: relaySelection should be nullable relay list
     fun subscribe(filters: List<Filter>, relaySelection: RelaySelection = AllRelays): List<String> {
         if (filters.isEmpty()) {
             return listOf()
@@ -61,8 +62,8 @@ class Client {
         val ids = mutableListOf<String>()
         val filteredSockets = when (relaySelection) {
             is AllRelays -> sockets.values
-            is Autopilot -> sockets.values // TODO: Use AutopilotProvider
-            is PersonalNip65 -> sockets.values // TODO: Use your relays
+            is Autopilot -> sockets.values
+            is PersonalNip65 -> sockets.values
             is MultipleRelays -> {
                 addRelays(relaySelection.relays)
                 sockets.entries
