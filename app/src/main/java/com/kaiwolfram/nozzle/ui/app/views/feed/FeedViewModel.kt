@@ -252,7 +252,7 @@ class FeedViewModel(
     private fun subscribeToNip65() {
         nostrSubscriber.unsubscribeToNip65()
         nostrSubscriber.subscribeToNip65(
-            pubkeys = contactListProvider.listPersonalContactPubkeys()
+            pubkeys = contactListProvider.listPersonalContactPubkeys() + personalProfileProvider.getPubkey()
         )
     }
 

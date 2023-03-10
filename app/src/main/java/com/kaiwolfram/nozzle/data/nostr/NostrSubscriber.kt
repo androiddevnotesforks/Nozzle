@@ -60,6 +60,7 @@ class NostrSubscriber(
     }
 
     // TODO: RelaySelection
+    // TODO: Set limit. Large threads will fry your device otherwise
     override suspend fun subscribeToAdditionalPostsData(
         posts: List<PostWithMeta>
     ): List<String> {

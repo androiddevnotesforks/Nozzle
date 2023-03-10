@@ -2,9 +2,6 @@ package com.kaiwolfram.nostrclientkt.model
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
-import com.kaiwolfram.nostrclientkt.ContactListEntry
-import com.kaiwolfram.nostrclientkt.Keys
-import com.kaiwolfram.nostrclientkt.Post
 import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 import com.kaiwolfram.nostrclientkt.utils.SchnorrUtils
 import com.kaiwolfram.nostrclientkt.utils.SchnorrUtils.secp256k1
@@ -29,7 +26,7 @@ class Event(
         const val TEXT_NOTE = 1
         const val CONTACT_LIST = 3
         const val REACTION = 7
-        const val Nip65 = 10002
+        const val NIP65 = 10002
     }
 
     companion object {
@@ -204,8 +201,25 @@ class Event(
         return tags.find { it.getOrNull(0) == "e" }?.getOrNull(1)
     }
 
+    fun getNip65Entries(): List<Nip65Entry> {
+        return tags.filter {
+            it.size >= 2
+                    && it.first() == "r"
+                    && it[1].startsWith("wss://") // TODO: Better URL check
+                    && it[1].length >= 10 // TODO: Better URL check
+        }.map {
+            val restriction = it.getOrNull(2)
+            Nip65Entry(
+                url = it[1],
+                isRead = restriction == null || restriction == "read",
+                isWrite = restriction == null || restriction == "write",
+            )
+        }
+    }
+
     fun isReaction() = this.kind == Kind.REACTION
     fun isPost() = this.kind == Kind.TEXT_NOTE
     fun isProfileMetadata() = this.kind == Kind.METADATA
     fun isContactList() = this.kind == Kind.CONTACT_LIST
+    fun isNip65() = this.kind == Kind.NIP65
 }

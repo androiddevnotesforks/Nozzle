@@ -63,7 +63,7 @@ class Filter(
         fun createNip65Filter(pubkeys: List<String>): Filter {
             return Filter(
                 authors = pubkeys,
-                kinds = listOf(Event.Kind.Nip65),
+                kinds = listOf(Event.Kind.NIP65),
             )
         }
     }

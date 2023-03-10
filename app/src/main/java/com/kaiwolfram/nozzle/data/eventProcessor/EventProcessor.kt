@@ -8,6 +8,7 @@ import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nostrclientkt.model.Tag
 import com.kaiwolfram.nozzle.data.room.dao.*
 import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
+import com.kaiwolfram.nozzle.data.room.entity.Nip65Entity
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.room.entity.ProfileEntity
 import kotlinx.coroutines.CoroutineScope
@@ -23,10 +24,12 @@ class EventProcessor(
     private val profileDao: ProfileDao,
     private val postDao: PostDao,
     private val eventRelayDao: EventRelayDao,
+    private val nip65Dao: Nip65Dao,
 ) : IEventProcessor {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
     private val idCache = Collections.synchronizedSet(mutableSetOf<String>())
+    private val idRelayCache = Collections.synchronizedSet(mutableSetOf<String>())
 
     override fun process(event: Event, relayUrl: String?) {
         if (event.isReaction()) {
@@ -45,29 +48,33 @@ class EventProcessor(
             processContactList(event = event)
             return
         }
+        if (event.isNip65()) {
+            processNip65(event = event)
+            return
+        }
     }
 
     private fun processPost(event: Event, relayUrl: String?) {
         if (!verify(event)) return
+        insertEventRelay(eventId = event.id, relayUrl = relayUrl)
 
-        if (!idCache.contains(event.id)) {
-            scope.launch {
-                postDao.insertIfNotPresent(
-                    PostEntity(
-                        id = event.id,
-                        pubkey = event.pubkey,
-                        replyToId = event.getReplyId(),
-                        replyToRootId = event.getRootReplyId(),
-                        repostedId = event.getRepostedId(),
-                        content = event.content,
-                        createdAt = event.createdAt,
-                    )
+        if (idCache.contains(event.id)) return
+        idCache.add(event.id)
+
+        scope.launch {
+            postDao.insertIfNotPresent(
+                PostEntity(
+                    id = event.id,
+                    pubkey = event.pubkey,
+                    replyToId = event.getReplyId(),
+                    replyToRootId = event.getRootReplyId(),
+                    repostedId = event.getRepostedId(),
+                    content = event.content,
+                    createdAt = event.createdAt,
                 )
-            }
+            )
         }
 
-        insertEventRelay(eventId = event.id, relayUrl = relayUrl)
-        idCache.add(event.id)
     }
 
     private fun processReaction(event: Event) {
@@ -92,6 +99,7 @@ class EventProcessor(
 
         scope.launch {
             // TODO: dao.deleteIfOutdated():Boolean to save one call
+            // TODO: room Transaction
             val latestTimestamp = contactDao.getLatestTimestamp(event.pubkey) ?: 0
             if (event.createdAt > latestTimestamp) {
                 contactDao.deleteList(pubkey = event.pubkey)
@@ -110,10 +118,7 @@ class EventProcessor(
 
     private fun processMetadata(event: Event) {
         if (idCache.contains(event.id)) return
-        if (!verify(event)) {
-            Log.d(TAG, "Metadata is invalid ${event.id}")
-            return
-        }
+        if (!verify(event)) return
 
         idCache.add(event.id)
 
@@ -121,6 +126,7 @@ class EventProcessor(
         deserializeMetadata(event.content)?.let {
             scope.launch {
                 // TODO: Return if deleted to save insert call
+                // TODO: room Transaction
                 profileDao.deleteIfOutdated(pubkey = event.pubkey, createdAt = event.createdAt)
                 profileDao.insertOrIgnore(
                     ProfileEntity(
@@ -134,6 +140,34 @@ class EventProcessor(
                     )
                 )
             }
+        }
+    }
+
+    private fun processNip65(event: Event) {
+        if (idCache.contains(event.id)) return
+
+        val nip65Entries = event.getNip65Entries()
+        if (nip65Entries.isEmpty()) return
+        if (!verify(event)) return
+
+        idCache.add(event.id)
+
+        Log.d(TAG, "Process ${nip65Entries.size} nip65 entries from ${event.pubkey}")
+        scope.launch {
+            val entities = nip65Entries.map {
+                Nip65Entity(
+                    pubkey = event.pubkey,
+                    url = it.url,
+                    isRead = it.isRead,
+                    isWrite = it.isWrite,
+                    createdAt = event.createdAt,
+                )
+            }
+            nip65Dao.insertAndDeleteOutdated(
+                pubkey = event.pubkey,
+                timestamp = event.createdAt,
+                nip65Entities = entities.toTypedArray()
+            )
         }
     }
 
@@ -165,12 +199,14 @@ class EventProcessor(
     }
 
     private fun insertEventRelay(eventId: String, relayUrl: String?) {
-        if (relayUrl == null) {
-            return
-        } else {
-            scope.launch {
-                eventRelayDao.insertOrIgnore(eventId = eventId, relayUrl = relayUrl)
-            }
+        if (relayUrl == null) return
+
+        val id = eventId + relayUrl
+        if (idRelayCache.contains(id)) return
+        idRelayCache.add(id)
+
+        scope.launch {
+            eventRelayDao.insertOrIgnore(eventId = eventId, relayUrl = relayUrl)
         }
     }
 }

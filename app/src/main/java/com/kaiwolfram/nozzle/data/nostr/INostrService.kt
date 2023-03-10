@@ -1,7 +1,5 @@
 package com.kaiwolfram.nozzle.data.nostr
 
-import com.kaiwolfram.nostrclientkt.ContactListEntry
-import com.kaiwolfram.nostrclientkt.ReplyTo
 import com.kaiwolfram.nostrclientkt.model.*
 
 interface INostrService {

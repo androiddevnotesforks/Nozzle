@@ -1,7 +1,7 @@
 package com.kaiwolfram.nozzle.data.room.entity
 
 import androidx.room.Entity
-import com.kaiwolfram.nostrclientkt.ContactListEntry
+import com.kaiwolfram.nostrclientkt.model.ContactListEntry
 
 @Entity(tableName = "contact", primaryKeys = ["pubkey", "contactPubkey"])
 data class ContactEntity(

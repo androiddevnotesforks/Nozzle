@@ -9,16 +9,18 @@ import com.kaiwolfram.nozzle.data.room.entity.*
     entities = [
         ContactEntity::class,
         EventRelayEntity::class,
+        Nip65Entity::class,
         PostEntity::class,
         ProfileEntity::class,
         ReactionEntity::class,
         RelayEntity::class,
     ],
-    version = 4
+    version = 5
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun contactDao(): ContactDao
     abstract fun eventRelayDao(): EventRelayDao
+    abstract fun nip65Dao(): Nip65Dao
     abstract fun profileDao(): ProfileDao
     abstract fun postDao(): PostDao
     abstract fun reactionDao(): ReactionDao

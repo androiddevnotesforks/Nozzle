@@ -1,10 +1,6 @@
 package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.ContactListEntry
-import com.kaiwolfram.nostrclientkt.Post
-import com.kaiwolfram.nostrclientkt.ReplyTo
-import com.kaiwolfram.nostrclientkt.RepostId
 import com.kaiwolfram.nostrclientkt.model.*
 import com.kaiwolfram.nostrclientkt.net.Client
 import com.kaiwolfram.nostrclientkt.net.NostrListener

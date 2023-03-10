@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.kaiwolfram.nostrclientkt.Keys
+import com.kaiwolfram.nostrclientkt.model.Keys
 import com.kaiwolfram.nozzle.data.PreferenceFileNames
 import com.kaiwolfram.nozzle.data.manager.IKeyManager
 import com.kaiwolfram.nozzle.data.utils.*

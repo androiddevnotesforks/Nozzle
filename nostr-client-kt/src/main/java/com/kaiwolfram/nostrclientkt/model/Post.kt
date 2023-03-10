@@ -1,4 +1,4 @@
-package com.kaiwolfram.nostrclientkt
+package com.kaiwolfram.nostrclientkt.model
 
 data class Post(
     val replyTo: ReplyTo? = null,
