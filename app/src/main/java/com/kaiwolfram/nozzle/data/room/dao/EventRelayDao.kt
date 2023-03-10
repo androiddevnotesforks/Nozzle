@@ -17,9 +17,18 @@ interface EventRelayDao {
     @Query(
         "SELECT * " +
                 "FROM eventRelay " +
-                "WHERE eventId IN (:eventIds) "
+                "WHERE eventId IN (:eventIds)"
     )
-    fun getRelayMapFlow(eventIds: List<String>): Flow<Map<String, List<String>>>
+    fun getRelaysPerEventIdMapFlow(eventIds: List<String>): Flow<Map<String, List<String>>>
+
+    @MapInfo(keyColumn = "relayUrl", valueColumn = "pubkey")
+    @Query(
+        "SELECT eventRelay.relayUrl, post.pubkey " +
+                "FROM eventRelay " +
+                "JOIN post ON post.id = eventRelay.eventId " +
+                "WHERE post.pubkey IN (:pubkeys)"
+    )
+    suspend fun getPubkeysPerRelayMap(pubkeys: List<String>): Map<String, Set<String>>
 
     @Query(
         "SELECT DISTINCT(relayUrl) " +

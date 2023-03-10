@@ -27,4 +27,21 @@ interface Nip65Dao {
         deleteIfOutdated(pubkey = pubkey, newTimestamp = timestamp)
         insertOrIgnore(*nip65Entities)
     }
+
+    @MapInfo(keyColumn = "url", valueColumn = "pubkey")
+    @Query(
+        "SELECT pubkey, url " +
+                "FROM nip65 " +
+                "WHERE isWrite IS TRUE " +
+                "AND pubkey IN (:pubkeys)"
+    )
+    suspend fun getPubkeysPerWriteRelayMap(pubkeys: List<String>): Map<String, Set<String>>
+
+    @Query(
+        "SELECT url " +
+                "FROM nip65 " +
+                "WHERE isRead IS TRUE " +
+                "AND pubkey = :pubkey"
+    )
+    suspend fun getReadRelaysOfPubkey(pubkey: String): List<String>
 }

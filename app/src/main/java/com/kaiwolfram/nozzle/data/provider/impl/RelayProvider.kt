@@ -25,7 +25,6 @@ class RelayProvider(private val relayDao: RelayDao) : IRelayProvider {
             "wss://nostr.sandwich.farm",
         )
         scope.launch {
-            relayDao.deleteAll()
             relays.forEach {
                 Log.i(TAG, "Insert relay $it")
                 relayDao.insertOrIgnore(it)
@@ -33,6 +32,10 @@ class RelayProvider(private val relayDao: RelayDao) : IRelayProvider {
         }
     }
 
+    // TODO: Show only active relays.
+    //  Initially nozzle defaults
+    //  Then your nip65
+    //  Then currently active in nostr client
     override fun listRelays(): List<String> {
         return relaysState.value
     }

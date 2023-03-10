@@ -31,7 +31,7 @@ class PostMapper(
         val replyRecipientsFlow =
             profileDao.getAuthorNamesAndPubkeysMapFlow(posts.mapNotNull { it.replyToId })
                 .distinctUntilChanged()
-        val relaysFlow = eventRelayDao.getRelayMapFlow(postIds).distinctUntilChanged()
+        val relaysFlow = eventRelayDao.getRelaysPerEventIdMapFlow(postIds).distinctUntilChanged()
 
         val mainFlow = flow {
             emit(posts.map {
