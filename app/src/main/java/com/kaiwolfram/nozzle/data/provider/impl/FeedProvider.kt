@@ -36,7 +36,10 @@ class FeedProvider(
         val authorPubkeys = listPubkeys(authorSelection = feedSettings.authorSelection)
         nostrSubscriber.subscribeToFeed(
             authorPubkeys = authorPubkeys,
-            limit = 2 * limit,
+            // We can't exclude replies in relay subscriptions,
+            // so we increase the limit for post-only settings
+            // to increase the chance of receiving more posts.
+            limit = if (feedSettings.isReplies) 2 * limit else 3 * limit,
             until = until,
             relaySelection = feedSettings.relaySelection
         )
