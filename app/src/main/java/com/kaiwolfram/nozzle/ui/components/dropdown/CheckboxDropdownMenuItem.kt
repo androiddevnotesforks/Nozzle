@@ -12,14 +12,17 @@ fun CheckboxDropdownMenuItem(
     isChecked: Boolean,
     text: String,
     onToggle: () -> Unit,
+    enabled: Boolean = true,
     contentPadding: PaddingValues = PaddingValues()
 ) {
     DropdownMenuItem(
         onClick = onToggle,
+        enabled = enabled,
         contentPadding = contentPadding
     ) {
         Checkbox(
             checked = isChecked,
+            enabled = enabled,
             onCheckedChange = { onToggle() })
         Text(
             text = text,

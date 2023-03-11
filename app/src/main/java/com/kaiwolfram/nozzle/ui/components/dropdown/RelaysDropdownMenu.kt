@@ -33,20 +33,24 @@ fun RelaysDropdownMenu(
                 )
             }
         }
-        if (isAutopilot != null && onToggleAutopilot != null) {
-            CheckboxDropdownMenuItem(
-                isChecked = isAutopilot,
-                text = stringResource(id = R.string.autopilot),
-                contentPadding = PaddingValues(start = spacing.medium, end = spacing.xl),
-                onToggle = onToggleAutopilot,
-            )
-            DropdownDivider()
+        isAutopilot?.let { isChecked ->
+            onToggleAutopilot?.let { onToggle ->
+                CheckboxDropdownMenuItem(
+                    isChecked = isChecked,
+                    text = stringResource(id = R.string.autopilot),
+                    contentPadding = PaddingValues(start = spacing.medium, end = spacing.xl),
+                    onToggle = onToggle,
+                )
+                DropdownDivider()
+            }
         }
+        val isAutopilotUI = isAutopilot == true && onToggleAutopilot != null
         menuItems.forEachIndexed { index, item ->
             CheckboxDropdownMenuItem(
                 isChecked = item.isActive,
                 text = item.relayUrl.removePrefix("wss://"),
                 contentPadding = PaddingValues(start = spacing.medium, end = spacing.xl),
+                enabled = !isAutopilotUI,
                 onToggle = { onClickIndex(index) }
             )
         }
