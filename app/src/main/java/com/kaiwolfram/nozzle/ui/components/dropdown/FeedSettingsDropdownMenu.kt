@@ -1,12 +1,8 @@
 package com.kaiwolfram.nozzle.ui.components.dropdown
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.model.FeedSettings
@@ -32,11 +28,7 @@ fun FeedSettingsDropdownMenu(
             contentPadding = padding,
             onToggle = onToggleContactsOnly,
         )
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = spacing.medium)
-        )
+        DropdownDivider()
         CheckboxDropdownMenuItem(
             isChecked = feedSettings.isPosts,
             text = stringResource(id = R.string.posts),

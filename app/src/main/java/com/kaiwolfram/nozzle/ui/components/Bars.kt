@@ -25,7 +25,7 @@ fun ContentCreationTopBar(
             Row {
                 ChooseRelayButton(
                     relays = relayStatuses,
-                    onClickIndex = onToggleRelaySelection
+                    onClickIndex = onToggleRelaySelection,
                 )
                 Spacer(modifier = Modifier.width(spacing.large))
                 SendTopBarButton(

@@ -2,7 +2,7 @@ package com.kaiwolfram.nozzle.data.preferences
 
 import android.content.Context
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.model.AllRelays
+import com.kaiwolfram.nostrclientkt.model.Autopilot
 import com.kaiwolfram.nozzle.data.PreferenceFileNames
 import com.kaiwolfram.nozzle.model.Contacts
 import com.kaiwolfram.nozzle.model.Everyone
@@ -30,7 +30,7 @@ class NozzlePreferences(context: Context) : IFeedSettingsPreferences {
             isPosts = isPosts,
             isReplies = isReplies,
             authorSelection = if (isContactsOnly) Contacts else Everyone,
-            relaySelection = AllRelays // Default
+            relaySelection = Autopilot // Default
         )
     }
 

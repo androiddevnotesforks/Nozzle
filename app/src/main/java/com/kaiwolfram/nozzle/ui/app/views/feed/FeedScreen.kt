@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.kaiwolfram.nostrclientkt.model.Autopilot
 import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.FeedSettings
@@ -53,6 +54,7 @@ fun FeedScreen(
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
     onToggleRelayIndex: (Int) -> Unit,
+    onToggleAutopilot: () -> Unit,
     onLoadMore: () -> Unit,
     onOpenDrawer: () -> Unit,
     onNavigateToThread: (PostIds) -> Unit,
@@ -75,7 +77,9 @@ fun FeedScreen(
                 onToggleReplies = onToggleReplies,
                 onPictureClick = onOpenDrawer,
                 onToggleRelayIndex = onToggleRelayIndex,
-                onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } })
+                onToggleAutopilot = onToggleAutopilot,
+                onScrollToTop = { scope.launch { lazyListState.animateScrollToItem(0) } }
+            )
         },
         floatingActionButton = {
             FeedFab(onPrepareNewPost = {
@@ -121,6 +125,7 @@ private fun FeedTopBar(
     onToggleReplies: () -> Unit,
     onPictureClick: () -> Unit,
     onToggleRelayIndex: (Int) -> Unit,
+    onToggleAutopilot: () -> Unit,
     onScrollToTop: () -> Unit
 ) {
     TopAppBar {
@@ -147,7 +152,13 @@ private fun FeedTopBar(
                 onScrollToTop = onScrollToTop,
             )
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.15f)) {
-                ChooseRelayButton(relays = relayStatuses, onClickIndex = onToggleRelayIndex)
+                ChooseRelayButton(
+                    relays = relayStatuses,
+                    onClickIndex = onToggleRelayIndex,
+                    onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
+                    isAutopilot = feedSettings.relaySelection is Autopilot,
+                    onToggleAutopilot = onToggleAutopilot,
+                )
                 Spacer(modifier = Modifier.width(spacing.large))
                 FeedSettingsButton(
                     feedSettings = feedSettings,

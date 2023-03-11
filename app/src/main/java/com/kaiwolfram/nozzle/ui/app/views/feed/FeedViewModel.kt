@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.model.AllRelays
+import com.kaiwolfram.nostrclientkt.model.Autopilot
 import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
@@ -32,7 +33,7 @@ data class FeedViewModelState(
         isPosts = true,
         isReplies = true,
         authorSelection = Contacts,
-        relaySelection = AllRelays,
+        relaySelection = Autopilot,
     ),
     val relayStatuses: List<RelayActive> = listOf(),
 )
@@ -102,15 +103,17 @@ class FeedViewModel(
     private var toggledContacts = false
     private var toggledPosts = false
     private var toggledReplies = false
+    private var toggledAutopilot = false
 
     val onRefreshOnMenuDismiss: () -> Unit = {
-        if (toggledContacts || toggledPosts || toggledReplies) {
+        if (toggledContacts || toggledPosts || toggledReplies || toggledAutopilot) {
             onRefreshFeedView()
             feedSettingsPreferences.setFeedSettings(viewModelState.value.feedSettings)
         }
         toggledContacts = false
         toggledPosts = false
         toggledReplies = false
+        toggledAutopilot = false
     }
 
     val onToggleContactsOnly: () -> Unit = {
@@ -157,6 +160,19 @@ class FeedViewModel(
         }
     }
 
+
+    val onToggleAutopilot: () -> Unit = {
+        viewModelState.value.feedSettings.let { oldSettings ->
+            this.toggledAutopilot = !this.toggledAutopilot
+            val newRelaySelection = if (oldSettings.relaySelection is Autopilot) {
+                AllRelays
+            } else Autopilot
+            viewModelState.update {
+                it.copy(feedSettings = it.feedSettings.copy(relaySelection = newRelaySelection))
+            }
+        }
+    }
+
     // TODO: Refresh on dismiss
     val onToggleRelayIndex: (Int) -> Unit = { index ->
         val toggled = toggleRelay(relays = viewModelState.value.relayStatuses, index = index)
@@ -199,7 +215,7 @@ class FeedViewModel(
         updateScreen()
         setUIRefresh(false)
         delay(WAIT_TIME)
-        renewAdditionalDataSubscription(feedState.value)
+        renewAdditionalDataSubscription()
     }
 
     private suspend fun updateScreen() {
@@ -257,9 +273,9 @@ class FeedViewModel(
     }
 
     // TODO: Consider relaySelection
-    private suspend fun renewAdditionalDataSubscription(posts: List<PostWithMeta>) {
+    private suspend fun renewAdditionalDataSubscription() {
         nostrSubscriber.unsubscribeAdditionalPostsData()
-        nostrSubscriber.subscribeToAdditionalPostsData(posts = posts)
+        nostrSubscriber.subscribeToAdditionalPostsData(posts = feedState.value)
     }
 
     private fun setUIRefresh(value: Boolean) {
@@ -267,6 +283,7 @@ class FeedViewModel(
     }
 
     private fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
+        if (viewModelState.value.feedSettings.relaySelection is Autopilot) return
         val selectedRelays = newRelayStatuses?.filter { it.isActive }?.map { it.relayUrl }
             ?: viewModelState.value.relayStatuses
                 .filter { it.isActive }

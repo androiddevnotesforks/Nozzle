@@ -16,7 +16,9 @@ fun RelaysDropdownMenu(
     showMenu: Boolean,
     menuItems: List<RelayActive>,
     onClickIndex: (Int) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isAutopilot: Boolean? = null,
+    onToggleAutopilot: (() -> Unit)? = null
 ) {
     DropdownMenu(
         expanded = showMenu,
@@ -30,6 +32,15 @@ fun RelaysDropdownMenu(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+        }
+        if (isAutopilot != null && onToggleAutopilot != null) {
+            CheckboxDropdownMenuItem(
+                isChecked = isAutopilot,
+                text = stringResource(id = R.string.autopilot),
+                contentPadding = PaddingValues(start = spacing.medium, end = spacing.xl),
+                onToggle = onToggleAutopilot,
+            )
+            DropdownDivider()
         }
         menuItems.forEachIndexed { index, item ->
             CheckboxDropdownMenuItem(

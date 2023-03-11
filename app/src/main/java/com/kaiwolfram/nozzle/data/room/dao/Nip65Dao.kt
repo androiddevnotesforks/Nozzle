@@ -35,7 +35,7 @@ interface Nip65Dao {
                 "WHERE isWrite IS TRUE " +
                 "AND pubkey IN (:pubkeys)"
     )
-    suspend fun getPubkeysPerWriteRelayMap(pubkeys: List<String>): Map<String, Set<String>>
+    suspend fun getPubkeysPerWriteRelayMap(pubkeys: Collection<String>): Map<String, Set<String>>
 
     @Query(
         "SELECT url " +

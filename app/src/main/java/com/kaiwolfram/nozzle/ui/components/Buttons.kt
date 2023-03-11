@@ -70,13 +70,21 @@ fun SendTopBarButton(
 fun ChooseRelayButton(
     relays: List<RelayActive>,
     onClickIndex: (Int) -> Unit,
+    onRefreshOnMenuDismiss: () -> Unit = { /*Do nothing*/ },
+    isAutopilot: Boolean? = null,
+    onToggleAutopilot: (() -> Unit)? = null
 ) {
     val showMenu = remember { mutableStateOf(false) }
     RelaysDropdownMenu(
         showMenu = showMenu.value,
         menuItems = relays,
         onClickIndex = onClickIndex,
-        onDismiss = { showMenu.value = false }
+        onDismiss = {
+            showMenu.value = false
+            onRefreshOnMenuDismiss()
+        },
+        isAutopilot = isAutopilot,
+        onToggleAutopilot = onToggleAutopilot
     )
     Icon(
         modifier = Modifier
@@ -103,8 +111,8 @@ fun FeedSettingsButton(
         onTogglePosts = onTogglePosts,
         onToggleReplies = onToggleReplies,
         onDismiss = {
-            onRefreshOnMenuDismiss()
             showMenu.value = false
+            onRefreshOnMenuDismiss()
         }
     )
     Icon(
