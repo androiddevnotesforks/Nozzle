@@ -33,9 +33,7 @@ class AppContainer(context: Context) {
         ).fallbackToDestructiveMigration().build()
     }
 
-    val relayProvider: IRelayProvider = RelayProvider(
-        relayDao = roomDb.relayDao()
-    )
+    val relayProvider: IRelayProvider = RelayProvider()
 
     val keyManager: IKeyManager = KeyManager(context = context)
 
