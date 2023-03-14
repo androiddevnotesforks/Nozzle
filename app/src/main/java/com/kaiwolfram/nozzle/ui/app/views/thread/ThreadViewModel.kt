@@ -86,14 +86,16 @@ class ThreadViewModel(
         }
         toLike?.let {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.like(postId = postId, postPubkey = it.pubkey)
+                // TODO: Use your write relays, and source relays (?)
+                postCardInteractor.like(postId = postId, postPubkey = it.pubkey, relays = null)
             }
         }
     }
 
     val onRepost: (String) -> Unit = { postId ->
         viewModelScope.launch(context = Dispatchers.IO) {
-            postCardInteractor.repost(postId = postId)
+            // TODO: Use your write relays, and source relays (?)
+            postCardInteractor.repost(postId = postId, relays = null)
         }
     }
 

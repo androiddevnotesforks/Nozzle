@@ -71,48 +71,41 @@ class NostrService(
             keys = keyManager.getKeys(),
         )
         Log.i(TAG, "new profile is valid ${event.verify()}")
-        client.publishToAllRelays(event)
+        client.publishToRelays(event)
 
         return event
     }
 
-    override fun sendPost(content: String, relaySelection: RelaySelection): Event {
+    override fun sendPost(content: String, relays: Collection<String>?): Event {
         Log.i(TAG, "Send post '${content.take(50)}'")
         val event = Event.createTextNoteEvent(
             post = Post(msg = content),
             keys = keyManager.getKeys(),
         )
-        when (relaySelection) {
-            is AllRelays -> client.publishToAllRelays(event)
-            is Autopilot -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
-            is PersonalNip65 -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
-            is MultipleRelays -> client.publishToRelays(
-                event = event,
-                relays = relaySelection.relays
-            )
-        }
+        client.publishToRelays(event = event, relays = relays)
 
         return event
     }
 
-    override fun sendRepost(postId: String, quote: String): Event {
+    override fun sendRepost(postId: String, quote: String, relays: Collection<String>?): Event {
         Log.i(TAG, "Send repost of $postId")
         val event = Event.createTextNoteEvent(
             post = Post(
                 repostId = RepostId(
                     repostId = postId,
+                    // TODO: Use origin relay
                     relayUrl = relayProvider.listRelays().firstOrNull().orEmpty()
                 ),
                 msg = quote
             ),
             keys = keyManager.getKeys(),
         )
-        client.publishToAllRelays(event)
+        client.publishToRelays(event = event, relays = relays)
 
         return event
     }
 
-    override fun sendLike(postId: String, postPubkey: String): Event {
+    override fun sendLike(postId: String, postPubkey: String, relays: Collection<String>?): Event {
         Log.i(TAG, "Send like reaction to $postId")
         val event = Event.createReactionEvent(
             eventId = postId,
@@ -120,7 +113,7 @@ class NostrService(
             isPositive = true,
             keys = keyManager.getKeys(),
         )
-        client.publishToAllRelays(event)
+        client.publishToRelays(event = event, relays = relays)
 
         return event
     }
@@ -128,22 +121,14 @@ class NostrService(
     override fun sendReply(
         replyTo: ReplyTo,
         content: String,
-        relaySelection: RelaySelection
+        relays: Collection<String>?
     ): Event {
         Log.i(TAG, "Send reply to ${replyTo.replyTo} of root ${replyTo.replyToRoot}")
         val event = Event.createTextNoteEvent(
             post = Post(replyTo = replyTo, msg = content),
             keys = keyManager.getKeys(),
         )
-        when (relaySelection) {
-            is AllRelays -> client.publishToAllRelays(event)
-            is PersonalNip65 -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
-            is Autopilot -> client.publishToAllRelays(event) // TODO: Use publishToRelays(...)
-            is MultipleRelays -> client.publishToRelays(
-                event = event,
-                relays = relaySelection.relays
-            )
-        }
+        client.publishToRelays(event = event, relays = relays)
 
         return event
     }
@@ -154,7 +139,7 @@ class NostrService(
             contacts = contacts,
             keys = keyManager.getKeys(),
         )
-        client.publishToAllRelays(event)
+        client.publishToRelays(event = event)
 
         return event
     }
@@ -162,9 +147,9 @@ class NostrService(
     override fun subscribe(
         filters: List<Filter>,
         unsubOnEOSE: Boolean,
-        relaySelection: RelaySelection
+        relays: Collection<String>?,
     ): List<String> {
-        val subscriptionIds = client.subscribe(filters = filters, relaySelection = relaySelection)
+        val subscriptionIds = client.subscribe(filters = filters, relays = relays)
         if (subscriptionIds.isNotEmpty() && unsubOnEOSE) unsubOnEOSECache.addAll(subscriptionIds)
 
         return subscriptionIds

@@ -2,11 +2,11 @@ package com.kaiwolfram.nozzle.data.preferences
 
 import android.content.Context
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.model.Autopilot
 import com.kaiwolfram.nozzle.data.PreferenceFileNames
 import com.kaiwolfram.nozzle.model.Contacts
 import com.kaiwolfram.nozzle.model.Everyone
 import com.kaiwolfram.nozzle.model.FeedSettings
+import com.kaiwolfram.nozzle.model.UserSpecific
 
 private const val TAG: String = "NozzlePreferences"
 
@@ -30,7 +30,7 @@ class NozzlePreferences(context: Context) : IFeedSettingsPreferences {
             isPosts = isPosts,
             isReplies = isReplies,
             authorSelection = if (isContactsOnly) Contacts else Everyone,
-            relaySelection = Autopilot // Default
+            relaySelection = UserSpecific(mapOf()) // Default
         )
     }
 

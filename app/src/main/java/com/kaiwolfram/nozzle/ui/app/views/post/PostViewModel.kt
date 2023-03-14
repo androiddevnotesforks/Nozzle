@@ -6,9 +6,6 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nostrclientkt.model.AllRelays
-import com.kaiwolfram.nostrclientkt.model.MultipleRelays
-import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
 import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
@@ -17,7 +14,9 @@ import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.utils.listRelayStatuses
 import com.kaiwolfram.nozzle.data.utils.toggleRelay
+import com.kaiwolfram.nozzle.model.AllRelays
 import com.kaiwolfram.nozzle.model.RelayActive
+import com.kaiwolfram.nozzle.model.RelaySelection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -109,11 +108,14 @@ class PostViewModel(
             if (err != null) {
                 Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
             } else {
-                val selectedRelays = state.relayStatuses.filter { it.isActive }.map { it.relayUrl }
-                Log.i(TAG, "Send post to ${selectedRelays.size} relays")
+                val selectedRelays = state.relayStatuses
+                    .filter { it.isActive }
+                    .map { it.relayUrl }
+                    .ifEmpty { null }
+                Log.i(TAG, "Send post to ${selectedRelays?.size ?: -1} relays")
                 val event = nostrService.sendPost(
                     content = state.content,
-                    relaySelection = MultipleRelays(selectedRelays)
+                    relays = selectedRelays
                 )
                 viewModelScope.launch(context = Dispatchers.IO) {
                     postDao.insertIfNotPresent(PostEntity.fromEvent(event))

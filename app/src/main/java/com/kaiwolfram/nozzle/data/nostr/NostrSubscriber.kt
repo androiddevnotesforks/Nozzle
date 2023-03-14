@@ -2,7 +2,6 @@ package com.kaiwolfram.nozzle.data.nostr
 
 import android.util.Log
 import com.kaiwolfram.nostrclientkt.model.Filter
-import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.utils.getCurrentTimeInSeconds
 import com.kaiwolfram.nozzle.data.utils.listReferencedPostIds
@@ -22,15 +21,18 @@ class NostrSubscriber(
     private val profileSubscriptions = mutableListOf<String>()
     private val nip65Subscriptions = mutableListOf<String>()
 
-    // TODO: RelaySelection
-    override fun subscribeToProfileMetadataAndContactList(pubkeys: List<String>): List<String> {
+    override fun subscribeToProfileMetadataAndContactList(
+        pubkeys: Collection<String>,
+        relays: Collection<String>?
+    ): List<String> {
         Log.i(TAG, "Subscribe metadata and contact list for ${pubkeys.size} pubkeys")
-        val profileFilter = Filter.createProfileFilter(pubkeys = pubkeys)
-        val contactListFilter = Filter.createContactListFilter(pubkeys = pubkeys)
+        val profileFilter = Filter.createProfileFilter(pubkeys = pubkeys.toList())
+        val contactListFilter = Filter.createContactListFilter(pubkeys = pubkeys.toList())
 
         val ids = nostrService.subscribe(
             filters = listOf(profileFilter, contactListFilter),
-            unsubOnEOSE = true
+            unsubOnEOSE = true,
+            relays = relays
         )
         profileSubscriptions.addAll(ids)
 
@@ -38,10 +40,10 @@ class NostrSubscriber(
     }
 
     override fun subscribeToFeed(
-        authorPubkeys: List<String>?,
+        authorPubkeys: Collection<String>?,
         limit: Int,
         until: Long?,
-        relaySelection: RelaySelection,
+        relays: Collection<String>?
     ): List<String> {
         Log.i(TAG, "Subscribe to feed")
         val postFilter = Filter.createPostFilter(
@@ -52,17 +54,17 @@ class NostrSubscriber(
         val ids = nostrService.subscribe(
             filters = listOf(postFilter),
             unsubOnEOSE = true,
-            relaySelection = relaySelection,
+            relays = relays,
         )
         feedSubscriptions.addAll(ids)
 
         return ids
     }
 
-    // TODO: RelaySelection
     // TODO: Set limit. Large threads will fry your device otherwise
     override suspend fun subscribeToAdditionalPostsData(
-        posts: List<PostWithMeta>
+        posts: Collection<PostWithMeta>,
+        relays: Collection<String>?,
     ): List<String> {
         Log.i(TAG, "Subscribe to additional posts data")
         if (posts.isEmpty()) return listOf()
@@ -85,18 +87,19 @@ class NostrSubscriber(
 
         val ids = nostrService.subscribe(
             filters = filters,
-            unsubOnEOSE = true
+            unsubOnEOSE = true,
+            relays = relays,
         )
         additionalFeedDataSubscriptions.addAll(ids)
 
         return ids
     }
 
-    // TODO: RelaySelection
     override fun subscribeToThread(
         currentPostId: String,
         replyToId: String?,
-        replyToRootId: String?
+        replyToRootId: String?,
+        relays: Collection<String>?,
     ): List<String> {
         Log.i(TAG, "Subscribe to thread")
 
@@ -110,24 +113,28 @@ class NostrSubscriber(
 
         val ids = nostrService.subscribe(
             filters = filters,
-            unsubOnEOSE = true
+            unsubOnEOSE = true,
+            relays = relays,
         )
         threadSubscriptions.addAll(ids)
 
         return ids
     }
 
-    // TODO: RelaySelection
-    override fun subscribeToProfiles(pubkeys: List<String>): List<String> {
+    override fun subscribeToProfiles(
+        pubkeys: Collection<String>,
+        relays: Collection<String>?,
+    ): List<String> {
         Log.i(TAG, "Subscribe to ${pubkeys.size} profiles")
 
         if (pubkeys.isEmpty()) return listOf()
 
-        val profileFilter = Filter.createProfileFilter(pubkeys = pubkeys)
+        val profileFilter = Filter.createProfileFilter(pubkeys = pubkeys.toList())
 
         val ids = nostrService.subscribe(
             filters = listOf(profileFilter),
-            unsubOnEOSE = true
+            unsubOnEOSE = true,
+            relays = relays
         )
         profileSubscriptions.addAll(ids)
 
@@ -135,16 +142,17 @@ class NostrSubscriber(
     }
 
     // No relaySelection needed because nip65 could be anywhere
-    override fun subscribeToNip65(pubkeys: List<String>): List<String> {
+    override fun subscribeToNip65(pubkeys: Collection<String>): List<String> {
         Log.i(TAG, "Subscribe to ${pubkeys.size} nip65s")
 
         if (pubkeys.isEmpty()) return listOf()
 
-        val nip65Filter = Filter.createNip65Filter(pubkeys = pubkeys)
+        val nip65Filter = Filter.createNip65Filter(pubkeys = pubkeys.toList())
 
         val ids = nostrService.subscribe(
             filters = listOf(nip65Filter),
-            unsubOnEOSE = true
+            unsubOnEOSE = true,
+            relays = null
         )
         nip65Subscriptions.addAll(ids)
 

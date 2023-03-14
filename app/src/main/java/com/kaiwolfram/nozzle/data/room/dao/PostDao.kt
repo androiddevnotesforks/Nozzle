@@ -25,8 +25,8 @@ interface PostDao {
     suspend fun getAuthoredFeedByRelays(
         isPosts: Boolean,
         isReplies: Boolean,
-        authorPubkeys: List<String>,
-        relays: List<String>,
+        authorPubkeys: Collection<String>,
+        relays: Collection<String>,
         until: Long,
         limit: Int,
     ): List<PostEntity>
@@ -46,7 +46,7 @@ interface PostDao {
     suspend fun getAuthoredFeed(
         isPosts: Boolean,
         isReplies: Boolean,
-        authorPubkeys: List<String>,
+        authorPubkeys: Collection<String>,
         until: Long,
         limit: Int,
     ): List<PostEntity>
@@ -66,7 +66,7 @@ interface PostDao {
     suspend fun getGlobalFeedByRelays(
         isPosts: Boolean,
         isReplies: Boolean,
-        relays: List<String>,
+        relays: Collection<String>,
         until: Long,
         limit: Int,
     ): List<PostEntity>
@@ -116,7 +116,7 @@ interface PostDao {
                 "JOIN profile ON post.pubkey = profile.pubkey " +
                 "WHERE id IN (:postIds) "
     )
-    fun getRepostsPreviewMapFlow(postIds: List<String>): Flow<Map<String, RepostPreview>>
+    fun getRepostsPreviewMapFlow(postIds: Collection<String>): Flow<Map<String, RepostPreview>>
 
     @MapInfo(keyColumn = "repostedId", valueColumn = "repostCount")
     @Query(
@@ -125,7 +125,7 @@ interface PostDao {
                 "WHERE repostedId IN (:postIds) " +
                 "GROUP BY repostedId"
     )
-    fun getNumOfRepostsPerPostFlow(postIds: List<String>): Flow<Map<String, Int>>
+    fun getNumOfRepostsPerPostFlow(postIds: Collection<String>): Flow<Map<String, Int>>
 
     @MapInfo(keyColumn = "replyToId", valueColumn = "replyCount")
     @Query(
@@ -134,7 +134,7 @@ interface PostDao {
                 "WHERE replyToId IN (:postIds) " +
                 "GROUP BY replyToId"
     )
-    fun getNumOfRepliesPerPostFlow(postIds: List<String>): Flow<Map<String, Int>>
+    fun getNumOfRepliesPerPostFlow(postIds: Collection<String>): Flow<Map<String, Int>>
 
     @Query(
         "SELECT repostedId " +
@@ -142,12 +142,12 @@ interface PostDao {
                 "WHERE pubkey = :pubkey " +
                 "AND repostedId IN (:postIds)"
     )
-    fun listRepostedByPubkeyFlow(pubkey: String, postIds: List<String>): Flow<List<String>>
+    fun listRepostedByPubkeyFlow(pubkey: String, postIds: Collection<String>): Flow<List<String>>
 
     @Query(
         "SELECT pubkey " +
                 "FROM post " +
                 "WHERE id IN (:postIds) "
     )
-    suspend fun listAuthorPubkeys(postIds: List<String>): List<String>
+    suspend fun listAuthorPubkeys(postIds: Collection<String>): List<String>
 }

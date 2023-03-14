@@ -21,13 +21,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.kaiwolfram.nostrclientkt.model.Autopilot
 import com.kaiwolfram.nostrclientkt.model.Metadata
-import com.kaiwolfram.nostrclientkt.model.RelaySelection
-import com.kaiwolfram.nozzle.model.FeedSettings
-import com.kaiwolfram.nozzle.model.PostIds
-import com.kaiwolfram.nozzle.model.PostWithMeta
-import com.kaiwolfram.nozzle.model.RelayActive
+import com.kaiwolfram.nozzle.model.*
 import com.kaiwolfram.nozzle.ui.components.AddIcon
 import com.kaiwolfram.nozzle.ui.components.ChooseRelayButton
 import com.kaiwolfram.nozzle.ui.components.FeedSettingsButton
@@ -156,7 +151,7 @@ private fun FeedTopBar(
                     relays = relayStatuses,
                     onClickIndex = onToggleRelayIndex,
                     onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
-                    isAutopilot = feedSettings.relaySelection is Autopilot,
+                    isAutopilot = feedSettings.relaySelection is UserSpecific,
                     onToggleAutopilot = onToggleAutopilot,
                 )
                 Spacer(modifier = Modifier.width(spacing.large))

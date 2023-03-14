@@ -7,6 +7,8 @@ interface NostrListener {
     fun onEvent(subscriptionId: String, event: Event, relayUrl: String?)
     fun onError(msg: String, throwable: Throwable? = null)
     fun onEOSE(subscriptionId: String)
+
+    // TODO: remove socket from hashmap
     fun onClose(reason: String)
     fun onFailure(msg: String?, throwable: Throwable? = null)
     fun onOk(id: String)

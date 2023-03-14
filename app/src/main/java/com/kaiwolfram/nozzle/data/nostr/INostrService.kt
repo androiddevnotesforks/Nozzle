@@ -5,24 +5,24 @@ import com.kaiwolfram.nostrclientkt.model.*
 interface INostrService {
     fun publishProfile(metadata: Metadata): Event
 
-    fun sendPost(content: String, relaySelection: RelaySelection = AllRelays): Event
+    fun sendPost(content: String, relays: Collection<String>?): Event
 
-    fun sendRepost(postId: String, quote: String): Event
+    fun sendRepost(postId: String, quote: String, relays: Collection<String>?): Event
 
-    fun sendLike(postId: String, postPubkey: String): Event
+    fun sendLike(postId: String, postPubkey: String, relays: Collection<String>?): Event
 
     fun sendReply(
         replyTo: ReplyTo,
         content: String,
-        relaySelection: RelaySelection = AllRelays
+        relays: Collection<String>?
     ): Event
 
     fun updateContactList(contacts: List<ContactListEntry>): Event
 
     fun subscribe(
         filters: List<Filter>,
-        unsubOnEOSE: Boolean = false,
-        relaySelection: RelaySelection = AllRelays
+        unsubOnEOSE: Boolean,
+        relays: Collection<String>?,
     ): List<String>
 
     fun unsubscribe(subscriptionIds: List<String>)

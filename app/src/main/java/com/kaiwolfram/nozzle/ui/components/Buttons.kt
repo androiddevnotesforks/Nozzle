@@ -80,8 +80,8 @@ fun ChooseRelayButton(
         menuItems = relays,
         onClickIndex = onClickIndex,
         onDismiss = {
-            showMenu.value = false
             onRefreshOnMenuDismiss()
+            showMenu.value = false
         },
         isAutopilot = isAutopilot,
         onToggleAutopilot = onToggleAutopilot
@@ -111,8 +111,8 @@ fun FeedSettingsButton(
         onTogglePosts = onTogglePosts,
         onToggleReplies = onToggleReplies,
         onDismiss = {
-            showMenu.value = false
             onRefreshOnMenuDismiss()
+            showMenu.value = false
         }
     )
     Icon(

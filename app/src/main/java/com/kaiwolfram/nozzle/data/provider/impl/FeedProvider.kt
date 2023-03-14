@@ -1,7 +1,6 @@
 package com.kaiwolfram.nozzle.data.provider.impl
 
 import android.util.Log
-import com.kaiwolfram.nostrclientkt.model.*
 import com.kaiwolfram.nozzle.data.mapper.IPostMapper
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.provider.IContactListProvider
@@ -34,16 +33,13 @@ class FeedProvider(
         nostrSubscriber.unsubscribeFeeds()
         nostrSubscriber.unsubscribeAdditionalPostsData()
         val authorPubkeys = listPubkeys(authorSelection = feedSettings.authorSelection)
-        nostrSubscriber.subscribeToFeed(
+        subscribeToFeed(
             authorPubkeys = authorPubkeys,
-            // We can't exclude replies in relay subscriptions,
-            // so we increase the limit for post-only settings
-            // to increase the chance of receiving more posts.
-            limit = if (feedSettings.isReplies) 2 * limit else 3 * limit,
+            isReplies = feedSettings.isReplies,
+            limit = limit,
             until = until,
             relaySelection = feedSettings.relaySelection
         )
-        val relays = listRelays(relaySelection = feedSettings.relaySelection)
 
         waitForSubscription?.let { delay(it) }
 
@@ -51,13 +47,63 @@ class FeedProvider(
             isPosts = feedSettings.isPosts,
             isReplies = feedSettings.isReplies,
             authorPubkeys = authorPubkeys,
-            relays = relays,
+            relays = feedSettings.relaySelection.getSelectedRelays(),
             until = until ?: getCurrentTimeInSeconds(),
             limit = limit,
         )
 
         return if (posts.isEmpty()) flow { emit(listOf()) }
         else postMapper.mapToPostsWithMetaFlow(posts)
+    }
+
+    private fun subscribeToFeed(
+        authorPubkeys: List<String>?,
+        isReplies: Boolean,
+        limit: Int,
+        until: Long?,
+        relaySelection: RelaySelection
+    ) {
+        if (authorPubkeys != null && authorPubkeys.isEmpty()) return
+
+        // We can't exclude replies in relay subscriptions,
+        // so we increase the limit for post-only settings
+        // to increase the chance of receiving more posts.
+        val adjustedLimit = if (isReplies) 2 * limit else 3 * limit
+
+        when (relaySelection) {
+            is AllRelays, is MultipleRelays -> {
+                nostrSubscriber.subscribeToFeed(
+                    authorPubkeys = authorPubkeys,
+                    limit = adjustedLimit,
+                    until = until,
+                    relays = relaySelection.getSelectedRelays()
+                )
+            }
+            is UserSpecific -> {
+                if (authorPubkeys == null) {
+                    nostrSubscriber.subscribeToFeed(
+                        authorPubkeys = null,
+                        limit = adjustedLimit,
+                        until = until,
+                        relays = relaySelection.getSelectedRelays()
+                    )
+                } else {
+                    relaySelection.pubkeysPerRelay.forEach { (relay, pubkeys) ->
+                        // We ignore authorPubkeys because relaySelection should contain them
+                        if (pubkeys.isNotEmpty()) {
+                            nostrSubscriber.subscribeToFeed(
+                                authorPubkeys = pubkeys,
+                                limit = adjustedLimit,
+                                until = until,
+                                relays = listOf(relay)
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+
     }
 
     private fun listPubkeys(authorSelection: AuthorSelection): List<String>? {
@@ -68,20 +114,11 @@ class FeedProvider(
         }
     }
 
-    private fun listRelays(relaySelection: RelaySelection): List<String>? {
-        return when (relaySelection) {
-            is AllRelays -> null
-            is Autopilot -> null // TODO: Use autopilot provider
-            is PersonalNip65 -> null // TODO: Use your relays
-            is MultipleRelays -> relaySelection.relays
-        }
-    }
-
     private suspend fun listPosts(
         isPosts: Boolean,
         isReplies: Boolean,
         authorPubkeys: List<String>?,
-        relays: List<String>?,
+        relays: Collection<String>?,
         until: Long,
         limit: Int,
     ): List<PostEntity> {

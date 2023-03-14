@@ -4,9 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nostrclientkt.model.AllRelays
-import com.kaiwolfram.nostrclientkt.model.Autopilot
-import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.IFeedSettingsPreferences
@@ -33,8 +30,9 @@ data class FeedViewModelState(
         isPosts = true,
         isReplies = true,
         authorSelection = Contacts,
-        relaySelection = Autopilot,
+        relaySelection = UserSpecific(mapOf()),
     ),
+    // TODO: Is this synchronized with relaySelection?
     val relayStatuses: List<RelayActive> = listOf(),
 )
 
@@ -74,9 +72,10 @@ class FeedViewModel(
                 pubkey = personalProfileProvider.getPubkey(),
                 feedSettings = feedSettingsPreferences.getFeedSettings(),
                 // TODO: remember selected relays
+                // TODO: autopilot
                 relayStatuses = listRelayStatuses(
                     allRelayUrls = relayProvider.listRelays(),
-                    relaySelection = AllRelays
+                    relaySelection = viewModelState.value.feedSettings.relaySelection
                 )
             )
         }
@@ -160,15 +159,14 @@ class FeedViewModel(
         }
     }
 
-
     val onToggleAutopilot: () -> Unit = {
-        viewModelState.value.feedSettings.let { oldSettings ->
-            this.toggledAutopilot = !this.toggledAutopilot
-            val newRelaySelection = if (oldSettings.relaySelection is Autopilot) {
-                AllRelays
-            } else Autopilot
+        this.toggledAutopilot = !this.toggledAutopilot
+        viewModelState.value.feedSettings.relaySelection.let { oldValue ->
+            val newValue = if (oldValue is UserSpecific) {
+                AllRelays // TODO: use cached multi Relay
+            } else UserSpecific(mapOf()) // TODO: use cached autopilot result
             viewModelState.update {
-                it.copy(feedSettings = it.feedSettings.copy(relaySelection = newRelaySelection))
+                it.copy(feedSettings = it.feedSettings.copy(relaySelection = newValue))
             }
         }
     }
@@ -195,7 +193,12 @@ class FeedViewModel(
         uiState.value.let { _ ->
             feedState.value.find { it.id == id }?.let {
                 viewModelScope.launch(context = IO) {
-                    postCardInteractor.like(postId = id, postPubkey = it.pubkey)
+                    postCardInteractor.like(
+                        postId = id,
+                        postPubkey = it.pubkey,
+                        // TODO: use your write relays
+                        relays = getSelectedRelays()
+                    )
                 }
             }
         }
@@ -203,7 +206,11 @@ class FeedViewModel(
 
     val onRepost: (String) -> Unit = { id ->
         viewModelScope.launch(context = IO) {
-            postCardInteractor.repost(postId = id)
+            postCardInteractor.repost(
+                postId = id,
+                // TODO: use your write relays
+                relays = getSelectedRelays()
+            )
         }
     }
 
@@ -283,12 +290,15 @@ class FeedViewModel(
     }
 
     private fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
-        if (viewModelState.value.feedSettings.relaySelection is Autopilot) return
         val selectedRelays = newRelayStatuses?.filter { it.isActive }?.map { it.relayUrl }
             ?: viewModelState.value.relayStatuses
                 .filter { it.isActive }
                 .map { it.relayUrl }
-        val relaySelection = MultipleRelays(selectedRelays)
+        val relaySelection = when (viewModelState.value.feedSettings.relaySelection) {
+            is UserSpecific -> UserSpecific(mapOf()) // TODO: implement
+            is MultipleRelays -> MultipleRelays(relays = selectedRelays)
+            is AllRelays -> AllRelays
+        }
         val newStatuses = newRelayStatuses ?: listRelayStatuses(
             allRelayUrls = relayProvider.listRelays(),
             relaySelection = relaySelection
@@ -299,6 +309,10 @@ class FeedViewModel(
                 feedSettings = it.feedSettings.copy(relaySelection = relaySelection)
             )
         }
+    }
+
+    private fun getSelectedRelays(): Collection<String>? {
+        return viewModelState.value.feedSettings.relaySelection.getSelectedRelays()
     }
 
     companion object {

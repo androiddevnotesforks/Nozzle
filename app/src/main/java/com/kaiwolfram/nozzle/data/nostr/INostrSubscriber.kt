@@ -1,29 +1,38 @@
 package com.kaiwolfram.nozzle.data.nostr
 
-import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
 interface INostrSubscriber {
-    fun subscribeToProfileMetadataAndContactList(pubkeys: List<String>): List<String>
-
-    fun subscribeToFeed(
-        authorPubkeys: List<String>?,
-        limit: Int,
-        until: Long?,
-        relaySelection: RelaySelection,
+    fun subscribeToProfileMetadataAndContactList(
+        pubkeys: Collection<String>,
+        relays: Collection<String>? = null
     ): List<String>
 
-    suspend fun subscribeToAdditionalPostsData(posts: List<PostWithMeta>): List<String>
+    fun subscribeToFeed(
+        authorPubkeys: Collection<String>?,
+        limit: Int,
+        until: Long?,
+        relays: Collection<String>? = null,
+    ): List<String>
+
+    suspend fun subscribeToAdditionalPostsData(
+        posts: Collection<PostWithMeta>,
+        relays: Collection<String>? = null
+    ): List<String>
 
     fun subscribeToThread(
         currentPostId: String,
         replyToId: String? = null,
-        replyToRootId: String? = null
+        replyToRootId: String? = null,
+        relays: Collection<String>? = null,
     ): List<String>
 
-    fun subscribeToProfiles(pubkeys: List<String>): List<String>
+    fun subscribeToProfiles(
+        pubkeys: Collection<String>,
+        relays: Collection<String>? = null
+    ): List<String>
 
-    fun subscribeToNip65(pubkeys: List<String>): List<String>
+    fun subscribeToNip65(pubkeys: Collection<String>): List<String>
 
     fun unsubscribeFeeds()
 

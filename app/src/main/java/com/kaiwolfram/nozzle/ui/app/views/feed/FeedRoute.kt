@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.kaiwolfram.nostrclientkt.model.RelaySelection
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import com.kaiwolfram.nozzle.model.RelaySelection
 
 private const val TAG = "FeedRoute"
 

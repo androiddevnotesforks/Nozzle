@@ -2,7 +2,7 @@ package com.kaiwolfram.nozzle.data.utils
 
 import com.kaiwolfram.nozzle.model.PostWithMeta
 
-fun listReferencedPubkeys(posts: List<PostWithMeta>): List<String> {
+fun listReferencedPubkeys(posts: Collection<PostWithMeta>): List<String> {
     if (posts.isEmpty()) return listOf()
 
     val referencedPubkeys = mutableListOf<String>()
@@ -15,7 +15,7 @@ fun listReferencedPubkeys(posts: List<PostWithMeta>): List<String> {
     return referencedPubkeys.distinct()
 }
 
-fun listReferencedPostIds(posts: List<PostWithMeta>): List<String> {
+fun listReferencedPostIds(posts: Collection<PostWithMeta>): List<String> {
     if (posts.isEmpty()) return listOf()
 
     val referencedPostIds = mutableListOf<String>()
@@ -25,10 +25,4 @@ fun listReferencedPostIds(posts: List<PostWithMeta>): List<String> {
     }
 
     return referencedPostIds.distinct()
-}
-
-fun listPostIds(posts: List<PostWithMeta>): List<String> {
-    if (posts.isEmpty()) return listOf()
-
-    return posts.map { it.id }
 }

@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nostrclientkt.model.MultipleRelays
 import com.kaiwolfram.nostrclientkt.model.ReplyTo
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.nostr.INostrService
@@ -16,6 +15,7 @@ import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.room.entity.PostEntity
 import com.kaiwolfram.nozzle.data.utils.listRelayStatuses
 import com.kaiwolfram.nozzle.data.utils.toggleRelay
+import com.kaiwolfram.nozzle.model.AllRelays
 import com.kaiwolfram.nozzle.model.PostWithMeta
 import com.kaiwolfram.nozzle.model.RelayActive
 import kotlinx.coroutines.Dispatchers
@@ -85,7 +85,7 @@ class ReplyViewModel(
                     // TODO: Preselect your nip65 write relays? + post.relays?
                     relaySelection = listRelayStatuses(
                         allRelayUrls = relayProvider.listRelays(),
-                        relaySelection = MultipleRelays(relays = post.relays),
+                        relaySelection = AllRelays,
                     ),
                 )
             }
@@ -122,12 +122,14 @@ class ReplyViewModel(
                         replyTo = parentPost.id,
                         relayUrl = parentPost.relays.firstOrNull().orEmpty(),
                     )
-                    val selectedRelays =
-                        state.relaySelection.filter { it.isActive }.map { it.relayUrl }
+                    val selectedRelays = state.relaySelection
+                        .filter { it.isActive }
+                        .map { it.relayUrl }
+                        .ifEmpty { null }
                     val event = nostrService.sendReply(
                         replyTo = replyTo,
                         content = state.reply,
-                        relaySelection = MultipleRelays(selectedRelays)
+                        relays = selectedRelays
                     )
                     viewModelScope.launch(context = Dispatchers.IO) {
                         postDao.insertIfNotPresent(PostEntity.fromEvent(event))

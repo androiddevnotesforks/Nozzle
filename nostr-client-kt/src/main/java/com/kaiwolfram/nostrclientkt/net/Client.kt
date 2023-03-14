@@ -2,7 +2,8 @@ package com.kaiwolfram.nostrclientkt.net
 
 import android.util.Log
 import com.google.gson.JsonElement
-import com.kaiwolfram.nostrclientkt.model.*
+import com.kaiwolfram.nostrclientkt.model.Event
+import com.kaiwolfram.nostrclientkt.model.Filter
 import com.kaiwolfram.nostrclientkt.utils.JsonUtils.gson
 import okhttp3.*
 import java.util.*
@@ -54,23 +55,15 @@ class Client {
         }
     }
 
-    // TODO: relaySelection should be nullable relay list
-    fun subscribe(filters: List<Filter>, relaySelection: RelaySelection = AllRelays): List<String> {
+    fun subscribe(filters: List<Filter>, relays: Collection<String>? = null): List<String> {
         if (filters.isEmpty()) {
             return listOf()
         }
         val ids = mutableListOf<String>()
-        val filteredSockets = when (relaySelection) {
-            is AllRelays -> sockets.values
-            is Autopilot -> sockets.values
-            is PersonalNip65 -> sockets.values
-            is MultipleRelays -> {
-                addRelays(relaySelection.relays)
-                sockets.entries
-                    .filter { relaySelection.relays.contains(it.key) }
-                    .map { it.value }
-            }
-        }
+        relays?.let { addRelays(relays) }
+        val filteredSockets = sockets.entries
+            .filter { relays?.contains(it.key) ?: true }
+            .map { it.value }
 
         filteredSockets.forEach {
             val subscriptionId = UUID.randomUUID().toString()
@@ -96,23 +89,17 @@ class Client {
         }
     }
 
-    fun publishToAllRelays(event: Event) {
+    fun publishToRelays(event: Event, relays: Collection<String>? = null) {
         val request = """["EVENT",${event.toJson()}]"""
-        Log.i(TAG, "Publish $request")
-        sockets.values.forEach { it.send(request) }
-    }
-
-    fun publishToRelays(event: Event, relays: List<String>) {
-        val request = """["EVENT",${event.toJson()}]"""
-        Log.i(TAG, "Publish $request to ${relays.size} relays")
-        for (relay in relays) {
+        Log.i(TAG, "Publish $request to relays")
+        for (relay in relays ?: sockets.keys) {
             val socket = sockets[relay]
             if (socket == null) Log.w(TAG, "Relay $relay is not registered")
             else socket.send(request)
         }
     }
 
-    fun addRelays(urls: List<String>) {
+    fun addRelays(urls: Collection<String>) {
         urls.forEach { addRelay(it) }
     }
 

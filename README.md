@@ -35,11 +35,11 @@ file or clone this repository and build it yourself.
 - [x] Relay selection for sending posts and replies
 - [x] Different feed settings
 - [ ] Relay management
-- [ ] nip05 verification
 - [ ] Mentions
-- [ ] Hashtags
-- [ ] Quote repost
 - [ ] Notifications tab
+- [ ] Quote repost
+- [ ] nip05 verification
+- [ ] Hashtags
 - [ ] Bookmarks
 - [ ] Profile lists (likes, reposts, following, followers)
 - [ ] Lightning tip button, invoice widget, zaps

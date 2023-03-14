@@ -8,7 +8,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaiwolfram.nostrclientkt.model.AllRelays
 import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
@@ -16,10 +15,7 @@ import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
-import com.kaiwolfram.nozzle.model.FeedSettings
-import com.kaiwolfram.nozzle.model.PostWithMeta
-import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
-import com.kaiwolfram.nozzle.model.SingleAuthor
+import com.kaiwolfram.nozzle.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -131,14 +127,16 @@ class ProfileViewModel(
     val onLike: (String) -> Unit = { id ->
         feedState.value.find { it.id == id }?.let {
             viewModelScope.launch(context = Dispatchers.IO) {
-                postCardInteractor.like(postId = id, postPubkey = it.pubkey)
+                // TODO: use your nip65 write relays, and source relay (?)
+                postCardInteractor.like(postId = id, postPubkey = it.pubkey, relays = null)
             }
         }
     }
 
     val onRepost: (String) -> Unit = { id ->
         viewModelScope.launch(context = Dispatchers.IO) {
-            postCardInteractor.repost(postId = id)
+            // TODO: use your nip65 write relays, and source relay (?)
+            postCardInteractor.repost(postId = id, relays = null)
         }
     }
 
