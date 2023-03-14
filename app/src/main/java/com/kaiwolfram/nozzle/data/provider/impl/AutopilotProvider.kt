@@ -98,6 +98,7 @@ class AutopilotProvider(
                 current?.let { _ -> result[it.first]?.addAll(it.second) }
             }
         }
+        Log.d(TAG, "${result.map { "${it.key} -> ${it.value.size}\n" }}")
 
         return result
     }

@@ -33,13 +33,22 @@ class AppContainer(context: Context) {
         ).fallbackToDestructiveMigration().build()
     }
 
-    val relayProvider: IRelayProvider = RelayProvider()
-
     val keyManager: IKeyManager = KeyManager(context = context)
 
     val contactListProvider: IContactListProvider = ContactListProvider(
         pubkeyProvider = keyManager,
         contactDao = roomDb.contactDao()
+    )
+
+    private val autopilotProvider: IAutopilotProvider = AutopilotProvider(
+        pubkeyProvider = keyManager,
+        nip65Dao = roomDb.nip65Dao(),
+        eventRelayDao = roomDb.eventRelayDao()
+    )
+
+    val relayProvider: IRelayProvider = RelayProvider(
+        contactListProvider = contactListProvider,
+        autopilotProvider = autopilotProvider,
     )
 
     private val nozzlePreferences = NozzlePreferences(context = context)

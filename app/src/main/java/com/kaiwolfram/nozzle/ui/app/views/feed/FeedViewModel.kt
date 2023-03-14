@@ -7,10 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.preferences.IFeedSettingsPreferences
-import com.kaiwolfram.nozzle.data.provider.IContactListProvider
-import com.kaiwolfram.nozzle.data.provider.IFeedProvider
-import com.kaiwolfram.nozzle.data.provider.IPersonalProfileProvider
-import com.kaiwolfram.nozzle.data.provider.IRelayProvider
+import com.kaiwolfram.nozzle.data.provider.*
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -177,7 +174,9 @@ class FeedViewModel(
         this.toggledRelay = true
         val toggled = toggleRelay(relays = viewModelState.value.relayStatuses, index = index)
         if (toggled.any { it.isActive }) {
-            updateRelaySelection(newRelayStatuses = toggled)
+            viewModelScope.launch(context = IO) {
+                updateRelaySelection(newRelayStatuses = toggled)
+            }
         }
     }
 
@@ -292,13 +291,13 @@ class FeedViewModel(
         viewModelState.update { it.copy(isRefreshing = value) }
     }
 
-    private fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
+    private suspend fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
         val selectedRelays = (newRelayStatuses ?: viewModelState.value.relayStatuses)
             .filter { it.isActive }
             .map { it.relayUrl }
 
         val relaySelection = when (viewModelState.value.feedSettings.relaySelection) {
-            is UserSpecific -> UserSpecific(mapOf()) // TODO: implement
+            is UserSpecific -> UserSpecific(relayProvider.getAutopilotRelays())
             is MultipleRelays, is AllRelays -> MultipleRelays(relays = selectedRelays)
         }
         val newStatuses = newRelayStatuses ?: listRelayStatuses(
