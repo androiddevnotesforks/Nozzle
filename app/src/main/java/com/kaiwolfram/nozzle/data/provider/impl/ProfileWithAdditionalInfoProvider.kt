@@ -7,9 +7,12 @@ import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.ContactDao
 import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
+import com.kaiwolfram.nozzle.data.room.dao.Nip65Dao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
+import com.kaiwolfram.nozzle.model.getDefaultRelays
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 private const val TAG = "ProfileWithAdditionalInfoProvider"
@@ -20,6 +23,7 @@ class ProfileWithAdditionalInfoProvider(
     private val profileDao: ProfileDao,
     private val contactDao: ContactDao,
     private val eventRelayDao: EventRelayDao,
+    private val nip65Dao: Nip65Dao,
 ) : IProfileWithAdditionalInfoProvider {
 
     override fun getProfileFlow(pubkey: String): Flow<ProfileWithAdditionalInfo> {
@@ -46,9 +50,14 @@ class ProfileWithAdditionalInfoProvider(
                     isFollowedByMe = false,
                 )
             )
+            nostrSubscriber.unsubscribeToNip65()
             nostrSubscriber.unsubscribeProfiles()
+            nostrSubscriber.subscribeToNip65(listOf(pubkey))
+            delay(1000)
             nostrSubscriber.subscribeToProfileMetadataAndContactList(
-                pubkeys = listContactPubkeysIfIsOneself(pubkey = pubkey)
+                pubkeys = listContactPubkeysIfIsOneself(pubkey = pubkey),
+                relays = nip65Dao.getWriteRelaysOfPubkey(pubkey = pubkey)
+                    .ifEmpty { getDefaultRelays() }
             )
         }
         return mainFlow

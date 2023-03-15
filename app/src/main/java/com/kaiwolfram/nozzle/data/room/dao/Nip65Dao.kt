@@ -47,6 +47,14 @@ interface Nip65Dao {
     suspend fun getReadRelaysOfPubkey(pubkey: String): List<String>
 
     @Query(
+        "SELECT url " +
+                "FROM nip65 " +
+                "WHERE isWrite = '1' " +
+                "AND pubkey = :pubkey"
+    )
+    suspend fun getWriteRelaysOfPubkey(pubkey: String): List<String>
+
+    @Query(
         "SELECT * " +
                 "FROM nip65 " +
                 "WHERE pubkey = :pubkey"

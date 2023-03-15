@@ -45,7 +45,7 @@ class NostrSubscriber(
         until: Long?,
         relays: Collection<String>?
     ): List<String> {
-        Log.i(TAG, "Subscribe to feed")
+        Log.i(TAG, "Subscribe to feed of ${authorPubkeys?.size} pubkeys in ${relays?.size} relays")
         val postFilter = Filter.createPostFilter(
             pubkeys = authorPubkeys,
             until = until ?: getCurrentTimeInSeconds(),

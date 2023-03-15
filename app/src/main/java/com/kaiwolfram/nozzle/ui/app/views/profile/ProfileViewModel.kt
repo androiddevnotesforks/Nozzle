@@ -16,6 +16,7 @@ import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
+import com.kaiwolfram.nozzle.data.room.dao.Nip65Dao
 import com.kaiwolfram.nozzle.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -33,6 +34,7 @@ class ProfileViewModel(
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
     private val pubkeyProvider: IPubkeyProvider,
+    private val nip65Dao: Nip65Dao,
     context: Context,
     clip: ClipboardManager,
 ) : ViewModel() {
@@ -226,12 +228,15 @@ class ProfileViewModel(
         isRefreshing.update { value }
     }
 
-    private fun getCurrentFeedSettings(): FeedSettings {
+    private suspend fun getCurrentFeedSettings(): FeedSettings {
         return FeedSettings(
             isPosts = true,
             isReplies = true,
             authorSelection = SingleAuthor(profileState.value.pubkey),
-            relaySelection = AllRelays // TODO: Autopilot
+            relaySelection = MultipleRelays(
+                relays = nip65Dao.getWriteRelaysOfPubkey(profileState.value.pubkey)
+                    .ifEmpty { getDefaultRelays() }
+            )
         )
     }
 
@@ -243,6 +248,7 @@ class ProfileViewModel(
             relayProvider: IRelayProvider,
             profileProvider: IProfileWithAdditionalInfoProvider,
             pubkeyProvider: IPubkeyProvider,
+            nip65Dao: Nip65Dao,
             context: Context,
             clip: ClipboardManager,
         ): ViewModelProvider.Factory =
@@ -256,6 +262,7 @@ class ProfileViewModel(
                         profileProvider = profileProvider,
                         pubkeyProvider = pubkeyProvider,
                         relayProvider = relayProvider,
+                        nip65Dao = nip65Dao,
                         context = context,
                         clip = clip,
                     ) as T

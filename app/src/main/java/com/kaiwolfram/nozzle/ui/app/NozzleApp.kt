@@ -62,6 +62,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         relayProvider = appContainer.relayProvider,
                         profileFollower = appContainer.profileFollower,
                         pubkeyProvider = appContainer.keyManager,
+                        nip65Dao = appContainer.roomDb.nip65Dao(),
                         context = LocalContext.current,
                         clip = LocalClipboardManager.current,
                     )
