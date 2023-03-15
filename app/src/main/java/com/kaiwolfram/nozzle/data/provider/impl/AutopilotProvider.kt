@@ -5,6 +5,7 @@ import com.kaiwolfram.nozzle.data.provider.IAutopilotProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.room.dao.EventRelayDao
 import com.kaiwolfram.nozzle.data.room.dao.Nip65Dao
+import com.kaiwolfram.nozzle.model.getDefaultRelays
 
 private const val TAG = "AutopilotProvider"
 
@@ -18,21 +19,23 @@ class AutopilotProvider(
         Log.i(TAG, "Get autopilot relays of ${pubkeys.size} pubkeys")
         if (pubkeys.isEmpty()) return mapOf()
 
-        val processedPubkeys = mutableSetOf<String>()
         val result = mutableListOf<Pair<String, Set<String>>>()
+        val processedPubkeys = mutableSetOf<String>()
 
         result.addAll(processNip65(pubkeys))
         result.forEach { processedPubkeys.addAll(it.second) }
-        Log.d(TAG, "Processed ${result.size} relays for ${processedPubkeys.size} pubkeys")
+        Log.d(TAG, "Processed ${result.size} nip65 relays for ${processedPubkeys.size} pubkeys")
 
         if (pubkeys.size > processedPubkeys.size) {
-            val unprocessedPubkeys = pubkeys.minus(processedPubkeys)
-            val processedEventRelays = processEventRelays(unprocessedPubkeys)
+            val processedEventRelays = processEventRelays(pubkeys.minus(processedPubkeys))
+            val newlyProcessedPubkeys = processedEventRelays.flatMap { it.second }
             result.addAll(processedEventRelays)
-            result.forEach { processedPubkeys.addAll(it.second) }
+            processedPubkeys.addAll(newlyProcessedPubkeys)
             Log.d(
                 TAG,
-                "Processed ${processedEventRelays.size} event relays for ${unprocessedPubkeys.size} pubkeys"
+                "Processed ${processedEventRelays.size} event relays for ${
+                    newlyProcessedPubkeys.size
+                } pubkeys"
             )
         }
 
@@ -40,8 +43,11 @@ class AutopilotProvider(
             val unprocessedPubkeys = pubkeys.minus(processedPubkeys)
             Log.d(TAG, "Default to your read relays for ${unprocessedPubkeys.size} pubkeys")
 
-            nip65Dao.getReadRelaysOfPubkey(pubkey = pubkeyProvider.getPubkey())
-                .firstOrNull()
+            var personalReadRelays =
+                nip65Dao.getReadRelaysOfPubkey(pubkey = pubkeyProvider.getPubkey())
+            if (personalReadRelays.isEmpty()) personalReadRelays = getDefaultRelays()
+
+            personalReadRelays.firstOrNull()
                 ?.let {
                     result.add(Pair(it, unprocessedPubkeys.toSet()))
                 }
@@ -71,7 +77,6 @@ class AutopilotProvider(
     }
 
     private suspend fun processEventRelays(pubkeys: Collection<String>): List<Pair<String, Set<String>>> {
-        Log.d(TAG, "Default to event relays for ${pubkeys.size} pubkeys")
         val processedPubkeys = mutableSetOf<String>()
         val result = mutableListOf<Pair<String, Set<String>>>()
 

@@ -3,6 +3,7 @@ package com.kaiwolfram.nozzle.data.provider.impl
 import com.kaiwolfram.nozzle.data.provider.IAutopilotProvider
 import com.kaiwolfram.nozzle.data.provider.IContactListProvider
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
+import com.kaiwolfram.nozzle.model.getDefaultRelays
 import java.util.*
 
 
@@ -10,16 +11,11 @@ class RelayProvider(
     private val autopilotProvider: IAutopilotProvider,
     private val contactListProvider: IContactListProvider,
 ) : IRelayProvider {
-    private val defaultRelays = listOf(
-        "wss://nos.lol",
-        "wss://nostr-pub.wellorder.net",
-        "wss://nostr.einundzwanzig.space",
-    )
 
     private val cache: MutableList<String> = Collections.synchronizedList(mutableListOf())
 
     init {
-        cache.addAll(defaultRelays)
+        cache.addAll(getDefaultRelays())
     }
 
     // TODO: Show your nip65 relays or default if empty
