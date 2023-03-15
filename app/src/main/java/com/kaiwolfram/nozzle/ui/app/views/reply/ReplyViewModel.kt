@@ -82,9 +82,8 @@ class ReplyViewModel(
                     pubkey = personalProfileProvider.getPubkey(),
                     reply = "",
                     isSendable = false,
-                    // TODO: Preselect your nip65 write relays? + post.relays?
                     relaySelection = listRelayStatuses(
-                        allRelayUrls = relayProvider.listRelays(),
+                        allRelayUrls = (relayProvider.getWriteRelays() + post.relays).distinct(),
                         relaySelection = AllRelays,
                     ),
                 )

@@ -15,6 +15,7 @@ import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
 import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
+import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import com.kaiwolfram.nozzle.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -28,6 +29,7 @@ private const val DB_BATCH_SIZE = 25
 class ProfileViewModel(
     private val feedProvider: IFeedProvider,
     private val profileProvider: IProfileWithAdditionalInfoProvider,
+    private val relayProvider: IRelayProvider,
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
     private val pubkeyProvider: IPubkeyProvider,
@@ -127,16 +129,25 @@ class ProfileViewModel(
     val onLike: (String) -> Unit = { id ->
         feedState.value.find { it.id == id }?.let {
             viewModelScope.launch(context = Dispatchers.IO) {
-                // TODO: use your nip65 write relays, and source relay (?)
-                postCardInteractor.like(postId = id, postPubkey = it.pubkey, relays = null)
+                postCardInteractor.like(
+                    postId = id,
+                    postPubkey = it.pubkey,
+                    relays = relayProvider.getWriteRelays()
+                )
             }
         }
     }
 
     val onRepost: (String) -> Unit = { id ->
-        viewModelScope.launch(context = Dispatchers.IO) {
-            // TODO: use your nip65 write relays, and source relay (?)
-            postCardInteractor.repost(postId = id, relays = null)
+        feedState.value.find { it.id == id }?.let {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                postCardInteractor.repost(
+                    postId = id,
+                    postPubkey = it.pubkey,
+                    originUrl = it.relays.firstOrNull().orEmpty(),
+                    relays = relayProvider.getWriteRelays()
+                )
+            }
         }
     }
 
@@ -229,6 +240,7 @@ class ProfileViewModel(
             profileFollower: IProfileFollower,
             postCardInteractor: IPostCardInteractor,
             feedProvider: IFeedProvider,
+            relayProvider: IRelayProvider,
             profileProvider: IProfileWithAdditionalInfoProvider,
             pubkeyProvider: IPubkeyProvider,
             context: Context,
@@ -243,6 +255,7 @@ class ProfileViewModel(
                         feedProvider = feedProvider,
                         profileProvider = profileProvider,
                         pubkeyProvider = pubkeyProvider,
+                        relayProvider = relayProvider,
                         context = context,
                         clip = clip,
                     ) as T

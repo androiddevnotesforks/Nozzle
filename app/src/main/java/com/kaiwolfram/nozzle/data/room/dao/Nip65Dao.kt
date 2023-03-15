@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.data.room.dao
 
 import androidx.room.*
 import com.kaiwolfram.nozzle.data.room.entity.Nip65Entity
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -44,4 +45,12 @@ interface Nip65Dao {
                 "AND pubkey = :pubkey"
     )
     suspend fun getReadRelaysOfPubkey(pubkey: String): List<String>
+
+    @Query(
+        "SELECT * " +
+                "FROM nip65 " +
+                "WHERE pubkey = :pubkey"
+    )
+    fun getRelaysOfPubkeyFlow(pubkey: String): Flow<List<Nip65Entity>>
+
 }

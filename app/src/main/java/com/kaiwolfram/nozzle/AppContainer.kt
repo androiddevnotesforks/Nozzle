@@ -49,6 +49,8 @@ class AppContainer(context: Context) {
     val relayProvider: IRelayProvider = RelayProvider(
         contactListProvider = contactListProvider,
         autopilotProvider = autopilotProvider,
+        pubkeyProvider = keyManager,
+        nip65Dao = roomDb.nip65Dao(),
     )
 
     private val nozzlePreferences = NozzlePreferences(context = context)

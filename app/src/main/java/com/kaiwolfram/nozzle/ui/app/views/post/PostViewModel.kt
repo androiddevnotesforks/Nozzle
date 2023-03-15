@@ -60,7 +60,6 @@ class PostViewModel(
         Log.i(TAG, "Initialize PostViewModel")
     }
 
-    // TODO: Preselect your nip65 write relays? + selected feed relays?
     val onPreparePost: (RelaySelection) -> Unit = { relaySelection ->
         metadataState = personalProfileProvider.getMetadata()
             .stateIn(
@@ -77,7 +76,8 @@ class PostViewModel(
                     content = "",
                     isSendable = false,
                     relayStatuses = listRelayStatuses(
-                        allRelayUrls = relayProvider.listRelays(),
+                        allRelayUrls = (relayProvider.getWriteRelays() + relaySelection.getSelectedRelays()
+                            ?.toList().orEmpty()).distinct(),
                         relaySelection = relaySelection
                     ),
                 )
@@ -145,7 +145,7 @@ class PostViewModel(
             it.copy(
                 content = "",
                 relayStatuses = listRelayStatuses(
-                    allRelayUrls = relayProvider.listRelays(),
+                    allRelayUrls = relayProvider.getWriteRelays(),
                     relaySelection = AllRelays
                 ),
                 isSendable = false,

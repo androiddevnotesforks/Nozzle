@@ -59,6 +59,7 @@ fun NozzleApp(appContainer: AppContainer) {
                         postCardInteractor = appContainer.postCardInteractor,
                         feedProvider = appContainer.feedProvider,
                         profileProvider = appContainer.profileWithFollowerProvider,
+                        relayProvider = appContainer.relayProvider,
                         profileFollower = appContainer.profileFollower,
                         pubkeyProvider = appContainer.keyManager,
                         context = LocalContext.current,
@@ -88,6 +89,7 @@ fun NozzleApp(appContainer: AppContainer) {
                 threadViewModel = viewModel(
                     factory = ThreadViewModel.provideFactory(
                         threadProvider = appContainer.threadProvider,
+                        relayProvider = appContainer.relayProvider,
                         postCardInteractor = appContainer.postCardInteractor,
                         nostrSubscriber = appContainer.nostrSubscriber,
                     )

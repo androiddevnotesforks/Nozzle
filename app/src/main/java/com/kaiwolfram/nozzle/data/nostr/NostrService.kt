@@ -13,7 +13,7 @@ private const val TAG = "NostrService"
 
 class NostrService(
     private val keyManager: IKeyManager,
-    private val relayProvider: IRelayProvider,
+    relayProvider: IRelayProvider,
     private val eventProcessor: IEventProcessor
 ) : INostrService {
     private val client = Client()
@@ -59,7 +59,7 @@ class NostrService(
 
     init {
         client.setListener(listener)
-        val relays = relayProvider.listRelays()
+        val relays = (relayProvider.getReadRelays() + relayProvider.getWriteRelays()).distinct()
         Log.i(TAG, "Add ${relays.size} relays")
         client.addRelays(relays)
     }
@@ -87,16 +87,22 @@ class NostrService(
         return event
     }
 
-    override fun sendRepost(postId: String, quote: String, relays: Collection<String>?): Event {
+    override fun sendRepost(
+        postId: String,
+        postPubkey: String,
+        quote: String,
+        originUrl: String,
+        relays: Collection<String>?
+    ): Event {
         Log.i(TAG, "Send repost of $postId")
         val event = Event.createTextNoteEvent(
             post = Post(
                 repostId = RepostId(
                     repostId = postId,
-                    // TODO: Use origin relay
-                    relayUrl = relayProvider.listRelays().firstOrNull().orEmpty()
+                    relayUrl = originUrl
                 ),
-                msg = quote
+                mentions = listOf(postPubkey),
+                msg = quote,
             ),
             keys = keyManager.getKeys(),
         )
@@ -125,7 +131,7 @@ class NostrService(
     ): Event {
         Log.i(TAG, "Send reply to ${replyTo.replyTo} of root ${replyTo.replyToRoot}")
         val event = Event.createTextNoteEvent(
-            post = Post(replyTo = replyTo, msg = content),
+            post = Post(replyTo = replyTo, msg = content, mentions = listOf(replyTo.replyTo)),
             keys = keyManager.getKeys(),
         )
         client.publishToRelays(event = event, relays = relays)

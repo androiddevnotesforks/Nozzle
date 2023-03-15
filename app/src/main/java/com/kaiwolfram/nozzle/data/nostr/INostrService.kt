@@ -7,7 +7,13 @@ interface INostrService {
 
     fun sendPost(content: String, relays: Collection<String>?): Event
 
-    fun sendRepost(postId: String, quote: String, relays: Collection<String>?): Event
+    fun sendRepost(
+        postId: String,
+        postPubkey: String,
+        quote: String,
+        originUrl: String,
+        relays: Collection<String>?
+    ): Event
 
     fun sendLike(postId: String, postPubkey: String, relays: Collection<String>?): Event
 

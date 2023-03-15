@@ -14,11 +14,12 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
 private const val DB_BATCH_SIZE = 30
-private const val WAIT_TIME = 2100L
+private const val WAIT_TIME = 1200L
 
 data class FeedViewModelState(
     val isRefreshing: Boolean = false,
@@ -29,7 +30,6 @@ data class FeedViewModelState(
         authorSelection = Contacts,
         relaySelection = UserSpecific(mapOf()),
     ),
-    // TODO: Is this synchronized with relaySelection?
     val relayStatuses: List<RelayActive> = listOf(),
 )
 
@@ -62,16 +62,17 @@ class FeedViewModel(
             0
         )
 
+    private val lastAutopilotResult: MutableMap<String, Set<String>> =
+        Collections.synchronizedMap(mutableMapOf<String, Set<String>>())
+
     init {
         Log.i(TAG, "Initialize FeedViewModel")
         viewModelState.update {
             it.copy(
                 pubkey = personalProfileProvider.getPubkey(),
                 feedSettings = feedSettingsPreferences.getFeedSettings(),
-                // TODO: remember selected relays
-                // TODO: autopilot
                 relayStatuses = listRelayStatuses(
-                    allRelayUrls = relayProvider.listRelays(),
+                    allRelayUrls = relayProvider.getReadRelays(),
                     relaySelection = viewModelState.value.feedSettings.relaySelection
                 )
             )
@@ -105,7 +106,9 @@ class FeedViewModel(
     val onRefreshOnMenuDismiss: () -> Unit = {
         if (toggledContacts || toggledPosts || toggledReplies || toggledAutopilot || toggledRelay) {
             onRefreshFeedView()
-            feedSettingsPreferences.setFeedSettings(viewModelState.value.feedSettings)
+            if (toggledContacts || toggledPosts || toggledReplies) {
+                feedSettingsPreferences.setFeedSettings(viewModelState.value.feedSettings)
+            }
         }
         toggledContacts = false
         toggledPosts = false
@@ -161,9 +164,10 @@ class FeedViewModel(
     val onToggleAutopilot: () -> Unit = {
         this.toggledAutopilot = !this.toggledAutopilot
         viewModelState.value.feedSettings.relaySelection.let { oldValue ->
+            // No need to set input. It will be updated in onRefreshOnMenuDismiss
             val newValue = if (oldValue is UserSpecific) {
-                MultipleRelays(relays = listOf()) // TODO: use cached multi Relay
-            } else UserSpecific(mapOf()) // TODO: use cached autopilot result
+                MultipleRelays(relays = listOf())
+            } else UserSpecific(pubkeysPerRelay = lastAutopilotResult)
             viewModelState.update {
                 it.copy(feedSettings = it.feedSettings.copy(relaySelection = newValue))
             }
@@ -174,12 +178,13 @@ class FeedViewModel(
         this.toggledRelay = true
         val toggled = toggleRelay(relays = viewModelState.value.relayStatuses, index = index)
         if (toggled.any { it.isActive }) {
-            viewModelScope.launch(context = IO) {
-                updateRelaySelection(newRelayStatuses = toggled)
+            viewModelState.update {
+                it.copy(relayStatuses = toggled)
             }
         }
     }
 
+    // TODO: This should be handled with a flow, not manually
     val onResetProfileIconUiState: () -> Unit = {
         Log.i(TAG, "Reset profile icon")
         metadataState = personalProfileProvider.getMetadata().stateIn(
@@ -197,8 +202,7 @@ class FeedViewModel(
                     postCardInteractor.like(
                         postId = id,
                         postPubkey = it.pubkey,
-                        // TODO: use your write relays
-                        relays = getSelectedRelays()
+                        relays = relayProvider.getWriteRelays()
                     )
                 }
             }
@@ -206,20 +210,25 @@ class FeedViewModel(
     }
 
     val onRepost: (String) -> Unit = { id ->
-        viewModelScope.launch(context = IO) {
-            postCardInteractor.repost(
-                postId = id,
-                // TODO: use your write relays
-                relays = getSelectedRelays()
-            )
+        uiState.value.let { _ ->
+            feedState.value.find { it.id == id }?.let {
+                viewModelScope.launch(context = IO) {
+                    postCardInteractor.repost(
+                        postId = id,
+                        postPubkey = it.pubkey,
+                        originUrl = it.relays.firstOrNull().orEmpty(),
+                        relays = relayProvider.getWriteRelays()
+                    )
+                }
+            }
         }
     }
 
     private suspend fun handleRefresh() {
         setUIRefresh(true)
-        // TODO: nip65
-        subscribeToPersonalProfile()
         subscribeToNip65()
+        delay(WAIT_TIME)
+        subscribeToPersonalProfile()
         updateScreen()
         setUIRefresh(false)
         delay(WAIT_TIME)
@@ -263,12 +272,11 @@ class FeedViewModel(
         }
     }
 
-    // TODO: use autopilot
     private fun subscribeToPersonalProfile() {
         nostrSubscriber.unsubscribeProfiles()
         nostrSubscriber.subscribeToProfileMetadataAndContactList(
             pubkeys = listOf(personalProfileProvider.getPubkey()),
-            relays = getSelectedRelays(),
+            relays = relayProvider.getWriteRelays(),
         )
     }
 
@@ -292,16 +300,18 @@ class FeedViewModel(
     }
 
     private suspend fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
-        val selectedRelays = (newRelayStatuses ?: viewModelState.value.relayStatuses)
-            .filter { it.isActive }
-            .map { it.relayUrl }
-
         val relaySelection = when (viewModelState.value.feedSettings.relaySelection) {
-            is UserSpecific -> UserSpecific(relayProvider.getAutopilotRelays())
-            is MultipleRelays, is AllRelays -> MultipleRelays(relays = selectedRelays)
+            is UserSpecific -> UserSpecific(getAndCacheAutopilotRelays())
+            is MultipleRelays, is AllRelays -> {
+                val selectedRelays = (newRelayStatuses ?: viewModelState.value.relayStatuses)
+                    .filter { it.isActive }
+                    .map { it.relayUrl }
+                MultipleRelays(relays = selectedRelays)
+            }
         }
         val newStatuses = newRelayStatuses ?: listRelayStatuses(
-            allRelayUrls = relayProvider.listRelays(),
+            allRelayUrls = (lastAutopilotResult.map { it.key } + relayProvider.getReadRelays())
+                .distinct(),
             relaySelection = relaySelection
         )
         viewModelState.update {
@@ -314,6 +324,14 @@ class FeedViewModel(
 
     private fun getSelectedRelays(): Collection<String>? {
         return viewModelState.value.feedSettings.relaySelection.getSelectedRelays()
+    }
+
+    private suspend fun getAndCacheAutopilotRelays(): Map<String, Set<String>> {
+        val result = relayProvider.getAutopilotRelays()
+        lastAutopilotResult.clear()
+        lastAutopilotResult.putAll(result)
+
+        return result
     }
 
     companion object {

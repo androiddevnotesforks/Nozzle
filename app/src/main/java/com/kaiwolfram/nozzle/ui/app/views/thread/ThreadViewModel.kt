@@ -6,10 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
+import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import com.kaiwolfram.nozzle.data.provider.IThreadProvider
 import com.kaiwolfram.nozzle.data.utils.*
 import com.kaiwolfram.nozzle.model.PostIds
 import com.kaiwolfram.nozzle.model.PostThread
+import com.kaiwolfram.nozzle.model.PostWithMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -21,6 +23,7 @@ private const val WAIT_TIME = 2100L
 
 class ThreadViewModel(
     private val threadProvider: IThreadProvider,
+    private val relayProvider: IRelayProvider,
     private val postCardInteractor: IPostCardInteractor,
     private val nostrSubscriber: INostrSubscriber,
 ) : ViewModel() {
@@ -73,17 +76,7 @@ class ThreadViewModel(
     }
 
     val onLike: (String) -> Unit = { postId ->
-        val toLike = threadState.value.let { state ->
-            if (state.current?.id == postId) {
-                state.current
-            } else if (state.previous.any { post -> post.id == postId }) {
-                state.previous.find { post -> post.id == postId }
-            } else if (state.replies.any { post -> post.id == postId }) {
-                state.replies.find { post -> post.id == postId }
-            } else {
-                null
-            }
-        }
+        val toLike = getCurrentPost(postId = postId)
         toLike?.let {
             viewModelScope.launch(context = Dispatchers.IO) {
                 // TODO: Use your write relays, and source relays (?)
@@ -93,9 +86,16 @@ class ThreadViewModel(
     }
 
     val onRepost: (String) -> Unit = { postId ->
-        viewModelScope.launch(context = Dispatchers.IO) {
-            // TODO: Use your write relays, and source relays (?)
-            postCardInteractor.repost(postId = postId, relays = null)
+        val toRepost = getCurrentPost(postId = postId)
+        toRepost?.let {
+            viewModelScope.launch(context = Dispatchers.IO) {
+                postCardInteractor.repost(
+                    postId = postId,
+                    postPubkey = it.pubkey,
+                    originUrl = it.relays.firstOrNull().orEmpty(),
+                    relays = relayProvider.getWriteRelays()
+                )
+            }
         }
     }
 
@@ -139,9 +139,24 @@ class ThreadViewModel(
         isRefreshing.update { value }
     }
 
+    private fun getCurrentPost(postId: String): PostWithMeta? {
+        return threadState.value.let { state ->
+            if (state.current?.id == postId) {
+                state.current
+            } else if (state.previous.any { post -> post.id == postId }) {
+                state.previous.find { post -> post.id == postId }
+            } else if (state.replies.any { post -> post.id == postId }) {
+                state.replies.find { post -> post.id == postId }
+            } else {
+                null
+            }
+        }
+    }
+
     companion object {
         fun provideFactory(
             threadProvider: IThreadProvider,
+            relayProvider: IRelayProvider,
             postCardInteractor: IPostCardInteractor,
             nostrSubscriber: INostrSubscriber
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -149,6 +164,7 @@ class ThreadViewModel(
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ThreadViewModel(
                     threadProvider = threadProvider,
+                    relayProvider = relayProvider,
                     postCardInteractor = postCardInteractor,
                     nostrSubscriber = nostrSubscriber,
                 ) as T

@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.data.provider
 
 
 interface IRelayProvider {
-    fun listRelays(): List<String>
+    fun getReadRelays(): List<String>
+    fun getWriteRelays(): List<String>
     suspend fun getAutopilotRelays(): Map<String, Set<String>>
 }
