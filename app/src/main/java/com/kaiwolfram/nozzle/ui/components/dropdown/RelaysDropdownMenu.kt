@@ -18,6 +18,7 @@ fun RelaysDropdownMenu(
     onClickIndex: (Int) -> Unit,
     onDismiss: () -> Unit,
     isAutopilot: Boolean? = null,
+    autopilotEnabled: Boolean? = null,
     onToggleAutopilot: (() -> Unit)? = null
 ) {
     DropdownMenu(
@@ -37,6 +38,7 @@ fun RelaysDropdownMenu(
             onToggleAutopilot?.let { onToggle ->
                 CheckboxDropdownMenuItem(
                     isChecked = isChecked,
+                    enabled = isChecked || autopilotEnabled == true,
                     text = stringResource(id = R.string.autopilot),
                     contentPadding = PaddingValues(start = spacing.medium, end = spacing.xl),
                     onToggle = onToggle,

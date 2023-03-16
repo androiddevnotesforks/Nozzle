@@ -152,6 +152,7 @@ private fun FeedTopBar(
                     onClickIndex = onToggleRelayIndex,
                     onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                     isAutopilot = feedSettings.relaySelection is UserSpecific,
+                    autopilotEnabled = feedSettings.authorSelection !is Everyone,
                     onToggleAutopilot = onToggleAutopilot,
                 )
                 Spacer(modifier = Modifier.width(spacing.large))

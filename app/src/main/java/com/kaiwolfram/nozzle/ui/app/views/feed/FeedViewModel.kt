@@ -71,10 +71,6 @@ class FeedViewModel(
             it.copy(
                 pubkey = personalProfileProvider.getPubkey(),
                 feedSettings = feedSettingsPreferences.getFeedSettings(),
-                relayStatuses = listRelayStatuses(
-                    allRelayUrls = relayProvider.getReadRelays(),
-                    relaySelection = viewModelState.value.feedSettings.relaySelection
-                )
             )
         }
         viewModelScope.launch(context = IO) {
@@ -132,7 +128,15 @@ class FeedViewModel(
                         Contacts
                     }
                 }
-                it.copy(feedSettings = it.feedSettings.copy(authorSelection = newValue))
+                it.copy(
+                    feedSettings = it.feedSettings.copy(
+                        authorSelection = newValue,
+                        // Autopilot is not allowed for global feed.
+                        // Relays are set in onRefreshOnMenuDismiss.
+                        relaySelection = if (newValue is Everyone) MultipleRelays(listOf())
+                        else it.feedSettings.relaySelection
+                    )
+                )
             }
         }
     }
@@ -162,16 +166,22 @@ class FeedViewModel(
     }
 
     val onToggleAutopilot: () -> Unit = {
-        this.toggledAutopilot = !this.toggledAutopilot
-        viewModelState.value.feedSettings.relaySelection.let { oldValue ->
-            // No need to set input. It will be updated in onRefreshOnMenuDismiss
-            val newValue = if (oldValue is UserSpecific) {
-                MultipleRelays(relays = listOf())
-            } else UserSpecific(pubkeysPerRelay = lastAutopilotResult)
-            viewModelState.update {
-                it.copy(feedSettings = it.feedSettings.copy(relaySelection = newValue))
+        if (autopilotIsToggleable()) {
+            this.toggledAutopilot = !this.toggledAutopilot
+            viewModelState.value.feedSettings.relaySelection.let { oldValue ->
+                // No need to set input. It will be updated in onRefreshOnMenuDismiss
+                val newValue = if (oldValue is UserSpecific) {
+                    MultipleRelays(relays = listOf())
+                } else UserSpecific(pubkeysPerRelay = lastAutopilotResult)
+                viewModelState.update {
+                    it.copy(feedSettings = it.feedSettings.copy(relaySelection = newValue))
+                }
             }
         }
+    }
+
+    private fun autopilotIsToggleable(): Boolean {
+        return viewModelState.value.feedSettings.authorSelection !is Everyone
     }
 
     val onToggleRelayIndex: (Int) -> Unit = { index ->
@@ -303,12 +313,13 @@ class FeedViewModel(
     private suspend fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
         val relaySelection = when (viewModelState.value.feedSettings.relaySelection) {
             is UserSpecific -> UserSpecific(getAndCacheAutopilotRelays())
-            is MultipleRelays, is AllRelays -> {
+            is MultipleRelays -> {
                 val selectedRelays = (newRelayStatuses ?: viewModelState.value.relayStatuses)
                     .filter { it.isActive }
                     .map { it.relayUrl }
                 MultipleRelays(relays = selectedRelays)
             }
+            is AllRelays -> AllRelays
         }
         val newStatuses = newRelayStatuses ?: listRelayStatuses(
             allRelayUrls = (lastAutopilotResult.map { it.key } + relayProvider.getReadRelays())

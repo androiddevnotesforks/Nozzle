@@ -72,6 +72,7 @@ fun ChooseRelayButton(
     onClickIndex: (Int) -> Unit,
     onRefreshOnMenuDismiss: () -> Unit = { /*Do nothing*/ },
     isAutopilot: Boolean? = null,
+    autopilotEnabled: Boolean? = null,
     onToggleAutopilot: (() -> Unit)? = null
 ) {
     val showMenu = remember { mutableStateOf(false) }
@@ -84,6 +85,7 @@ fun ChooseRelayButton(
             showMenu.value = false
         },
         isAutopilot = isAutopilot,
+        autopilotEnabled = autopilotEnabled,
         onToggleAutopilot = onToggleAutopilot
     )
     Icon(
