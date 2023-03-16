@@ -206,11 +206,11 @@ class Event(
             it.size >= 2
                     && it.first() == "r"
                     && it[1].startsWith("wss://") // TODO: Better URL check
-                    && it[1].length >= 10 // TODO: Better URL check
+                    && it[1].length >= 10
         }.map {
             val restriction = it.getOrNull(2)
             Nip65Entry(
-                url = it[1],
+                url = it[1].trim().trimEnd('/', ' '),
                 isRead = restriction == null || restriction == "read",
                 isWrite = restriction == null || restriction == "write",
             )
