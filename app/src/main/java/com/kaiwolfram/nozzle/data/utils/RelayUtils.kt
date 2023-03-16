@@ -13,11 +13,15 @@ fun listRelayStatuses(
     relaySelection: RelaySelection
 ): List<RelayActive> {
     return allRelayUrls.map {
+        var count = 0
         val isActive = when (relaySelection) {
             is AllRelays -> true
             is MultipleRelays -> relaySelection.getSelectedRelays().contains(it)
-            is UserSpecific -> relaySelection.getSelectedRelays().contains(it)
+            is UserSpecific -> {
+                count = relaySelection.pubkeysPerRelay[it].orEmpty().size
+                relaySelection.getSelectedRelays().contains(it)
+            }
         }
-        RelayActive(relayUrl = it, isActive = isActive)
+        RelayActive(relayUrl = it, isActive = isActive, count = count)
     }
 }

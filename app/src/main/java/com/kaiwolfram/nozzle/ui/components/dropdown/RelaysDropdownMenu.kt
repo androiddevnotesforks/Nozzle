@@ -51,6 +51,7 @@ fun RelaysDropdownMenu(
             CheckboxDropdownMenuItem(
                 isChecked = item.isActive,
                 text = item.relayUrl.removePrefix("wss://"),
+                count = if (isAutopilotUI) item.count else null,
                 contentPadding = PaddingValues(start = spacing.medium, end = spacing.xl),
                 enabled = !isAutopilotUI,
                 onToggle = { onClickIndex(index) }
