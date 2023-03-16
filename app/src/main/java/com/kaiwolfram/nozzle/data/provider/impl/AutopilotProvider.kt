@@ -45,7 +45,6 @@ class AutopilotProvider(
         }
 
         return mergeResult(result)
-
     }
 
     private suspend fun processNip65(
@@ -57,8 +56,7 @@ class AutopilotProvider(
             .toList()
             .sortedByDescending { it.second.size }
             .forEach {
-                val pubkeysToAdd = mutableSetOf<String>()
-                pubkeysToAdd.addAll(it.second.minus(processedPubkeys))
+                val pubkeysToAdd = it.second.minus(processedPubkeys)
                 if (pubkeysToAdd.isNotEmpty()) {
                     processedPubkeys.addAll(pubkeysToAdd)
                     result.add(Pair(it.first, pubkeysToAdd))
@@ -80,8 +78,7 @@ class AutopilotProvider(
             .toList()
             .sortedByDescending { it.second.size }
             .forEach {
-                val pubkeysToAdd = mutableSetOf<String>()
-                pubkeysToAdd.addAll(it.second.minus(processedPubkeys).minus(newlyProcessedPubkeys))
+                val pubkeysToAdd = it.second.minus(processedPubkeys).minus(newlyProcessedPubkeys)
                 if (pubkeysToAdd.isNotEmpty()) {
                     newlyProcessedPubkeys.addAll(pubkeysToAdd)
                     newlyProcessedEventRelays.add(Pair(it.first, pubkeysToAdd))
@@ -106,12 +103,9 @@ class AutopilotProvider(
     ) {
         Log.d(TAG, "Default to your read relays for ${pubkeys.size} pubkeys")
 
-        var personalReadRelays = nip65Dao.getReadRelaysOfPubkey(
-            pubkey = pubkeyProvider.getPubkey()
-        )
-        if (personalReadRelays.isEmpty()) personalReadRelays = getDefaultRelays()
-
-        personalReadRelays.firstOrNull()
+        nip65Dao.getReadRelaysOfPubkey(pubkey = pubkeyProvider.getPubkey())
+            .ifEmpty { getDefaultRelays() }
+            .randomOrNull()
             ?.let {
                 result.add(Pair(it, pubkeys.toSet()))
                 processedPubkeys.addAll(pubkeys)
