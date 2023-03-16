@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.kaiwolfram.nostrclientkt.model.Metadata
 import com.kaiwolfram.nozzle.R
 import com.kaiwolfram.nozzle.data.getDefaultRelays
+import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.postCardInteractor.IPostCardInteractor
 import com.kaiwolfram.nozzle.data.profileFollower.IProfileFollower
 import com.kaiwolfram.nozzle.data.provider.IFeedProvider
@@ -35,6 +36,7 @@ class ProfileViewModel(
     private val profileFollower: IProfileFollower,
     private val postCardInteractor: IPostCardInteractor,
     private val pubkeyProvider: IPubkeyProvider,
+    private val nostrSubscriber: INostrSubscriber,
     private val nip65Dao: Nip65Dao,
     context: Context,
     clip: ClipboardManager,
@@ -196,6 +198,7 @@ class ProfileViewModel(
             if (pubkey == profileState.value.pubkey) feedState.value else listOf(),
         )
         forceRecomposition.update { it + 1 }
+        renewAdditionalDataSubscription()
     }
 
     private val isAppending = AtomicBoolean(false)
@@ -223,6 +226,15 @@ class ProfileViewModel(
             isAppending.set(false)
             forceRecomposition.update { it + 1 }
         }
+        renewAdditionalDataSubscription()
+    }
+
+    private suspend fun renewAdditionalDataSubscription() {
+        nostrSubscriber.unsubscribeAdditionalPostsData()
+        nostrSubscriber.subscribeToAdditionalPostsData(
+            posts = feedState.value.takeLast(DB_BATCH_SIZE),
+            relays = getRelays()
+        )
     }
 
     private fun setUIRefresh(value: Boolean) {
@@ -234,11 +246,13 @@ class ProfileViewModel(
             isPosts = true,
             isReplies = true,
             authorSelection = SingleAuthor(profileState.value.pubkey),
-            relaySelection = MultipleRelays(
-                relays = nip65Dao.getWriteRelaysOfPubkey(profileState.value.pubkey)
-                    .ifEmpty { getDefaultRelays() }
-            )
+            relaySelection = MultipleRelays(relays = getRelays())
         )
+    }
+
+    private suspend fun getRelays(): List<String> {
+        return nip65Dao.getWriteRelaysOfPubkey(profileState.value.pubkey)
+            .ifEmpty { getDefaultRelays() }
     }
 
     companion object {
@@ -249,6 +263,7 @@ class ProfileViewModel(
             relayProvider: IRelayProvider,
             profileProvider: IProfileWithAdditionalInfoProvider,
             pubkeyProvider: IPubkeyProvider,
+            nostrSubscriber: INostrSubscriber,
             nip65Dao: Nip65Dao,
             context: Context,
             clip: ClipboardManager,
@@ -263,6 +278,7 @@ class ProfileViewModel(
                         profileProvider = profileProvider,
                         pubkeyProvider = pubkeyProvider,
                         relayProvider = relayProvider,
+                        nostrSubscriber = nostrSubscriber,
                         nip65Dao = nip65Dao,
                         context = context,
                         clip = clip,

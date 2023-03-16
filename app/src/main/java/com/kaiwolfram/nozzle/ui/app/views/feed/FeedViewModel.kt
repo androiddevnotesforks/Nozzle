@@ -232,7 +232,6 @@ class FeedViewModel(
         updateScreen()
         setUIRefresh(false)
         delay(WAIT_TIME)
-        renewAdditionalDataSubscription()
     }
 
     private suspend fun updateScreen() {
@@ -247,6 +246,7 @@ class FeedViewModel(
             SharingStarted.Eagerly,
             feedState.value,
         )
+        renewAdditionalDataSubscription()
     }
 
     private val isAppending = AtomicBoolean(false)
@@ -270,6 +270,7 @@ class FeedViewModel(
             Log.i(TAG, "New feed length ${feedState.value.size}")
             isAppending.set(false)
         }
+        renewAdditionalDataSubscription()
     }
 
     private fun subscribeToPersonalProfile() {
@@ -290,7 +291,7 @@ class FeedViewModel(
     private suspend fun renewAdditionalDataSubscription() {
         nostrSubscriber.unsubscribeAdditionalPostsData()
         nostrSubscriber.subscribeToAdditionalPostsData(
-            posts = feedState.value,
+            posts = feedState.value.takeLast(DB_BATCH_SIZE),
             relays = getSelectedRelays()
         )
     }
