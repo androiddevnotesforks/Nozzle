@@ -12,8 +12,9 @@ private const val TAG = "Client"
 
 class Client {
     private val httpClient = OkHttpClient()
-    private val sockets: HashMap<String, WebSocket> = HashMap()
-    private val subscriptions: HashMap<String, WebSocket> = HashMap()
+    private val sockets: MutableMap<String, WebSocket> = Collections.synchronizedMap(mutableMapOf())
+    private val subscriptions: MutableMap<String, WebSocket> =
+        Collections.synchronizedMap(mutableMapOf())
     private var nostrListener: NostrListener? = null
     private val baseListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -47,10 +48,12 @@ class Client {
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            removeSocket(socket = webSocket)
             nostrListener?.onClose(reason)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            removeSocket(socket = webSocket)
             nostrListener?.onFailure(response?.message, t)
         }
     }
@@ -139,4 +142,18 @@ class Client {
         return sockets.entries.find { it.value == webSocket }?.key
     }
 
+    private fun removeSocket(socket: WebSocket) {
+        val removedUrls = mutableSetOf<String>()
+        var removedSubCount = 0
+        sockets.filter { it.value == socket }.forEach {
+            removedUrls.add(it.key)
+            sockets.remove(it.key)
+        }
+        subscriptions.filter { it.value == socket }.forEach {
+            removedSubCount += 1
+            subscriptions.remove(it.key)
+        }
+        Log.i(TAG, "Removed socket of $removedUrls")
+        Log.i(TAG, "Removed socket of $removedSubCount subscriptions")
+    }
 }
