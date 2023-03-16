@@ -68,6 +68,7 @@ class EventProcessor(
                     pubkey = event.pubkey,
                     replyToId = event.getReplyId(),
                     replyToRootId = event.getRootReplyId(),
+                    replyRelayHint = event.getReplyRelayHint(),
                     repostedId = event.getRepostedId(),
                     content = event.content,
                     createdAt = event.createdAt,

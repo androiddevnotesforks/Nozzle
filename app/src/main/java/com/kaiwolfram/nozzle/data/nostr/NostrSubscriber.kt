@@ -4,9 +4,11 @@ import android.util.Log
 import com.kaiwolfram.nostrclientkt.model.Filter
 import com.kaiwolfram.nozzle.data.room.dao.PostDao
 import com.kaiwolfram.nozzle.data.utils.getCurrentTimeInSeconds
+import com.kaiwolfram.nozzle.data.utils.getIdsPerRelayHintMap
 import com.kaiwolfram.nozzle.data.utils.listReferencedPostIds
 import com.kaiwolfram.nozzle.data.utils.listReferencedPubkeys
 import com.kaiwolfram.nozzle.model.PostWithMeta
+import java.util.*
 
 private const val TAG = "NostrSubscriber"
 
@@ -15,11 +17,12 @@ class NostrSubscriber(
     private val nostrService: INostrService,
     private val postDao: PostDao
 ) : INostrSubscriber {
-    private val feedSubscriptions = mutableListOf<String>()
-    private val threadSubscriptions = mutableListOf<String>()
-    private val additionalFeedDataSubscriptions = mutableListOf<String>()
-    private val profileSubscriptions = mutableListOf<String>()
-    private val nip65Subscriptions = mutableListOf<String>()
+    private val feedSubscriptions = Collections.synchronizedList(mutableListOf<String>())
+    private val threadSubscriptions = Collections.synchronizedList(mutableListOf<String>())
+    private val additionalFeedDataSubscriptions =
+        Collections.synchronizedList(mutableListOf<String>())
+    private val profileSubscriptions = Collections.synchronizedList(mutableListOf<String>())
+    private val nip65Subscriptions = Collections.synchronizedList(mutableListOf<String>())
 
     override fun subscribeToProfileMetadataAndContactList(
         pubkeys: Collection<String>,
@@ -89,8 +92,36 @@ class NostrSubscriber(
             filters = filters,
             unsubOnEOSE = true,
             relays = relays,
-        )
+        ).toMutableList()
+        ids.addAll(subscribeToReplyRelayHint(posts, relays))
         additionalFeedDataSubscriptions.addAll(ids)
+
+        return ids
+    }
+
+    private fun subscribeToReplyRelayHint(
+        posts: Collection<PostWithMeta>,
+        relays: Collection<String>?,
+    ): List<String> {
+        val ids = mutableListOf<String>()
+        getIdsPerRelayHintMap(posts = posts).forEach { (relayHint, hintedPostIds) ->
+            // TODO: Relay URL utils for checking this
+            if (relays?.contains(relayHint) == false
+                && relayHint.startsWith("wss://")
+                && hintedPostIds.isNotEmpty()
+            ) {
+                Log.i(
+                    TAG,
+                    "Subscribe to reply relay hint of ${hintedPostIds.size} posts in $relayHint"
+                )
+                val relayHintIds = nostrService.subscribe(
+                    filters = listOf(Filter.createPostFilter(ids = hintedPostIds)),
+                    unsubOnEOSE = true,
+                    relays = listOf(relayHint),
+                )
+                ids.addAll(relayHintIds)
+            }
+        }
 
         return ids
     }

@@ -19,9 +19,14 @@ class ThreadProvider(
     override suspend fun getThreadFlow(
         currentPostId: String,
         replyToId: String?,
+        relays: List<String>?,
         waitForSubscription: Long?
     ): Flow<PostThread> {
-        renewThreadSubscription(currentPostId = currentPostId, replyToId = replyToId)
+        renewThreadSubscription(
+            currentPostId = currentPostId,
+            replyToId = replyToId,
+            relays = relays
+        )
         waitForSubscription?.let { delay(it) }
 
         val threadEnd = postDao.getThreadEnd(
@@ -36,12 +41,17 @@ class ThreadProvider(
         return getMappedThreadFlow(current, previous, replies)
     }
 
-    private fun renewThreadSubscription(currentPostId: String, replyToId: String?) {
+    private fun renewThreadSubscription(
+        currentPostId: String,
+        replyToId: String?,
+        relays: List<String>?
+    ) {
         nostrSubscriber.unsubscribeThread()
         nostrSubscriber.subscribeToThread(
             currentPostId = currentPostId,
             replyToId = replyToId,
-            replyToRootId = replyToId
+            replyToRootId = replyToId,
+            relays = relays
         )
     }
 

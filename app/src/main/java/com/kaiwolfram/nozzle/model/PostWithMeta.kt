@@ -6,6 +6,7 @@ data class PostWithMeta(
     val replyToRootId: String?,
     val replyToName: String?,
     val replyToPubkey: String?,
+    val replyRelayHint: String?,
     val pubkey: String,
     val createdAt: Long,
     val content: String,

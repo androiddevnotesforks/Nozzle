@@ -108,6 +108,7 @@ class ThreadViewModel(
             currentPostId = postIds.id,
             replyToId = postIds.replyToId,
             waitForSubscription = waitForSubscription,
+            relays = getRelays(thread = initValue)
         )
             .stateIn(
                 viewModelScope,
@@ -128,7 +129,10 @@ class ThreadViewModel(
 
     private suspend fun renewAdditionalDataSubscription(thread: PostThread) {
         nostrSubscriber.unsubscribeAdditionalPostsData()
-        nostrSubscriber.subscribeToAdditionalPostsData(thread.getList())
+        nostrSubscriber.subscribeToAdditionalPostsData(
+            posts = thread.getList(),
+            relays = getRelays(thread = thread),
+        )
     }
 
     private fun setEmptyThread() {
@@ -151,6 +155,10 @@ class ThreadViewModel(
                 null
             }
         }
+    }
+
+    private fun getRelays(thread: PostThread): List<String> {
+        return (relayProvider.getReadRelays() + thread.getList().flatMap { it.relays }).distinct()
     }
 
     companion object {

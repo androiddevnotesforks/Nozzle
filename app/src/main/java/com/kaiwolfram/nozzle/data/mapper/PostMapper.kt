@@ -41,6 +41,7 @@ class PostMapper(
                     replyToRootId = it.replyToRootId,
                     replyToName = "",
                     replyToPubkey = "",
+                    replyRelayHint = it.replyRelayHint,
                     pubkey = it.pubkey,
                     createdAt = it.createdAt,
                     content = it.content,

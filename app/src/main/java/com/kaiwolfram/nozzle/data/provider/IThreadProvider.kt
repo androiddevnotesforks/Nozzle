@@ -7,6 +7,7 @@ interface IThreadProvider {
     suspend fun getThreadFlow(
         currentPostId: String,
         replyToId: String?,
+        relays: List<String>?,
         waitForSubscription: Long? = null
     ): Flow<PostThread>
 }

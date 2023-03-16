@@ -26,3 +26,16 @@ fun listReferencedPostIds(posts: Collection<PostWithMeta>): List<String> {
 
     return referencedPostIds.distinct()
 }
+
+fun getIdsPerRelayHintMap(posts: Collection<PostWithMeta>): Map<String, List<String>> {
+    val result = mutableMapOf<String, MutableList<String>>()
+
+    posts.forEach { post ->
+        if (post.replyRelayHint != null && post.replyToId != null) {
+            val current = result.putIfAbsent(post.replyRelayHint, mutableListOf(post.replyToId))
+            if (current != null) result[post.replyRelayHint]?.add(post.replyToId)
+        }
+    }
+
+    return result
+}

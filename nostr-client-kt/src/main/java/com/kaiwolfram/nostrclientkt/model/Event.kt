@@ -11,6 +11,7 @@ import fr.acinq.secp256k1.Hex
 typealias Tag = List<String>
 
 fun Tag.getNip10Marker() = this.getOrNull(3)
+fun Tag.getNip10RelayHint() = this.getOrNull(2)
 
 class Event(
     val id: String,
@@ -186,6 +187,32 @@ class Event(
 
         // nip10 relational (deprecated)
         return eventTags[0][1]
+    }
+
+    fun getReplyRelayHint(): String? {
+        // Like getReplyId but with checking relay hint
+        val eventTags = tags.filter {
+            it.size in 2..4
+                    && it[0] == "e"
+                    && it.getNip10RelayHint()?.isNotBlank() == true
+                    && (
+                    when (it.getNip10Marker()) {
+                        "reply" -> true
+                        "root" -> true
+                        null -> true
+                        else -> false
+                    }
+                    )
+        }
+        if (eventTags.isEmpty()) return null
+
+        val nip10Reply = eventTags.find { it.getNip10Marker() == "reply" }
+        if (nip10Reply != null) return nip10Reply.getNip10RelayHint()
+
+        val nip10Root = eventTags.find { it.getNip10Marker() == "root" }
+        if (nip10Root != null) return nip10Root.getNip10RelayHint()
+
+        return null
     }
 
     fun getRepostedId(): String? {
