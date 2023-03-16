@@ -1,11 +1,11 @@
 package com.kaiwolfram.nozzle.data.provider.impl
 
+import com.kaiwolfram.nozzle.data.getDefaultRelays
 import com.kaiwolfram.nozzle.data.provider.IAutopilotProvider
 import com.kaiwolfram.nozzle.data.provider.IContactListProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
 import com.kaiwolfram.nozzle.data.provider.IRelayProvider
 import com.kaiwolfram.nozzle.data.room.dao.Nip65Dao
-import com.kaiwolfram.nozzle.model.getDefaultRelays
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted

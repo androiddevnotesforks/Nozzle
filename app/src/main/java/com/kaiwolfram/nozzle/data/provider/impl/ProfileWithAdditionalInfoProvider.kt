@@ -2,6 +2,7 @@ package com.kaiwolfram.nozzle.data.provider.impl
 
 import android.util.Log
 import com.kaiwolfram.nostrclientkt.model.Metadata
+import com.kaiwolfram.nozzle.data.getDefaultRelays
 import com.kaiwolfram.nozzle.data.nostr.INostrSubscriber
 import com.kaiwolfram.nozzle.data.provider.IProfileWithAdditionalInfoProvider
 import com.kaiwolfram.nozzle.data.provider.IPubkeyProvider
@@ -11,7 +12,6 @@ import com.kaiwolfram.nozzle.data.room.dao.Nip65Dao
 import com.kaiwolfram.nozzle.data.room.dao.ProfileDao
 import com.kaiwolfram.nozzle.data.utils.hexToNpub
 import com.kaiwolfram.nozzle.model.ProfileWithAdditionalInfo
-import com.kaiwolfram.nozzle.model.getDefaultRelays
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 

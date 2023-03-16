@@ -1,10 +1,10 @@
-package com.kaiwolfram.nozzle.model
+package com.kaiwolfram.nozzle.data
 
 
 private val defaultRelays = listOf(
     "wss://nos.lol",
-    "wss://nostr-pub.wellorder.net",
     "wss://nostr.einundzwanzig.space",
+    "wss://nostr-pub.wellorder.net",
 )
 
 fun getDefaultRelays(): List<String> = defaultRelays
