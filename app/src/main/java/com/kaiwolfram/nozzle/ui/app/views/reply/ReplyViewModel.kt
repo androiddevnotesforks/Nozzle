@@ -38,7 +38,7 @@ data class ReplyViewModelState(
 class ReplyViewModel(
     private val nostrService: INostrService,
     private val personalProfileProvider: IPersonalProfileProvider,
-    relayProvider: IRelayProvider,
+    private val relayProvider: IRelayProvider,
     private val postDao: PostDao,
     context: Context,
 ) : ViewModel() {
@@ -83,7 +83,7 @@ class ReplyViewModel(
                     reply = "",
                     isSendable = false,
                     relaySelection = listRelayStatuses(
-                        allRelayUrls = (relayProvider.getWriteRelays() + post.relays).distinct(),
+                        allRelayUrls = (post.relays + relayProvider.getWriteRelays()).distinct(),
                         relaySelection = AllRelays,
                     ),
                 )
@@ -156,6 +156,10 @@ class ReplyViewModel(
                 recipientName = "",
                 reply = "",
                 isSendable = false,
+                relaySelection = listRelayStatuses(
+                    allRelayUrls = relayProvider.getWriteRelays(),
+                    relaySelection = AllRelays,
+                ),
             )
         }
     }

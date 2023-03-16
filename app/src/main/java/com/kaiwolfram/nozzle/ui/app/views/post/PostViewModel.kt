@@ -76,9 +76,10 @@ class PostViewModel(
                     content = "",
                     isSendable = false,
                     relayStatuses = listRelayStatuses(
-                        allRelayUrls = (relayProvider.getWriteRelays() + relaySelection.getSelectedRelays()
-                            ?.toList().orEmpty()).distinct(),
-                        relaySelection = relaySelection
+                        allRelayUrls = (relaySelection.getSelectedRelays()
+                            .orEmpty() + relayProvider.getWriteRelays()
+                            .toList()).distinct(),
+                        relaySelection = AllRelays
                     ),
                 )
             }
@@ -120,14 +121,18 @@ class PostViewModel(
                 viewModelScope.launch(context = Dispatchers.IO) {
                     postDao.insertIfNotPresent(PostEntity.fromEvent(event))
                 }
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.post_published),
-                    Toast.LENGTH_SHORT
-                ).show()
+                showPostPublishedToast()
                 resetUI()
             }
         }
+    }
+
+    private val showPostPublishedToast: () -> Unit = {
+        Toast.makeText(
+            context,
+            context.getString(R.string.post_published),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun getErrorText(context: Context, state: PostViewModelState): String? {
