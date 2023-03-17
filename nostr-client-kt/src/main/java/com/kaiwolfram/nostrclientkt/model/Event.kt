@@ -190,7 +190,7 @@ class Event(
     }
 
     fun getReplyRelayHint(): String? {
-        // Like getReplyId but with checking relay hint
+        // Like getReplyId but with relay hint check
         val eventTags = tags.filter {
             it.size in 2..4
                     && it[0] == "e"

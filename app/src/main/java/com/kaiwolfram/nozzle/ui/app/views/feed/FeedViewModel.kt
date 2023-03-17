@@ -241,7 +241,6 @@ class FeedViewModel(
         subscribeToPersonalProfile()
         updateScreen()
         setUIRefresh(false)
-        delay(WAIT_TIME)
     }
 
     private suspend fun updateScreen() {
@@ -256,6 +255,7 @@ class FeedViewModel(
             SharingStarted.Eagerly,
             feedState.value,
         )
+        delay(WAIT_TIME)
         renewAdditionalDataSubscription()
     }
 
@@ -280,6 +280,7 @@ class FeedViewModel(
             Log.i(TAG, "New feed length ${feedState.value.size}")
             isAppending.set(false)
         }
+        delay(WAIT_TIME)
         renewAdditionalDataSubscription()
     }
 
