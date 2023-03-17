@@ -70,6 +70,7 @@ fun SendTopBarButton(
 fun ChooseRelayButton(
     relays: List<RelayActive>,
     onClickIndex: (Int) -> Unit,
+    isOpenable: Boolean = true,
     onRefreshOnMenuDismiss: () -> Unit = { /*Do nothing*/ },
     isAutopilot: Boolean? = null,
     autopilotEnabled: Boolean? = null,
@@ -91,7 +92,7 @@ fun ChooseRelayButton(
     Icon(
         modifier = Modifier
             .clip(CircleShape)
-            .clickable { showMenu.value = true },
+            .clickable { if (isOpenable) showMenu.value = true },
         imageVector = Icons.Default.CellTower,
         contentDescription = stringResource(id = R.string.choose_relays),
     )
@@ -104,6 +105,7 @@ fun FeedSettingsButton(
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
     onToggleReplies: () -> Unit,
+    isOpenable: Boolean = true,
 ) {
     val showMenu = remember { mutableStateOf(false) }
     FeedSettingsDropdownMenu(
@@ -121,7 +123,7 @@ fun FeedSettingsButton(
         modifier = Modifier
             .clip(CircleShape)
             .size(sizing.mediumIcon)
-            .clickable { showMenu.value = true },
+            .clickable { if (isOpenable) showMenu.value = true },
         imageVector = Icons.Default.SettingsSuggest,
         contentDescription = stringResource(id = R.string.feed_settings),
     )

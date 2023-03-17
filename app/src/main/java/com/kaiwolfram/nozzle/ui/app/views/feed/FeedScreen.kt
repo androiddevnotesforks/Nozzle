@@ -66,6 +66,7 @@ fun FeedScreen(
                 pubkey = uiState.pubkey,
                 feedSettings = uiState.feedSettings,
                 relayStatuses = uiState.relayStatuses,
+                isRefreshing = uiState.isRefreshing,
                 onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                 onToggleContactsOnly = onToggleContactsOnly,
                 onTogglePosts = onTogglePosts,
@@ -114,6 +115,7 @@ private fun FeedTopBar(
     pubkey: String,
     feedSettings: FeedSettings,
     relayStatuses: List<RelayActive>,
+    isRefreshing: Boolean,
     onRefreshOnMenuDismiss: () -> Unit,
     onToggleContactsOnly: () -> Unit,
     onTogglePosts: () -> Unit,
@@ -149,6 +151,7 @@ private fun FeedTopBar(
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.15f)) {
                 ChooseRelayButton(
                     relays = relayStatuses,
+                    isOpenable = !isRefreshing,
                     onClickIndex = onToggleRelayIndex,
                     onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                     isAutopilot = feedSettings.relaySelection is UserSpecific,
@@ -158,6 +161,7 @@ private fun FeedTopBar(
                 Spacer(modifier = Modifier.width(spacing.large))
                 FeedSettingsButton(
                     feedSettings = feedSettings,
+                    isOpenable = !isRefreshing,
                     onRefreshOnMenuDismiss = onRefreshOnMenuDismiss,
                     onToggleContactsOnly = onToggleContactsOnly,
                     onTogglePosts = onTogglePosts,
