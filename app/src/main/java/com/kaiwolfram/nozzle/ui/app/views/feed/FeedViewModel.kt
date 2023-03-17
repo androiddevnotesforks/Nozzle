@@ -313,7 +313,14 @@ class FeedViewModel(
 
     private suspend fun updateRelaySelection(newRelayStatuses: List<RelayActive>? = null) {
         val relaySelection = when (viewModelState.value.feedSettings.relaySelection) {
-            is UserSpecific -> UserSpecific(getAndCacheAutopilotRelays())
+            is UserSpecific -> {
+                val autopilotRelays = getAndCacheAutopilotRelays()
+                if (autopilotRelays.any { it.value.isNotEmpty() }) {
+                    UserSpecific(pubkeysPerRelay = autopilotRelays)
+                } else {
+                    AllRelays
+                }
+            }
             is MultipleRelays -> {
                 val selectedRelays = (newRelayStatuses ?: viewModelState.value.relayStatuses)
                     .filter { it.isActive }
