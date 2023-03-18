@@ -1,9 +1,6 @@
 package com.kaiwolfram.nozzle.data.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.kaiwolfram.nozzle.data.room.entity.ContactEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -91,15 +88,18 @@ interface ContactDao {
     fun isFollowedFlow(pubkey: String, contactPubkey: String): Flow<Boolean>
 
     @Query(
-        "SELECT MAX(createdAt) " +
-                "FROM contact " +
-                "WHERE pubkey = :pubkey"
-    )
-    suspend fun getLatestTimestamp(pubkey: String): Long?
-
-    @Query(
         "DELETE FROM contact " +
-                "WHERE pubkey = :pubkey"
+                "WHERE pubkey = :pubkey AND createdAt < :newTimestamp"
     )
-    suspend fun deleteList(pubkey: String)
+    suspend fun deleteIfOutdated(pubkey: String, newTimestamp: Long)
+
+    @Transaction
+    suspend fun insertAndDeleteOutdated(
+        pubkey: String,
+        newTimestamp: Long,
+        vararg contacts: ContactEntity
+    ) {
+        deleteIfOutdated(pubkey = pubkey, newTimestamp = newTimestamp)
+        insertOrIgnore(*contacts)
+    }
 }

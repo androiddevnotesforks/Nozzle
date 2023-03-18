@@ -75,7 +75,6 @@ class EventProcessor(
                 )
             )
         }
-
     }
 
     private fun processReaction(event: Event) {
@@ -99,21 +98,19 @@ class EventProcessor(
         idCache.add(event.id)
 
         scope.launch {
-            // TODO: dao.deleteIfOutdated():Boolean to save one call
-            // TODO: room Transaction
-            val latestTimestamp = contactDao.getLatestTimestamp(event.pubkey) ?: 0
-            if (event.createdAt > latestTimestamp) {
-                contactDao.deleteList(pubkey = event.pubkey)
-                val contacts = getContactPubkeysAndRelayUrls(event.tags).map {
-                    ContactEntity(
-                        pubkey = event.pubkey,
-                        contactPubkey = it.first,
-                        relayUrl = it.second,
-                        createdAt = event.createdAt
-                    )
-                }
-                contactDao.insertOrIgnore(*contacts.toTypedArray())
+            val contacts = getContactPubkeysAndRelayUrls(event.tags).map {
+                ContactEntity(
+                    pubkey = event.pubkey,
+                    contactPubkey = it.first,
+                    relayUrl = it.second,
+                    createdAt = event.createdAt
+                )
             }
+            contactDao.insertAndDeleteOutdated(
+                pubkey = event.pubkey,
+                newTimestamp = event.createdAt,
+                *contacts.toTypedArray()
+            )
         }
     }
 
@@ -126,10 +123,9 @@ class EventProcessor(
         Log.d(TAG, "Process profile event ${event.content}")
         deserializeMetadata(event.content)?.let {
             scope.launch {
-                // TODO: Return if deleted to save insert call
-                // TODO: room Transaction
-                profileDao.deleteIfOutdated(pubkey = event.pubkey, createdAt = event.createdAt)
-                profileDao.insertOrIgnore(
+                profileDao.insertAndDeleteOutdated(
+                    pubkey = event.pubkey,
+                    newTimestamp = event.createdAt,
                     ProfileEntity(
                         pubkey = event.pubkey,
                         name = it.name.orEmpty(),
@@ -175,7 +171,7 @@ class EventProcessor(
     private fun verify(event: Event): Boolean {
         val isValid = event.verify()
         if (!isValid) {
-            Log.d(TAG, "Invalid event ${event.id} kind ${event.kind}")
+            Log.w(TAG, "Invalid event ${event.id} kind ${event.kind}")
         }
         return isValid
     }

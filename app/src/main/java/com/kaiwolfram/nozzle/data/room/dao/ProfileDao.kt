@@ -42,9 +42,19 @@ interface ProfileDao {
 
     @Query(
         "DELETE FROM profile " +
-                "WHERE pubkey = :pubkey AND createdAt < :createdAt"
+                "WHERE pubkey = :pubkey AND createdAt < :newTimestamp"
     )
-    suspend fun deleteIfOutdated(pubkey: String, createdAt: Long)
+    suspend fun deleteIfOutdated(pubkey: String, newTimestamp: Long)
+
+    @Transaction
+    suspend fun insertAndDeleteOutdated(
+        pubkey: String,
+        newTimestamp: Long,
+        profile: ProfileEntity
+    ) {
+        deleteIfOutdated(pubkey = pubkey, newTimestamp = newTimestamp)
+        insertOrIgnore(profile)
+    }
 
     @RewriteQueriesToDropUnusedColumns
     @MapInfo(keyColumn = "pubkey")

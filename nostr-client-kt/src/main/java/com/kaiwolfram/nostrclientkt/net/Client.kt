@@ -94,7 +94,7 @@ class Client {
 
     fun publishToRelays(event: Event, relays: Collection<String>? = null) {
         val request = """["EVENT",${event.toJson()}]"""
-        Log.i(TAG, "Publish $request to relays")
+        Log.i(TAG, "Publish $request to ${relays?.size} relays")
         relays?.let { addRelays(it) }
         for (relay in relays ?: sockets.keys) {
             val socket = sockets[relay]
