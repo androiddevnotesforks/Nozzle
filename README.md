@@ -34,9 +34,9 @@ file or clone this repository and build it yourself.
 - [x] Show on which relays posts have been seen on
 - [x] Relay selection for sending posts and replies
 - [x] Different feed settings
-- [ ] Relay management
 - [ ] Mentions
 - [ ] Notifications tab
+- [ ] Relay management
 - [ ] Quote repost
 - [ ] nip05 verification
 - [ ] Hashtags
@@ -44,10 +44,10 @@ file or clone this repository and build it yourself.
 - [ ] Profile lists (likes, reposts, following, followers)
 - [ ] Lightning tip button, invoice widget, zaps
 - [ ] Multiple accounts
-- [ ] Mute users
-- [ ] Encrypted direct messages
-- [ ] Export/Import events
-- [ ] Event signing with NFC card
+
+## Contributing
+
+Contributors are very welcome.
 
 ## License
 
