@@ -3,6 +3,7 @@ package com.kaiwolfram.nozzle.data.room.dao
 import androidx.room.Dao
 import androidx.room.MapInfo
 import androidx.room.Query
+import com.kaiwolfram.nozzle.model.CountedRelayUsage
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,14 +22,15 @@ interface EventRelayDao {
     )
     fun getRelaysPerEventIdMapFlow(eventIds: Collection<String>): Flow<Map<String, List<String>>>
 
-    @MapInfo(keyColumn = "relayUrl", valueColumn = "pubkey")
     @Query(
-        "SELECT eventRelay.relayUrl, post.pubkey " +
+        "SELECT post.pubkey, eventRelay.relayUrl, COUNT(eventRelay.relayUrl) AS numOfPosts " +
                 "FROM eventRelay " +
                 "JOIN post ON post.id = eventRelay.eventId " +
-                "WHERE post.pubkey IN (:pubkeys)"
+                "WHERE post.pubkey IN (:pubkeys) " +
+                "GROUP BY post.pubkey " +
+                "HAVING numOfPosts > 0"
     )
-    suspend fun getPubkeysPerRelayMap(pubkeys: Collection<String>): Map<String, Set<String>>
+    suspend fun getCountedRelaysPerPubkey(pubkeys: Collection<String>): List<CountedRelayUsage>
 
     @Query(
         "SELECT DISTINCT(relayUrl) " +

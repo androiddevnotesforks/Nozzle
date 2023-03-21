@@ -72,27 +72,31 @@ class AutopilotProvider(
         pubkeys: Collection<String>
     ) {
         val newlyProcessedPubkeys = mutableSetOf<String>()
-        val newlyProcessedEventRelays = mutableListOf<Pair<String, Set<String>>>()
+        val newlyProcessedEventRelays = mutableMapOf<String, MutableSet<String>>()
 
-        eventRelayDao.getPubkeysPerRelayMap(pubkeys = pubkeys)
-            .toList()
-            .sortedByDescending { it.second.size }
+        eventRelayDao.getCountedRelaysPerPubkey(pubkeys = pubkeys)
+            .sortedByDescending { it.numOfPosts }
             .forEach {
-                val pubkeysToAdd = it.second.minus(processedPubkeys).minus(newlyProcessedPubkeys)
-                if (pubkeysToAdd.isNotEmpty()) {
-                    newlyProcessedPubkeys.addAll(pubkeysToAdd)
-                    newlyProcessedEventRelays.add(Pair(it.first, pubkeysToAdd))
+                if (!newlyProcessedPubkeys.contains(it.pubkey)) {
+                    newlyProcessedPubkeys.add(it.pubkey)
+                    val current =
+                        newlyProcessedEventRelays.putIfAbsent(it.relayUrl, mutableSetOf(it.pubkey))
+                    current?.add(it.pubkey)
                 }
             }
 
         processedPubkeys.addAll(newlyProcessedPubkeys)
-        result.addAll(newlyProcessedEventRelays)
+        result.addAll(newlyProcessedEventRelays.toList())
 
         Log.d(
             TAG,
             "Processed ${newlyProcessedEventRelays.size} event relays for ${
                 newlyProcessedPubkeys.size
             } pubkeys"
+        )
+        Log.d(
+            TAG,
+            "Selected event relays ${newlyProcessedEventRelays.map { Pair(it.key, it.value.size) }}"
         )
     }
 
@@ -107,6 +111,7 @@ class AutopilotProvider(
             .ifEmpty { getDefaultRelays() }
             .randomOrNull()
             ?.let {
+                Log.d(TAG, "Selected default relay $it")
                 result.add(Pair(it, pubkeys.toSet()))
                 processedPubkeys.addAll(pubkeys)
             }
