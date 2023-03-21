@@ -1,6 +1,6 @@
 # Nozzle
 
-Nozzle is a Twitter-like nostr client for Android.
+Nozzle is a lightweight nostr client for Android.
 
 ## State
 
