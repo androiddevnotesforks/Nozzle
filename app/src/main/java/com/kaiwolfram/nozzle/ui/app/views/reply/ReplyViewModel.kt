@@ -127,6 +127,7 @@ class ReplyViewModel(
                         .ifEmpty { null }
                     val event = nostrService.sendReply(
                         replyTo = replyTo,
+                        replyToPubkey = parentPost.pubkey,
                         content = state.reply,
                         relays = selectedRelays
                     )

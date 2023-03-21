@@ -126,12 +126,13 @@ class NostrService(
 
     override fun sendReply(
         replyTo: ReplyTo,
+        replyToPubkey: String,
         content: String,
         relays: Collection<String>?
     ): Event {
-        Log.i(TAG, "Send reply to ${replyTo.replyTo} of root ${replyTo.replyToRoot}")
+        Log.i(TAG, "Send reply to ${replyTo.replyTo} from author $replyToPubkey")
         val event = Event.createTextNoteEvent(
-            post = Post(replyTo = replyTo, msg = content, mentions = listOf(replyTo.replyTo)),
+            post = Post(replyTo = replyTo, msg = content, mentions = listOf(replyToPubkey)),
             keys = keyManager.getKeys(),
         )
         client.publishToRelays(event = event, relays = relays)

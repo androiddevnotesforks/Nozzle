@@ -19,6 +19,7 @@ interface INostrService {
 
     fun sendReply(
         replyTo: ReplyTo,
+        replyToPubkey: String,
         content: String,
         relays: Collection<String>?
     ): Event
