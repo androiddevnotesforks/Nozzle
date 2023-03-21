@@ -1,7 +1,6 @@
 package com.kaiwolfram.nozzle.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -9,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.kaiwolfram.nozzle.model.RelayActive
+import com.kaiwolfram.nozzle.ui.theme.White21
 import com.kaiwolfram.nozzle.ui.theme.spacing
 
 @Composable
@@ -80,7 +80,7 @@ private fun BaseTopBar(
                     Text(
                         text = text,
                         style = typography.h6,
-                        color = colors.background
+                        color = White21,
                     )
                 }
             }

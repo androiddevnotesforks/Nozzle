@@ -25,7 +25,6 @@ import com.kaiwolfram.nozzle.model.FeedSettings
 import com.kaiwolfram.nozzle.model.RelayActive
 import com.kaiwolfram.nozzle.ui.components.dropdown.FeedSettingsDropdownMenu
 import com.kaiwolfram.nozzle.ui.components.dropdown.RelaysDropdownMenu
-import com.kaiwolfram.nozzle.ui.theme.LightGray21
 import com.kaiwolfram.nozzle.ui.theme.sizing
 
 @Composable
@@ -185,7 +184,6 @@ private fun TopBarButton(
             },
         imageVector = imageVector,
         contentDescription = description,
-        tint = if (hasChanges) colors.surface else LightGray21
     )
 }
 

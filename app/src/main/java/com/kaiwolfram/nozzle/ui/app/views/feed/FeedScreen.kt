@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -192,14 +191,13 @@ private fun Headline(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = typography.h6,
-            color = colors.background
         )
     }
 }
 
 @Composable
 private fun FeedFab(onPrepareNewPost: () -> Unit) {
-    FloatingActionButton(onClick = { onPrepareNewPost() }, contentColor = colors.surface) {
+    FloatingActionButton(onClick = { onPrepareNewPost() }, contentColor = White21) {
         AddIcon()
     }
 }

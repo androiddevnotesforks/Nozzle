@@ -1,8 +1,10 @@
 package com.kaiwolfram.nozzle.ui.components.text
 
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -24,7 +26,9 @@ fun HyperlinkedText(
     overflow: TextOverflow = TextOverflow.Ellipsis
 ) {
     if (text.isNotBlank()) {
-        val annotatedString = remember(text) { buildAnnotatedString(text) }
+        val textColor = colors.onSurface
+        val annotatedString =
+            remember(text) { buildAnnotatedString(text = text, textColor = textColor) }
         val uriHandler = LocalUriHandler.current
         ClickableText(
             text = annotatedString,
@@ -44,7 +48,7 @@ fun HyperlinkedText(
     }
 }
 
-private fun buildAnnotatedString(text: String): AnnotatedString {
+private fun buildAnnotatedString(text: String, textColor: Color): AnnotatedString {
     return buildAnnotatedString {
         append(text)
         extractUrls(text).forEach { url ->
@@ -66,7 +70,7 @@ private fun buildAnnotatedString(text: String): AnnotatedString {
             )
         }
         addStyle(
-            style = Typography.body1.toSpanStyle(),
+            style = Typography.body1.toSpanStyle().copy(color = textColor),
             start = 0,
             end = text.length
         )
