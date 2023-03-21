@@ -252,7 +252,13 @@ class ProfileViewModel(
 
     private suspend fun getRelays(): List<String> {
         return nip65Dao.getWriteRelaysOfPubkey(profileState.value.pubkey)
-            .ifEmpty { getDefaultRelays() }
+            .ifEmpty {
+                profileState.value
+                    .relays
+                    .shuffled()
+                    .take(10)  // Don't ask more than 10 relays
+                    .ifEmpty { getDefaultRelays() }
+            }
     }
 
     companion object {

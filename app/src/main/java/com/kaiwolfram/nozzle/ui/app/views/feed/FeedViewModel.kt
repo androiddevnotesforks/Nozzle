@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "FeedViewModel"
 private const val DB_BATCH_SIZE = 30
-private const val WAIT_TIME = 1200L
+private const val WAIT_TIME = 1300L
 
 data class FeedViewModelState(
     val isRefreshing: Boolean = false,

@@ -57,7 +57,12 @@ class ProfileWithAdditionalInfoProvider(
             nostrSubscriber.subscribeToProfileMetadataAndContactList(
                 pubkeys = listContactPubkeysIfIsOneself(pubkey = pubkey),
                 relays = nip65Dao.getWriteRelaysOfPubkey(pubkey = pubkey)
-                    .ifEmpty { getDefaultRelays() }
+                    .ifEmpty {
+                        relaysFlow.first()
+                            .shuffled()
+                            .take(10)  // Don't ask more than 10 relays
+                            .ifEmpty { getDefaultRelays() }
+                    }
             )
         }
         return mainFlow
