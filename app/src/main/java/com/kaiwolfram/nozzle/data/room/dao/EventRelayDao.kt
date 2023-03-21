@@ -23,11 +23,11 @@ interface EventRelayDao {
     fun getRelaysPerEventIdMapFlow(eventIds: Collection<String>): Flow<Map<String, List<String>>>
 
     @Query(
-        "SELECT post.pubkey, eventRelay.relayUrl, COUNT(eventRelay.relayUrl) AS numOfPosts " +
+        "SELECT post.pubkey, eventRelay.relayUrl, COUNT(post.id) AS numOfPosts " +
                 "FROM eventRelay " +
                 "JOIN post ON post.id = eventRelay.eventId " +
                 "WHERE post.pubkey IN (:pubkeys) " +
-                "GROUP BY post.pubkey " +
+                "GROUP BY post.pubkey, eventRelay.relayUrl " +
                 "HAVING numOfPosts > 0"
     )
     suspend fun getCountedRelaysPerPubkey(pubkeys: Collection<String>): List<CountedRelayUsage>
