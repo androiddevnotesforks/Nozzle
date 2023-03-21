@@ -191,6 +191,7 @@ private fun Headline(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = typography.h6,
+            color = White21,
         )
     }
 }
