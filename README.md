@@ -15,9 +15,9 @@ file or clone this repository and build it yourself.
 
 <p float="left">
 <img src="screenshots/feed.png" width="24%" height="24%" />
-<img src="screenshots/thread.png" width="24%" height="24%" />
 <img src="screenshots/friend_profile.png" width="24%" height="24%" />
-<img src="screenshots/keys.png" width="24%" height="24%" />
+<img src="screenshots/feed_dark.png" width="24%" height="24%" />
+<img src="screenshots/friend_profile_dark.png" width="24%" height="24%" />
 </p>
 
 ## Features
